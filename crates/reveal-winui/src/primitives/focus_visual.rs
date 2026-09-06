@@ -1,0 +1,127 @@
+//! XAML's system focus visual (`UseSystemFocusVisuals="True"`): a two-pixel primary ring outside the control with a one-pixel secondary ring inside it, offset by the control's `FocusVisualMargin`, shown for keyboard focus only.
+
+use crate::{Brush, Theme};
+use reveal_embedder::{Canvas, Color, Offset, RRect, Radius, Size};
+use reveal_foundation::App;
+use reveal_painting::draw_rrect;
+use reveal_rendering::CustomPainter;
+use reveal_widgets::*;
+
+/// XAML `SystemFocusVisualPrimaryThickness`.
+pub const FOCUS_VISUAL_PRIMARY_THICKNESS: f64 = 2.0;
+/// XAML `SystemFocusVisualSecondaryThickness`.
+pub const FOCUS_VISUAL_SECONDARY_THICKNESS: f64 = 1.0;
+
+/// Draws the focus rings around `child` when `visible`, `margin` (left, top, right, bottom; negative grows outward, as XAML's `FocusVisualMargin`) away from its bounds.
+#[derive(Clone, Debug)]
+pub struct FocusVisual {
+    pub child: WidgetRef,
+    pub visible: bool,
+    pub margin: [f64; 4],
+    pub corner_radius: f64,
+    pub theme: Theme,
+}
+
+impl FocusVisual {
+    pub fn new<K>(child: impl IntoWidget<K>, theme: Theme) -> FocusVisual {
+        FocusVisual {
+            child: child.into_widget(),
+            visible: false,
+            margin: [0.0; 4],
+            corner_radius: 0.0,
+            theme,
+        }
+    }
+
+    pub fn visible(mut self, visible: bool) -> FocusVisual {
+        self.visible = visible;
+        self
+    }
+
+    /// XAML `FocusVisualMargin`.
+    pub fn margin(mut self, margin: [f64; 4]) -> FocusVisual {
+        self.margin = margin;
+        self
+    }
+
+    pub fn corner_radius(mut self, radius: f64) -> FocusVisual {
+        self.corner_radius = radius;
+        self
+    }
+
+    /// `SystemControlFocusVisualPrimaryBrush`: the system's base-high colour, black in light and white in dark.
+    pub fn primary_color(theme: Theme) -> Color {
+        match theme {
+            Theme::Light => Color::from_argb(255, 0, 0, 0),
+            Theme::Dark => Color::from_argb(255, 255, 255, 255),
+        }
+    }
+
+    /// `SystemControlFocusVisualSecondaryBrush`: the system's alt-medium colour, white at 60 % in light and black at 60 % in dark.
+    pub fn secondary_color(theme: Theme) -> Color {
+        match theme {
+            Theme::Light => Color::from_argb(153, 255, 255, 255),
+            Theme::Dark => Color::from_argb(153, 0, 0, 0),
+        }
+    }
+}
+
+impl StatelessWidget for FocusVisual {
+    fn build(&self, _app: &mut App, _context: BuildContext) -> WidgetRef {
+        if !self.visible {
+            return self.child.clone();
+        }
+        let [left, top, right, bottom] = self.margin;
+        let ring = FocusRingPainter {
+            primary: Brush::Solid(FocusVisual::primary_color(self.theme)),
+            secondary: Brush::Solid(FocusVisual::secondary_color(self.theme)),
+            corner_radius: self.corner_radius - left.min(0.0),
+        };
+        Stack::new()
+            .clip_behavior(reveal_embedder::Clip::None)
+            .children(vec![
+                self.child.clone(),
+                Positioned::new(CustomPaint::new().painter(ring))
+                    .left(left)
+                    .top(top)
+                    .right(right)
+                    .bottom(bottom)
+                    .into_widget(),
+            ])
+            .into_widget()
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct FocusRingPainter {
+    primary: Brush,
+    secondary: Brush,
+    corner_radius: f64,
+}
+
+impl CustomPainter for FocusRingPainter {
+    fn paint(&self, _app: &mut App, canvas: &mut Canvas, size: Size) {
+        let bounds = Offset::ZERO & size;
+        let outer = RRect::from_rect_and_radius(bounds, Radius::circular(self.corner_radius));
+        draw_rrect(
+            canvas,
+            outer.deflate(FOCUS_VISUAL_PRIMARY_THICKNESS / 2.0),
+            &self.primary.stroke(bounds, FOCUS_VISUAL_PRIMARY_THICKNESS),
+        );
+        draw_rrect(
+            canvas,
+            outer.deflate(FOCUS_VISUAL_PRIMARY_THICKNESS + FOCUS_VISUAL_SECONDARY_THICKNESS / 2.0),
+            &self
+                .secondary
+                .stroke(bounds, FOCUS_VISUAL_SECONDARY_THICKNESS),
+        );
+    }
+
+    fn should_repaint(&self, _app: &App, old_delegate: &dyn CustomPainter) -> bool {
+        old_delegate.as_any().downcast_ref::<Self>() != Some(self)
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}

@@ -1,0 +1,122 @@
+//! WinUI's theme resources: the XAML `ResourceDictionary.ThemeDictionaries` (light, dark) and the OS accent palette, reachable from any widget through [`ThemeResources::of`] the way a template reaches `{ThemeResource X}`.
+
+mod generated;
+mod typography;
+pub use generated::*;
+pub use typography::*;
+
+use reveal_embedder::Color;
+use reveal_foundation::App;
+use reveal_widgets::{BuildContext, InheritedWidget, IntoWidget, MediaQuery, WidgetRef};
+
+/// XAML `ElementTheme` / the theme dictionary a lookup resolves in. High contrast is deferred: its values are the OS's system colours.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum Theme {
+    #[default]
+    Light,
+    Dark,
+}
+
+/// The `SystemAccentColor*` resources the OS supplies to every XAML app: the accent and its three lighter and three darker shades. Light theme controls use `dark1`, dark theme controls `light2`.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct AccentPalette {
+    pub base: Color,
+    pub light1: Color,
+    pub light2: Color,
+    pub light3: Color,
+    pub dark1: Color,
+    pub dark2: Color,
+    pub dark3: Color,
+}
+
+impl AccentPalette {
+    /// Windows 11's default blue. `dark1` (light-theme controls, #0067C0) and `light2` (dark-theme controls, #4CC2FF) are the published defaults; the other shades are the ramp Windows shows for that blue and should be verified against a Windows machine.
+    pub const WINDOWS_BLUE: AccentPalette = AccentPalette {
+        base: Color::from_argb(255, 0, 120, 212),
+        light1: Color::from_argb(255, 0, 145, 248),
+        light2: Color::from_argb(255, 76, 194, 255),
+        light3: Color::from_argb(255, 153, 235, 255),
+        dark1: Color::from_argb(255, 0, 103, 192),
+        dark2: Color::from_argb(255, 0, 62, 146),
+        dark3: Color::from_argb(255, 0, 26, 104),
+    };
+}
+
+impl Default for AccentPalette {
+    fn default() -> Self {
+        Self::WINDOWS_BLUE
+    }
+}
+
+/// The resolved theme a subtree renders with: the theme, the accent palette, and the shared Fluent tokens for that theme. Controls fetch their own `<Control>Resources` from it.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ThemeResources {
+    pub theme: Theme,
+    pub accent: AccentPalette,
+    pub common: CommonResources,
+}
+
+impl ThemeResources {
+    pub fn new(theme: Theme, accent: AccentPalette) -> ThemeResources {
+        ThemeResources {
+            theme,
+            accent,
+            common: CommonResources::for_theme(theme, &accent),
+        }
+    }
+
+    /// The nearest [`ThemeScope`]'s resources, or the platform's (light or dark from the media query, the default accent) when none encloses `context`.
+    pub fn of(app: &mut App, context: BuildContext) -> ThemeResources {
+        if let Some(scope) = context.depend_on_inherited_widget_of_exact_type::<ThemeScope>(app) {
+            return scope.resources.clone();
+        }
+        let theme = match MediaQuery::maybe_platform_brightness_of(app, context) {
+            Some(reveal_embedder::Brightness::Dark) => Theme::Dark,
+            _ => Theme::Light,
+        };
+        ThemeResources::new(theme, AccentPalette::default())
+    }
+
+    /// A control's own resources, as `{ThemeResource ButtonBackground}` resolves in this theme.
+    pub fn button(&self) -> ButtonResources {
+        ButtonResources::for_theme(self.theme, &self.accent)
+    }
+
+    pub fn toggle_switch(&self) -> ToggleSwitchResources {
+        ToggleSwitchResources::for_theme(self.theme, &self.accent)
+    }
+
+    pub fn check_box(&self) -> CheckBoxResources {
+        CheckBoxResources::for_theme(self.theme, &self.accent)
+    }
+}
+
+/// Sets the theme and accent for a subtree; XAML `FrameworkElement.RequestedTheme` plus the accent the OS would supply.
+#[derive(Debug)]
+pub struct ThemeScope {
+    pub resources: ThemeResources,
+    pub child: WidgetRef,
+}
+
+impl ThemeScope {
+    pub fn new<K>(theme: Theme, child: impl IntoWidget<K>) -> ThemeScope {
+        ThemeScope {
+            resources: ThemeResources::new(theme, AccentPalette::default()),
+            child: child.into_widget(),
+        }
+    }
+
+    pub fn accent(mut self, accent: AccentPalette) -> ThemeScope {
+        self.resources = ThemeResources::new(self.resources.theme, accent);
+        self
+    }
+}
+
+impl InheritedWidget for ThemeScope {
+    fn child(&self) -> &WidgetRef {
+        &self.child
+    }
+    fn update_should_notify(&self, old: &Self) -> bool {
+        self.resources != old.resources
+    }
+}
