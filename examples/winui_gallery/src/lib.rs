@@ -12,6 +12,9 @@ use reveal_widgets::*;
 use reveal_winui::*;
 use std::rc::Rc;
 
+/// The gallery switches directly between expanded and minimal navigation.
+const GALLERY_NAVIGATION_BREAKPOINT: f64 = 800.0;
+
 /// Registers the bundled Selawik faces under the kit's font family.
 pub fn install_fonts(app: &mut App) {
     install_icon_font(app);
@@ -198,6 +201,7 @@ impl GalleryState {
         app: &mut App,
         feature: Feature,
         resources: &ThemeResources,
+        horizontal_inset: f64,
     ) -> WidgetRef {
         let examples = match feature {
             Feature::Button => sections::button::build(self, resources),
@@ -236,7 +240,15 @@ impl GalleryState {
         // The shell supplies the page heading; each section's first widget is that same title.
         children.extend(examples.into_iter().skip(1));
         SingleChildScrollView::new()
-            .child(Padding::new(EdgeInsetsGeometry::all(32.0)).child(column(children, 20.0)))
+            .child(
+                Padding::new(EdgeInsetsGeometry::from_ltrb(
+                    horizontal_inset,
+                    32.0,
+                    horizontal_inset,
+                    32.0,
+                ))
+                .child(column(children, 20.0)),
+            )
             .into_widget()
     }
 }
@@ -245,7 +257,14 @@ impl State for GalleryState {
     type Widget = Gallery;
     reveal_widgets::state_accessors!();
 
-    fn build(self: Handle<Self>, app: &mut App, _context: BuildContext) -> WidgetRef {
+    fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
+        // Minimal HeaderContent follows the visible toggle column and its negative margin.
+        let horizontal_inset =
+            if MediaQuery::size_of(app, context).width() < GALLERY_NAVIGATION_BREAKPOINT {
+                PANE_TOGGLE_BUTTON_WIDTH + NAVIGATION_VIEW_MINIMAL_HEADER_MARGIN[0]
+            } else {
+                NAVIGATION_VIEW_HEADER_MARGIN[0]
+            };
         let state = app.get(self);
         let (dark, selected, visited) = (state.dark, state.selected, state.visited.clone());
         let theme = if dark { Theme::Dark } else { Theme::Light };
@@ -254,7 +273,7 @@ impl State for GalleryState {
             .into_iter()
             .map(|feature| {
                 let active = feature == selected;
-                let page = self.feature_page(app, feature, &resources);
+                let page = self.feature_page(app, feature, &resources, horizontal_inset);
                 KeyedSubtree::new(
                     Offstage::new().offstage(!active).child(TickerMode::new(
                         active,
@@ -294,8 +313,8 @@ impl State for GalleryState {
         );
         navigation.pane_title = "WinUI Gallery".to_owned();
         navigation.open_pane_length = 240.0;
-        navigation.compact_mode_threshold_width = 800.0;
-        navigation.expanded_mode_threshold_width = 800.0;
+        navigation.compact_mode_threshold_width = GALLERY_NAVIGATION_BREAKPOINT;
+        navigation.expanded_mode_threshold_width = GALLERY_NAVIGATION_BREAKPOINT;
         navigation.is_settings_visible = false;
         navigation.is_back_button_visible = NavigationViewBackButtonVisible::Collapsed;
         navigation.header = Some(label(
