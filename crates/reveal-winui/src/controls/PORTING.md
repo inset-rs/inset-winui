@@ -80,6 +80,7 @@ Ported against: aa3207e6
 - `RadioButton` arrow keys moving focus within a group, wrapping. Trigger: a group scope plus a traversal policy that can be told the candidates.
 - The header presenter's lazy load, written as omitting it without a header.
 - `ToggleSwitch`'s 83 ms colour fades into pointer-over, pressed and disabled, written discrete. Trigger: a `ColorTransition` whose duration varies per transition.
+- `ToggleSwitch` retains a tap target spanning the outer control, including the header, rather than only `SwitchThumb`. Trigger: a review of source-matched pointer hit areas using native reveal gestures.
 - `Grid` children with `Visibility="Collapsed"` (zero size, still in the cell), written as omitting the child.
 - `Slider`'s value tool tip: the `ToolTip` control is not ported. Trigger: `ToolTip` on an overlay, with the thumb-relative placement of `ToolTipService`.
 - `Slider` focus engagement and gamepad keys. Trigger: gamepad or remote input.

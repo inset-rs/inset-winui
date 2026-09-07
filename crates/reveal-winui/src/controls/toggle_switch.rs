@@ -8,12 +8,11 @@ use crate::{
     BackgroundSizing, Brush, CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS,
     CONTROL_FAST_ANIMATION_DURATION, CONTROL_FAST_OUT_SLOW_IN_KEY_SPLINE,
     CONTROL_FASTER_ANIMATION_DURATION, CONTROL_NORMAL_ANIMATION_DURATION, ColumnDefinition,
-    CommonState, CommonStates, ControlBorder, ControlStates, FocusVisual, Grid, GridCell,
-    GridLength, RowDefinition, TOGGLE_SWITCH_ON_STROKE_THICKNESS,
-    TOGGLE_SWITCH_OUTER_BORDER_STROKE_THICKNESS, TOGGLE_SWITCH_POST_CONTENT_MARGIN,
-    TOGGLE_SWITCH_PRE_CONTENT_MARGIN, TOGGLE_SWITCH_THEME_MIN_WIDTH,
-    TOGGLE_SWITCH_TOP_HEADER_MARGIN, Theme, ThemeResources, ToggleSwitchResources,
-    control_text_style,
+    CommonState, ControlBorder, ControlStates, FocusVisual, Grid, GridCell, GridLength,
+    RowDefinition, TOGGLE_SWITCH_ON_STROKE_THICKNESS, TOGGLE_SWITCH_OUTER_BORDER_STROKE_THICKNESS,
+    TOGGLE_SWITCH_POST_CONTENT_MARGIN, TOGGLE_SWITCH_PRE_CONTENT_MARGIN,
+    TOGGLE_SWITCH_THEME_MIN_WIDTH, TOGGLE_SWITCH_TOP_HEADER_MARGIN, Theme, ThemeResources,
+    ToggleSwitchResources, control_text_style,
 };
 use reveal_animation::{Cubic, Curve};
 use reveal_embedder::{Clip, Color, FontWeight};
@@ -24,6 +23,7 @@ use reveal_gestures::{
 };
 use reveal_painting::{AlignmentGeometry, EdgeInsetsGeometry, TextStyle};
 use reveal_rendering::{BoxConstraints, HitTestBehavior};
+use reveal_services::{KeyEvent, LogicalKeyboardKey};
 use reveal_widgets::*;
 use std::{any::TypeId, fmt, rc::Rc, time::Duration};
 
@@ -148,6 +148,10 @@ pub struct ToggleSwitchState {
     knob_translation: f64,
     /// `ControlFastOutSlowInKeySpline`, shared by every animation of the template.
     curve: Rc<dyn Curve>,
+    focus_node: Option<Handle<FocusNode>>,
+    hovered: bool,
+    focused: bool,
+    handled_key_down: bool,
 }
 
 impl StatefulWidget for ToggleSwitch {
@@ -164,6 +168,10 @@ impl StatefulWidget for ToggleSwitch {
             was_dragged: false,
             knob_translation: 0.0,
             curve: fast_out_slow_in(),
+            focus_node: None,
+            hovered: false,
+            focused: false,
+            handled_key_down: false,
         }
     }
 }
@@ -172,38 +180,111 @@ impl State for ToggleSwitchState {
     type Widget = ToggleSwitch;
     reveal_widgets::state_accessors!();
 
-    /// `OnIsEnabledChanged`: disabling ends a drag.
-    fn did_update_widget(self: Handle<Self>, app: &mut App, _old_widget: &ToggleSwitch) {
-        if !self.widget(app).is_enabled {
-            app.get_mut(self).is_dragging = false;
+    fn init_state(self: Handle<Self>, app: &mut App) {
+        app.get_mut(self).focus_node = Some(FocusNode::new(app));
+    }
+
+    fn dispose(self: Handle<Self>, app: &mut App) {
+        if let Some(node) = app.get_mut(self).focus_node.take() {
+            node.dispose(app);
+            app.destroy(node);
         }
     }
 
-    fn build(self: Handle<Self>, app: &mut App, _context: BuildContext) -> WidgetRef {
+    /// `OnIsEnabledChanged`: disabling ends a drag.
+    fn did_update_widget(self: Handle<Self>, app: &mut App, _old_widget: &ToggleSwitch) {
+        if !self.widget(app).is_enabled {
+            let state = app.get_mut(self);
+            state.is_dragging = false;
+            state.hovered = false;
+            state.handled_key_down = false;
+        }
+    }
+
+    fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let is_enabled = self.widget(app).is_enabled;
-        // `TapHandler`: the thumb's `Tapped` toggles unless a drag holds the pointer.
-        let tapped = Listener::new(move |app| {
-            if !app.get(self).is_dragging {
-                self.toggle(app);
-            }
-        });
-        CommonStates::new(tapped, move |app, context, states| {
-            self.template(app, context, states)
-        })
-        .is_enabled(is_enabled)
-        .into_widget()
+        let state = app.get(self);
+        let states = ControlStates {
+            common: if !is_enabled {
+                CommonState::Disabled
+            } else if state.hovered {
+                CommonState::PointerOver
+            } else {
+                CommonState::Normal
+            },
+            focused: is_enabled && state.focused,
+        };
+        let node = state.focus_node.unwrap();
+        let body = self.template(app, context, states);
+        let mut tapped = GestureDetector::new()
+            .behavior(HitTestBehavior::Opaque)
+            .child(body);
+        if is_enabled {
+            tapped = tapped.on_tap(Listener::new(move |app| {
+                if !app.get(self).is_dragging {
+                    let node = app.get(self).focus_node.unwrap();
+                    node.request_focus(app, None);
+                    self.toggle(app);
+                }
+            }));
+        }
+        let detector = FocusableActionDetector::new(tapped)
+            .focus_node(node.as_node())
+            .enabled(is_enabled)
+            .on_show_focus_highlight(move |app, focused| {
+                self.set_state(app, |state| state.focused = focused);
+            })
+            .on_show_hover_highlight(move |app, hovered| {
+                self.set_state(app, |state| state.hovered = hovered);
+            });
+        Focus::new(detector)
+            .can_request_focus(false)
+            .skip_traversal(true)
+            .on_key_event(Rc::new(move |app, _, event| self.handle_key(app, event)))
+            .into_widget()
     }
 }
 
 impl ToggleSwitchState {
+    // `HandlesKey` accepts Space and GamepadA.
+    fn handle_key(self: Handle<Self>, app: &mut App, event: &KeyEvent) -> KeyEventResult {
+        if !self.widget(app).is_enabled {
+            return KeyEventResult::Ignored;
+        }
+        let gamepad = event.logical_key() == LogicalKeyboardKey::GAME_BUTTON_A;
+        let handles_key = event.logical_key() == LogicalKeyboardKey::SPACE || gamepad;
+        match event {
+            KeyEvent::Down(_) | KeyEvent::Repeat(_) if !app.get(self).is_dragging => {
+                app.get_mut(self).handled_key_down = handles_key;
+                if handles_key {
+                    return KeyEventResult::Handled;
+                }
+            }
+            KeyEvent::Up(_) if handles_key => {
+                let handled = app.get(self).handled_key_down;
+                app.get_mut(self).handled_key_down = false;
+                if gamepad || (handled && !app.get(self).is_dragging) {
+                    self.toggle(app);
+                    return KeyEventResult::Handled;
+                }
+            }
+            _ => {}
+        }
+        KeyEventResult::Ignored
+    }
+
     /// `Toggle`: `IsOn` flips; here the `Toggled` handler is asked for the flipped value.
     fn toggle(self: Handle<Self>, app: &mut App) {
         let widget = self.widget(app).clone();
-        (widget.toggled)(app, !widget.is_on);
+        if widget.is_enabled {
+            (widget.toggled)(app, !widget.is_on);
+        }
     }
 
     /// `DragStartedHandler`: the drag begins where the state left the knob (`GetTranslations`), shown pressed (`UpdateVisualState`).
     fn drag_started(self: Handle<Self>, app: &mut App) {
+        let node = app.get(self).focus_node.unwrap();
+        node.request_focus(app, None);
         let is_on = self.widget(app).is_on;
         self.set_state(app, |state| {
             state.is_dragging = true;
@@ -463,7 +544,7 @@ impl ToggleSwitchState {
             .into_widget()
     }
 
-    /// `SwitchThumb`: a `Thumb` templated as a transparent rectangle over the whole switch. Its `Tapped` is the tap of `CommonStates`' `GestureDetector` around the template; its `DragStarted` / `DragDelta` / `DragCompleted` are a `HorizontalDragGestureRecognizer` here, in the same arena, so a press that moves past the slop becomes the drag and cancels the tap, and one that does not stays the tap — as `Thumb`'s drag and `Tapped` compose in XAML.
+    /// `SwitchThumb`: a `Thumb` templated as a transparent rectangle over the whole switch. Its `Tapped` is the tap of the `GestureDetector` around the template; its `DragStarted` / `DragDelta` / `DragCompleted` are a `HorizontalDragGestureRecognizer` here, in the same arena, so a press that moves past the slop becomes the drag and cancels the tap, and one that does not stays the tap — as `Thumb`'s drag and `Tapped` compose in XAML.
     fn switch_thumb(self: Handle<Self>, is_enabled: bool) -> WidgetRef {
         let gestures = if is_enabled {
             vec![(
@@ -476,7 +557,6 @@ impl ToggleSwitchState {
         RawGestureDetector::new()
             .gestures(gestures)
             .behavior(HitTestBehavior::Opaque)
-            // The `Rectangle` has no size of its own and stretches to the cell.
             .child(SizedBox::new())
             .into_widget()
     }

@@ -2,17 +2,18 @@
 //!
 //! The template is one `ContentPresenter` (`x:Name="ContentPresenter"`) carrying `Background`, `BorderBrush`, `ButtonBorderThemeThickness`, `CornerRadius`, `ButtonPadding` and `Foreground`, with a `BrushTransition` of 83 ms on `Background`; the `CommonStates` storyboards swap those brushes per state.
 //!
-//! Behaviour is `RepeatButton_Partial.cpp` over `ButtonBase_Partial.cpp`: `Initialize` sets `ClickMode_Press`, so `ButtonBase::OnPointerPressed` raises `Click` on the left-button press and `KeyPress::ButtonBase::KeyDown` on the Space or Enter key down; `RepeatButton::OnPointerPressed` and `OnKeyDown` then start a `TimelineTimer` at `Delay`, whose `TickCallback` raises `Click` while the button is pressed with the pointer over it (or the key held) and restarts the timer at `Interval`; `OnPointerReleased`, `OnKeyUp`, `OnLostFocus` and `OnIsEnabledChanged` stop it. Those overrides sit around `CommonStates` (the `ButtonBase`) as a pointer `Listener` and a `Focus` key handler, the way the C++ overrides sit over its base.
+//! Behaviour follows `RepeatButton_Partial.cpp` and `ButtonBaseKeyProcess.h`: pointer and Space presses click immediately and start the repeat timer; Enter clicks once. The control owns its pressed state and focus node so activation keys reach its Press-mode handler before application shortcuts.
 
 use crate::{
     BUTTON_BORDER_THEME_THICKNESS, BUTTON_PADDING, BackgroundSizing, Brush,
     CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, CONTROL_FASTER_ANIMATION_DURATION,
-    ColorTransition, CommonState, CommonStates, ControlBorder, ControlStates, FocusVisual,
-    RepeatButtonResources, ThemeResources, control_text_style,
+    ColorTransition, CommonState, ControlBorder, ControlStates, FocusVisual, RepeatButtonResources,
+    ThemeResources, control_text_style,
 };
-use reveal_embedder::{Color, FontWeight, Offset};
+use reveal_embedder::{Color, FontWeight, Offset, PointerDeviceKind};
 use reveal_foundation::{App, Handle, Listener, Timer};
 use reveal_gestures::{K_PRIMARY_BUTTON, PointerDownEvent, PointerMoveEvent};
+use reveal_rendering::HitTestBehavior;
 use reveal_services::{KeyEvent, LogicalKeyboardKey};
 use reveal_widgets::Listener as PointerListener;
 use reveal_widgets::*;
@@ -65,11 +66,12 @@ pub fn repeat_button_brushes(
     }
 }
 
-/// `KeyPress::ButtonBase::IsPress` with `AcceptsReturn` (every `ButtonBase::Initialize` sets it): Space or Enter.
+/// `KeyPress::ButtonBase::IsPress` with `AcceptsReturn`: Space, Enter or GamepadA.
 fn is_press_key(key: LogicalKeyboardKey) -> bool {
     key == LogicalKeyboardKey::SPACE
         || key == LogicalKeyboardKey::ENTER
         || key == LogicalKeyboardKey::NUMPAD_ENTER
+        || key == LogicalKeyboardKey::GAME_BUTTON_A
 }
 
 /// XAML `RepeatButton`: `Click` on the press, then again after `Delay` and every `Interval` while held.
@@ -152,6 +154,11 @@ impl StatefulWidget for RepeatButton {
             pointer_causing_repeat: false,
             keyboard_causing_repeat: false,
             pointer_over: false,
+            pressed: false,
+            key_down: false,
+            gamepad_a_key_down: false,
+            focused: false,
+            focus_node: None,
         }
     }
 }
@@ -167,6 +174,11 @@ pub struct RepeatButtonState {
     keyboard_causing_repeat: bool,
     /// `IsPointerOver` for the pressed pointer, from its position against the control's bounds.
     pointer_over: bool,
+    pressed: bool,
+    key_down: bool,
+    gamepad_a_key_down: bool,
+    focused: bool,
+    focus_node: Option<AnyFocusNode>,
 }
 
 impl RepeatButtonState {
@@ -180,13 +192,19 @@ impl RepeatButtonState {
         if !self.widget(app).is_enabled || event.buttons != K_PRIMARY_BUTTON {
             return;
         }
-        app.get_mut(self).pointer_over = true;
+        if let Some(node) = app.get(self).focus_node {
+            node.request_focus(app, None);
+        }
+        self.set_state(app, |state| {
+            state.pointer_over = true;
+            state.pressed = true;
+        });
         self.on_click(app);
         app.get_mut(self).pointer_causing_repeat = true;
         self.update_repeat_state(app);
     }
 
-    /// `OnPointerEntered` / `OnPointerExited` for the captured pointer: re-entering restarts the repeat (`UpdateRepeatState`); leaving lets the next tick stop it.
+    /// `OnPointerEntered` / `OnPointerExited` for the active pointer: re-entering restarts the repeat (`UpdateRepeatState`); leaving lets the next tick stop it.
     fn on_pointer_moved(self: Handle<Self>, app: &mut App, event: PointerMoveEvent) {
         if !app.get(self).pointer_causing_repeat {
             return;
@@ -199,25 +217,72 @@ impl RepeatButtonState {
     }
 
     /// `RepeatButton::OnPointerReleased`, and the capture lost: the pointer stops causing repeats.
-    fn on_pointer_released(self: Handle<Self>, app: &mut App) {
-        app.get_mut(self).pointer_causing_repeat = false;
+    fn on_pointer_released(self: Handle<Self>, app: &mut App, kind: PointerDeviceKind) {
+        self.set_state(app, |state| {
+            state.pointer_causing_repeat = false;
+            if kind == PointerDeviceKind::Touch {
+                state.pointer_over = false;
+            }
+            if !state.key_down && !state.gamepad_a_key_down {
+                state.pressed = false;
+            }
+        });
         self.update_repeat_state(app);
     }
 
-    /// `RepeatButton::OnKeyDown` / `OnKeyUp` over `KeyPress::ButtonBase::KeyDown` / `KeyUp`: Space or Enter down starts the repeat and raises `Click` (`ClickMode_Press`), up stops it; a key already down (`m_bIsSpaceOrEnterKeyDown`) does nothing more.
+    /// `RepeatButton::OnKeyDown` starts repetition for Space before `ButtonBase` processes the key.
     fn on_key_event(self: Handle<Self>, app: &mut App, event: &KeyEvent) -> KeyEventResult {
-        if !is_press_key(event.logical_key()) || !self.widget(app).is_enabled {
+        if !self.widget(app).is_enabled {
+            return KeyEventResult::Ignored;
+        }
+        let key = event.logical_key();
+        if !is_press_key(key) {
+            if !matches!(event, KeyEvent::Up(_))
+                && (app.get(self).key_down || app.get(self).gamepad_a_key_down)
+            {
+                self.set_state(app, |state| {
+                    state.key_down = false;
+                    state.gamepad_a_key_down = false;
+                    state.pressed = false;
+                });
+            }
             return KeyEventResult::Ignored;
         }
         match event {
-            KeyEvent::Down(_) if !app.get(self).keyboard_causing_repeat => {
-                app.get_mut(self).keyboard_causing_repeat = true;
-                self.update_repeat_state(app);
-                self.on_click(app);
+            KeyEvent::Down(_) | KeyEvent::Repeat(_) => {
+                if key == LogicalKeyboardKey::SPACE {
+                    app.get_mut(self).keyboard_causing_repeat = true;
+                    self.update_repeat_state(app);
+                }
+                if !app.get(self).pointer_causing_repeat
+                    && !app.get(self).key_down
+                    && !app.get(self).gamepad_a_key_down
+                {
+                    self.set_state(app, |state| {
+                        if key == LogicalKeyboardKey::GAME_BUTTON_A {
+                            state.gamepad_a_key_down = true;
+                        } else {
+                            state.key_down = true;
+                        }
+                        state.pressed = true;
+                    });
+                    self.on_click(app);
+                }
             }
-            KeyEvent::Down(_) | KeyEvent::Repeat(_) => {}
             KeyEvent::Up(_) => {
-                app.get_mut(self).keyboard_causing_repeat = false;
+                self.set_state(app, |state| {
+                    if key == LogicalKeyboardKey::GAME_BUTTON_A {
+                        state.gamepad_a_key_down = false;
+                    } else {
+                        state.key_down = false;
+                    }
+                    if !state.pointer_causing_repeat {
+                        state.pressed = false;
+                    }
+                    if key == LogicalKeyboardKey::SPACE {
+                        state.keyboard_causing_repeat = false;
+                    }
+                });
                 self.update_repeat_state(app);
             }
         }
@@ -226,9 +291,13 @@ impl RepeatButtonState {
 
     /// `RepeatButton::OnLostFocus` and `OnIsEnabledChanged`: neither input causes repeats any more.
     fn reset_repeat(self: Handle<Self>, app: &mut App) {
-        let state = app.get_mut(self);
-        state.keyboard_causing_repeat = false;
-        state.pointer_causing_repeat = false;
+        self.set_state(app, |state| {
+            state.keyboard_causing_repeat = false;
+            state.pointer_causing_repeat = false;
+            state.key_down = false;
+            state.gamepad_a_key_down = false;
+            state.pressed = false;
+        });
         self.update_repeat_state(app);
     }
 
@@ -272,11 +341,11 @@ impl RepeatButtonState {
     /// `TimelineTimer::TimerCallback`: `RepeatButton::TickCallback` raises `Click` while the repeat condition holds and the timer restarts at `Interval`; otherwise it stops.
     fn tick(self: Handle<Self>, app: &mut App) {
         app.get_mut(self).timer = None;
-        if !self.should_repeat(app) {
+        if !app.get(self).pressed || !self.should_repeat(app) {
             return;
         }
         self.on_click(app);
-        if !self.mounted(app) {
+        if !self.mounted(app) || !app.get(self).pressed || !self.should_repeat(app) {
             return;
         }
         let interval = self.widget(app).interval;
@@ -296,6 +365,15 @@ impl State for RepeatButtonState {
     type Widget = RepeatButton;
     reveal_widgets::state_accessors!();
 
+    fn init_state(self: Handle<Self>, app: &mut App) {
+        let node = FocusNode::new(app).as_node();
+        node.set_on_key_event(
+            app,
+            Some(Rc::new(move |app, _, event| self.on_key_event(app, event))),
+        );
+        app.get_mut(self).focus_node = Some(node);
+    }
+
     fn did_update_widget(self: Handle<Self>, app: &mut App, old_widget: &RepeatButton) {
         // `RepeatButton::OnIsEnabledChanged`.
         if self.widget(app).is_enabled != old_widget.is_enabled {
@@ -305,30 +383,55 @@ impl State for RepeatButtonState {
 
     fn dispose(self: Handle<Self>, app: &mut App) {
         self.stop_timer(app);
+        if let Some(node) = app.get_mut(self).focus_node.take() {
+            node.dispose(app);
+            app.destroy(node.id());
+        }
     }
 
-    fn build(self: Handle<Self>, app: &mut App, _context: BuildContext) -> WidgetRef {
+    fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
-        let content = widget.content.clone();
-        // `ButtonBase` with `ClickMode_Press`: its release activation is unused.
-        let presenter = CommonStates::new(Listener::new(|_| {}), move |app, context, states| {
-            template(app, context, content.clone(), states)
-        })
-        .is_enabled(widget.is_enabled);
-        // `RepeatButton::OnPointerPressed` / `OnPointerMoved` / `OnPointerReleased`.
+        let state = app.get(self);
+        let states = ControlStates {
+            common: if !widget.is_enabled {
+                CommonState::Disabled
+            } else if state.pressed {
+                CommonState::Pressed
+            } else if state.pointer_over {
+                CommonState::PointerOver
+            } else {
+                CommonState::Normal
+            },
+            focused: state.focused && widget.is_enabled,
+        };
+        let presenter = template(app, context, widget.content, states);
         let pointer = PointerListener::new()
+            .behavior(HitTestBehavior::Opaque)
             .on_pointer_down(Rc::new(move |app, event| {
                 self.on_pointer_pressed(app, event)
             }))
             .on_pointer_move(Rc::new(move |app, event| self.on_pointer_moved(app, event)))
-            .on_pointer_up(Rc::new(move |app, _| self.on_pointer_released(app)))
-            .on_pointer_cancel(Rc::new(move |app, _| self.on_pointer_released(app)))
+            .on_pointer_up(Rc::new(move |app, event| {
+                self.on_pointer_released(app, event.kind)
+            }))
+            .on_pointer_cancel(Rc::new(move |app, event| {
+                self.on_pointer_released(app, event.kind);
+                self.set_state(app, |state| state.pressed = false);
+                self.stop_timer(app);
+            }))
             .child(presenter);
-        // `RepeatButton::OnKeyDown` / `OnKeyUp` / `OnLostFocus`, ahead of the app's `ActivateIntent` shortcuts; not a focus stop of its own.
-        Focus::new(pointer)
-            .can_request_focus(false)
-            .skip_traversal(true)
-            .on_key_event(Rc::new(move |app, _, event| self.on_key_event(app, event)))
+        FocusableActionDetector::new(pointer)
+            .enabled(widget.is_enabled)
+            .focus_node(app.get(self).focus_node.expect("initialized focus node"))
+            .on_show_focus_highlight(move |app, value| {
+                self.set_state(app, |state| state.focused = value)
+            })
+            .on_show_hover_highlight(move |app, value| {
+                self.set_state(app, |state| state.pointer_over = value);
+                if value {
+                    self.update_repeat_state(app);
+                }
+            })
             .on_focus_change(move |app, has_focus| {
                 if !has_focus {
                     self.reset_repeat(app);

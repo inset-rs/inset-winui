@@ -26,6 +26,10 @@ Bottom up: a panel or primitive a template needs is ported before the control th
 4. Add a gallery section and a GPU test, and look at the exported screenshot.
 5. Write the `PORTING.md` entries.
 
+## Porting guidance
+
+Faithful WinUI behavior remains the aim, especially where later controls depend on it, to avoid drift over time. For small interaction differences, prefer reveal's native mechanisms when reproducing the WinUI mechanism would add substantial complexity for little user benefit. One example is Button tap recognition: it uses reveal's native tap recognizer, not WinUI's pointer capture.
+
 ## Rules
 
 - No stubs, hacks or partial controls: stop and say so.

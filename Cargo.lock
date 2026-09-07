@@ -3007,6 +3007,7 @@ dependencies = [
  "reveal-painting",
  "reveal-rendering",
  "reveal-scheduler",
+ "reveal-services",
  "reveal-shell",
  "reveal-widgets",
  "reveal-winui",

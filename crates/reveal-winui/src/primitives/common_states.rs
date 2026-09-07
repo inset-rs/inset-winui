@@ -2,7 +2,7 @@
 
 use reveal_foundation::{App, Handle, Listener};
 use reveal_rendering::HitTestBehavior;
-use reveal_services::LogicalKeyboardKey;
+use reveal_services::{KeyEvent, LogicalKeyboardKey};
 use reveal_widgets::*;
 use std::{any::TypeId, collections::HashMap, fmt, rc::Rc};
 
@@ -81,6 +81,10 @@ pub struct CommonStatesData {
     pressed: bool,
     hovered: bool,
     focused: bool,
+    focus_node: Option<AnyFocusNode>,
+    pointer_down: bool,
+    space_or_enter_key_down: bool,
+    gamepad_a_key_down: bool,
     actions: HashMap<TypeId, AnyAction>,
 }
 
@@ -95,12 +99,88 @@ impl StatefulWidget for CommonStates {
             pressed: false,
             hovered: false,
             focused: false,
+            focus_node: None,
+            pointer_down: false,
+            space_or_enter_key_down: false,
+            gamepad_a_key_down: false,
             actions: HashMap::new(),
         }
     }
 }
 
 impl CommonStatesData {
+    fn clear_state_flags(self: Handle<Self>, app: &mut App) {
+        self.set_state(app, |state| {
+            state.pressed = false;
+            state.pointer_down = false;
+            state.space_or_enter_key_down = false;
+            state.gamepad_a_key_down = false;
+        });
+    }
+
+    /// `KeyPress::ButtonBase`: a release-mode button presses on key-down and clicks on key-up.
+    fn on_key_event(self: Handle<Self>, app: &mut App, event: &KeyEvent) -> KeyEventResult {
+        if !self.widget(app).is_enabled {
+            return KeyEventResult::Ignored;
+        }
+        let key = event.logical_key();
+        let is_space_or_enter = key == LogicalKeyboardKey::SPACE
+            || (self.widget(app).accepts_return
+                && matches!(
+                    key,
+                    LogicalKeyboardKey::ENTER | LogicalKeyboardKey::NUMPAD_ENTER
+                ));
+        let is_press = is_space_or_enter || key == LogicalKeyboardKey::GAME_BUTTON_A;
+        match event {
+            KeyEvent::Down(_) | KeyEvent::Repeat(_) => {
+                let state = app.get(self);
+                if is_press {
+                    if !state.pointer_down
+                        && !state.space_or_enter_key_down
+                        && !state.gamepad_a_key_down
+                    {
+                        self.set_state(app, |state| {
+                            state.space_or_enter_key_down = is_space_or_enter;
+                            state.gamepad_a_key_down = !is_space_or_enter;
+                            state.pressed = true;
+                        });
+                    }
+                } else if state.space_or_enter_key_down || state.gamepad_a_key_down {
+                    self.set_state(app, |state| {
+                        state.pressed = false;
+                        state.space_or_enter_key_down = false;
+                        state.gamepad_a_key_down = false;
+                    });
+                }
+            }
+            KeyEvent::Up(_) if is_press => {
+                if is_space_or_enter {
+                    app.get_mut(self).space_or_enter_key_down = false;
+                } else {
+                    app.get_mut(self).gamepad_a_key_down = false;
+                }
+                if !app.get(self).pointer_down {
+                    if app.get(self).pressed {
+                        self.activate(app);
+                    }
+                    self.set_state(app, |state| state.pressed = false);
+                }
+            }
+            KeyEvent::Up(_) => {}
+        }
+        // The app's activation shortcut must not turn an ignored repeat into another click.
+        if is_press {
+            KeyEventResult::Handled
+        } else if matches!(
+            key,
+            LogicalKeyboardKey::ENTER | LogicalKeyboardKey::NUMPAD_ENTER
+        ) {
+            KeyEventResult::SkipRemainingHandlers
+        } else {
+            KeyEventResult::Ignored
+        }
+    }
+
     fn activate(self: Handle<Self>, app: &mut App) {
         let widget = self.widget(app).clone();
         if widget.is_enabled {
@@ -135,6 +215,12 @@ impl State for CommonStatesData {
     reveal_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
+        let node = FocusNode::new(app).as_node();
+        node.set_on_key_event(
+            app,
+            Some(Rc::new(move |app, _, event| self.on_key_event(app, event))),
+        );
+        app.get_mut(self).focus_node = Some(node);
         let action = CallbackAction::<ActivateIntent>::new(
             app,
             Rc::new(move |app, _| {
@@ -148,8 +234,19 @@ impl State for CommonStatesData {
     }
 
     fn dispose(self: Handle<Self>, app: &mut App) {
+        if let Some(node) = app.get_mut(self).focus_node.take() {
+            node.dispose(app);
+            app.destroy(node.id());
+        }
         for action in std::mem::take(&mut app.get_mut(self).actions).into_values() {
             app.destroy(action.id());
+        }
+    }
+
+    fn did_update_widget(self: Handle<Self>, app: &mut App, _old_widget: &CommonStates) {
+        if !self.widget(app).is_enabled {
+            self.clear_state_flags(app);
+            app.get_mut(self).hovered = false;
         }
     }
 
@@ -163,18 +260,43 @@ impl State for CommonStatesData {
         if widget.is_enabled {
             gesture = gesture
                 .on_tap_down(Rc::new(move |app, _| {
-                    self.set_state(app, |state| state.pressed = true)
+                    if let Some(node) = app.get(self).focus_node {
+                        node.request_focus(app, None);
+                    }
+                    self.set_state(app, |state| {
+                        state.pointer_down = true;
+                        state.pressed = true;
+                    })
                 }))
                 .on_tap_up(Rc::new(move |app, _| {
-                    self.set_state(app, |state| state.pressed = false)
+                    self.set_state(app, |state| {
+                        state.pointer_down = false;
+                        if !state.space_or_enter_key_down && !state.gamepad_a_key_down {
+                            state.pressed = false;
+                        }
+                    })
                 }))
                 .on_tap_cancel(Listener::new(move |app| {
-                    self.set_state(app, |state| state.pressed = false)
+                    self.set_state(app, |state| {
+                        state.pointer_down = false;
+                        state.pressed = false;
+                    })
                 }))
-                .on_tap(Listener::new(move |app| self.activate(app)));
+                .on_tap(Listener::new(move |app| {
+                    let state = app.get(self);
+                    if !state.space_or_enter_key_down && !state.gamepad_a_key_down {
+                        self.activate(app);
+                    }
+                }));
         }
-        let detector = FocusableActionDetector::new(gesture)
+        FocusableActionDetector::new(gesture)
+            .focus_node(app.get(self).focus_node.unwrap())
             .enabled(widget.is_enabled)
+            .on_focus_change(move |app, focused| {
+                if !focused {
+                    self.clear_state_flags(app);
+                }
+            })
             .actions(app.get(self).actions.clone())
             .on_show_focus_highlight(move |app, value| {
                 self.set_state(app, |state| state.focused = value)
@@ -182,26 +304,6 @@ impl State for CommonStatesData {
             .on_show_hover_highlight(move |app, value| {
                 self.set_state(app, |state| state.hovered = value)
             })
-            .into_widget();
-        if widget.accepts_return {
-            return detector;
-        }
-        // `KeyPress::ButtonBase::IsPress` with `AcceptsReturn` false: Enter is not a press. The
-        // app's shortcuts map Enter to `ActivateIntent`; a nearer binding to a do-nothing intent
-        // stops it before it reaches the action above.
-        let ignore = |key: LogicalKeyboardKey| -> (ShortcutActivatorRef, IntentRef) {
-            (
-                Rc::new(SingleActivator::new(key)),
-                Rc::new(DoNothingAndStopPropagationIntent),
-            )
-        };
-        Shortcuts::new(
-            vec![
-                ignore(LogicalKeyboardKey::ENTER),
-                ignore(LogicalKeyboardKey::NUMPAD_ENTER),
-            ],
-            detector,
-        )
-        .into_widget()
+            .into_widget()
     }
 }

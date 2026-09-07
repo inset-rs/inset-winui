@@ -14,6 +14,7 @@ reveal-rendering.workspace = true
 reveal-shell.workspace = true
 reveal-widgets.workspace = true
 [dev-dependencies]
+reveal-services.workspace = true
 reveal-gestures.workspace = true
 reveal-scheduler.workspace = true
 valo-harness.workspace = true
