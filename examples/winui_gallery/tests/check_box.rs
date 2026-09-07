@@ -27,7 +27,7 @@ fn tap_and_pump(fixture: &mut Fixture, text: &str, frames: u32) {
 
 #[test]
 fn check_box_toggles_cycles_and_renders_in_both_themes() {
-    let mut fixture = Fixture::new([900, 2000]);
+    let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::CheckBox);
     fixture.find("CheckBox: unchecked · checked · indeterminate");
     fixture.capture("check_box_light");
 

@@ -3,7 +3,6 @@
 use crate::{Brush, Theme};
 use reveal_embedder::{Canvas, Color, Offset, RRect, Radius, Size};
 use reveal_foundation::App;
-use reveal_painting::draw_rrect;
 use reveal_rendering::CustomPainter;
 use reveal_widgets::*;
 
@@ -109,17 +108,17 @@ impl CustomPainter for FocusRingPainter {
         }
         let bounds = Offset::ZERO & size;
         let outer = RRect::from_rect_and_radius(bounds, Radius::circular(self.corner_radius));
-        draw_rrect(
+        self.primary.paint_rrect_stroke(
             canvas,
             outer.deflate(FOCUS_VISUAL_PRIMARY_THICKNESS / 2.0),
-            &self.primary.stroke(bounds, FOCUS_VISUAL_PRIMARY_THICKNESS),
+            bounds,
+            FOCUS_VISUAL_PRIMARY_THICKNESS,
         );
-        draw_rrect(
+        self.secondary.paint_rrect_stroke(
             canvas,
             outer.deflate(FOCUS_VISUAL_PRIMARY_THICKNESS + FOCUS_VISUAL_SECONDARY_THICKNESS / 2.0),
-            &self
-                .secondary
-                .stroke(bounds, FOCUS_VISUAL_SECONDARY_THICKNESS),
+            bounds,
+            FOCUS_VISUAL_SECONDARY_THICKNESS,
         );
     }
 

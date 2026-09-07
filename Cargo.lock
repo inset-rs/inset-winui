@@ -3000,6 +3000,7 @@ dependencies = [
 name = "winui_gallery"
 version = "0.1.0"
 dependencies = [
+ "reveal-animation",
  "reveal-embedder",
  "reveal-embedder-winit",
  "reveal-foundation",

@@ -21,7 +21,8 @@ fn send(fixture: &mut Fixture, key: LogicalKeyboardKey, physical: PhysicalKeyboa
 
 #[test]
 fn switch_click_focuses_and_space_toggles_once_on_release() {
-    let mut fixture = Fixture::new([900, 2000]);
+    let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::ToggleSwitch);
+    fixture.ensure_visible("Airplane mode off");
     fixture.tap("Airplane mode off");
     fixture.find("Clicked 0 times · wifi true · airplane true");
     send(
@@ -75,7 +76,8 @@ fn switch_click_focuses_and_space_toggles_once_on_release() {
 
 #[test]
 fn another_key_cancels_pending_space() {
-    let mut fixture = Fixture::new([900, 2000]);
+    let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::ToggleSwitch);
+    fixture.ensure_visible("Airplane mode off");
     fixture.tap("Airplane mode off");
     send(
         &mut fixture,

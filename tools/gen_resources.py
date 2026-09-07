@@ -58,7 +58,10 @@ def control_source(root, control):
     for path in candidates:
         if path.is_file():
             return path
-    raise FileNotFoundError(f'No resource dictionary for {control}: {candidates}')
+    nested = list((root / 'controls/dev').glob(f'*/{filename}'))
+    if len(nested) == 1:
+        return nested[0]
+    raise FileNotFoundError(f'No unique resource dictionary for {control}: {candidates}, {nested}')
 
 
 def read_dictionaries(path, keys=None):
@@ -95,9 +98,19 @@ def read_dictionaries(path, keys=None):
                 entries[name] = ('alias', match.group(1)) if match else ('color', parse_color(color))
             elif kind == 'Color':
                 entries[name] = ('color', parse_color(element.text))
+            elif kind == 'AcrylicBrush':
+                entries[name] = ('acrylic', {
+                    'tint_color': element.get('TintColor', 'White'),
+                    'tint_opacity': float(element.get('TintOpacity', '0.5')),
+                    'fallback_color': element.get('FallbackColor', 'Transparent'),
+                    'tint_luminosity_opacity': element.get('TintLuminosityOpacity'),
+                })
             elif kind == 'LinearGradientBrush':
-                stops = [(float(s.get('Offset')), re.match(r'\{(?:StaticResource|ThemeResource) (\w+)\}', s.get('Color')).group(1))
-                         for s in element.iter(P + 'GradientStop')]
+                stops = []
+                for stop in element.iter(P + 'GradientStop'):
+                    color = stop.get('Color')
+                    match = re.fullmatch(r'\{(?:StaticResource|ThemeResource) (\w+)\}', color)
+                    stops.append((float(stop.get('Offset')), match.group(1) if match else ('color', parse_color(color))))
                 entries[name] = ('gradient', stops)
             else:
                 # Sizes inside a theme dictionary that every theme agrees on
@@ -163,7 +176,15 @@ def resolve(entries, base, name, seen=()):
             return None
         return resolve(entries, base, value, seen + (value,))
     if kind == 'gradient':
-        return ('gradient', [(offset, resolve(entries, base, key)) for offset, key in value])
+        return ('gradient', [(offset, key if isinstance(key, tuple) else resolve(entries, base, key)) for offset, key in value])
+    if kind == 'acrylic':
+        value = dict(value)
+        for field in ('tint_color', 'fallback_color'):
+            match = re.fullmatch(r'\{(?:StaticResource|ThemeResource) (\w+)\}', value[field])
+            value[field] = resolve(entries, base, match.group(1), seen) if match else ('color', parse_color(value[field]))
+            if value[field] is None:
+                return None
+        return ('acrylic', value)
     return entry
 
 
@@ -189,6 +210,16 @@ def value_literal(entry):
     return accent_field(value) if kind == 'accent' else color_literal(value)
 
 
+def acrylic_literal(value):
+    luminosity = value['tint_luminosity_opacity']
+    luminosity = f'Some({float(luminosity)})' if luminosity is not None else 'None'
+    return ('AcrylicBrushResources { '
+            f'tint_color: {value_literal(value["tint_color"])}, '
+            f'tint_opacity: {value["tint_opacity"]}, '
+            f'tint_luminosity_opacity: {luminosity}, '
+            f'fallback_color: {value_literal(value["fallback_color"])} }}')
+
+
 def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
     fields = []
     values = {'Light': [], 'Default': []}
@@ -209,13 +240,20 @@ def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
             fields.append((snake(key), '[(f64, Color); 2]'))
             values['Light'].append(stops(light[1]))
             values['Default'].append(stops(dark[1]))
+        elif kinds == {'acrylic'}:
+            fields.append((snake(key), 'AcrylicBrushResources'))
+            values['Light'].append(acrylic_literal(light[1]))
+            values['Default'].append(acrylic_literal(dark[1]))
     out.append(f'/// Theme-dependent resources of `{source}`, resolved to literals; `Default` in XAML is the dark theme.')
     out.append('#[derive(Clone, Debug, PartialEq)]')
     out.append(f'pub struct {struct_name} {{')
     for field, ty in fields:
+        out.append(f'    /// The resolved `{next(key for key in keys if snake(key) == field)}` resource.')
         out.append(f'    pub {field}: {ty},')
     out.append('}')
+    out.append('')
     out.append(f'impl {struct_name} {{')
+    out.append('    /// Resolves the source dictionary for the requested theme and accent palette.')
     out.append('    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {')
     out.append('        match theme {')
     for theme, label in (('Light', 'Theme::Light'), ('Default', 'Theme::Dark')):
@@ -253,26 +291,36 @@ def main():
     styles = root / 'controls/dev/CommonStyles'
     base_themes, base_shared = read_dictionaries(styles / 'Common_themeresources_any.xaml')
     common_themes, _ = read_dictionaries(styles / 'Common_themeresources.xaml')
+    acrylic_themes, _ = read_dictionaries(root / 'controls/dev/Materials/Acrylic/AcrylicBrush_themeresources.xaml')
     out = ['//! Generated by tools/gen_resources.py from microsoft-ui-xaml; do not edit by hand.',
            '//! Colours are ARGB literals resolved through every StaticResource alias in the',
            '//! XAML theme dictionaries; the XAML "Default" dictionary is the dark theme.',
            '#![allow(clippy::excessive_precision, unused_variables)]',
-           'use super::{AccentPalette, Theme};', 'use crate::BackgroundSizing;', 'use reveal_embedder::{Color, FontWeight};', 'use std::time::Duration;', '']
+           'use super::{AccentPalette, AcrylicBrushResources, Theme};', 'use crate::BackgroundSizing;', 'use reveal_embedder::{Color, FontWeight};', 'use std::time::Duration;', '']
     common_keys = [k for k, v in base_themes['Light'].items() if v[0] in ('color', 'gradient')]
     emit_struct(out, 'CommonResources', common_keys, base_themes, {}, base_shared, 'Common_themeresources_any.xaml')
-    for control in controls:
-        source = control_source(root, control)
+    sources = [(control, control_source(root, control)) for control in controls]
+    declared = set(base_shared)
+    for _, source in sources:
+        declared.update(read_dictionaries(source)[1])
+    emitted = set(base_shared)
+    for control, source in sources:
         themes, shared = read_dictionaries(source)
-        references = resource_references(ET.parse(source).getroot())
-        legacy_themes, _ = read_dictionaries(root / 'dxaml/xcp/dxaml/themes/generic.xaml', references)
-        fallback = {theme: {**legacy_themes.get(theme, {}), **common_themes.get(theme, {}), **base_themes.get(theme, {})}
+        templates = [ET.parse(source).getroot()]
+        companion = source.with_name(f'{control}.xaml')
+        if companion.is_file():
+            templates.append(ET.parse(companion).getroot())
+        references = [key for template in templates for key in resource_references(template)]
+        legacy_themes, legacy_shared = read_dictionaries(root / 'dxaml/xcp/dxaml/themes/generic.xaml', references)
+        shared = {**{key: value for key, value in legacy_shared.items() if key not in declared}, **shared}
+        shared = {key: value for key, value in shared.items() if key not in emitted}
+        emitted.update(shared)
+        fallback = {theme: {**legacy_themes.get(theme, {}), **common_themes.get(theme, {}), **acrylic_themes.get(theme, {}), **base_themes.get(theme, {})}
                     for theme in ('Light', 'Default')}
         keys = list(themes.get('Light', {}).keys())
         # Expose system brushes used directly by a template, as well as its
         # named resources. Fluent common tokens retain their existing accessor.
-        template_references = [key for element in ET.parse(source).getroot()
-                               if local(element.tag) == 'Style'
-                               for key in resource_references(element)]
+        template_references = references
         for key in template_references:
             if key not in keys and key not in base_themes.get('Light', {}) and key in legacy_themes.get('Light', {}):
                 keys.append(key)

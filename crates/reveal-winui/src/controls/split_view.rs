@@ -488,6 +488,7 @@ impl SplitViewState {
             if app.contains(previous.id())
                 && !app.is_disposed(previous.id())
                 && previous.context(app).is_some()
+                && previous.parent(app).is_some()
                 && previous.can_request_focus(app)
             {
                 previous.request_focus(app, None);
@@ -714,7 +715,9 @@ impl State for SplitViewState {
     }
 
     fn dispose(self: Handle<Self>, app: &mut App) {
-        self.restore_focus(app);
+        // OnUnloaded tears down dismissal; focus restoration belongs to closing or changing mode,
+        // not to a subtree whose focus attachments have already been detached.
+        app.get_mut(self).previous_focus = None;
         app.get(self).ticker.unwrap().dispose(app);
         let pane = app.get(self).pane_focus.unwrap();
         let content = app.get(self).content_focus.unwrap();

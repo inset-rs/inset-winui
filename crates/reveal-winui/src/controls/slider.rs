@@ -7,14 +7,14 @@
 use crate::{
     Brush, CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, CONTROL_FAST_ANIMATION_DURATION,
     CONTROL_NORMAL_ANIMATION_DURATION, ColumnDefinition, CommonState, ControlBorder, FocusVisual,
-    Grid, GridCell, GridLength, RangeBase, RowDefinition, SLIDER_HEADER_THEME_FONT_WEIGHT,
-    SLIDER_HORIZONTAL_HEIGHT, SLIDER_HORIZONTAL_THUMB_HEIGHT, SLIDER_HORIZONTAL_THUMB_WIDTH,
-    SLIDER_INNER_THUMB_HEIGHT, SLIDER_INNER_THUMB_WIDTH, SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT,
-    SLIDER_POST_CONTENT_MARGIN, SLIDER_PRE_CONTENT_MARGIN, SLIDER_THUMB_CORNER_RADIUS,
-    SLIDER_TOP_HEADER_MARGIN, SLIDER_TRACK_CORNER_RADIUS, SLIDER_TRACK_THEME_HEIGHT,
-    SLIDER_VERTICAL_THUMB_HEIGHT, SLIDER_VERTICAL_THUMB_WIDTH, SLIDER_VERTICAL_WIDTH,
-    SliderResources, ThemeResources, TickBar, TickPlacement, are_close, control_text_style,
-    fast_out_slow_in, fractional,
+    Grid, GridCell, GridLength, PlacementMode, RangeBase, RowDefinition,
+    SLIDER_HEADER_THEME_FONT_WEIGHT, SLIDER_HORIZONTAL_HEIGHT, SLIDER_HORIZONTAL_THUMB_HEIGHT,
+    SLIDER_HORIZONTAL_THUMB_WIDTH, SLIDER_INNER_THUMB_HEIGHT, SLIDER_INNER_THUMB_WIDTH,
+    SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT, SLIDER_POST_CONTENT_MARGIN, SLIDER_PRE_CONTENT_MARGIN,
+    SLIDER_THUMB_CORNER_RADIUS, SLIDER_TOP_HEADER_MARGIN, SLIDER_TRACK_CORNER_RADIUS,
+    SLIDER_TRACK_THEME_HEIGHT, SLIDER_VERTICAL_THUMB_HEIGHT, SLIDER_VERTICAL_THUMB_WIDTH,
+    SLIDER_VERTICAL_WIDTH, SliderResources, ThemeResources, TickBar, TickPlacement, ToolTip,
+    ToolTipService, are_close, control_text_style, fast_out_slow_in, fractional,
 };
 use reveal_embedder::{Canvas, Color, Offset, PointerDeviceKind, Rect, Size};
 use reveal_foundation::{App, Handle};
@@ -72,6 +72,9 @@ pub fn inner_thumb_scale(state: CommonState) -> (f64, Duration) {
 /// XAML `ValueChanged` handler, given the value the slider wants.
 pub type ValueChangedHandler = Rc<dyn Fn(&mut App, f64)>;
 
+/// Rust equivalent of `ThumbToolTipValueConverter`, returning the displayed value text.
+pub type ThumbToolTipValueConverter = Rc<dyn Fn(f64) -> String>;
+
 /// XAML `Slider`: `Value` between `Minimum` and `Maximum` with `ValueChanged`, `StepFrequency`, ticks, `Orientation` and `Header`.
 #[derive(Clone)]
 pub struct Slider {
@@ -93,6 +96,10 @@ pub struct Slider {
     pub is_direction_reversed: bool,
     pub header: Option<WidgetRef>,
     pub is_enabled: bool,
+    /// XAML `IsThumbToolTipEnabled`; enabled by default.
+    pub is_thumb_tool_tip_enabled: bool,
+    /// Optional replacement for the source step-frequency-based value formatter.
+    pub thumb_tool_tip_value_converter: Option<ThumbToolTipValueConverter>,
     pub key: Option<KeyRef>,
 }
 
@@ -112,8 +119,25 @@ impl Slider {
             is_direction_reversed: false,
             header: None,
             is_enabled: true,
+            is_thumb_tool_tip_enabled: true,
+            thumb_tool_tip_value_converter: None,
             key: None,
         }
+    }
+
+    /// Enables the default thumb value tooltip.
+    pub fn is_thumb_tool_tip_enabled(mut self, enabled: bool) -> Self {
+        self.is_thumb_tool_tip_enabled = enabled;
+        self
+    }
+
+    /// Converts `Value` to the text shown in the thumb tooltip.
+    pub fn thumb_tool_tip_value_converter(
+        mut self,
+        converter: impl Fn(f64) -> String + 'static,
+    ) -> Self {
+        self.thumb_tool_tip_value_converter = Some(Rc::new(converter));
+        self
     }
 
     /// XAML `Minimum`.
@@ -271,6 +295,10 @@ pub struct SliderState {
     is_thumb_pointer_over: bool,
     /// The keyboard focus visual shows (`Focused`).
     focused: bool,
+    /// Source thumb tooltip visibility, independent of mouse hover.
+    tooltip_open: bool,
+    /// Source keyboard/mouse/touch separation from the thumb.
+    tooltip_offset: f64,
     /// `m_DragValue`: the value the drag started at plus the deltas since.
     drag_value: f64,
     /// `IntermediateValue` while a press or drag is in progress; `Value` otherwise.
@@ -295,6 +323,8 @@ impl StatefulWidget for Slider {
             is_dragging: false,
             is_thumb_pointer_over: false,
             focused: false,
+            tooltip_open: false,
+            tooltip_offset: 12.0,
             drag_value: 0.0,
             intermediate_value: None,
             previous_position: Offset::ZERO,
@@ -442,6 +472,14 @@ impl SliderState {
         if event.buttons & K_PRIMARY_BUTTON == 0 {
             return;
         }
+        self.set_state(app, |state| {
+            state.tooltip_open = true;
+            state.tooltip_offset = if event.kind == PointerDeviceKind::Touch {
+                44.0
+            } else {
+                20.0
+            };
+        });
         let point = event.local_position();
         if let Some(node) = app.get(self).focus_node {
             node.request_focus(app, None);
@@ -478,6 +516,7 @@ impl SliderState {
     fn pointer_released(self: Handle<Self>, app: &mut App, point: Offset, kind: PointerDeviceKind) {
         let over_thumb = kind != PointerDeviceKind::Touch && self.hits_thumb(app, point);
         self.set_state(app, |state| {
+            state.tooltip_open = false;
             state.is_dragging = false;
             state.is_pressed = false;
             state.intermediate_value = None;
@@ -488,6 +527,7 @@ impl SliderState {
     /// `Slider::OnPointerCaptureLost` and `Thumb::OnPointerCaptureLost`: everything the pointer held is let go.
     fn pointer_capture_lost(self: Handle<Self>, app: &mut App) {
         self.set_state(app, |state| {
+            state.tooltip_open = false;
             state.is_dragging = false;
             state.is_pressed = false;
             state.is_pointer_over = false;
@@ -577,6 +617,7 @@ impl State for SliderState {
             let state = app.get_mut(self);
             state.is_pointer_over = false;
             state.is_pressed = false;
+            state.tooltip_open = false;
             state.is_dragging = false;
             state.is_thumb_pointer_over = false;
             state.intermediate_value = None;
@@ -586,6 +627,7 @@ impl State for SliderState {
     fn dispose(self: Handle<Self>, app: &mut App) {
         if let Some(node) = app.get_mut(self).focus_node.take() {
             node.dispose(app);
+            app.destroy(node.id());
         }
     }
 
@@ -598,6 +640,10 @@ impl State for SliderState {
             focused: app.get(self).focused && widget.is_enabled,
             intermediate_value: self.intermediate_value(app),
             zoom_scale: MediaQuery::device_pixel_ratio_of(app, context),
+            tooltip_open: app.get(self).tooltip_open
+                && widget.is_enabled
+                && widget.is_thumb_tool_tip_enabled,
+            tooltip_offset: app.get(self).tooltip_offset,
         };
         let container_key: KeyRef = app.get(self).container_key.clone();
         let container = slider_container(&resources, &widget, states, container_key);
@@ -621,7 +667,18 @@ impl State for SliderState {
         let mut detector = FocusableActionDetector::new(body)
             .enabled(widget.is_enabled)
             .on_show_focus_highlight(move |app, value| {
-                self.set_state(app, |state| state.focused = value)
+                self.set_state(app, |state| {
+                    state.focused = value;
+                    if value {
+                        state.tooltip_open = true;
+                        state.tooltip_offset = 12.0;
+                    }
+                })
+            })
+            .on_focus_change(move |app, focused| {
+                if !focused {
+                    self.set_state(app, |state| state.tooltip_open = false);
+                }
             })
             .on_show_hover_highlight(move |app, value| {
                 // `Slider::OnPointerEntered` / `OnPointerExited`; the thumb exits with the control.
@@ -647,6 +704,10 @@ struct TemplateStates {
     focused: bool,
     intermediate_value: f64,
     zoom_scale: f64,
+    /// Source-controlled thumb tooltip visibility.
+    tooltip_open: bool,
+    /// Separation chosen by the input that opened the tooltip.
+    tooltip_offset: f64,
 }
 
 /// The brushes the slider's `CommonStates` storyboards set for one state.
@@ -945,6 +1006,8 @@ fn horizontal_template(
                 .height_factor(1.0)
                 .child(thumb(
                     resources,
+                    widget,
+                    states,
                     brushes.thumb,
                     states.thumb,
                     SLIDER_HORIZONTAL_THUMB_WIDTH,
@@ -1083,6 +1146,8 @@ fn vertical_template(
                 .height_factor(1.0)
                 .child(thumb(
                     resources,
+                    widget,
+                    states,
                     brushes.thumb,
                     states.thumb,
                     SLIDER_VERTICAL_THUMB_WIDTH,
@@ -1117,6 +1182,8 @@ fn vertical_template(
 /// A `Thumb` with `SliderThumbStyle`: the `Border` overhanging the `width × height` slot by `THUMB_BORDER_OVERHANG`, `SliderOuterThumbBackground` inside `SliderThumbBorderBrush`, around `SliderInnerThumb` at the scale its state animates to.
 fn thumb(
     resources: &ThemeResources,
+    widget: &Slider,
+    states: TemplateStates,
     fill: Color,
     state: CommonState,
     width: f64,
@@ -1138,7 +1205,7 @@ fn thumb(
     .corner_radius(SLIDER_THUMB_CORNER_RADIUS[0])
     .child(Center::new().child(inner));
     let overhang = 2.0 * THUMB_BORDER_OVERHANG;
-    SizedBox::new()
+    let owner = SizedBox::new()
         .width(width)
         .height(height)
         .child(
@@ -1149,7 +1216,44 @@ fn thumb(
                 .max_height(height + overhang)
                 .child(border),
         )
+        .into_widget();
+    let value = widget.range().value;
+    let text = widget
+        .thumb_tool_tip_value_converter
+        .as_ref()
+        .map(|converter| converter(value))
+        .unwrap_or_else(|| format_thumb_value(value, widget.step_frequency));
+    let tooltip = ToolTip::new(Text::new(text).style(control_text_style(
+        15.0,
+        reveal_embedder::FontWeight::W400,
+        resources.common.text_fill_color_primary,
+    )))
+    .padding([8.0, 3.0, 8.0, 5.0])
+    .placement(if widget.orientation == Orientation::Horizontal {
+        PlacementMode::Top
+    } else {
+        PlacementMode::Left
+    })
+    .horizontal_offset(states.tooltip_offset)
+    .vertical_offset(states.tooltip_offset);
+    ToolTipService::new(owner, tooltip)
+        .is_open(states.tooltip_open)
         .into_widget()
+}
+
+/// DefaultDisambiguationUIConverter: decimal precision follows StepFrequency, capped at four places.
+fn format_thumb_value(value: f64, mut step: f64) -> String {
+    let mut places = 0;
+    while fractional(step).abs() > 0.00001 && places < 4 {
+        places += 1;
+        step *= 10.0;
+    }
+    let mut scale = 1.0;
+    for _ in 0..places {
+        scale /= 10.0;
+    }
+    let rounded = (value / scale + 0.5).floor() * scale;
+    format!("{rounded:.places$}")
 }
 
 /// XAML `Ellipse` with a solid `Fill`, filling its box.
@@ -1161,7 +1265,11 @@ struct EllipsePainter {
 impl CustomPainter for EllipsePainter {
     fn paint(&self, _app: &mut App, canvas: &mut Canvas, size: Size) {
         let bounds = Rect::from_ltwh(0.0, 0.0, size.width(), size.height());
-        draw_oval(canvas, bounds, &Brush::Solid(self.fill).fill(bounds));
+        draw_oval(
+            canvas,
+            bounds,
+            &reveal_embedder::Paint::from_color(self.fill.into()),
+        );
     }
 
     fn should_repaint(&self, _app: &App, old_delegate: &dyn CustomPainter) -> bool {
@@ -1170,5 +1278,18 @@ impl CustomPainter for EllipsePainter {
 
     fn as_any(&self) -> &dyn std::any::Any {
         self
+    }
+}
+
+#[cfg(test)]
+mod tooltip_tests {
+    use super::format_thumb_value;
+    #[test]
+    fn default_converter_uses_step_precision_capped_at_four_and_source_rounding() {
+        assert_eq!(format_thumb_value(0.57, 0.1), "0.6");
+        assert_eq!(format_thumb_value(12.0, 0.01), "12.00");
+        assert_eq!(format_thumb_value(0.123456, 0.123456), "0.1235");
+        assert_eq!(format_thumb_value(0.123456, 0.000001), "0");
+        assert_eq!(format_thumb_value(-0.55, 0.1), "-0.5");
     }
 }

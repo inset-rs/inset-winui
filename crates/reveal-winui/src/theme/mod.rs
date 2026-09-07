@@ -9,6 +9,20 @@ use reveal_embedder::Color;
 use reveal_foundation::App;
 use reveal_widgets::{BuildContext, InheritedWidget, IntoWidget, MediaQuery, WidgetRef};
 
+/// The source AcrylicBrush tint, luminosity, and fallback recipe.
+/// `Brush::Acrylic` paints the in-window material using these values.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct AcrylicBrushResources {
+    /// The colour blended over the blurred backdrop.
+    pub tint_color: Color,
+    /// The opacity applied to the tint colour.
+    pub tint_opacity: f64,
+    /// An explicit luminosity-layer opacity, or the source's automatic calculation.
+    pub tint_luminosity_opacity: Option<f64>,
+    /// The source colour used when acrylic composition is unavailable.
+    pub fallback_color: Color,
+}
+
 /// XAML `ElementTheme` / the theme dictionary a lookup resolves in. High contrast is deferred: its values are the OS's system colours.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub enum Theme {
@@ -116,6 +130,31 @@ impl ThemeResources {
 
     pub fn tool_tip(&self) -> ToolTipResources {
         ToolTipResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The tab strip and tab item resources for this theme.
+    pub fn tab_view(&self) -> TabViewResources {
+        TabViewResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The desktop scroll indicator resources for this theme.
+    pub fn scroll_bar(&self) -> ScrollBarResources {
+        ScrollBarResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The interactive popup presenter resources for this theme.
+    pub fn flyout_presenter(&self) -> FlyoutPresenterResources {
+        FlyoutPresenterResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The navigation back and close button resources for this theme.
+    pub fn navigation_back_button(&self) -> NavigationBackButtonResources {
+        NavigationBackButtonResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The navigation pane and top navigation resources for this theme.
+    pub fn navigation_view(&self) -> NavigationViewResources {
+        NavigationViewResources::for_theme(self.theme, &self.accent)
     }
 }
 

@@ -5,7 +5,7 @@
 //! Behaviour follows `RepeatButton_Partial.cpp` and `ButtonBaseKeyProcess.h`: pointer and Space presses click immediately and start the repeat timer; Enter clicks once. The control owns its pressed state and focus node so activation keys reach its Press-mode handler before application shortcuts.
 
 use crate::{
-    BUTTON_BORDER_THEME_THICKNESS, BUTTON_PADDING, BackgroundSizing, Brush,
+    BUTTON_BORDER_THEME_THICKNESS, BUTTON_PADDING, BackgroundSizing, Brush, ButtonTemplate,
     CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, CONTROL_FASTER_ANIMATION_DURATION,
     ColorTransition, CommonState, ControlBorder, ControlStates, FocusVisual, RepeatButtonResources,
     ThemeResources, control_text_style,
@@ -77,17 +77,31 @@ fn is_press_key(key: LogicalKeyboardKey) -> bool {
 /// XAML `RepeatButton`: `Click` on the press, then again after `Delay` and every `Interval` while held.
 #[derive(Clone)]
 pub struct RepeatButton {
+    /// The content rendered by the button's template.
     pub content: WidgetRef,
+
+    /// Raised on the initial press and each repeat tick.
     pub click: Listener,
+
     /// XAML `Delay`: the time from the press to the first repeat.
     pub delay: Duration,
     /// XAML `Interval`: the time between repeats.
     pub interval: Duration,
+    /// Whether this button accepts input.
     pub is_enabled: bool,
+
+    /// Whether keyboard traversal includes this button; defaults to true.
+    pub is_tab_stop: bool,
+
+    /// An alternate ContentPresenter template using the same input and repeat state.
+    pub template: Option<ButtonTemplate>,
+
+    /// Identity of this button in its parent's child list.
     pub key: Option<KeyRef>,
 }
 
 impl RepeatButton {
+    /// Creates a repeating button with the default WinUI style.
     pub fn new<K>(content: impl IntoWidget<K>, click: Listener) -> RepeatButton {
         RepeatButton {
             content: content.into_widget(),
@@ -95,6 +109,8 @@ impl RepeatButton {
             delay: REPEAT_BUTTON_DELAY,
             interval: REPEAT_BUTTON_INTERVAL,
             is_enabled: true,
+            is_tab_stop: true,
+            template: None,
             key: None,
         }
     }
@@ -126,6 +142,22 @@ impl RepeatButton {
         self
     }
 
+    /// XAML `IsTabStop`.
+    pub fn is_tab_stop(mut self, is_tab_stop: bool) -> Self {
+        self.is_tab_stop = is_tab_stop;
+        self
+    }
+
+    /// Replaces the visual template while preserving repeat, keyboard and pointer handling.
+    pub fn template(
+        mut self,
+        builder: impl Fn(&mut App, BuildContext, ControlStates, WidgetRef) -> WidgetRef + 'static,
+    ) -> Self {
+        self.template = Some(Rc::new(builder));
+        self
+    }
+
+    /// Sets this button's identity.
     pub fn key(mut self, key: KeyRef) -> RepeatButton {
         self.key = Some(key);
         self
@@ -367,6 +399,7 @@ impl State for RepeatButtonState {
 
     fn init_state(self: Handle<Self>, app: &mut App) {
         let node = FocusNode::new(app).as_node();
+        node.set_skip_traversal(app, !self.widget(app).is_tab_stop);
         node.set_on_key_event(
             app,
             Some(Rc::new(move |app, _, event| self.on_key_event(app, event))),
@@ -375,6 +408,12 @@ impl State for RepeatButtonState {
     }
 
     fn did_update_widget(self: Handle<Self>, app: &mut App, old_widget: &RepeatButton) {
+        if self.widget(app).is_tab_stop != old_widget.is_tab_stop {
+            app.get(self)
+                .focus_node
+                .expect("initialized focus node")
+                .set_skip_traversal(app, !self.widget(app).is_tab_stop);
+        }
         // `RepeatButton::OnIsEnabledChanged`.
         if self.widget(app).is_enabled != old_widget.is_enabled {
             self.reset_repeat(app);
@@ -404,7 +443,11 @@ impl State for RepeatButtonState {
             },
             focused: state.focused && widget.is_enabled,
         };
-        let presenter = template(app, context, widget.content, states);
+        let presenter = if let Some(template) = widget.template {
+            template(app, context, states, widget.content)
+        } else {
+            template(app, context, widget.content, states)
+        };
         let pointer = PointerListener::new()
             .behavior(HitTestBehavior::Opaque)
             .on_pointer_down(Rc::new(move |app, event| {

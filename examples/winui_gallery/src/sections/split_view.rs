@@ -1,26 +1,56 @@
 //! SplitView's four display modes, pane placement, dimming and cancelable dismissal.
-use crate::{column, label, row, section};
+use crate::{column, example, example_row, label, section};
 use reveal_foundation::{App, Handle, Listener};
 use reveal_painting::EdgeInsetsGeometry;
 use reveal_widgets::*;
 use reveal_winui::*;
 
+/// Builds the configurable pane layout example.
 pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
-    section("SplitView", resources, SplitViewDemo.into_widget())
+    section(
+        "SplitView",
+        resources,
+        example(
+            "Pane layout and light dismissal",
+            "Compare all four display modes and both pane placements. Overlay modes can dismiss on outside click; inline modes reserve content space.",
+            resources,
+            SplitViewDemo.into_widget(),
+        ),
+    )
 }
 
+/// Owns the interactive pane configuration.
 #[derive(Debug)]
 struct SplitViewDemo;
 
+/// Tracks pane options, selected content, and lifecycle events.
 struct SplitViewDemoState {
+    /// Native widget lifecycle.
     state: StateData<SplitViewDemo>,
+
+    /// Owner-managed open state.
     open: bool,
+
+    /// Current pane layout mode.
     mode: SplitViewDisplayMode,
+
+    /// Side containing the pane.
     placement: SplitViewPanePlacement,
+
+    /// Whether overlay modes dim the content.
     dim: bool,
+
+    /// Whether dismiss requests are canceled.
     cancel: bool,
+
+    /// Selected content label.
     page: &'static str,
+
+    /// Most recent pane lifecycle event.
     event: &'static str,
+
+    /// Uses a wider open pane length.
+    wide: bool,
 }
 
 impl StatefulWidget for SplitViewDemo {
@@ -36,6 +66,7 @@ impl StatefulWidget for SplitViewDemo {
             cancel: false,
             page: "Home",
             event: "Ready",
+            wide: false,
         }
     }
 }
@@ -59,13 +90,14 @@ impl State for SplitViewDemoState {
                 state.event,
             )
         };
+        let wide = app.get(self).wide;
         let mode_name = match mode {
             SplitViewDisplayMode::Overlay => "Overlay",
             SplitViewDisplayMode::Inline => "Inline",
             SplitViewDisplayMode::CompactOverlay => "CompactOverlay",
             SplitViewDisplayMode::CompactInline => "CompactInline",
         };
-        let controls = row(
+        let controls = example_row(
             vec![
                 Button::text(
                     if open { "Close pane" } else { "Open pane" },
@@ -110,7 +142,7 @@ impl State for SplitViewDemoState {
             ],
             8.0,
         );
-        let options = row(
+        let options = example_row(
             vec![
                 CheckBox::new(Some(dim), move |app, value| {
                     self.set_state(app, |s| s.dim = value.unwrap_or(false))
@@ -121,6 +153,11 @@ impl State for SplitViewDemoState {
                     self.set_state(app, |s| s.cancel = value.unwrap_or(false))
                 })
                 .content(Text::new("Cancel light dismiss"))
+                .into_widget(),
+                CheckBox::new(Some(wide), move |app, value| {
+                    self.set_state(app, |s| s.wide = value.unwrap_or(false))
+                })
+                .content(Text::new("Wide pane (240 px)"))
                 .into_widget(),
             ],
             16.0,
@@ -158,7 +195,7 @@ impl State for SplitViewDemoState {
         })
         .display_mode(mode)
         .pane_placement(placement)
-        .open_pane_length(160.0)
+        .open_pane_length(if wide { 240.0 } else { 160.0 })
         .compact_pane_length(48.0)
         .light_dismiss_overlay_mode(if dim {
             LightDismissOverlayMode::On

@@ -14,7 +14,7 @@ use crate::{
 };
 use reveal_embedder::{Canvas, Color, FontWeight, Offset, Size};
 use reveal_foundation::{App, Listener};
-use reveal_painting::{AlignmentGeometry, EdgeInsetsGeometry, draw_oval};
+use reveal_painting::{AlignmentGeometry, EdgeInsetsGeometry};
 use reveal_rendering::{BoxConstraints, CustomPainter};
 use reveal_widgets::*;
 use std::{fmt, time::Duration};
@@ -359,15 +359,15 @@ impl CustomPainter for Ellipse {
     fn paint(&self, _app: &mut App, canvas: &mut Canvas, size: Size) {
         let bounds = Offset::ZERO & size;
         let geometry = bounds.deflate(self.stroke_thickness / 2.0);
-        if self.fill.representative_color().a > 0.0 {
-            draw_oval(canvas, geometry, &self.fill.fill(bounds));
+        if matches!(self.fill, Brush::Acrylic(_)) || self.fill.representative_color().a > 0.0 {
+            self.fill.paint_oval(canvas, geometry, bounds);
         }
-        if self.stroke_thickness > 0.0 && self.stroke.representative_color().a > 0.0 {
-            draw_oval(
-                canvas,
-                geometry,
-                &self.stroke.stroke(bounds, self.stroke_thickness),
-            );
+        if self.stroke_thickness > 0.0
+            && (matches!(self.stroke, Brush::Acrylic(_))
+                || self.stroke.representative_color().a > 0.0)
+        {
+            self.stroke
+                .paint_oval_stroke(canvas, geometry, bounds, self.stroke_thickness);
         }
     }
 

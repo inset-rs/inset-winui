@@ -1,9 +1,12 @@
-//! `Grid`: Auto, star and pixel columns, an Auto row over a star row, spacing and a column span.
-use crate::{label, section};
+//! `Grid`: sizing, spacing, spans and child alignment.
+
+use crate::{example, label, section};
 use reveal_embedder::Size;
+use reveal_painting::Alignment;
 use reveal_widgets::*;
 use reveal_winui::*;
 
+/// Builds the grid sizing, spanning and alignment example.
 pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
     let text = resources.common.text_fill_color_primary;
     let cell = |name: &str, brush: Brush| {
@@ -26,6 +29,7 @@ pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
         .row_definitions([
             RowDefinition::new(GridLength::AUTO),
             RowDefinition::new(GridLength::STAR),
+            RowDefinition::new(GridLength::AUTO),
         ])
         .row_spacing(8.0)
         .column_spacing(8.0)
@@ -35,18 +39,36 @@ pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
             GridCell::new(cell("80 px", fill)).column(2).into_widget(),
             GridCell::new(cell("Row 1, ColumnSpan 2", accent))
                 .row(1)
+                .column(1)
                 .column_span(2)
                 .into_widget(),
-            GridCell::new(cell("Row 1", fill))
+            GridCell::new(cell("RowSpan 2", fill))
                 .row(1)
+                .row_span(2)
+                .into_widget(),
+            GridCell::new(
+                Align::new()
+                    .alignment(Alignment::CENTER_RIGHT.into())
+                    .child(cell("Aligned right", accent)),
+            )
+            .row(2)
+            .column(1)
+            .into_widget(),
+            GridCell::new(cell("Bottom", fill))
+                .row(2)
                 .column(2)
                 .into_widget(),
         ]);
     section(
         "Grid",
         resources,
-        SizedBox::from_size(Some(Size::new(420.0, 100.0)))
-            .child(grid)
-            .into_widget(),
+        example(
+            "Sizing, spans and alignment",
+            "Auto, star and pixel tracks share a grid with a column span, a row span and a right-aligned child.",
+            resources,
+            SizedBox::from_size(Some(Size::new(420.0, 140.0)))
+                .child(grid)
+                .into_widget(),
+        ),
     )
 }

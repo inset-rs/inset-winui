@@ -73,6 +73,18 @@ impl Fixture {
         Self::with_root(size, winui_gallery::run)
     }
 
+    /// Mounts the gallery directly on the feature under test.
+    pub fn for_feature(size: [u32; 2], feature: winui_gallery::Feature) -> Self {
+        Self::with_root(size, move |app| winui_gallery::run_feature(app, feature))
+    }
+
+    /// Switches pages through the visible navigation item.
+    pub fn navigate(&mut self, feature: winui_gallery::Feature) {
+        self.ensure_visible(feature.title());
+        self.tap(feature.title());
+        self.pump();
+    }
+
     /// Mounts whatever `run` starts, for a test of one control.
     pub fn with_root(size: [u32; 2], run: impl FnOnce(&mut App)) -> Self {
         let (device, queue) = valo_harness::headless_device().expect("GPU required");
@@ -120,8 +132,30 @@ impl Fixture {
         }
         all
     }
+    /// Enumerates painted subtrees while excluding descendants of Offstage widgets.
+    fn onstage_elements(&self) -> Vec<AnyElement> {
+        let mut app = self.cell.borrow_mut();
+        let root = WidgetsBinding::instance(&mut app)
+            .root_element(&app)
+            .unwrap();
+        let mut elements = vec![root];
+        let mut index = 0;
+        while index < elements.len() {
+            let element = elements[index];
+            let offstage = reveal_widgets::downcast_widget::<reveal_widgets::Offstage>(
+                element.widget(&app).as_ref(),
+            )
+            .is_some_and(|widget| widget.offstage);
+            if !offstage {
+                elements.extend(element.children(&app));
+            }
+            index += 1;
+        }
+        elements
+    }
+
     pub fn find(&self, text: &str) -> Offset {
-        let elements = self.elements();
+        let elements = self.onstage_elements();
         let app = self.cell.borrow();
         for element in elements {
             if let Some(object) = element.render_object(&app)
@@ -139,6 +173,32 @@ impl Fixture {
         }
         panic!("missing label {text}")
     }
+    /// Brings an already mounted label into view before a test sends pointer input.
+    pub fn ensure_visible(&mut self, text: &str) {
+        let elements = self.onstage_elements();
+        let mut app = self.cell.borrow_mut();
+        let context = elements
+            .into_iter()
+            .find(|element| {
+                element
+                    .render_object(&app)
+                    .and_then(|object| object.downcast::<RenderParagraph>(&app))
+                    .is_some_and(|paragraph| paragraph.text(&app).to_plain_text(true, true) == text)
+            })
+            .unwrap_or_else(|| panic!("missing label {text}"));
+        drop(reveal_widgets::Scrollable::ensure_visible(
+            &mut app,
+            context,
+            0.5,
+            Duration::ZERO,
+            reveal_animation::Curves::linear(),
+            reveal_widgets::ScrollPositionAlignmentPolicy::Explicit,
+        ));
+        drop(app);
+        self.cell.checkpoint();
+        self.pump();
+    }
+
     pub fn send(&mut self, change: PointerChange, point: Offset) {
         let mut app = self.cell.borrow_mut();
         GestureBinding::instance(&mut app).handle_pointer_data_packet(

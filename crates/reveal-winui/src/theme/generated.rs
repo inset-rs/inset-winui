@@ -2,7 +2,7 @@
 //! Colours are ARGB literals resolved through every StaticResource alias in the
 //! XAML theme dictionaries; the XAML "Default" dictionary is the dark theme.
 #![allow(clippy::excessive_precision, unused_variables)]
-use super::{AccentPalette, Theme};
+use super::{AccentPalette, AcrylicBrushResources, Theme};
 use crate::BackgroundSizing;
 use reveal_embedder::{Color, FontWeight};
 use std::time::Duration;
@@ -10,102 +10,198 @@ use std::time::Duration;
 /// Theme-dependent resources of `Common_themeresources_any.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct CommonResources {
+    /// The resolved `TextFillColorPrimary` resource.
     pub text_fill_color_primary: Color,
+    /// The resolved `TextFillColorSecondary` resource.
     pub text_fill_color_secondary: Color,
+    /// The resolved `TextFillColorTertiary` resource.
     pub text_fill_color_tertiary: Color,
+    /// The resolved `TextFillColorDisabled` resource.
     pub text_fill_color_disabled: Color,
+    /// The resolved `TextFillColorInverse` resource.
     pub text_fill_color_inverse: Color,
+    /// The resolved `AccentTextFillColorDisabled` resource.
     pub accent_text_fill_color_disabled: Color,
+    /// The resolved `TextOnAccentFillColorSelectedText` resource.
     pub text_on_accent_fill_color_selected_text: Color,
+    /// The resolved `TextOnAccentFillColorPrimary` resource.
     pub text_on_accent_fill_color_primary: Color,
+    /// The resolved `TextOnAccentFillColorSecondary` resource.
     pub text_on_accent_fill_color_secondary: Color,
+    /// The resolved `TextOnAccentFillColorDisabled` resource.
     pub text_on_accent_fill_color_disabled: Color,
+    /// The resolved `ControlFillColorDefault` resource.
     pub control_fill_color_default: Color,
+    /// The resolved `ControlFillColorSecondary` resource.
     pub control_fill_color_secondary: Color,
+    /// The resolved `ControlFillColorTertiary` resource.
     pub control_fill_color_tertiary: Color,
+    /// The resolved `ControlFillColorQuarternary` resource.
     pub control_fill_color_quarternary: Color,
+    /// The resolved `ControlFillColorDisabled` resource.
     pub control_fill_color_disabled: Color,
+    /// The resolved `ControlFillColorTransparent` resource.
     pub control_fill_color_transparent: Color,
+    /// The resolved `ControlFillColorInputActive` resource.
     pub control_fill_color_input_active: Color,
+    /// The resolved `ControlStrongFillColorDefault` resource.
     pub control_strong_fill_color_default: Color,
+    /// The resolved `ControlStrongFillColorDisabled` resource.
     pub control_strong_fill_color_disabled: Color,
+    /// The resolved `ControlSolidFillColorDefault` resource.
     pub control_solid_fill_color_default: Color,
+    /// The resolved `SubtleFillColorTransparent` resource.
     pub subtle_fill_color_transparent: Color,
+    /// The resolved `SubtleFillColorSecondary` resource.
     pub subtle_fill_color_secondary: Color,
+    /// The resolved `SubtleFillColorTertiary` resource.
     pub subtle_fill_color_tertiary: Color,
+    /// The resolved `SubtleFillColorDisabled` resource.
     pub subtle_fill_color_disabled: Color,
+    /// The resolved `ControlAltFillColorTransparent` resource.
     pub control_alt_fill_color_transparent: Color,
+    /// The resolved `ControlAltFillColorSecondary` resource.
     pub control_alt_fill_color_secondary: Color,
+    /// The resolved `ControlAltFillColorTertiary` resource.
     pub control_alt_fill_color_tertiary: Color,
+    /// The resolved `ControlAltFillColorQuarternary` resource.
     pub control_alt_fill_color_quarternary: Color,
+    /// The resolved `ControlAltFillColorDisabled` resource.
     pub control_alt_fill_color_disabled: Color,
+    /// The resolved `ControlOnImageFillColorDefault` resource.
     pub control_on_image_fill_color_default: Color,
+    /// The resolved `ControlOnImageFillColorSecondary` resource.
     pub control_on_image_fill_color_secondary: Color,
+    /// The resolved `ControlOnImageFillColorTertiary` resource.
     pub control_on_image_fill_color_tertiary: Color,
+    /// The resolved `ControlOnImageFillColorDisabled` resource.
     pub control_on_image_fill_color_disabled: Color,
+    /// The resolved `AccentFillColorDisabled` resource.
     pub accent_fill_color_disabled: Color,
+    /// The resolved `ControlStrokeColorDefault` resource.
     pub control_stroke_color_default: Color,
+    /// The resolved `ControlStrokeColorSecondary` resource.
     pub control_stroke_color_secondary: Color,
+    /// The resolved `ControlStrokeColorOnAccentDefault` resource.
     pub control_stroke_color_on_accent_default: Color,
+    /// The resolved `ControlStrokeColorOnAccentSecondary` resource.
     pub control_stroke_color_on_accent_secondary: Color,
+    /// The resolved `ControlStrokeColorOnAccentTertiary` resource.
     pub control_stroke_color_on_accent_tertiary: Color,
+    /// The resolved `ControlStrokeColorOnAccentDisabled` resource.
     pub control_stroke_color_on_accent_disabled: Color,
+    /// The resolved `ControlStrokeColorForStrongFillWhenOnImage` resource.
     pub control_stroke_color_for_strong_fill_when_on_image: Color,
+    /// The resolved `CardStrokeColorDefault` resource.
     pub card_stroke_color_default: Color,
+    /// The resolved `CardStrokeColorDefaultSolid` resource.
     pub card_stroke_color_default_solid: Color,
+    /// The resolved `ControlStrongStrokeColorDefault` resource.
     pub control_strong_stroke_color_default: Color,
+    /// The resolved `ControlStrongStrokeColorDisabled` resource.
     pub control_strong_stroke_color_disabled: Color,
+    /// The resolved `SurfaceStrokeColorDefault` resource.
     pub surface_stroke_color_default: Color,
+    /// The resolved `SurfaceStrokeColorFlyout` resource.
     pub surface_stroke_color_flyout: Color,
+    /// The resolved `SurfaceStrokeColorInverse` resource.
     pub surface_stroke_color_inverse: Color,
+    /// The resolved `DividerStrokeColorDefault` resource.
     pub divider_stroke_color_default: Color,
+    /// The resolved `FocusStrokeColorOuter` resource.
     pub focus_stroke_color_outer: Color,
+    /// The resolved `FocusStrokeColorInner` resource.
     pub focus_stroke_color_inner: Color,
+    /// The resolved `CardBackgroundFillColorDefault` resource.
     pub card_background_fill_color_default: Color,
+    /// The resolved `CardBackgroundFillColorSecondary` resource.
     pub card_background_fill_color_secondary: Color,
+    /// The resolved `CardBackgroundFillColorTertiary` resource.
     pub card_background_fill_color_tertiary: Color,
+    /// The resolved `SmokeFillColorDefault` resource.
     pub smoke_fill_color_default: Color,
+    /// The resolved `LayerFillColorDefault` resource.
     pub layer_fill_color_default: Color,
+    /// The resolved `LayerFillColorAlt` resource.
     pub layer_fill_color_alt: Color,
+    /// The resolved `LayerOnAcrylicFillColorDefault` resource.
     pub layer_on_acrylic_fill_color_default: Color,
+    /// The resolved `LayerOnAccentAcrylicFillColorDefault` resource.
     pub layer_on_accent_acrylic_fill_color_default: Color,
+    /// The resolved `LayerOnMicaBaseAltFillColorDefault` resource.
     pub layer_on_mica_base_alt_fill_color_default: Color,
+    /// The resolved `LayerOnMicaBaseAltFillColorSecondary` resource.
     pub layer_on_mica_base_alt_fill_color_secondary: Color,
+    /// The resolved `LayerOnMicaBaseAltFillColorTertiary` resource.
     pub layer_on_mica_base_alt_fill_color_tertiary: Color,
+    /// The resolved `LayerOnMicaBaseAltFillColorTransparent` resource.
     pub layer_on_mica_base_alt_fill_color_transparent: Color,
+    /// The resolved `SolidBackgroundFillColorBase` resource.
     pub solid_background_fill_color_base: Color,
+    /// The resolved `SolidBackgroundFillColorSecondary` resource.
     pub solid_background_fill_color_secondary: Color,
+    /// The resolved `SolidBackgroundFillColorTertiary` resource.
     pub solid_background_fill_color_tertiary: Color,
+    /// The resolved `SolidBackgroundFillColorQuarternary` resource.
     pub solid_background_fill_color_quarternary: Color,
+    /// The resolved `SolidBackgroundFillColorQuinary` resource.
     pub solid_background_fill_color_quinary: Color,
+    /// The resolved `SolidBackgroundFillColorSenary` resource.
     pub solid_background_fill_color_senary: Color,
+    /// The resolved `SolidBackgroundFillColorTransparent` resource.
     pub solid_background_fill_color_transparent: Color,
+    /// The resolved `SolidBackgroundFillColorBaseAlt` resource.
     pub solid_background_fill_color_base_alt: Color,
+    /// The resolved `SystemFillColorSuccess` resource.
     pub system_fill_color_success: Color,
+    /// The resolved `SystemFillColorCaution` resource.
     pub system_fill_color_caution: Color,
+    /// The resolved `SystemFillColorCritical` resource.
     pub system_fill_color_critical: Color,
+    /// The resolved `SystemFillColorNeutral` resource.
     pub system_fill_color_neutral: Color,
+    /// The resolved `SystemFillColorSolidNeutral` resource.
     pub system_fill_color_solid_neutral: Color,
+    /// The resolved `SystemFillColorAttentionBackground` resource.
     pub system_fill_color_attention_background: Color,
+    /// The resolved `SystemFillColorSuccessBackground` resource.
     pub system_fill_color_success_background: Color,
+    /// The resolved `SystemFillColorCautionBackground` resource.
     pub system_fill_color_caution_background: Color,
+    /// The resolved `SystemFillColorCriticalBackground` resource.
     pub system_fill_color_critical_background: Color,
+    /// The resolved `SystemFillColorNeutralBackground` resource.
     pub system_fill_color_neutral_background: Color,
+    /// The resolved `SystemFillColorSolidAttentionBackground` resource.
     pub system_fill_color_solid_attention_background: Color,
+    /// The resolved `SystemFillColorSolidNeutralBackground` resource.
     pub system_fill_color_solid_neutral_background: Color,
+    /// The resolved `ControlElevationBorderBrush` resource.
     pub control_elevation_border_brush: [(f64, Color); 2],
+    /// The resolved `CircleElevationBorderBrush` resource.
     pub circle_elevation_border_brush: [(f64, Color); 2],
+    /// The resolved `AccentControlElevationBorderBrush` resource.
     pub accent_control_elevation_border_brush: [(f64, Color); 2],
+    /// The resolved `SystemColorWindowTextColorBrush` resource.
     pub system_color_window_text_color_brush: Color,
+    /// The resolved `SystemColorWindowColorBrush` resource.
     pub system_color_window_color_brush: Color,
+    /// The resolved `SystemColorButtonFaceColorBrush` resource.
     pub system_color_button_face_color_brush: Color,
+    /// The resolved `SystemColorButtonTextColorBrush` resource.
     pub system_color_button_text_color_brush: Color,
+    /// The resolved `SystemColorHighlightColorBrush` resource.
     pub system_color_highlight_color_brush: Color,
+    /// The resolved `SystemColorHighlightTextColorBrush` resource.
     pub system_color_highlight_text_color_brush: Color,
+    /// The resolved `SystemColorHotlightColorBrush` resource.
     pub system_color_hotlight_color_brush: Color,
+    /// The resolved `SystemColorGrayTextColorBrush` resource.
     pub system_color_gray_text_color_brush: Color,
 }
+
 impl CommonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -332,54 +428,126 @@ pub const CONTROL_FASTER_ANIMATION_DURATION: Duration = Duration::from_millis(83
 /// Theme-dependent resources of `Button_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ButtonResources {
+    /// The resolved `AccentButtonBackground` resource.
     pub accent_button_background: Color,
+    /// The resolved `AccentButtonBackgroundPointerOver` resource.
     pub accent_button_background_pointer_over: Color,
+    /// The resolved `AccentButtonBackgroundPressed` resource.
     pub accent_button_background_pressed: Color,
+    /// The resolved `AccentButtonBackgroundDisabled` resource.
     pub accent_button_background_disabled: Color,
+    /// The resolved `AccentButtonForeground` resource.
     pub accent_button_foreground: Color,
+    /// The resolved `AccentButtonForegroundPointerOver` resource.
     pub accent_button_foreground_pointer_over: Color,
+    /// The resolved `AccentButtonForegroundPressed` resource.
     pub accent_button_foreground_pressed: Color,
+    /// The resolved `AccentButtonForegroundDisabled` resource.
     pub accent_button_foreground_disabled: Color,
+    /// The resolved `AccentButtonBorderBrush` resource.
     pub accent_button_border_brush: [(f64, Color); 2],
+    /// The resolved `AccentButtonBorderBrushPointerOver` resource.
     pub accent_button_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `AccentButtonBorderBrushPressed` resource.
     pub accent_button_border_brush_pressed: Color,
+    /// The resolved `AccentButtonBorderBrushDisabled` resource.
     pub accent_button_border_brush_disabled: Color,
+    /// The resolved `SubtleButtonBackground` resource.
     pub subtle_button_background: Color,
+    /// The resolved `SubtleButtonBackgroundPointerOver` resource.
     pub subtle_button_background_pointer_over: Color,
+    /// The resolved `SubtleButtonBackgroundPressed` resource.
     pub subtle_button_background_pressed: Color,
+    /// The resolved `SubtleButtonBackgroundDisabled` resource.
     pub subtle_button_background_disabled: Color,
+    /// The resolved `SubtleButtonForeground` resource.
     pub subtle_button_foreground: Color,
+    /// The resolved `SubtleButtonForegroundPointerOver` resource.
     pub subtle_button_foreground_pointer_over: Color,
+    /// The resolved `SubtleButtonForegroundPressed` resource.
     pub subtle_button_foreground_pressed: Color,
+    /// The resolved `SubtleButtonForegroundDisabled` resource.
     pub subtle_button_foreground_disabled: Color,
+    /// The resolved `SubtleButtonBorderBrush` resource.
     pub subtle_button_border_brush: Color,
+    /// The resolved `SubtleButtonBorderBrushPointerOver` resource.
     pub subtle_button_border_brush_pointer_over: Color,
+    /// The resolved `SubtleButtonBorderBrushPressed` resource.
     pub subtle_button_border_brush_pressed: Color,
+    /// The resolved `SubtleButtonBorderBrushDisabled` resource.
     pub subtle_button_border_brush_disabled: Color,
+    /// The resolved `ButtonBackground` resource.
     pub button_background: Color,
+    /// The resolved `ButtonBackgroundPointerOver` resource.
     pub button_background_pointer_over: Color,
+    /// The resolved `ButtonBackgroundPressed` resource.
     pub button_background_pressed: Color,
+    /// The resolved `ButtonBackgroundDisabled` resource.
     pub button_background_disabled: Color,
+    /// The resolved `ButtonForeground` resource.
     pub button_foreground: Color,
+    /// The resolved `ButtonForegroundPointerOver` resource.
     pub button_foreground_pointer_over: Color,
+    /// The resolved `ButtonForegroundPressed` resource.
     pub button_foreground_pressed: Color,
+    /// The resolved `ButtonForegroundDisabled` resource.
     pub button_foreground_disabled: Color,
+    /// The resolved `ButtonBorderBrush` resource.
     pub button_border_brush: [(f64, Color); 2],
+    /// The resolved `ButtonBorderBrushPointerOver` resource.
     pub button_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `ButtonBorderBrushPressed` resource.
     pub button_border_brush_pressed: Color,
+    /// The resolved `ButtonBorderBrushDisabled` resource.
     pub button_border_brush_disabled: Color,
+    /// The resolved `ButtonBackgroundThemeBrush` resource.
     pub button_background_theme_brush: Color,
+    /// The resolved `ButtonBorderThemeBrush` resource.
     pub button_border_theme_brush: Color,
+    /// The resolved `ButtonDisabledBackgroundThemeBrush` resource.
     pub button_disabled_background_theme_brush: Color,
+    /// The resolved `ButtonDisabledBorderThemeBrush` resource.
     pub button_disabled_border_theme_brush: Color,
+    /// The resolved `ButtonDisabledForegroundThemeBrush` resource.
     pub button_disabled_foreground_theme_brush: Color,
+    /// The resolved `ButtonForegroundThemeBrush` resource.
     pub button_foreground_theme_brush: Color,
+    /// The resolved `ButtonPointerOverBackgroundThemeBrush` resource.
     pub button_pointer_over_background_theme_brush: Color,
+    /// The resolved `ButtonPointerOverForegroundThemeBrush` resource.
     pub button_pointer_over_foreground_theme_brush: Color,
+    /// The resolved `ButtonPressedBackgroundThemeBrush` resource.
     pub button_pressed_background_theme_brush: Color,
+    /// The resolved `ButtonPressedForegroundThemeBrush` resource.
     pub button_pressed_foreground_theme_brush: Color,
+    /// The resolved `SystemControlHighlightAccentBrush` resource.
+    pub system_control_highlight_accent_brush: Color,
+    /// The resolved `SystemControlForegroundAccentBrush` resource.
+    pub system_control_foreground_accent_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseMediumLowBrush` resource.
+    pub system_control_background_base_medium_low_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
+    pub system_control_background_base_low_brush: Color,
+    /// The resolved `SystemControlHighlightAltAccentBrush` resource.
+    pub system_control_highlight_alt_accent_brush: Color,
+    /// The resolved `SystemControlBackgroundChromeWhiteBrush` resource.
+    pub system_control_background_chrome_white_brush: Color,
+    /// The resolved `SystemControlHighlightBaseHighBrush` resource.
+    pub system_control_highlight_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumLowBrush` resource.
+    pub system_control_highlight_base_medium_low_brush: Color,
+    /// The resolved `SystemControlHighlightTransparentBrush` resource.
+    pub system_control_highlight_transparent_brush: Color,
+    /// The resolved `SystemControlDisabledTransparentBrush` resource.
+    pub system_control_disabled_transparent_brush: Color,
+    /// The resolved `SystemControlForegroundTransparentBrush` resource.
+    pub system_control_foreground_transparent_brush: Color,
 }
+
 impl ButtonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -441,6 +609,18 @@ impl ButtonResources {
                 button_pointer_over_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
                 button_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
                 button_pressed_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_foreground_accent_brush: accent.base,
+                system_control_background_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_highlight_alt_accent_brush: accent.base,
+                system_control_background_chrome_white_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_highlight_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
             Theme::Dark => Self {
                 accent_button_background: accent.light2,
@@ -501,10 +681,27 @@ impl ButtonResources {
                 button_pointer_over_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
                 button_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
                 button_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_foreground_accent_brush: accent.base,
+                system_control_background_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_highlight_alt_accent_brush: accent.base,
+                system_control_background_chrome_white_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_highlight_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
         }
     }
 }
+pub const CONTROL_CONTENT_THEME_FONT_SIZE: f64 = 14.0;
 /// Left, top, right, bottom.
 pub const BUTTON_PADDING: [f64; 4] = [11.0, 5.0, 11.0, 6.0];
 /// Left, top, right, bottom.
@@ -512,64 +709,124 @@ pub const BUTTON_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
 /// Theme-dependent resources of `ToggleSwitch_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ToggleSwitchResources {
+    /// The resolved `ToggleSwitchContentForeground` resource.
     pub toggle_switch_content_foreground: Color,
+    /// The resolved `ToggleSwitchContentForegroundDisabled` resource.
     pub toggle_switch_content_foreground_disabled: Color,
+    /// The resolved `ToggleSwitchHeaderForeground` resource.
     pub toggle_switch_header_foreground: Color,
+    /// The resolved `ToggleSwitchHeaderForegroundDisabled` resource.
     pub toggle_switch_header_foreground_disabled: Color,
+    /// The resolved `ToggleSwitchContainerBackground` resource.
     pub toggle_switch_container_background: Color,
+    /// The resolved `ToggleSwitchContainerBackgroundPointerOver` resource.
     pub toggle_switch_container_background_pointer_over: Color,
+    /// The resolved `ToggleSwitchContainerBackgroundPressed` resource.
     pub toggle_switch_container_background_pressed: Color,
+    /// The resolved `ToggleSwitchContainerBackgroundDisabled` resource.
     pub toggle_switch_container_background_disabled: Color,
+    /// The resolved `ToggleSwitchFillOff` resource.
     pub toggle_switch_fill_off: Color,
+    /// The resolved `ToggleSwitchFillOffPointerOver` resource.
     pub toggle_switch_fill_off_pointer_over: Color,
+    /// The resolved `ToggleSwitchFillOffPressed` resource.
     pub toggle_switch_fill_off_pressed: Color,
+    /// The resolved `ToggleSwitchFillOffDisabled` resource.
     pub toggle_switch_fill_off_disabled: Color,
+    /// The resolved `ToggleSwitchStrokeOff` resource.
     pub toggle_switch_stroke_off: Color,
+    /// The resolved `ToggleSwitchStrokeOffPointerOver` resource.
     pub toggle_switch_stroke_off_pointer_over: Color,
+    /// The resolved `ToggleSwitchStrokeOffPressed` resource.
     pub toggle_switch_stroke_off_pressed: Color,
+    /// The resolved `ToggleSwitchStrokeOffDisabled` resource.
     pub toggle_switch_stroke_off_disabled: Color,
+    /// The resolved `ToggleSwitchFillOn` resource.
     pub toggle_switch_fill_on: Color,
+    /// The resolved `ToggleSwitchFillOnPointerOver` resource.
     pub toggle_switch_fill_on_pointer_over: Color,
+    /// The resolved `ToggleSwitchFillOnPressed` resource.
     pub toggle_switch_fill_on_pressed: Color,
+    /// The resolved `ToggleSwitchFillOnDisabled` resource.
     pub toggle_switch_fill_on_disabled: Color,
+    /// The resolved `ToggleSwitchStrokeOn` resource.
     pub toggle_switch_stroke_on: Color,
+    /// The resolved `ToggleSwitchStrokeOnPointerOver` resource.
     pub toggle_switch_stroke_on_pointer_over: Color,
+    /// The resolved `ToggleSwitchStrokeOnPressed` resource.
     pub toggle_switch_stroke_on_pressed: Color,
+    /// The resolved `ToggleSwitchStrokeOnDisabled` resource.
     pub toggle_switch_stroke_on_disabled: Color,
+    /// The resolved `ToggleSwitchKnobFillOff` resource.
     pub toggle_switch_knob_fill_off: Color,
+    /// The resolved `ToggleSwitchKnobFillOffPointerOver` resource.
     pub toggle_switch_knob_fill_off_pointer_over: Color,
+    /// The resolved `ToggleSwitchKnobFillOffPressed` resource.
     pub toggle_switch_knob_fill_off_pressed: Color,
+    /// The resolved `ToggleSwitchKnobFillOffDisabled` resource.
     pub toggle_switch_knob_fill_off_disabled: Color,
+    /// The resolved `ToggleSwitchKnobFillOn` resource.
     pub toggle_switch_knob_fill_on: Color,
+    /// The resolved `ToggleSwitchKnobFillOnPointerOver` resource.
     pub toggle_switch_knob_fill_on_pointer_over: Color,
+    /// The resolved `ToggleSwitchKnobFillOnPressed` resource.
     pub toggle_switch_knob_fill_on_pressed: Color,
+    /// The resolved `ToggleSwitchKnobFillOnDisabled` resource.
     pub toggle_switch_knob_fill_on_disabled: Color,
+    /// The resolved `ToggleSwitchKnobStrokeOn` resource.
     pub toggle_switch_knob_stroke_on: [(f64, Color); 2],
+    /// The resolved `ToggleSwitchCurtainBackgroundThemeBrush` resource.
     pub toggle_switch_curtain_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchCurtainDisabledBackgroundThemeBrush` resource.
     pub toggle_switch_curtain_disabled_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchCurtainPointerOverBackgroundThemeBrush` resource.
     pub toggle_switch_curtain_pointer_over_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchCurtainPressedBackgroundThemeBrush` resource.
     pub toggle_switch_curtain_pressed_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchDisabledForegroundThemeBrush` resource.
     pub toggle_switch_disabled_foreground_theme_brush: Color,
+    /// The resolved `ToggleSwitchForegroundThemeBrush` resource.
     pub toggle_switch_foreground_theme_brush: Color,
+    /// The resolved `ToggleSwitchHeaderDisabledForegroundThemeBrush` resource.
     pub toggle_switch_header_disabled_foreground_theme_brush: Color,
+    /// The resolved `ToggleSwitchHeaderForegroundThemeBrush` resource.
     pub toggle_switch_header_foreground_theme_brush: Color,
+    /// The resolved `ToggleSwitchOuterBorderBorderThemeBrush` resource.
     pub toggle_switch_outer_border_border_theme_brush: Color,
+    /// The resolved `ToggleSwitchOuterBorderDisabledBorderThemeBrush` resource.
     pub toggle_switch_outer_border_disabled_border_theme_brush: Color,
+    /// The resolved `ToggleSwitchThumbBackgroundThemeBrush` resource.
     pub toggle_switch_thumb_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchThumbBorderThemeBrush` resource.
     pub toggle_switch_thumb_border_theme_brush: Color,
+    /// The resolved `ToggleSwitchThumbDisabledBackgroundThemeBrush` resource.
     pub toggle_switch_thumb_disabled_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchThumbDisabledBorderThemeBrush` resource.
     pub toggle_switch_thumb_disabled_border_theme_brush: Color,
+    /// The resolved `ToggleSwitchThumbPointerOverBackgroundThemeBrush` resource.
     pub toggle_switch_thumb_pointer_over_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchThumbPointerOverBorderThemeBrush` resource.
     pub toggle_switch_thumb_pointer_over_border_theme_brush: Color,
+    /// The resolved `ToggleSwitchThumbPressedBackgroundThemeBrush` resource.
     pub toggle_switch_thumb_pressed_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchThumbPressedForegroundThemeBrush` resource.
     pub toggle_switch_thumb_pressed_foreground_theme_brush: Color,
+    /// The resolved `ToggleSwitchTrackBackgroundThemeBrush` resource.
     pub toggle_switch_track_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchTrackBorderThemeBrush` resource.
     pub toggle_switch_track_border_theme_brush: Color,
+    /// The resolved `ToggleSwitchTrackDisabledBackgroundThemeBrush` resource.
     pub toggle_switch_track_disabled_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchTrackPointerOverBackgroundThemeBrush` resource.
     pub toggle_switch_track_pointer_over_background_theme_brush: Color,
+    /// The resolved `ToggleSwitchTrackPressedBackgroundThemeBrush` resource.
     pub toggle_switch_track_pressed_background_theme_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
 }
+
 impl ToggleSwitchResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -648,6 +905,7 @@ impl ToggleSwitchResources {
                     74, 0, 0, 0,
                 ),
                 toggle_switch_track_pressed_background_theme_brush: Color::from_argb(66, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
             Theme::Dark => Self {
                 toggle_switch_content_foreground: Color::from_argb(255, 255, 255, 255),
@@ -735,6 +993,7 @@ impl ToggleSwitchResources {
                 toggle_switch_track_pressed_background_theme_brush: Color::from_argb(
                     89, 255, 255, 255,
                 ),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
         }
     }
@@ -749,94 +1008,182 @@ pub const TOGGLE_SWITCH_OUTER_BORDER_STROKE_THICKNESS: f64 = 1.0;
 /// Theme-dependent resources of `CheckBox_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct CheckBoxResources {
+    /// The resolved `CheckBoxForegroundUnchecked` resource.
     pub check_box_foreground_unchecked: Color,
+    /// The resolved `CheckBoxForegroundUncheckedPointerOver` resource.
     pub check_box_foreground_unchecked_pointer_over: Color,
+    /// The resolved `CheckBoxForegroundUncheckedPressed` resource.
     pub check_box_foreground_unchecked_pressed: Color,
+    /// The resolved `CheckBoxForegroundUncheckedDisabled` resource.
     pub check_box_foreground_unchecked_disabled: Color,
+    /// The resolved `CheckBoxForegroundChecked` resource.
     pub check_box_foreground_checked: Color,
+    /// The resolved `CheckBoxForegroundCheckedPointerOver` resource.
     pub check_box_foreground_checked_pointer_over: Color,
+    /// The resolved `CheckBoxForegroundCheckedPressed` resource.
     pub check_box_foreground_checked_pressed: Color,
+    /// The resolved `CheckBoxForegroundCheckedDisabled` resource.
     pub check_box_foreground_checked_disabled: Color,
+    /// The resolved `CheckBoxForegroundIndeterminate` resource.
     pub check_box_foreground_indeterminate: Color,
+    /// The resolved `CheckBoxForegroundIndeterminatePointerOver` resource.
     pub check_box_foreground_indeterminate_pointer_over: Color,
+    /// The resolved `CheckBoxForegroundIndeterminatePressed` resource.
     pub check_box_foreground_indeterminate_pressed: Color,
+    /// The resolved `CheckBoxForegroundIndeterminateDisabled` resource.
     pub check_box_foreground_indeterminate_disabled: Color,
+    /// The resolved `CheckBoxBackgroundUnchecked` resource.
     pub check_box_background_unchecked: Color,
+    /// The resolved `CheckBoxBackgroundUncheckedPointerOver` resource.
     pub check_box_background_unchecked_pointer_over: Color,
+    /// The resolved `CheckBoxBackgroundUncheckedPressed` resource.
     pub check_box_background_unchecked_pressed: Color,
+    /// The resolved `CheckBoxBackgroundUncheckedDisabled` resource.
     pub check_box_background_unchecked_disabled: Color,
+    /// The resolved `CheckBoxBackgroundChecked` resource.
     pub check_box_background_checked: Color,
+    /// The resolved `CheckBoxBackgroundCheckedPointerOver` resource.
     pub check_box_background_checked_pointer_over: Color,
+    /// The resolved `CheckBoxBackgroundCheckedPressed` resource.
     pub check_box_background_checked_pressed: Color,
+    /// The resolved `CheckBoxBackgroundCheckedDisabled` resource.
     pub check_box_background_checked_disabled: Color,
+    /// The resolved `CheckBoxBackgroundIndeterminate` resource.
     pub check_box_background_indeterminate: Color,
+    /// The resolved `CheckBoxBackgroundIndeterminatePointerOver` resource.
     pub check_box_background_indeterminate_pointer_over: Color,
+    /// The resolved `CheckBoxBackgroundIndeterminatePressed` resource.
     pub check_box_background_indeterminate_pressed: Color,
+    /// The resolved `CheckBoxBackgroundIndeterminateDisabled` resource.
     pub check_box_background_indeterminate_disabled: Color,
+    /// The resolved `CheckBoxBorderBrushUnchecked` resource.
     pub check_box_border_brush_unchecked: Color,
+    /// The resolved `CheckBoxBorderBrushUncheckedPointerOver` resource.
     pub check_box_border_brush_unchecked_pointer_over: Color,
+    /// The resolved `CheckBoxBorderBrushUncheckedPressed` resource.
     pub check_box_border_brush_unchecked_pressed: Color,
+    /// The resolved `CheckBoxBorderBrushUncheckedDisabled` resource.
     pub check_box_border_brush_unchecked_disabled: Color,
+    /// The resolved `CheckBoxBorderBrushChecked` resource.
     pub check_box_border_brush_checked: Color,
+    /// The resolved `CheckBoxBorderBrushCheckedPointerOver` resource.
     pub check_box_border_brush_checked_pointer_over: Color,
+    /// The resolved `CheckBoxBorderBrushCheckedPressed` resource.
     pub check_box_border_brush_checked_pressed: Color,
+    /// The resolved `CheckBoxBorderBrushCheckedDisabled` resource.
     pub check_box_border_brush_checked_disabled: Color,
+    /// The resolved `CheckBoxBorderBrushIndeterminate` resource.
     pub check_box_border_brush_indeterminate: Color,
+    /// The resolved `CheckBoxBorderBrushIndeterminatePointerOver` resource.
     pub check_box_border_brush_indeterminate_pointer_over: Color,
+    /// The resolved `CheckBoxBorderBrushIndeterminatePressed` resource.
     pub check_box_border_brush_indeterminate_pressed: Color,
+    /// The resolved `CheckBoxBorderBrushIndeterminateDisabled` resource.
     pub check_box_border_brush_indeterminate_disabled: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeUnchecked` resource.
     pub check_box_check_background_stroke_unchecked: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeUncheckedPointerOver` resource.
     pub check_box_check_background_stroke_unchecked_pointer_over: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeUncheckedPressed` resource.
     pub check_box_check_background_stroke_unchecked_pressed: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeUncheckedDisabled` resource.
     pub check_box_check_background_stroke_unchecked_disabled: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeChecked` resource.
     pub check_box_check_background_stroke_checked: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeCheckedPointerOver` resource.
     pub check_box_check_background_stroke_checked_pointer_over: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeCheckedPressed` resource.
     pub check_box_check_background_stroke_checked_pressed: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeCheckedDisabled` resource.
     pub check_box_check_background_stroke_checked_disabled: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeIndeterminate` resource.
     pub check_box_check_background_stroke_indeterminate: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeIndeterminatePointerOver` resource.
     pub check_box_check_background_stroke_indeterminate_pointer_over: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeIndeterminatePressed` resource.
     pub check_box_check_background_stroke_indeterminate_pressed: Color,
+    /// The resolved `CheckBoxCheckBackgroundStrokeIndeterminateDisabled` resource.
     pub check_box_check_background_stroke_indeterminate_disabled: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillUnchecked` resource.
     pub check_box_check_background_fill_unchecked: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillUncheckedPointerOver` resource.
     pub check_box_check_background_fill_unchecked_pointer_over: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillUncheckedPressed` resource.
     pub check_box_check_background_fill_unchecked_pressed: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillUncheckedDisabled` resource.
     pub check_box_check_background_fill_unchecked_disabled: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillChecked` resource.
     pub check_box_check_background_fill_checked: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillCheckedPointerOver` resource.
     pub check_box_check_background_fill_checked_pointer_over: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillCheckedPressed` resource.
     pub check_box_check_background_fill_checked_pressed: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillCheckedDisabled` resource.
     pub check_box_check_background_fill_checked_disabled: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillIndeterminate` resource.
     pub check_box_check_background_fill_indeterminate: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillIndeterminatePointerOver` resource.
     pub check_box_check_background_fill_indeterminate_pointer_over: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillIndeterminatePressed` resource.
     pub check_box_check_background_fill_indeterminate_pressed: Color,
+    /// The resolved `CheckBoxCheckBackgroundFillIndeterminateDisabled` resource.
     pub check_box_check_background_fill_indeterminate_disabled: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundUnchecked` resource.
     pub check_box_check_glyph_foreground_unchecked: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundUncheckedPointerOver` resource.
     pub check_box_check_glyph_foreground_unchecked_pointer_over: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundUncheckedPressed` resource.
     pub check_box_check_glyph_foreground_unchecked_pressed: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundUncheckedDisabled` resource.
     pub check_box_check_glyph_foreground_unchecked_disabled: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundChecked` resource.
     pub check_box_check_glyph_foreground_checked: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundCheckedPointerOver` resource.
     pub check_box_check_glyph_foreground_checked_pointer_over: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundCheckedPressed` resource.
     pub check_box_check_glyph_foreground_checked_pressed: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundCheckedDisabled` resource.
     pub check_box_check_glyph_foreground_checked_disabled: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundIndeterminate` resource.
     pub check_box_check_glyph_foreground_indeterminate: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundIndeterminatePointerOver` resource.
     pub check_box_check_glyph_foreground_indeterminate_pointer_over: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundIndeterminatePressed` resource.
     pub check_box_check_glyph_foreground_indeterminate_pressed: Color,
+    /// The resolved `CheckBoxCheckGlyphForegroundIndeterminateDisabled` resource.
     pub check_box_check_glyph_foreground_indeterminate_disabled: Color,
+    /// The resolved `CheckBoxBackgroundThemeBrush` resource.
     pub check_box_background_theme_brush: Color,
+    /// The resolved `CheckBoxBorderThemeBrush` resource.
     pub check_box_border_theme_brush: Color,
+    /// The resolved `CheckBoxContentDisabledForegroundThemeBrush` resource.
     pub check_box_content_disabled_foreground_theme_brush: Color,
+    /// The resolved `CheckBoxContentForegroundThemeBrush` resource.
     pub check_box_content_foreground_theme_brush: Color,
+    /// The resolved `CheckBoxDisabledBackgroundThemeBrush` resource.
     pub check_box_disabled_background_theme_brush: Color,
+    /// The resolved `CheckBoxDisabledBorderThemeBrush` resource.
     pub check_box_disabled_border_theme_brush: Color,
+    /// The resolved `CheckBoxDisabledForegroundThemeBrush` resource.
     pub check_box_disabled_foreground_theme_brush: Color,
+    /// The resolved `CheckBoxForegroundThemeBrush` resource.
     pub check_box_foreground_theme_brush: Color,
+    /// The resolved `CheckBoxPointerOverBackgroundThemeBrush` resource.
     pub check_box_pointer_over_background_theme_brush: Color,
+    /// The resolved `CheckBoxPointerOverForegroundThemeBrush` resource.
     pub check_box_pointer_over_foreground_theme_brush: Color,
+    /// The resolved `CheckBoxPointerOverBorderThemeBrush` resource.
     pub check_box_pointer_over_border_theme_brush: Color,
+    /// The resolved `CheckBoxPressedBackgroundThemeBrush` resource.
     pub check_box_pressed_background_theme_brush: Color,
+    /// The resolved `CheckBoxPressedBorderThemeBrush` resource.
     pub check_box_pressed_border_theme_brush: Color,
+    /// The resolved `CheckBoxPressedForegroundThemeBrush` resource.
     pub check_box_pressed_foreground_theme_brush: Color,
 }
+
 impl CheckBoxResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -1102,62 +1449,120 @@ pub const CHECK_BOX_FOCUS_VISUAL_MARGIN: [f64; 4] = [-7.0, -3.0, -7.0, -3.0];
 /// Theme-dependent resources of `RadioButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct RadioButtonResources {
+    /// The resolved `RadioButtonForeground` resource.
     pub radio_button_foreground: Color,
+    /// The resolved `RadioButtonForegroundPointerOver` resource.
     pub radio_button_foreground_pointer_over: Color,
+    /// The resolved `RadioButtonForegroundPressed` resource.
     pub radio_button_foreground_pressed: Color,
+    /// The resolved `RadioButtonForegroundDisabled` resource.
     pub radio_button_foreground_disabled: Color,
+    /// The resolved `RadioButtonBackground` resource.
     pub radio_button_background: Color,
+    /// The resolved `RadioButtonBackgroundPointerOver` resource.
     pub radio_button_background_pointer_over: Color,
+    /// The resolved `RadioButtonBackgroundPressed` resource.
     pub radio_button_background_pressed: Color,
+    /// The resolved `RadioButtonBackgroundDisabled` resource.
     pub radio_button_background_disabled: Color,
+    /// The resolved `RadioButtonBorderBrush` resource.
     pub radio_button_border_brush: Color,
+    /// The resolved `RadioButtonBorderBrushPointerOver` resource.
     pub radio_button_border_brush_pointer_over: Color,
+    /// The resolved `RadioButtonBorderBrushPressed` resource.
     pub radio_button_border_brush_pressed: Color,
+    /// The resolved `RadioButtonBorderBrushDisabled` resource.
     pub radio_button_border_brush_disabled: Color,
+    /// The resolved `RadioButtonOuterEllipseStroke` resource.
     pub radio_button_outer_ellipse_stroke: Color,
+    /// The resolved `RadioButtonOuterEllipseStrokePointerOver` resource.
     pub radio_button_outer_ellipse_stroke_pointer_over: Color,
+    /// The resolved `RadioButtonOuterEllipseStrokePressed` resource.
     pub radio_button_outer_ellipse_stroke_pressed: Color,
+    /// The resolved `RadioButtonOuterEllipseStrokeDisabled` resource.
     pub radio_button_outer_ellipse_stroke_disabled: Color,
+    /// The resolved `RadioButtonOuterEllipseFill` resource.
     pub radio_button_outer_ellipse_fill: Color,
+    /// The resolved `RadioButtonOuterEllipseFillPointerOver` resource.
     pub radio_button_outer_ellipse_fill_pointer_over: Color,
+    /// The resolved `RadioButtonOuterEllipseFillPressed` resource.
     pub radio_button_outer_ellipse_fill_pressed: Color,
+    /// The resolved `RadioButtonOuterEllipseFillDisabled` resource.
     pub radio_button_outer_ellipse_fill_disabled: Color,
+    /// The resolved `RadioButtonOuterEllipseCheckedStroke` resource.
     pub radio_button_outer_ellipse_checked_stroke: Color,
+    /// The resolved `RadioButtonOuterEllipseCheckedStrokePointerOver` resource.
     pub radio_button_outer_ellipse_checked_stroke_pointer_over: Color,
+    /// The resolved `RadioButtonOuterEllipseCheckedStrokePressed` resource.
     pub radio_button_outer_ellipse_checked_stroke_pressed: Color,
+    /// The resolved `RadioButtonOuterEllipseCheckedStrokeDisabled` resource.
     pub radio_button_outer_ellipse_checked_stroke_disabled: Color,
+    /// The resolved `RadioButtonOuterEllipseCheckedFill` resource.
     pub radio_button_outer_ellipse_checked_fill: Color,
+    /// The resolved `RadioButtonOuterEllipseCheckedFillPointerOver` resource.
     pub radio_button_outer_ellipse_checked_fill_pointer_over: Color,
+    /// The resolved `RadioButtonOuterEllipseCheckedFillPressed` resource.
     pub radio_button_outer_ellipse_checked_fill_pressed: Color,
+    /// The resolved `RadioButtonOuterEllipseCheckedFillDisabled` resource.
     pub radio_button_outer_ellipse_checked_fill_disabled: Color,
+    /// The resolved `RadioButtonCheckGlyphFill` resource.
     pub radio_button_check_glyph_fill: Color,
+    /// The resolved `RadioButtonCheckGlyphFillPointerOver` resource.
     pub radio_button_check_glyph_fill_pointer_over: Color,
+    /// The resolved `RadioButtonCheckGlyphFillPressed` resource.
     pub radio_button_check_glyph_fill_pressed: Color,
+    /// The resolved `RadioButtonCheckGlyphFillDisabled` resource.
     pub radio_button_check_glyph_fill_disabled: Color,
+    /// The resolved `RadioButtonCheckGlyphStroke` resource.
     pub radio_button_check_glyph_stroke: [(f64, Color); 2],
+    /// The resolved `RadioButtonCheckGlyphStrokePointerOver` resource.
     pub radio_button_check_glyph_stroke_pointer_over: [(f64, Color); 2],
+    /// The resolved `RadioButtonCheckGlyphStrokePressed` resource.
     pub radio_button_check_glyph_stroke_pressed: [(f64, Color); 2],
+    /// The resolved `RadioButtonCheckGlyphStrokeDisabled` resource.
     pub radio_button_check_glyph_stroke_disabled: [(f64, Color); 2],
+    /// The resolved `RadioButtonCheckGlyphStrokeChecked` resource.
     pub radio_button_check_glyph_stroke_checked: [(f64, Color); 2],
+    /// The resolved `RadioButtonCheckGlyphStrokeCheckedPointerOver` resource.
     pub radio_button_check_glyph_stroke_checked_pointer_over: [(f64, Color); 2],
+    /// The resolved `RadioButtonCheckGlyphStrokeCheckedPressed` resource.
     pub radio_button_check_glyph_stroke_checked_pressed: [(f64, Color); 2],
+    /// The resolved `RadioButtonCheckGlyphStrokeCheckedDisabled` resource.
     pub radio_button_check_glyph_stroke_checked_disabled: [(f64, Color); 2],
+    /// The resolved `RadioButtonBackgroundThemeBrush` resource.
     pub radio_button_background_theme_brush: Color,
+    /// The resolved `RadioButtonBorderThemeBrush` resource.
     pub radio_button_border_theme_brush: Color,
+    /// The resolved `RadioButtonContentDisabledForegroundThemeBrush` resource.
     pub radio_button_content_disabled_foreground_theme_brush: Color,
+    /// The resolved `RadioButtonContentForegroundThemeBrush` resource.
     pub radio_button_content_foreground_theme_brush: Color,
+    /// The resolved `RadioButtonDisabledBackgroundThemeBrush` resource.
     pub radio_button_disabled_background_theme_brush: Color,
+    /// The resolved `RadioButtonDisabledBorderThemeBrush` resource.
     pub radio_button_disabled_border_theme_brush: Color,
+    /// The resolved `RadioButtonDisabledForegroundThemeBrush` resource.
     pub radio_button_disabled_foreground_theme_brush: Color,
+    /// The resolved `RadioButtonForegroundThemeBrush` resource.
     pub radio_button_foreground_theme_brush: Color,
+    /// The resolved `RadioButtonPointerOverBackgroundThemeBrush` resource.
     pub radio_button_pointer_over_background_theme_brush: Color,
+    /// The resolved `RadioButtonPointerOverBorderThemeBrush` resource.
     pub radio_button_pointer_over_border_theme_brush: Color,
+    /// The resolved `RadioButtonPointerOverForegroundThemeBrush` resource.
     pub radio_button_pointer_over_foreground_theme_brush: Color,
+    /// The resolved `RadioButtonPressedBackgroundThemeBrush` resource.
     pub radio_button_pressed_background_theme_brush: Color,
+    /// The resolved `RadioButtonPressedBorderThemeBrush` resource.
     pub radio_button_pressed_border_theme_brush: Color,
+    /// The resolved `RadioButtonPressedForegroundThemeBrush` resource.
     pub radio_button_pressed_foreground_theme_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
 }
+
 impl RadioButtonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -1243,6 +1648,7 @@ impl RadioButtonResources {
                 radio_button_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
                 radio_button_pressed_border_theme_brush: Color::from_argb(255, 0, 0, 0),
                 radio_button_pressed_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
             Theme::Dark => Self {
                 radio_button_foreground: Color::from_argb(255, 255, 255, 255),
@@ -1333,6 +1739,7 @@ impl RadioButtonResources {
                 radio_button_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
                 radio_button_pressed_border_theme_brush: Color::from_argb(255, 255, 255, 255),
                 radio_button_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
         }
     }
@@ -1344,62 +1751,142 @@ pub const RADIO_BUTTON_BORDER_THEME_THICKNESS: f64 = 1.0;
 /// Theme-dependent resources of `ToggleButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ToggleButtonResources {
+    /// The resolved `ToggleButtonBackground` resource.
     pub toggle_button_background: Color,
+    /// The resolved `ToggleButtonBackgroundPointerOver` resource.
     pub toggle_button_background_pointer_over: Color,
+    /// The resolved `ToggleButtonBackgroundPressed` resource.
     pub toggle_button_background_pressed: Color,
+    /// The resolved `ToggleButtonBackgroundDisabled` resource.
     pub toggle_button_background_disabled: Color,
+    /// The resolved `ToggleButtonBackgroundChecked` resource.
     pub toggle_button_background_checked: Color,
+    /// The resolved `ToggleButtonBackgroundCheckedPointerOver` resource.
     pub toggle_button_background_checked_pointer_over: Color,
+    /// The resolved `ToggleButtonBackgroundCheckedPressed` resource.
     pub toggle_button_background_checked_pressed: Color,
+    /// The resolved `ToggleButtonBackgroundCheckedDisabled` resource.
     pub toggle_button_background_checked_disabled: Color,
+    /// The resolved `ToggleButtonBackgroundIndeterminate` resource.
     pub toggle_button_background_indeterminate: Color,
+    /// The resolved `ToggleButtonBackgroundIndeterminatePointerOver` resource.
     pub toggle_button_background_indeterminate_pointer_over: Color,
+    /// The resolved `ToggleButtonBackgroundIndeterminatePressed` resource.
     pub toggle_button_background_indeterminate_pressed: Color,
+    /// The resolved `ToggleButtonBackgroundIndeterminateDisabled` resource.
     pub toggle_button_background_indeterminate_disabled: Color,
+    /// The resolved `ToggleButtonForeground` resource.
     pub toggle_button_foreground: Color,
+    /// The resolved `ToggleButtonForegroundPointerOver` resource.
     pub toggle_button_foreground_pointer_over: Color,
+    /// The resolved `ToggleButtonForegroundPressed` resource.
     pub toggle_button_foreground_pressed: Color,
+    /// The resolved `ToggleButtonForegroundDisabled` resource.
     pub toggle_button_foreground_disabled: Color,
+    /// The resolved `ToggleButtonForegroundChecked` resource.
     pub toggle_button_foreground_checked: Color,
+    /// The resolved `ToggleButtonForegroundCheckedPointerOver` resource.
     pub toggle_button_foreground_checked_pointer_over: Color,
+    /// The resolved `ToggleButtonForegroundCheckedPressed` resource.
     pub toggle_button_foreground_checked_pressed: Color,
+    /// The resolved `ToggleButtonForegroundCheckedDisabled` resource.
     pub toggle_button_foreground_checked_disabled: Color,
+    /// The resolved `ToggleButtonForegroundIndeterminate` resource.
     pub toggle_button_foreground_indeterminate: Color,
+    /// The resolved `ToggleButtonForegroundIndeterminatePointerOver` resource.
     pub toggle_button_foreground_indeterminate_pointer_over: Color,
+    /// The resolved `ToggleButtonForegroundIndeterminatePressed` resource.
     pub toggle_button_foreground_indeterminate_pressed: Color,
+    /// The resolved `ToggleButtonForegroundIndeterminateDisabled` resource.
     pub toggle_button_foreground_indeterminate_disabled: Color,
+    /// The resolved `ToggleButtonBorderBrush` resource.
     pub toggle_button_border_brush: [(f64, Color); 2],
+    /// The resolved `ToggleButtonBorderBrushPointerOver` resource.
     pub toggle_button_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `ToggleButtonBorderBrushPressed` resource.
     pub toggle_button_border_brush_pressed: Color,
+    /// The resolved `ToggleButtonBorderBrushDisabled` resource.
     pub toggle_button_border_brush_disabled: Color,
+    /// The resolved `ToggleButtonBorderBrushChecked` resource.
     pub toggle_button_border_brush_checked: [(f64, Color); 2],
+    /// The resolved `ToggleButtonBorderBrushCheckedPointerOver` resource.
     pub toggle_button_border_brush_checked_pointer_over: [(f64, Color); 2],
+    /// The resolved `ToggleButtonBorderBrushCheckedPressed` resource.
     pub toggle_button_border_brush_checked_pressed: Color,
+    /// The resolved `ToggleButtonBorderBrushCheckedDisabled` resource.
     pub toggle_button_border_brush_checked_disabled: Color,
+    /// The resolved `ToggleButtonBorderBrushIndeterminate` resource.
     pub toggle_button_border_brush_indeterminate: [(f64, Color); 2],
+    /// The resolved `ToggleButtonBorderBrushIndeterminatePointerOver` resource.
     pub toggle_button_border_brush_indeterminate_pointer_over: [(f64, Color); 2],
+    /// The resolved `ToggleButtonBorderBrushIndeterminatePressed` resource.
     pub toggle_button_border_brush_indeterminate_pressed: Color,
+    /// The resolved `ToggleButtonBorderBrushIndeterminateDisabled` resource.
     pub toggle_button_border_brush_indeterminate_disabled: Color,
+    /// The resolved `ToggleButtonBackgroundThemeBrush` resource.
     pub toggle_button_background_theme_brush: Color,
+    /// The resolved `ToggleButtonBorderThemeBrush` resource.
     pub toggle_button_border_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedBackgroundThemeBrush` resource.
     pub toggle_button_checked_background_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedBorderThemeBrush` resource.
     pub toggle_button_checked_border_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedDisabledBackgroundThemeBrush` resource.
     pub toggle_button_checked_disabled_background_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedDisabledForegroundThemeBrush` resource.
     pub toggle_button_checked_disabled_foreground_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedForegroundThemeBrush` resource.
     pub toggle_button_checked_foreground_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedPointerOverBackgroundThemeBrush` resource.
     pub toggle_button_checked_pointer_over_background_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedPointerOverBorderThemeBrush` resource.
     pub toggle_button_checked_pointer_over_border_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedPressedBackgroundThemeBrush` resource.
     pub toggle_button_checked_pressed_background_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedPressedBorderThemeBrush` resource.
     pub toggle_button_checked_pressed_border_theme_brush: Color,
+    /// The resolved `ToggleButtonCheckedPressedForegroundThemeBrush` resource.
     pub toggle_button_checked_pressed_foreground_theme_brush: Color,
+    /// The resolved `ToggleButtonDisabledBorderThemeBrush` resource.
     pub toggle_button_disabled_border_theme_brush: Color,
+    /// The resolved `ToggleButtonDisabledForegroundThemeBrush` resource.
     pub toggle_button_disabled_foreground_theme_brush: Color,
+    /// The resolved `ToggleButtonForegroundThemeBrush` resource.
     pub toggle_button_foreground_theme_brush: Color,
+    /// The resolved `ToggleButtonPointerOverBackgroundThemeBrush` resource.
     pub toggle_button_pointer_over_background_theme_brush: Color,
+    /// The resolved `ToggleButtonPressedBackgroundThemeBrush` resource.
     pub toggle_button_pressed_background_theme_brush: Color,
+    /// The resolved `ToggleButtonPressedForegroundThemeBrush` resource.
     pub toggle_button_pressed_foreground_theme_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
+    pub system_control_background_base_low_brush: Color,
+    /// The resolved `SystemControlHighlightAccentBrush` resource.
+    pub system_control_highlight_accent_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseMediumLowBrush` resource.
+    pub system_control_background_base_medium_low_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlHighlightBaseHighBrush` resource.
+    pub system_control_highlight_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlHighlightAltChromeWhiteBrush` resource.
+    pub system_control_highlight_alt_chrome_white_brush: Color,
+    /// The resolved `SystemControlForegroundTransparentBrush` resource.
+    pub system_control_foreground_transparent_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumLowBrush` resource.
+    pub system_control_highlight_base_medium_low_brush: Color,
+    /// The resolved `SystemControlDisabledTransparentBrush` resource.
+    pub system_control_disabled_transparent_brush: Color,
+    /// The resolved `SystemControlHighlightAltTransparentBrush` resource.
+    pub system_control_highlight_alt_transparent_brush: Color,
+    /// The resolved `SystemControlHighlightTransparentBrush` resource.
+    pub system_control_highlight_transparent_brush: Color,
 }
+
 impl ToggleButtonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -1489,6 +1976,20 @@ impl ToggleButtonResources {
                 toggle_button_pointer_over_background_theme_brush: Color::from_argb(33, 0, 0, 0),
                 toggle_button_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
                 toggle_button_pressed_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_background_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_highlight_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_highlight_alt_chrome_white_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_alt_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
             Theme::Dark => Self {
                 toggle_button_background: Color::from_argb(15, 255, 255, 255),
@@ -1591,6 +2092,24 @@ impl ToggleButtonResources {
                 ),
                 toggle_button_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
                 toggle_button_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_background_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_highlight_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_highlight_alt_chrome_white_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_alt_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
         }
     }
@@ -1602,20 +2121,46 @@ pub const TOGGLE_BUTTON_CHECKED_STATE_BACKGROUND_SIZING: BackgroundSizing =
 /// Theme-dependent resources of `HyperlinkButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct HyperlinkButtonResources {
+    /// The resolved `HyperlinkButtonForeground` resource.
     pub hyperlink_button_foreground: Color,
+    /// The resolved `HyperlinkButtonForegroundPointerOver` resource.
     pub hyperlink_button_foreground_pointer_over: Color,
+    /// The resolved `HyperlinkButtonForegroundPressed` resource.
     pub hyperlink_button_foreground_pressed: Color,
+    /// The resolved `HyperlinkButtonForegroundDisabled` resource.
     pub hyperlink_button_foreground_disabled: Color,
+    /// The resolved `HyperlinkButtonBackground` resource.
     pub hyperlink_button_background: Color,
+    /// The resolved `HyperlinkButtonBackgroundPointerOver` resource.
     pub hyperlink_button_background_pointer_over: Color,
+    /// The resolved `HyperlinkButtonBackgroundPressed` resource.
     pub hyperlink_button_background_pressed: Color,
+    /// The resolved `HyperlinkButtonBackgroundDisabled` resource.
     pub hyperlink_button_background_disabled: Color,
+    /// The resolved `HyperlinkButtonBorderBrush` resource.
     pub hyperlink_button_border_brush: Color,
+    /// The resolved `HyperlinkButtonBorderBrushPointerOver` resource.
     pub hyperlink_button_border_brush_pointer_over: Color,
+    /// The resolved `HyperlinkButtonBorderBrushPressed` resource.
     pub hyperlink_button_border_brush_pressed: Color,
+    /// The resolved `HyperlinkButtonBorderBrushDisabled` resource.
     pub hyperlink_button_border_brush_disabled: Color,
+    /// The resolved `SystemControlHyperlinkTextBrush` resource.
+    pub system_control_hyperlink_text_brush: Color,
+    /// The resolved `SystemControlPageTextBaseMediumBrush` resource.
+    pub system_control_page_text_base_medium_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumLowBrush` resource.
+    pub system_control_highlight_base_medium_low_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlPageBackgroundTransparentBrush` resource.
+    pub system_control_page_background_transparent_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
 }
+
 impl HyperlinkButtonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -1631,6 +2176,12 @@ impl HyperlinkButtonResources {
                 hyperlink_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
                 hyperlink_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
                 hyperlink_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                system_control_hyperlink_text_brush: accent.base,
+                system_control_page_text_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_page_background_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
             Theme::Dark => Self {
                 hyperlink_button_foreground: accent.light3,
@@ -1645,6 +2196,14 @@ impl HyperlinkButtonResources {
                 hyperlink_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
                 hyperlink_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
                 hyperlink_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                system_control_hyperlink_text_brush: accent.base,
+                system_control_page_text_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_page_background_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
         }
     }
@@ -1654,29 +2213,70 @@ pub const HYPERLINK_BUTTON_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.
 /// Theme-dependent resources of `RepeatButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct RepeatButtonResources {
+    /// The resolved `RepeatButtonBackground` resource.
     pub repeat_button_background: Color,
+    /// The resolved `RepeatButtonBackgroundPointerOver` resource.
     pub repeat_button_background_pointer_over: Color,
+    /// The resolved `RepeatButtonBackgroundPressed` resource.
     pub repeat_button_background_pressed: Color,
+    /// The resolved `RepeatButtonBackgroundDisabled` resource.
     pub repeat_button_background_disabled: Color,
+    /// The resolved `RepeatButtonForeground` resource.
     pub repeat_button_foreground: Color,
+    /// The resolved `RepeatButtonForegroundPointerOver` resource.
     pub repeat_button_foreground_pointer_over: Color,
+    /// The resolved `RepeatButtonForegroundPressed` resource.
     pub repeat_button_foreground_pressed: Color,
+    /// The resolved `RepeatButtonForegroundDisabled` resource.
     pub repeat_button_foreground_disabled: Color,
+    /// The resolved `RepeatButtonBorderBrush` resource.
     pub repeat_button_border_brush: [(f64, Color); 2],
+    /// The resolved `RepeatButtonBorderBrushPointerOver` resource.
     pub repeat_button_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `RepeatButtonBorderBrushPressed` resource.
     pub repeat_button_border_brush_pressed: Color,
+    /// The resolved `RepeatButtonBorderBrushDisabled` resource.
     pub repeat_button_border_brush_disabled: Color,
+    /// The resolved `RepeatButtonBorderThemeBrush` resource.
     pub repeat_button_border_theme_brush: Color,
+    /// The resolved `RepeatButtonDisabledBackgroundThemeBrush` resource.
     pub repeat_button_disabled_background_theme_brush: Color,
+    /// The resolved `RepeatButtonDisabledBorderThemeBrush` resource.
     pub repeat_button_disabled_border_theme_brush: Color,
+    /// The resolved `RepeatButtonDisabledForegroundThemeBrush` resource.
     pub repeat_button_disabled_foreground_theme_brush: Color,
+    /// The resolved `RepeatButtonForegroundThemeBrush` resource.
     pub repeat_button_foreground_theme_brush: Color,
+    /// The resolved `RepeatButtonPointerOverBackgroundThemeBrush` resource.
     pub repeat_button_pointer_over_background_theme_brush: Color,
+    /// The resolved `RepeatButtonPointerOverForegroundThemeBrush` resource.
     pub repeat_button_pointer_over_foreground_theme_brush: Color,
+    /// The resolved `RepeatButtonPressedBackgroundThemeBrush` resource.
     pub repeat_button_pressed_background_theme_brush: Color,
+    /// The resolved `RepeatButtonPressedForegroundThemeBrush` resource.
     pub repeat_button_pressed_foreground_theme_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
+    pub system_control_background_base_low_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseMediumLowBrush` resource.
+    pub system_control_background_base_medium_low_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlHighlightBaseHighBrush` resource.
+    pub system_control_highlight_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlForegroundTransparentBrush` resource.
+    pub system_control_foreground_transparent_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumLowBrush` resource.
+    pub system_control_highlight_base_medium_low_brush: Color,
+    /// The resolved `SystemControlHighlightTransparentBrush` resource.
+    pub system_control_highlight_transparent_brush: Color,
+    /// The resolved `SystemControlDisabledTransparentBrush` resource.
+    pub system_control_disabled_transparent_brush: Color,
 }
+
 impl RepeatButtonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -1709,6 +2309,15 @@ impl RepeatButtonResources {
                 repeat_button_pointer_over_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
                 repeat_button_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
                 repeat_button_pressed_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_background_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_highlight_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
             Theme::Dark => Self {
                 repeat_button_background: Color::from_argb(15, 255, 255, 255),
@@ -1742,6 +2351,19 @@ impl RepeatButtonResources {
                 ),
                 repeat_button_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
                 repeat_button_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_background_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_highlight_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
             },
         }
     }
@@ -1751,53 +2373,118 @@ pub const REPEAT_BUTTON_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
 /// Theme-dependent resources of `Slider_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SliderResources {
+    /// The resolved `SliderContainerBackground` resource.
     pub slider_container_background: Color,
+    /// The resolved `SliderContainerBackgroundPointerOver` resource.
     pub slider_container_background_pointer_over: Color,
+    /// The resolved `SliderContainerBackgroundPressed` resource.
     pub slider_container_background_pressed: Color,
+    /// The resolved `SliderContainerBackgroundDisabled` resource.
     pub slider_container_background_disabled: Color,
+    /// The resolved `SliderThumbBackground` resource.
     pub slider_thumb_background: Color,
+    /// The resolved `SliderThumbBackgroundPointerOver` resource.
     pub slider_thumb_background_pointer_over: Color,
+    /// The resolved `SliderThumbBackgroundPressed` resource.
     pub slider_thumb_background_pressed: Color,
+    /// The resolved `SliderThumbBackgroundDisabled` resource.
     pub slider_thumb_background_disabled: Color,
+    /// The resolved `SliderThumbBorderBrush` resource.
     pub slider_thumb_border_brush: [(f64, Color); 2],
+    /// The resolved `SliderOuterThumbBackground` resource.
     pub slider_outer_thumb_background: Color,
+    /// The resolved `SliderTrackFill` resource.
     pub slider_track_fill: Color,
+    /// The resolved `SliderTrackFillPointerOver` resource.
     pub slider_track_fill_pointer_over: Color,
+    /// The resolved `SliderTrackFillPressed` resource.
     pub slider_track_fill_pressed: Color,
+    /// The resolved `SliderTrackFillDisabled` resource.
     pub slider_track_fill_disabled: Color,
+    /// The resolved `SliderTrackValueFill` resource.
     pub slider_track_value_fill: Color,
+    /// The resolved `SliderTrackValueFillPointerOver` resource.
     pub slider_track_value_fill_pointer_over: Color,
+    /// The resolved `SliderTrackValueFillPressed` resource.
     pub slider_track_value_fill_pressed: Color,
+    /// The resolved `SliderTrackValueFillDisabled` resource.
     pub slider_track_value_fill_disabled: Color,
+    /// The resolved `SliderHeaderForeground` resource.
     pub slider_header_foreground: Color,
+    /// The resolved `SliderHeaderForegroundDisabled` resource.
     pub slider_header_foreground_disabled: Color,
+    /// The resolved `SliderTickBarFill` resource.
     pub slider_tick_bar_fill: Color,
+    /// The resolved `SliderTickBarFillDisabled` resource.
     pub slider_tick_bar_fill_disabled: Color,
+    /// The resolved `SliderInlineTickBarFill` resource.
     pub slider_inline_tick_bar_fill: Color,
+    /// The resolved `SliderBorderThemeBrush` resource.
     pub slider_border_theme_brush: Color,
+    /// The resolved `SliderDisabledBorderThemeBrush` resource.
     pub slider_disabled_border_theme_brush: Color,
+    /// The resolved `SliderThumbBackgroundThemeBrush` resource.
     pub slider_thumb_background_theme_brush: Color,
+    /// The resolved `SliderThumbBorderThemeBrush` resource.
     pub slider_thumb_border_theme_brush: Color,
+    /// The resolved `SliderThumbDisabledBackgroundThemeBrush` resource.
     pub slider_thumb_disabled_background_theme_brush: Color,
+    /// The resolved `SliderThumbPointerOverBackgroundThemeBrush` resource.
     pub slider_thumb_pointer_over_background_theme_brush: Color,
+    /// The resolved `SliderThumbPointerOverBorderThemeBrush` resource.
     pub slider_thumb_pointer_over_border_theme_brush: Color,
+    /// The resolved `SliderThumbPressedBackgroundThemeBrush` resource.
     pub slider_thumb_pressed_background_theme_brush: Color,
+    /// The resolved `SliderThumbPressedBorderThemeBrush` resource.
     pub slider_thumb_pressed_border_theme_brush: Color,
+    /// The resolved `SliderTickMarkInlineBackgroundThemeBrush` resource.
     pub slider_tick_mark_inline_background_theme_brush: Color,
+    /// The resolved `SliderTickMarkInlineDisabledForegroundThemeBrush` resource.
     pub slider_tick_mark_inline_disabled_foreground_theme_brush: Color,
+    /// The resolved `SliderTickmarkOutsideBackgroundThemeBrush` resource.
     pub slider_tickmark_outside_background_theme_brush: Color,
+    /// The resolved `SliderTickMarkOutsideDisabledForegroundThemeBrush` resource.
     pub slider_tick_mark_outside_disabled_foreground_theme_brush: Color,
+    /// The resolved `SliderTrackBackgroundThemeBrush` resource.
     pub slider_track_background_theme_brush: Color,
+    /// The resolved `SliderTrackDecreaseBackgroundThemeBrush` resource.
     pub slider_track_decrease_background_theme_brush: Color,
+    /// The resolved `SliderTrackDecreaseDisabledBackgroundThemeBrush` resource.
     pub slider_track_decrease_disabled_background_theme_brush: Color,
+    /// The resolved `SliderTrackDecreasePointerOverBackgroundThemeBrush` resource.
     pub slider_track_decrease_pointer_over_background_theme_brush: Color,
+    /// The resolved `SliderTrackDecreasePressedBackgroundThemeBrush` resource.
     pub slider_track_decrease_pressed_background_theme_brush: Color,
+    /// The resolved `SliderTrackDisabledBackgroundThemeBrush` resource.
     pub slider_track_disabled_background_theme_brush: Color,
+    /// The resolved `SliderTrackPointerOverBackgroundThemeBrush` resource.
     pub slider_track_pointer_over_background_theme_brush: Color,
+    /// The resolved `SliderTrackPressedBackgroundThemeBrush` resource.
     pub slider_track_pressed_background_theme_brush: Color,
+    /// The resolved `SliderHeaderForegroundThemeBrush` resource.
     pub slider_header_foreground_theme_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `SystemControlForegroundAccentBrush` resource.
+    pub system_control_foreground_accent_brush: Color,
+    /// The resolved `SystemControlDisabledChromeDisabledHighBrush` resource.
+    pub system_control_disabled_chrome_disabled_high_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumLowBrush` resource.
+    pub system_control_foreground_base_medium_low_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumBrush` resource.
+    pub system_control_foreground_base_medium_brush: Color,
+    /// The resolved `SystemControlHighlightAccentBrush` resource.
+    pub system_control_highlight_accent_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlBackgroundAltHighBrush` resource.
+    pub system_control_background_alt_high_brush: Color,
 }
+
 impl SliderResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -1865,6 +2552,17 @@ impl SliderResources {
                 ),
                 slider_track_pressed_background_theme_brush: Color::from_argb(89, 255, 255, 255),
                 slider_header_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_accent_brush: accent.base,
+                system_control_disabled_chrome_disabled_high_brush: Color::from_argb(
+                    255, 204, 204, 204,
+                ),
+                system_control_foreground_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_background_alt_high_brush: Color::from_argb(255, 255, 255, 255),
             },
             Theme::Dark => Self {
                 slider_container_background: Color::from_argb(0, 0, 0, 0),
@@ -1931,6 +2629,19 @@ impl SliderResources {
                 ),
                 slider_track_pressed_background_theme_brush: Color::from_argb(89, 255, 255, 255),
                 slider_header_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_accent_brush: accent.base,
+                system_control_disabled_chrome_disabled_high_brush: Color::from_argb(
+                    255, 51, 51, 51,
+                ),
+                system_control_foreground_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_background_alt_high_brush: Color::from_argb(255, 0, 0, 0),
             },
         }
     }
@@ -1961,15 +2672,30 @@ pub const SLIDER_HEADER_THEME_FONT_WEIGHT: FontWeight = FontWeight::NORMAL;
 /// Theme-dependent resources of `ToolTip_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ToolTipResources {
+    /// The resolved `ToolTipForeground` resource.
     pub tool_tip_foreground: Color,
+    /// The resolved `ToolTipBackground` resource.
     pub tool_tip_background: Color,
+    /// The resolved `ToolTipBorderBrush` resource.
     pub tool_tip_border_brush: Color,
+    /// The resolved `ToolTipBackgroundThemeBrush` resource.
     pub tool_tip_background_theme_brush: Color,
+    /// The resolved `ToolTipBorderThemeBrush` resource.
     pub tool_tip_border_theme_brush: Color,
+    /// The resolved `ToolTipForegroundThemeBrush` resource.
     pub tool_tip_foreground_theme_brush: Color,
+    /// The resolved `ToolTipForegroundBrush` resource.
     pub tool_tip_foreground_brush: Color,
+    /// The resolved `ToolTipBackgroundBrush` resource.
+    pub tool_tip_background_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBackgroundChromeMediumLowBrush` resource.
+    pub system_control_background_chrome_medium_low_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
 }
+
 impl ToolTipResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
@@ -1980,6 +2706,16 @@ impl ToolTipResources {
                 tool_tip_border_theme_brush: Color::from_argb(255, 128, 128, 128),
                 tool_tip_foreground_theme_brush: Color::from_argb(255, 102, 102, 102),
                 tool_tip_foreground_brush: Color::from_argb(228, 0, 0, 0),
+                tool_tip_background_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                system_control_background_chrome_medium_low_brush: Color::from_argb(
+                    255, 242, 242, 242,
+                ),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
             },
             Theme::Dark => Self {
                 tool_tip_foreground: Color::from_argb(255, 255, 255, 255),
@@ -1989,6 +2725,16 @@ impl ToolTipResources {
                 tool_tip_border_theme_brush: Color::from_argb(255, 128, 128, 128),
                 tool_tip_foreground_theme_brush: Color::from_argb(255, 102, 102, 102),
                 tool_tip_foreground_brush: Color::from_argb(255, 255, 255, 255),
+                tool_tip_background_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                system_control_background_chrome_medium_low_brush: Color::from_argb(
+                    255, 43, 43, 43,
+                ),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
             },
         }
     }
@@ -2002,7 +2748,9 @@ pub const TOOL_TIP_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
 /// Theme-dependent resources of `TextBlock_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct TextBlockResources {}
+
 impl TextBlockResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {},
@@ -2020,7 +2768,9 @@ pub const DISPLAY_TEXT_BLOCK_FONT_SIZE: f64 = 68.0;
 /// Theme-dependent resources of `CornerRadius_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct CornerRadiusResources {}
+
 impl CornerRadiusResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {},
@@ -2035,15 +2785,25 @@ pub const OVERLAY_CORNER_RADIUS: [f64; 4] = [8.0, 8.0, 8.0, 8.0];
 /// Theme-dependent resources of `SplitView_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SplitViewResources {
+    /// The resolved `SplitViewLightDismissOverlayBackground` resource.
     pub split_view_light_dismiss_overlay_background: Color,
+    /// The resolved `SystemControlPageBackgroundMediumAltMediumBrush` resource.
+    pub system_control_page_background_medium_alt_medium_brush: Color,
+    /// The resolved `SystemControlForegroundTransparentBrush` resource.
     pub system_control_foreground_transparent_brush: Color,
+    /// The resolved `SystemControlPageBackgroundChromeLowBrush` resource.
     pub system_control_page_background_chrome_low_brush: Color,
 }
+
 impl SplitViewResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
                 split_view_light_dismiss_overlay_background: Color::from_argb(153, 255, 255, 255),
+                system_control_page_background_medium_alt_medium_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
                 system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
                 system_control_page_background_chrome_low_brush: Color::from_argb(
                     255, 242, 242, 242,
@@ -2051,6 +2811,9 @@ impl SplitViewResources {
             },
             Theme::Dark => Self {
                 split_view_light_dismiss_overlay_background: Color::from_argb(153, 0, 0, 0),
+                system_control_page_background_medium_alt_medium_brush: Color::from_argb(
+                    153, 0, 0, 0,
+                ),
                 system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
                 system_control_page_background_chrome_low_brush: Color::from_argb(255, 23, 23, 23),
             },
@@ -2068,3 +2831,1427 @@ pub const SPLIT_VIEW_PANE_ANIMATION_OPEN_PRE_DURATION: Duration = Duration::from
 pub const SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION: Duration = Duration::from_millis(100);
 /// Top-left, top-right, bottom-right, bottom-left.
 pub const SPLIT_VIEW_PANE_ROOT_CORNER_RADIUS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Theme-dependent resources of `TabView_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct TabViewResources {
+    /// The resolved `TabViewBackground` resource.
+    pub tab_view_background: Color,
+    /// The resolved `TabViewItemHeaderBackground` resource.
+    pub tab_view_item_header_background: Color,
+    /// The resolved `TabViewItemHeaderBackgroundSelected` resource.
+    pub tab_view_item_header_background_selected: Color,
+    /// The resolved `TabViewItemHeaderDragBackground` resource.
+    pub tab_view_item_header_drag_background: Color,
+    /// The resolved `TabViewItemHeaderBackgroundPointerOver` resource.
+    pub tab_view_item_header_background_pointer_over: Color,
+    /// The resolved `TabViewItemHeaderBackgroundPressed` resource.
+    pub tab_view_item_header_background_pressed: Color,
+    /// The resolved `TabViewItemHeaderBackgroundDisabled` resource.
+    pub tab_view_item_header_background_disabled: Color,
+    /// The resolved `TabViewItemHeaderForeground` resource.
+    pub tab_view_item_header_foreground: Color,
+    /// The resolved `TabViewItemHeaderForegroundPressed` resource.
+    pub tab_view_item_header_foreground_pressed: Color,
+    /// The resolved `TabViewItemHeaderForegroundSelected` resource.
+    pub tab_view_item_header_foreground_selected: Color,
+    /// The resolved `TabViewItemHeaderForegroundPointerOver` resource.
+    pub tab_view_item_header_foreground_pointer_over: Color,
+    /// The resolved `TabViewItemHeaderForegroundDisabled` resource.
+    pub tab_view_item_header_foreground_disabled: Color,
+    /// The resolved `TabViewItemIconForeground` resource.
+    pub tab_view_item_icon_foreground: Color,
+    /// The resolved `TabViewItemIconForegroundPressed` resource.
+    pub tab_view_item_icon_foreground_pressed: Color,
+    /// The resolved `TabViewItemIconForegroundSelected` resource.
+    pub tab_view_item_icon_foreground_selected: Color,
+    /// The resolved `TabViewItemIconForegroundPointerOver` resource.
+    pub tab_view_item_icon_foreground_pointer_over: Color,
+    /// The resolved `TabViewItemIconForegroundDisabled` resource.
+    pub tab_view_item_icon_foreground_disabled: Color,
+    /// The resolved `TabViewButtonBackground` resource.
+    pub tab_view_button_background: Color,
+    /// The resolved `TabViewButtonBackgroundPressed` resource.
+    pub tab_view_button_background_pressed: Color,
+    /// The resolved `TabViewButtonBackgroundPointerOver` resource.
+    pub tab_view_button_background_pointer_over: Color,
+    /// The resolved `TabViewButtonBackgroundDisabled` resource.
+    pub tab_view_button_background_disabled: Color,
+    /// The resolved `TabViewButtonForeground` resource.
+    pub tab_view_button_foreground: Color,
+    /// The resolved `TabViewButtonForegroundPressed` resource.
+    pub tab_view_button_foreground_pressed: Color,
+    /// The resolved `TabViewButtonForegroundPointerOver` resource.
+    pub tab_view_button_foreground_pointer_over: Color,
+    /// The resolved `TabViewButtonForegroundDisabled` resource.
+    pub tab_view_button_foreground_disabled: Color,
+    /// The resolved `TabViewButtonBorderBrush` resource.
+    pub tab_view_button_border_brush: Color,
+    /// The resolved `TabViewButtonBorderBrushPressed` resource.
+    pub tab_view_button_border_brush_pressed: Color,
+    /// The resolved `TabViewButtonBorderBrushPointerOver` resource.
+    pub tab_view_button_border_brush_pointer_over: Color,
+    /// The resolved `TabViewButtonBorderBrushDisabled` resource.
+    pub tab_view_button_border_brush_disabled: Color,
+    /// The resolved `TabViewScrollButtonBackground` resource.
+    pub tab_view_scroll_button_background: Color,
+    /// The resolved `TabViewScrollButtonBackgroundPressed` resource.
+    pub tab_view_scroll_button_background_pressed: Color,
+    /// The resolved `TabViewScrollButtonBackgroundPointerOver` resource.
+    pub tab_view_scroll_button_background_pointer_over: Color,
+    /// The resolved `TabViewScrollButtonBackgroundDisabled` resource.
+    pub tab_view_scroll_button_background_disabled: Color,
+    /// The resolved `TabViewScrollButtonForeground` resource.
+    pub tab_view_scroll_button_foreground: Color,
+    /// The resolved `TabViewScrollButtonForegroundPressed` resource.
+    pub tab_view_scroll_button_foreground_pressed: Color,
+    /// The resolved `TabViewScrollButtonForegroundPointerOver` resource.
+    pub tab_view_scroll_button_foreground_pointer_over: Color,
+    /// The resolved `TabViewScrollButtonForegroundDisabled` resource.
+    pub tab_view_scroll_button_foreground_disabled: Color,
+    /// The resolved `TabViewScrollButtonBorderBrush` resource.
+    pub tab_view_scroll_button_border_brush: Color,
+    /// The resolved `TabViewScrollButtonBorderBrushPressed` resource.
+    pub tab_view_scroll_button_border_brush_pressed: Color,
+    /// The resolved `TabViewScrollButtonBorderBrushPointerOver` resource.
+    pub tab_view_scroll_button_border_brush_pointer_over: Color,
+    /// The resolved `TabViewScrollButtonBorderBrushDisabled` resource.
+    pub tab_view_scroll_button_border_brush_disabled: Color,
+    /// The resolved `TabViewItemSeparator` resource.
+    pub tab_view_item_separator: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonBackground` resource.
+    pub tab_view_item_header_close_button_background: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonBackgroundPressed` resource.
+    pub tab_view_item_header_close_button_background_pressed: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonBackgroundPointerOver` resource.
+    pub tab_view_item_header_close_button_background_pointer_over: Color,
+    /// The resolved `TabViewItemHeaderPressedCloseButtonBackground` resource.
+    pub tab_view_item_header_pressed_close_button_background: Color,
+    /// The resolved `TabViewItemHeaderPointerOverCloseButtonBackground` resource.
+    pub tab_view_item_header_pointer_over_close_button_background: Color,
+    /// The resolved `TabViewItemHeaderSelectedCloseButtonBackground` resource.
+    pub tab_view_item_header_selected_close_button_background: Color,
+    /// The resolved `TabViewItemHeaderDisabledCloseButtonBackground` resource.
+    pub tab_view_item_header_disabled_close_button_background: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonForeground` resource.
+    pub tab_view_item_header_close_button_foreground: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonForegroundPressed` resource.
+    pub tab_view_item_header_close_button_foreground_pressed: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonForegroundPointerOver` resource.
+    pub tab_view_item_header_close_button_foreground_pointer_over: Color,
+    /// The resolved `TabViewItemHeaderPressedCloseButtonForeground` resource.
+    pub tab_view_item_header_pressed_close_button_foreground: Color,
+    /// The resolved `TabViewItemHeaderPointerOverCloseButtonForeground` resource.
+    pub tab_view_item_header_pointer_over_close_button_foreground: Color,
+    /// The resolved `TabViewItemHeaderSelectedCloseButtonForeground` resource.
+    pub tab_view_item_header_selected_close_button_foreground: Color,
+    /// The resolved `TabViewItemHeaderDisabledCloseButtonForeground` resource.
+    pub tab_view_item_header_disabled_close_button_foreground: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonBorderBrush` resource.
+    pub tab_view_item_header_close_button_border_brush: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonBorderBrushPointerOver` resource.
+    pub tab_view_item_header_close_button_border_brush_pointer_over: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonBorderBrushPressed` resource.
+    pub tab_view_item_header_close_button_border_brush_pressed: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonBorderBrushSelected` resource.
+    pub tab_view_item_header_close_button_border_brush_selected: Color,
+    /// The resolved `TabViewItemHeaderCloseButtonBorderBrushDisabled` resource.
+    pub tab_view_item_header_close_button_border_brush_disabled: Color,
+    /// The resolved `TabViewButtonBackgroundActiveTab` resource.
+    pub tab_view_button_background_active_tab: Color,
+    /// The resolved `TabViewButtonForegroundActiveTab` resource.
+    pub tab_view_button_foreground_active_tab: Color,
+    /// The resolved `TabViewBorderBrush` resource.
+    pub tab_view_border_brush: Color,
+    /// The resolved `TabViewItemBorderBrush` resource.
+    pub tab_view_item_border_brush: Color,
+    /// The resolved `TabViewSelectedItemBorderBrush` resource.
+    pub tab_view_selected_item_border_brush: [(f64, Color); 2],
+    /// The resolved `SystemControlBackgroundBaseMediumBrush` resource.
+    pub system_control_background_base_medium_brush: Color,
+}
+
+impl TabViewResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                tab_view_background: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_header_background: Color::from_argb(0, 0, 0, 0),
+                tab_view_item_header_background_selected: Color::from_argb(255, 249, 249, 249),
+                tab_view_item_header_drag_background: Color::from_argb(255, 249, 249, 249),
+                tab_view_item_header_background_pointer_over: Color::from_argb(10, 0, 0, 0),
+                tab_view_item_header_background_pressed: Color::from_argb(179, 255, 255, 255),
+                tab_view_item_header_background_disabled: Color::from_argb(0, 0, 0, 0),
+                tab_view_item_header_foreground: Color::from_argb(158, 0, 0, 0),
+                tab_view_item_header_foreground_pressed: Color::from_argb(114, 0, 0, 0),
+                tab_view_item_header_foreground_selected: Color::from_argb(228, 0, 0, 0),
+                tab_view_item_header_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                tab_view_item_header_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                tab_view_item_icon_foreground: Color::from_argb(158, 0, 0, 0),
+                tab_view_item_icon_foreground_pressed: Color::from_argb(114, 0, 0, 0),
+                tab_view_item_icon_foreground_selected: Color::from_argb(228, 0, 0, 0),
+                tab_view_item_icon_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                tab_view_item_icon_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                tab_view_button_background: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                tab_view_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                tab_view_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_foreground: Color::from_argb(228, 0, 0, 0),
+                tab_view_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                tab_view_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                tab_view_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                tab_view_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_background: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                tab_view_scroll_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                tab_view_scroll_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_foreground: Color::from_argb(158, 0, 0, 0),
+                tab_view_scroll_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                tab_view_scroll_button_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                tab_view_scroll_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                tab_view_scroll_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_border_brush_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_scroll_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_separator: Color::from_argb(15, 0, 0, 0),
+                tab_view_item_header_close_button_background: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_header_close_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                tab_view_item_header_close_button_background_pointer_over: Color::from_argb(
+                    9, 0, 0, 0,
+                ),
+                tab_view_item_header_pressed_close_button_background: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_pointer_over_close_button_background: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_selected_close_button_background: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_disabled_close_button_background: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_foreground: Color::from_argb(228, 0, 0, 0),
+                tab_view_item_header_close_button_foreground_pressed: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                tab_view_item_header_close_button_foreground_pointer_over: Color::from_argb(
+                    228, 0, 0, 0,
+                ),
+                tab_view_item_header_pressed_close_button_foreground: Color::from_argb(
+                    228, 0, 0, 0,
+                ),
+                tab_view_item_header_pointer_over_close_button_foreground: Color::from_argb(
+                    228, 0, 0, 0,
+                ),
+                tab_view_item_header_selected_close_button_foreground: Color::from_argb(
+                    228, 0, 0, 0,
+                ),
+                tab_view_item_header_disabled_close_button_foreground: Color::from_argb(
+                    92, 0, 0, 0,
+                ),
+                tab_view_item_header_close_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_header_close_button_border_brush_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_border_brush_pressed: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_border_brush_selected: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_border_brush_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_button_background_active_tab: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_foreground_active_tab: Color::from_argb(114, 0, 0, 0),
+                tab_view_border_brush: Color::from_argb(15, 0, 0, 0),
+                tab_view_item_border_brush: Color::from_argb(0, 255, 255, 255),
+                tab_view_selected_item_border_brush: [
+                    (1.0, Color::from_argb(0, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                system_control_background_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                tab_view_background: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_header_background: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_header_background_selected: Color::from_argb(255, 40, 40, 40),
+                tab_view_item_header_drag_background: Color::from_argb(255, 40, 40, 40),
+                tab_view_item_header_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                tab_view_item_header_background_pressed: Color::from_argb(115, 58, 58, 58),
+                tab_view_item_header_background_disabled: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_header_foreground: Color::from_argb(197, 255, 255, 255),
+                tab_view_item_header_foreground_pressed: Color::from_argb(135, 255, 255, 255),
+                tab_view_item_header_foreground_selected: Color::from_argb(255, 255, 255, 255),
+                tab_view_item_header_foreground_pointer_over: Color::from_argb(197, 255, 255, 255),
+                tab_view_item_header_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                tab_view_item_icon_foreground: Color::from_argb(197, 255, 255, 255),
+                tab_view_item_icon_foreground_pressed: Color::from_argb(135, 255, 255, 255),
+                tab_view_item_icon_foreground_selected: Color::from_argb(255, 255, 255, 255),
+                tab_view_item_icon_foreground_pointer_over: Color::from_argb(197, 255, 255, 255),
+                tab_view_item_icon_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                tab_view_button_background: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                tab_view_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                tab_view_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_foreground: Color::from_argb(255, 255, 255, 255),
+                tab_view_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                tab_view_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                tab_view_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                tab_view_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_background: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                tab_view_scroll_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                tab_view_scroll_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_foreground: Color::from_argb(197, 255, 255, 255),
+                tab_view_scroll_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                tab_view_scroll_button_foreground_pointer_over: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                tab_view_scroll_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                tab_view_scroll_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                tab_view_scroll_button_border_brush_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_scroll_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_separator: Color::from_argb(21, 255, 255, 255),
+                tab_view_item_header_close_button_background: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_header_close_button_background_pressed: Color::from_argb(
+                    10, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_background_pointer_over: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                tab_view_item_header_pressed_close_button_background: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_pointer_over_close_button_background: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_selected_close_button_background: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_disabled_close_button_background: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_foreground: Color::from_argb(255, 255, 255, 255),
+                tab_view_item_header_close_button_foreground_pressed: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_foreground_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                tab_view_item_header_pressed_close_button_foreground: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                tab_view_item_header_pointer_over_close_button_foreground: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                tab_view_item_header_selected_close_button_foreground: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                tab_view_item_header_disabled_close_button_foreground: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                tab_view_item_header_close_button_border_brush_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_border_brush_pressed: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_border_brush_selected: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_item_header_close_button_border_brush_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tab_view_button_background_active_tab: Color::from_argb(0, 255, 255, 255),
+                tab_view_button_foreground_active_tab: Color::from_argb(139, 255, 255, 255),
+                tab_view_border_brush: Color::from_argb(25, 0, 0, 0),
+                tab_view_item_border_brush: Color::from_argb(0, 255, 255, 255),
+                tab_view_selected_item_border_brush: [
+                    (1.0, Color::from_argb(0, 0, 0, 0)),
+                    (1.0, Color::from_argb(25, 0, 0, 0)),
+                ],
+                system_control_background_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+            },
+        }
+    }
+}
+pub const LIST_VIEW_ITEM_DRAG_THEME_OPACITY: f64 = 0.8;
+pub const LIST_VIEW_ITEM_REORDER_THEME_OPACITY: f64 = 0.8;
+pub const LIST_VIEW_ITEM_REORDER_TARGET_THEME_OPACITY: f64 = 0.5;
+pub const LIST_VIEW_ITEM_REORDER_HINT_THEME_OFFSET: f64 = 10.0;
+/// Left, top, right, bottom.
+pub const TAB_VIEW_HEADER_PADDING: [f64; 4] = [0.0, 8.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_HEADER_PADDING: [f64; 4] = [8.0, 3.0, 4.0, 3.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_SELECTED_ITEM_HEADER_PADDING: [f64; 4] = [9.0, 3.0, 5.0, 4.0];
+pub const TAB_VIEW_ITEM_MIN_HEIGHT: f64 = 32.0;
+pub const TAB_VIEW_ITEM_MAX_WIDTH: f64 = 240.0;
+pub const TAB_VIEW_ITEM_MIN_WIDTH: f64 = 100.0;
+pub const TAB_VIEW_ITEM_HEADER_FONT_SIZE: f64 = 12.0;
+pub const TAB_VIEW_ITEM_HEADER_ICON_SIZE: f64 = 16.0;
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_HEADER_ICON_MARGIN: [f64; 4] = [0.0, 0.0, 10.0, 0.0];
+pub const TAB_VIEW_ITEM_HEADER_CLOSE_BUTTON_HEIGHT: f64 = 24.0;
+pub const TAB_VIEW_ITEM_HEADER_CLOSE_BUTTON_WIDTH: f64 = 32.0;
+pub const TAB_VIEW_ITEM_HEADER_CLOSE_BUTTON_SIZE: f64 = 16.0;
+pub const TAB_VIEW_ITEM_HEADER_CLOSE_FONT_SIZE: f64 = 12.0;
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_HEADER_CLOSE_MARGIN: [f64; 4] = [4.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_HEADER_PADDING_WITH_CLOSE_BUTTON: [f64; 4] = [8.0, 3.0, 4.0, 3.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_HEADER_PADDING_WITHOUT_CLOSE_BUTTON: [f64; 4] = [8.0, 3.0, 8.0, 3.0];
+pub const TAB_VIEW_ITEM_SCROLL_BUTTON_WIDTH: f64 = 32.0;
+pub const TAB_VIEW_ITEM_SCROLL_BUTTON_HEIGHT: f64 = 24.0;
+pub const TAB_VIEW_ITEM_SCROLL_BUTON_FONT_SIZE: f64 = 8.0;
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_SCROLL_BUTTON_PADDING: [f64; 4] = [7.0, 3.0, 7.0, 3.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_LEFT_SCROLL_BUTTON_CONTAINER_PADDING: [f64; 4] = [8.0, 0.0, 3.0, 3.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_RIGHT_SCROLL_BUTTON_CONTAINER_PADDING: [f64; 4] = [3.0, 0.0, 8.0, 3.0];
+pub const TAB_VIEW_ITEM_ADD_BUTTON_WIDTH: f64 = 32.0;
+pub const TAB_VIEW_ITEM_ADD_BUTTON_HEIGHT: f64 = 24.0;
+pub const TAB_VIEW_ITEM_ADD_BUTTON_FONT_SIZE: f64 = 12.0;
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_ADD_BUTTON_CONTAINER_PADDING: [f64; 4] = [3.0, 0.0, 0.0, 3.0];
+pub const TAB_VIEW_SHADOW_DEPTH: f64 = 16.0;
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_SEPARATOR_MARGIN: [f64; 4] = [0.0, 8.0, 0.0, 8.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_SELECTED_ITEM_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 0.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_SELECTED_ITEM_HEADER_MARGIN: [f64; 4] = [-1.0, 0.0, -1.0, 1.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_BUTTON_BORDER_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TAB_VIEW_ITEM_HEADER_CLOSE_BUTTON_BORDER_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Theme-dependent resources of `ScrollBar_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScrollBarResources {
+    /// The resolved `ScrollBarBackground` resource.
+    pub scroll_bar_background: Color,
+    /// The resolved `ScrollBarBackgroundPointerOver` resource.
+    pub scroll_bar_background_pointer_over: Color,
+    /// The resolved `ScrollBarBackgroundDisabled` resource.
+    pub scroll_bar_background_disabled: Color,
+    /// The resolved `ScrollBarForeground` resource.
+    pub scroll_bar_foreground: Color,
+    /// The resolved `ScrollBarBorderBrush` resource.
+    pub scroll_bar_border_brush: Color,
+    /// The resolved `ScrollBarBorderBrushPointerOver` resource.
+    pub scroll_bar_border_brush_pointer_over: Color,
+    /// The resolved `ScrollBarBorderBrushDisabled` resource.
+    pub scroll_bar_border_brush_disabled: Color,
+    /// The resolved `ScrollBarButtonBackground` resource.
+    pub scroll_bar_button_background: Color,
+    /// The resolved `ScrollBarButtonBackgroundPointerOver` resource.
+    pub scroll_bar_button_background_pointer_over: Color,
+    /// The resolved `ScrollBarButtonBackgroundPressed` resource.
+    pub scroll_bar_button_background_pressed: Color,
+    /// The resolved `ScrollBarButtonBackgroundDisabled` resource.
+    pub scroll_bar_button_background_disabled: Color,
+    /// The resolved `ScrollBarButtonBorderBrush` resource.
+    pub scroll_bar_button_border_brush: Color,
+    /// The resolved `ScrollBarButtonBorderBrushPointerOver` resource.
+    pub scroll_bar_button_border_brush_pointer_over: Color,
+    /// The resolved `ScrollBarButtonBorderBrushPressed` resource.
+    pub scroll_bar_button_border_brush_pressed: Color,
+    /// The resolved `ScrollBarButtonBorderBrushDisabled` resource.
+    pub scroll_bar_button_border_brush_disabled: Color,
+    /// The resolved `ScrollBarButtonArrowForeground` resource.
+    pub scroll_bar_button_arrow_foreground: Color,
+    /// The resolved `ScrollBarButtonArrowForegroundPointerOver` resource.
+    pub scroll_bar_button_arrow_foreground_pointer_over: Color,
+    /// The resolved `ScrollBarButtonArrowForegroundPressed` resource.
+    pub scroll_bar_button_arrow_foreground_pressed: Color,
+    /// The resolved `ScrollBarButtonArrowForegroundDisabled` resource.
+    pub scroll_bar_button_arrow_foreground_disabled: Color,
+    /// The resolved `ScrollBarThumbFill` resource.
+    pub scroll_bar_thumb_fill: Color,
+    /// The resolved `ScrollBarThumbFillPointerOver` resource.
+    pub scroll_bar_thumb_fill_pointer_over: Color,
+    /// The resolved `ScrollBarThumbFillPressed` resource.
+    pub scroll_bar_thumb_fill_pressed: Color,
+    /// The resolved `ScrollBarThumbFillDisabled` resource.
+    pub scroll_bar_thumb_fill_disabled: Color,
+    /// The resolved `ScrollBarThumbBorderBrush` resource.
+    pub scroll_bar_thumb_border_brush: Color,
+    /// The resolved `ScrollBarTrackFill` resource.
+    pub scroll_bar_track_fill: AcrylicBrushResources,
+    /// The resolved `ScrollBarTrackFillPointerOver` resource.
+    pub scroll_bar_track_fill_pointer_over: AcrylicBrushResources,
+    /// The resolved `ScrollBarTrackFillDisabled` resource.
+    pub scroll_bar_track_fill_disabled: AcrylicBrushResources,
+    /// The resolved `ScrollBarTrackStroke` resource.
+    pub scroll_bar_track_stroke: AcrylicBrushResources,
+    /// The resolved `ScrollBarTrackStrokePointerOver` resource.
+    pub scroll_bar_track_stroke_pointer_over: AcrylicBrushResources,
+    /// The resolved `ScrollBarTrackStrokeDisabled` resource.
+    pub scroll_bar_track_stroke_disabled: AcrylicBrushResources,
+    /// The resolved `ScrollBarThumbBackground` resource.
+    pub scroll_bar_thumb_background: Color,
+    /// The resolved `ScrollBarPanningThumbBackground` resource.
+    pub scroll_bar_panning_thumb_background: Color,
+    /// The resolved `ScrollBarPanningThumbBackgroundDisabled` resource.
+    pub scroll_bar_panning_thumb_background_disabled: Color,
+    /// The resolved `ScrollBarButtonForegroundThemeBrush` resource.
+    pub scroll_bar_button_foreground_theme_brush: Color,
+    /// The resolved `ScrollBarButtonPointerOverBackgroundThemeBrush` resource.
+    pub scroll_bar_button_pointer_over_background_theme_brush: Color,
+    /// The resolved `ScrollBarButtonPointerOverBorderThemeBrush` resource.
+    pub scroll_bar_button_pointer_over_border_theme_brush: Color,
+    /// The resolved `ScrollBarButtonPointerOverForegroundThemeBrush` resource.
+    pub scroll_bar_button_pointer_over_foreground_theme_brush: Color,
+    /// The resolved `ScrollBarButtonPressedBackgroundThemeBrush` resource.
+    pub scroll_bar_button_pressed_background_theme_brush: Color,
+    /// The resolved `ScrollBarButtonPressedBorderThemeBrush` resource.
+    pub scroll_bar_button_pressed_border_theme_brush: Color,
+    /// The resolved `ScrollBarButtonPressedForegroundThemeBrush` resource.
+    pub scroll_bar_button_pressed_foreground_theme_brush: Color,
+    /// The resolved `ScrollBarPanningBackgroundThemeBrush` resource.
+    pub scroll_bar_panning_background_theme_brush: Color,
+    /// The resolved `ScrollBarPanningBorderThemeBrush` resource.
+    pub scroll_bar_panning_border_theme_brush: Color,
+    /// The resolved `ScrollBarThumbBackgroundThemeBrush` resource.
+    pub scroll_bar_thumb_background_theme_brush: Color,
+    /// The resolved `ScrollBarThumbBorderThemeBrush` resource.
+    pub scroll_bar_thumb_border_theme_brush: Color,
+    /// The resolved `ScrollBarThumbPointerOverBackgroundThemeBrush` resource.
+    pub scroll_bar_thumb_pointer_over_background_theme_brush: Color,
+    /// The resolved `ScrollBarThumbPointerOverBorderThemeBrush` resource.
+    pub scroll_bar_thumb_pointer_over_border_theme_brush: Color,
+    /// The resolved `ScrollBarThumbPressedBackgroundThemeBrush` resource.
+    pub scroll_bar_thumb_pressed_background_theme_brush: Color,
+    /// The resolved `ScrollBarThumbPressedBorderThemeBrush` resource.
+    pub scroll_bar_thumb_pressed_border_theme_brush: Color,
+    /// The resolved `ScrollBarTrackBackgroundThemeBrush` resource.
+    pub scroll_bar_track_background_theme_brush: Color,
+    /// The resolved `ScrollBarTrackBorderThemeBrush` resource.
+    pub scroll_bar_track_border_theme_brush: Color,
+    /// The resolved `ScrollBarThumbBackgroundColor` resource.
+    pub scroll_bar_thumb_background_color: Color,
+    /// The resolved `ScrollBarPanningThumbBackgroundColor` resource.
+    pub scroll_bar_panning_thumb_background_color: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `SystemControlBackgroundListLowBrush` resource.
+    pub system_control_background_list_low_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseMediumBrush` resource.
+    pub system_control_background_base_medium_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlHighlightBaseHighBrush` resource.
+    pub system_control_highlight_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseHighBrush` resource.
+    pub system_control_disabled_base_high_brush: Color,
+    /// The resolved `SystemControlForegroundChromeDisabledLowBrush` resource.
+    pub system_control_foreground_chrome_disabled_low_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumLowBrush` resource.
+    pub system_control_highlight_base_medium_low_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumBrush` resource.
+    pub system_control_highlight_base_medium_brush: Color,
+    /// The resolved `SystemControlPageBackgroundChromeLowBrush` resource.
+    pub system_control_page_background_chrome_low_brush: Color,
+    /// The resolved `SystemControlDisabledTransparentBrush` resource.
+    pub system_control_disabled_transparent_brush: Color,
+    /// The resolved `SystemControlForegroundTransparentBrush` resource.
+    pub system_control_foreground_transparent_brush: Color,
+    /// The resolved `SystemControlDisabledChromeHighBrush` resource.
+    pub system_control_disabled_chrome_high_brush: Color,
+}
+
+impl ScrollBarResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                scroll_bar_background: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_background_pointer_over: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_background_disabled: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_foreground: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_border_brush: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                scroll_bar_button_background_pressed: Color::from_argb(114, 0, 0, 0),
+                scroll_bar_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_arrow_foreground: Color::from_argb(114, 0, 0, 0),
+                scroll_bar_button_arrow_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                scroll_bar_button_arrow_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                scroll_bar_button_arrow_foreground_disabled: Color::from_argb(81, 0, 0, 0),
+                scroll_bar_thumb_fill: Color::from_argb(114, 0, 0, 0),
+                scroll_bar_thumb_fill_pointer_over: Color::from_argb(114, 0, 0, 0),
+                scroll_bar_thumb_fill_pressed: Color::from_argb(114, 0, 0, 0),
+                scroll_bar_thumb_fill_disabled: Color::from_argb(81, 0, 0, 0),
+                scroll_bar_thumb_border_brush: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_track_fill: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                scroll_bar_track_fill_pointer_over: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                scroll_bar_track_fill_disabled: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                scroll_bar_track_stroke: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                scroll_bar_track_stroke_pointer_over: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                scroll_bar_track_stroke_disabled: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                scroll_bar_thumb_background: Color::from_argb(114, 0, 0, 0),
+                scroll_bar_panning_thumb_background: Color::from_argb(114, 0, 0, 0),
+                scroll_bar_panning_thumb_background_disabled: Color::from_argb(81, 0, 0, 0),
+                scroll_bar_button_foreground_theme_brush: Color::from_argb(153, 0, 0, 0),
+                scroll_bar_button_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 218, 218, 218,
+                ),
+                scroll_bar_button_pointer_over_border_theme_brush: Color::from_argb(
+                    255, 218, 218, 218,
+                ),
+                scroll_bar_button_pointer_over_foreground_theme_brush: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                scroll_bar_button_pressed_background_theme_brush: Color::from_argb(153, 0, 0, 0),
+                scroll_bar_button_pressed_border_theme_brush: Color::from_argb(153, 0, 0, 0),
+                scroll_bar_button_pressed_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                scroll_bar_panning_background_theme_brush: Color::from_argb(255, 205, 205, 205),
+                scroll_bar_panning_border_theme_brush: Color::from_argb(125, 154, 154, 154),
+                scroll_bar_thumb_background_theme_brush: Color::from_argb(255, 205, 205, 205),
+                scroll_bar_thumb_border_theme_brush: Color::from_argb(59, 85, 85, 85),
+                scroll_bar_thumb_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 218, 218, 218,
+                ),
+                scroll_bar_thumb_pointer_over_border_theme_brush: Color::from_argb(
+                    107, 183, 183, 183,
+                ),
+                scroll_bar_thumb_pressed_background_theme_brush: Color::from_argb(153, 0, 0, 0),
+                scroll_bar_thumb_pressed_border_theme_brush: Color::from_argb(237, 85, 85, 85),
+                scroll_bar_track_background_theme_brush: Color::from_argb(89, 213, 213, 213),
+                scroll_bar_track_border_theme_brush: Color::from_argb(89, 213, 213, 213),
+                scroll_bar_thumb_background_color: Color::from_argb(114, 0, 0, 0),
+                scroll_bar_panning_thumb_background_color: Color::from_argb(114, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_background_list_low_brush: Color::from_argb(25, 0, 0, 0),
+                system_control_background_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_highlight_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_foreground_chrome_disabled_low_brush: Color::from_argb(
+                    255, 122, 122, 122,
+                ),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_highlight_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_page_background_chrome_low_brush: Color::from_argb(
+                    255, 242, 242, 242,
+                ),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_chrome_high_brush: Color::from_argb(255, 204, 204, 204),
+            },
+            Theme::Dark => Self {
+                scroll_bar_background: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_background_pointer_over: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_background_disabled: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_foreground: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_border_brush: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                scroll_bar_button_background_pressed: Color::from_argb(139, 255, 255, 255),
+                scroll_bar_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_button_arrow_foreground: Color::from_argb(139, 255, 255, 255),
+                scroll_bar_button_arrow_foreground_pointer_over: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                scroll_bar_button_arrow_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                scroll_bar_button_arrow_foreground_disabled: Color::from_argb(63, 255, 255, 255),
+                scroll_bar_thumb_fill: Color::from_argb(139, 255, 255, 255),
+                scroll_bar_thumb_fill_pointer_over: Color::from_argb(139, 255, 255, 255),
+                scroll_bar_thumb_fill_pressed: Color::from_argb(139, 255, 255, 255),
+                scroll_bar_thumb_fill_disabled: Color::from_argb(63, 255, 255, 255),
+                scroll_bar_thumb_border_brush: Color::from_argb(0, 255, 255, 255),
+                scroll_bar_track_fill: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                scroll_bar_track_fill_pointer_over: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                scroll_bar_track_fill_disabled: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                scroll_bar_track_stroke: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                scroll_bar_track_stroke_pointer_over: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                scroll_bar_track_stroke_disabled: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                scroll_bar_thumb_background: Color::from_argb(139, 255, 255, 255),
+                scroll_bar_panning_thumb_background: Color::from_argb(139, 255, 255, 255),
+                scroll_bar_panning_thumb_background_disabled: Color::from_argb(63, 255, 255, 255),
+                scroll_bar_button_foreground_theme_brush: Color::from_argb(153, 0, 0, 0),
+                scroll_bar_button_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 218, 218, 218,
+                ),
+                scroll_bar_button_pointer_over_border_theme_brush: Color::from_argb(
+                    255, 218, 218, 218,
+                ),
+                scroll_bar_button_pointer_over_foreground_theme_brush: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                scroll_bar_button_pressed_background_theme_brush: Color::from_argb(153, 0, 0, 0),
+                scroll_bar_button_pressed_border_theme_brush: Color::from_argb(153, 0, 0, 0),
+                scroll_bar_button_pressed_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                scroll_bar_panning_background_theme_brush: Color::from_argb(255, 205, 205, 205),
+                scroll_bar_panning_border_theme_brush: Color::from_argb(125, 154, 154, 154),
+                scroll_bar_thumb_background_theme_brush: Color::from_argb(255, 205, 205, 205),
+                scroll_bar_thumb_border_theme_brush: Color::from_argb(59, 85, 85, 85),
+                scroll_bar_thumb_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 218, 218, 218,
+                ),
+                scroll_bar_thumb_pointer_over_border_theme_brush: Color::from_argb(
+                    107, 183, 183, 183,
+                ),
+                scroll_bar_thumb_pressed_background_theme_brush: Color::from_argb(153, 0, 0, 0),
+                scroll_bar_thumb_pressed_border_theme_brush: Color::from_argb(237, 85, 85, 85),
+                scroll_bar_track_background_theme_brush: Color::from_argb(89, 213, 213, 213),
+                scroll_bar_track_border_theme_brush: Color::from_argb(89, 213, 213, 213),
+                scroll_bar_thumb_background_color: Color::from_argb(139, 255, 255, 255),
+                scroll_bar_panning_thumb_background_color: Color::from_argb(139, 255, 255, 255),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_background_list_low_brush: Color::from_argb(25, 255, 255, 255),
+                system_control_background_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_highlight_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_foreground_chrome_disabled_low_brush: Color::from_argb(
+                    255, 133, 133, 133,
+                ),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_highlight_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_page_background_chrome_low_brush: Color::from_argb(255, 23, 23, 23),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_chrome_high_brush: Color::from_argb(255, 118, 118, 118),
+            },
+        }
+    }
+}
+pub const SCROLL_BAR_EXPAND_DURATION: Duration = Duration::from_millis(167);
+pub const SCROLL_BAR_OPACITY_CHANGE_DURATION: Duration = Duration::from_millis(83);
+pub const SCROLL_BAR_COLOR_CHANGE_DURATION: Duration = Duration::from_millis(83);
+pub const SCROLL_BAR_CONTRACT_DURATION: Duration = Duration::from_millis(167);
+pub const SCROLL_BAR_THUMB_OFFSET: f64 = 2.0;
+pub const SCROLL_BAR_CONTRACT_DELAY: Duration = Duration::from_millis(2000);
+pub const SCROLL_BAR_CONTRACT_FINAL_KEYFRAME: Duration = Duration::from_millis(2100);
+pub const SCROLL_BAR_SIZE: f64 = 12.0;
+pub const SCROLL_BAR_VERTICAL_THUMB_MIN_HEIGHT: f64 = 30.0;
+pub const SCROLL_BAR_VERTICAL_THUMB_MIN_WIDTH: f64 = 8.0;
+pub const SCROLL_BAR_HORIZONTAL_THUMB_MIN_WIDTH: f64 = 30.0;
+pub const SCROLL_BAR_HORIZONTAL_THUMB_MIN_HEIGHT: f64 = 8.0;
+pub const SCROLL_BAR_THUMB_STROKE_THICKNESS: f64 = 6.0;
+pub const SCROLL_BAR_BUTTON_ARROW_ICON_FONT_SIZE: f64 = 8.0;
+pub const SCROLL_BAR_BUTTON_ARROW_SCALE_PRESSED: f64 = 0.875;
+pub const SCROLL_BAR_EXPAND_BEGIN_TIME: Duration = Duration::from_millis(400);
+pub const SCROLL_BAR_CONTRACT_BEGIN_TIME: Duration = Duration::from_millis(500);
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const SCROLL_BAR_CORNER_RADIUS: [f64; 4] = [3.0, 3.0, 3.0, 3.0];
+/// Left, top, right, bottom.
+pub const SCROLL_BAR_HORIZONTAL_DECREASE_MARGIN: [f64; 4] = [4.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const SCROLL_BAR_HORIZONTAL_INCREASE_MARGIN: [f64; 4] = [0.0, 0.0, 4.0, 0.0];
+/// Left, top, right, bottom.
+pub const SCROLL_BAR_VERTICAL_DECREASE_MARGIN: [f64; 4] = [0.0, 4.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const SCROLL_BAR_VERTICAL_INCREASE_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 4.0];
+pub const SCROLL_BAR_TRACK_BORDER_THEME_THICKNESS: f64 = 0.0;
+/// Left, top, right, bottom.
+pub const SCROLL_BAR_PANNING_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Theme-dependent resources of `NavigationView_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct NavigationViewResources {
+    /// The resolved `NavigationViewDefaultPaneBackground` resource.
+    pub navigation_view_default_pane_background: AcrylicBrushResources,
+    /// The resolved `NavigationViewExpandedPaneBackground` resource.
+    pub navigation_view_expanded_pane_background: Color,
+    /// The resolved `NavigationViewTopPaneBackground` resource.
+    pub navigation_view_top_pane_background: Color,
+    /// The resolved `NavigationViewContentBackground` resource.
+    pub navigation_view_content_background: Color,
+    /// The resolved `NavigationViewItemBackground` resource.
+    pub navigation_view_item_background: Color,
+    /// The resolved `NavigationViewItemBackgroundPointerOver` resource.
+    pub navigation_view_item_background_pointer_over: Color,
+    /// The resolved `NavigationViewItemBackgroundPressed` resource.
+    pub navigation_view_item_background_pressed: Color,
+    /// The resolved `NavigationViewItemBackgroundDisabled` resource.
+    pub navigation_view_item_background_disabled: Color,
+    /// The resolved `NavigationViewItemBackgroundChecked` resource.
+    pub navigation_view_item_background_checked: Color,
+    /// The resolved `NavigationViewItemBackgroundCheckedPointerOver` resource.
+    pub navigation_view_item_background_checked_pointer_over: Color,
+    /// The resolved `NavigationViewItemBackgroundCheckedPressed` resource.
+    pub navigation_view_item_background_checked_pressed: Color,
+    /// The resolved `NavigationViewItemBackgroundCheckedDisabled` resource.
+    pub navigation_view_item_background_checked_disabled: Color,
+    /// The resolved `NavigationViewItemBackgroundSelected` resource.
+    pub navigation_view_item_background_selected: Color,
+    /// The resolved `NavigationViewItemBackgroundSelectedPointerOver` resource.
+    pub navigation_view_item_background_selected_pointer_over: Color,
+    /// The resolved `NavigationViewItemBackgroundSelectedPressed` resource.
+    pub navigation_view_item_background_selected_pressed: Color,
+    /// The resolved `NavigationViewItemBackgroundSelectedDisabled` resource.
+    pub navigation_view_item_background_selected_disabled: Color,
+    /// The resolved `NavigationViewItemForeground` resource.
+    pub navigation_view_item_foreground: Color,
+    /// The resolved `NavigationViewItemForegroundPointerOver` resource.
+    pub navigation_view_item_foreground_pointer_over: Color,
+    /// The resolved `NavigationViewItemForegroundPressed` resource.
+    pub navigation_view_item_foreground_pressed: Color,
+    /// The resolved `NavigationViewItemForegroundDisabled` resource.
+    pub navigation_view_item_foreground_disabled: Color,
+    /// The resolved `NavigationViewItemForegroundChecked` resource.
+    pub navigation_view_item_foreground_checked: Color,
+    /// The resolved `NavigationViewItemForegroundCheckedPointerOver` resource.
+    pub navigation_view_item_foreground_checked_pointer_over: Color,
+    /// The resolved `NavigationViewItemForegroundCheckedPressed` resource.
+    pub navigation_view_item_foreground_checked_pressed: Color,
+    /// The resolved `NavigationViewItemForegroundCheckedDisabled` resource.
+    pub navigation_view_item_foreground_checked_disabled: Color,
+    /// The resolved `NavigationViewItemForegroundSelected` resource.
+    pub navigation_view_item_foreground_selected: Color,
+    /// The resolved `NavigationViewItemForegroundSelectedPointerOver` resource.
+    pub navigation_view_item_foreground_selected_pointer_over: Color,
+    /// The resolved `NavigationViewItemForegroundSelectedPressed` resource.
+    pub navigation_view_item_foreground_selected_pressed: Color,
+    /// The resolved `NavigationViewItemForegroundSelectedDisabled` resource.
+    pub navigation_view_item_foreground_selected_disabled: Color,
+    /// The resolved `NavigationViewItemBorderBrush` resource.
+    pub navigation_view_item_border_brush: Color,
+    /// The resolved `NavigationViewItemBorderBrushPointerOver` resource.
+    pub navigation_view_item_border_brush_pointer_over: Color,
+    /// The resolved `NavigationViewItemBorderBrushPressed` resource.
+    pub navigation_view_item_border_brush_pressed: Color,
+    /// The resolved `NavigationViewItemBorderBrushDisabled` resource.
+    pub navigation_view_item_border_brush_disabled: Color,
+    /// The resolved `NavigationViewItemBorderBrushChecked` resource.
+    pub navigation_view_item_border_brush_checked: Color,
+    /// The resolved `NavigationViewItemBorderBrushCheckedPointerOver` resource.
+    pub navigation_view_item_border_brush_checked_pointer_over: Color,
+    /// The resolved `NavigationViewItemBorderBrushCheckedPressed` resource.
+    pub navigation_view_item_border_brush_checked_pressed: Color,
+    /// The resolved `NavigationViewItemBorderBrushCheckedDisabled` resource.
+    pub navigation_view_item_border_brush_checked_disabled: Color,
+    /// The resolved `NavigationViewItemBorderBrushSelected` resource.
+    pub navigation_view_item_border_brush_selected: Color,
+    /// The resolved `NavigationViewItemBorderBrushSelectedPointerOver` resource.
+    pub navigation_view_item_border_brush_selected_pointer_over: Color,
+    /// The resolved `NavigationViewItemBorderBrushSelectedPressed` resource.
+    pub navigation_view_item_border_brush_selected_pressed: Color,
+    /// The resolved `NavigationViewItemBorderBrushSelectedDisabled` resource.
+    pub navigation_view_item_border_brush_selected_disabled: Color,
+    /// The resolved `NavigationViewItemIconBackground` resource.
+    pub navigation_view_item_icon_background: Color,
+    /// The resolved `NavigationViewItemSeparatorForeground` resource.
+    pub navigation_view_item_separator_foreground: Color,
+    /// The resolved `NavigationViewItemHeaderForeground` resource.
+    pub navigation_view_item_header_foreground: Color,
+    /// The resolved `NavigationViewSelectionIndicatorForeground` resource.
+    pub navigation_view_selection_indicator_foreground: Color,
+    /// The resolved `NavigationViewContentGridBorderBrush` resource.
+    pub navigation_view_content_grid_border_brush: Color,
+    /// The resolved `TopNavigationViewItemForeground` resource.
+    pub top_navigation_view_item_foreground: Color,
+    /// The resolved `TopNavigationViewItemForegroundPointerOver` resource.
+    pub top_navigation_view_item_foreground_pointer_over: Color,
+    /// The resolved `TopNavigationViewItemForegroundPressed` resource.
+    pub top_navigation_view_item_foreground_pressed: Color,
+    /// The resolved `TopNavigationViewItemForegroundDisabled` resource.
+    pub top_navigation_view_item_foreground_disabled: Color,
+    /// The resolved `TopNavigationViewItemForegroundSelected` resource.
+    pub top_navigation_view_item_foreground_selected: Color,
+    /// The resolved `TopNavigationViewItemForegroundSelectedPointerOver` resource.
+    pub top_navigation_view_item_foreground_selected_pointer_over: Color,
+    /// The resolved `TopNavigationViewItemForegroundSelectedPressed` resource.
+    pub top_navigation_view_item_foreground_selected_pressed: Color,
+    /// The resolved `TopNavigationViewItemBackgroundPointerOver` resource.
+    pub top_navigation_view_item_background_pointer_over: Color,
+    /// The resolved `TopNavigationViewItemBackgroundPressed` resource.
+    pub top_navigation_view_item_background_pressed: Color,
+    /// The resolved `TopNavigationViewItemBackgroundSelected` resource.
+    pub top_navigation_view_item_background_selected: Color,
+    /// The resolved `TopNavigationViewItemBackgroundSelectedPointerOver` resource.
+    pub top_navigation_view_item_background_selected_pointer_over: Color,
+    /// The resolved `TopNavigationViewItemBackgroundSelectedPressed` resource.
+    pub top_navigation_view_item_background_selected_pressed: Color,
+    /// The resolved `TopNavigationViewItemSeparatorForeground` resource.
+    pub top_navigation_view_item_separator_foreground: Color,
+    /// The resolved `NavigationViewButtonBackgroundPointerOver` resource.
+    pub navigation_view_button_background_pointer_over: Color,
+    /// The resolved `NavigationViewButtonBackgroundPressed` resource.
+    pub navigation_view_button_background_pressed: Color,
+    /// The resolved `NavigationViewButtonBackgroundDisabled` resource.
+    pub navigation_view_button_background_disabled: Color,
+    /// The resolved `NavigationViewButtonForegroundPointerOver` resource.
+    pub navigation_view_button_foreground_pointer_over: Color,
+    /// The resolved `NavigationViewButtonForegroundPressed` resource.
+    pub navigation_view_button_foreground_pressed: Color,
+    /// The resolved `NavigationViewButtonForegroundDisabled` resource.
+    pub navigation_view_button_foreground_disabled: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
+    pub system_control_background_base_low_brush: Color,
+    /// The resolved `SystemControlHighlightListLowRevealBackgroundBrush` resource.
+    pub system_control_highlight_list_low_reveal_background_brush: Color,
+    /// The resolved `SystemControlHighlightListMediumRevealBackgroundBrush` resource.
+    pub system_control_highlight_list_medium_reveal_background_brush: Color,
+    /// The resolved `SystemControlTransparentRevealBackgroundBrush` resource.
+    pub system_control_transparent_reveal_background_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlHighlightAltBaseHighBrush` resource.
+    pub system_control_highlight_alt_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlHighlightAltTransparentRevealBorderBrush` resource.
+    pub system_control_highlight_alt_transparent_reveal_border_brush: Color,
+    /// The resolved `SystemControlBackgroundTransparentRevealBorderBrush` resource.
+    pub system_control_background_transparent_reveal_border_brush: Color,
+    /// The resolved `SystemControlHighlightListLowBrush` resource.
+    pub system_control_highlight_list_low_brush: Color,
+    /// The resolved `SystemControlHighlightListMediumBrush` resource.
+    pub system_control_highlight_list_medium_brush: Color,
+}
+
+impl NavigationViewResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                navigation_view_default_pane_background: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                navigation_view_expanded_pane_background: Color::from_argb(0, 243, 243, 243),
+                navigation_view_top_pane_background: Color::from_argb(0, 243, 243, 243),
+                navigation_view_content_background: Color::from_argb(128, 255, 255, 255),
+                navigation_view_item_background: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                navigation_view_item_background_pressed: Color::from_argb(6, 0, 0, 0),
+                navigation_view_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_background_checked: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_background_checked_pointer_over: Color::from_argb(9, 0, 0, 0),
+                navigation_view_item_background_checked_pressed: Color::from_argb(6, 0, 0, 0),
+                navigation_view_item_background_checked_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_background_selected: Color::from_argb(9, 0, 0, 0),
+                navigation_view_item_background_selected_pointer_over: Color::from_argb(6, 0, 0, 0),
+                navigation_view_item_background_selected_pressed: Color::from_argb(9, 0, 0, 0),
+                navigation_view_item_background_selected_disabled: Color::from_argb(9, 0, 0, 0),
+                navigation_view_item_foreground: Color::from_argb(228, 0, 0, 0),
+                navigation_view_item_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                navigation_view_item_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                navigation_view_item_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                navigation_view_item_foreground_checked: Color::from_argb(228, 0, 0, 0),
+                navigation_view_item_foreground_checked_pointer_over: Color::from_argb(
+                    228, 0, 0, 0,
+                ),
+                navigation_view_item_foreground_checked_pressed: Color::from_argb(158, 0, 0, 0),
+                navigation_view_item_foreground_checked_disabled: Color::from_argb(92, 0, 0, 0),
+                navigation_view_item_foreground_selected: Color::from_argb(228, 0, 0, 0),
+                navigation_view_item_foreground_selected_pointer_over: Color::from_argb(
+                    228, 0, 0, 0,
+                ),
+                navigation_view_item_foreground_selected_pressed: Color::from_argb(158, 0, 0, 0),
+                navigation_view_item_foreground_selected_disabled: Color::from_argb(92, 0, 0, 0),
+                navigation_view_item_border_brush: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_checked: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_checked_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_checked_pressed: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_checked_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_selected: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_selected_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_selected_pressed: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_selected_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_icon_background: Color::from_argb(0, 0, 0, 0),
+                navigation_view_item_separator_foreground: Color::from_argb(15, 0, 0, 0),
+                navigation_view_item_header_foreground: Color::from_argb(158, 0, 0, 0),
+                navigation_view_selection_indicator_foreground: accent.dark1,
+                navigation_view_content_grid_border_brush: Color::from_argb(15, 0, 0, 0),
+                top_navigation_view_item_foreground: Color::from_argb(228, 0, 0, 0),
+                top_navigation_view_item_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                top_navigation_view_item_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                top_navigation_view_item_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                top_navigation_view_item_foreground_selected: Color::from_argb(228, 0, 0, 0),
+                top_navigation_view_item_foreground_selected_pointer_over: Color::from_argb(
+                    228, 0, 0, 0,
+                ),
+                top_navigation_view_item_foreground_selected_pressed: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                top_navigation_view_item_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                top_navigation_view_item_background_pressed: Color::from_argb(6, 0, 0, 0),
+                top_navigation_view_item_background_selected: Color::from_argb(0, 255, 255, 255),
+                top_navigation_view_item_background_selected_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                top_navigation_view_item_background_selected_pressed: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                top_navigation_view_item_separator_foreground: Color::from_argb(15, 0, 0, 0),
+                navigation_view_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                navigation_view_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                navigation_view_button_background_disabled: Color::from_argb(77, 249, 249, 249),
+                navigation_view_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                navigation_view_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                navigation_view_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_highlight_list_low_reveal_background_brush: Color::from_argb(
+                    25, 0, 0, 0,
+                ),
+                system_control_highlight_list_medium_reveal_background_brush: Color::from_argb(
+                    51, 0, 0, 0,
+                ),
+                system_control_transparent_reveal_background_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_highlight_alt_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_highlight_alt_transparent_reveal_border_brush: Color::from_argb(
+                    0, 0, 0, 0,
+                ),
+                system_control_background_transparent_reveal_border_brush: Color::from_argb(
+                    0, 0, 0, 0,
+                ),
+                system_control_highlight_list_low_brush: Color::from_argb(25, 0, 0, 0),
+                system_control_highlight_list_medium_brush: Color::from_argb(51, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                navigation_view_default_pane_background: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                navigation_view_expanded_pane_background: Color::from_argb(0, 32, 32, 32),
+                navigation_view_top_pane_background: Color::from_argb(0, 32, 32, 32),
+                navigation_view_content_background: Color::from_argb(76, 58, 58, 58),
+                navigation_view_item_background: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                navigation_view_item_background_pressed: Color::from_argb(10, 255, 255, 255),
+                navigation_view_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_background_checked: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_background_checked_pointer_over: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                navigation_view_item_background_checked_pressed: Color::from_argb(
+                    10, 255, 255, 255,
+                ),
+                navigation_view_item_background_checked_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_background_selected: Color::from_argb(15, 255, 255, 255),
+                navigation_view_item_background_selected_pointer_over: Color::from_argb(
+                    10, 255, 255, 255,
+                ),
+                navigation_view_item_background_selected_pressed: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                navigation_view_item_background_selected_disabled: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                navigation_view_item_foreground: Color::from_argb(255, 255, 255, 255),
+                navigation_view_item_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                navigation_view_item_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                navigation_view_item_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                navigation_view_item_foreground_checked: Color::from_argb(255, 255, 255, 255),
+                navigation_view_item_foreground_checked_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                navigation_view_item_foreground_checked_pressed: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                navigation_view_item_foreground_checked_disabled: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                navigation_view_item_foreground_selected: Color::from_argb(255, 255, 255, 255),
+                navigation_view_item_foreground_selected_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                navigation_view_item_foreground_selected_pressed: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                navigation_view_item_foreground_selected_disabled: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_checked: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_checked_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_checked_pressed: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_checked_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_selected: Color::from_argb(0, 255, 255, 255),
+                navigation_view_item_border_brush_selected_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_selected_pressed: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_border_brush_selected_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                navigation_view_item_icon_background: Color::from_argb(0, 0, 0, 0),
+                navigation_view_item_separator_foreground: Color::from_argb(21, 255, 255, 255),
+                navigation_view_item_header_foreground: Color::from_argb(197, 255, 255, 255),
+                navigation_view_selection_indicator_foreground: accent.light2,
+                navigation_view_content_grid_border_brush: Color::from_argb(25, 0, 0, 0),
+                top_navigation_view_item_foreground: Color::from_argb(255, 255, 255, 255),
+                top_navigation_view_item_foreground_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                top_navigation_view_item_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                top_navigation_view_item_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                top_navigation_view_item_foreground_selected: Color::from_argb(255, 255, 255, 255),
+                top_navigation_view_item_foreground_selected_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                top_navigation_view_item_foreground_selected_pressed: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                top_navigation_view_item_background_pointer_over: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                top_navigation_view_item_background_pressed: Color::from_argb(10, 255, 255, 255),
+                top_navigation_view_item_background_selected: Color::from_argb(0, 255, 255, 255),
+                top_navigation_view_item_background_selected_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                top_navigation_view_item_background_selected_pressed: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                top_navigation_view_item_separator_foreground: Color::from_argb(21, 255, 255, 255),
+                navigation_view_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                navigation_view_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                navigation_view_button_background_disabled: Color::from_argb(11, 255, 255, 255),
+                navigation_view_button_foreground_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                navigation_view_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                navigation_view_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_highlight_list_low_reveal_background_brush: Color::from_argb(
+                    25, 255, 255, 255,
+                ),
+                system_control_highlight_list_medium_reveal_background_brush: Color::from_argb(
+                    51, 255, 255, 255,
+                ),
+                system_control_transparent_reveal_background_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_highlight_alt_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_highlight_alt_transparent_reveal_border_brush: Color::from_argb(
+                    0, 0, 0, 0,
+                ),
+                system_control_background_transparent_reveal_border_brush: Color::from_argb(
+                    0, 0, 0, 0,
+                ),
+                system_control_highlight_list_low_brush: Color::from_argb(25, 255, 255, 255),
+                system_control_highlight_list_medium_brush: Color::from_argb(51, 255, 255, 255),
+            },
+        }
+    }
+}
+pub const LIST_VIEW_ITEM_DISABLED_THEME_OPACITY: f64 = 0.55;
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_AUTO_SUGGEST_BOX_MARGIN: [f64; 4] = [16.0, 0.0, 16.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_AUTO_SUGGEST_BOX_MARGIN: [f64; 4] = [4.0, 0.0, 4.0, 0.0];
+pub const PANE_TOGGLE_BUTTON_HEIGHT: f64 = 36.0;
+pub const PANE_TOGGLE_BUTTON_WIDTH: f64 = 40.0;
+pub const PANE_OVERLAY_SHADOW_DEPTH: f64 = 16.0;
+pub const NAVIGATION_VIEW_COMPACT_PANE_LENGTH: f64 = 48.0;
+pub const NAVIGATION_VIEW_ICON_BOX_WIDTH: f64 = 40.0;
+pub const NAVIGATION_VIEW_TOP_PANE_HEIGHT: f64 = 48.0;
+pub const NAVIGATION_VIEW_AUTO_SUGGEST_AREA_HEIGHT: f64 = 40.0;
+pub const TOP_NAVIGATION_VIEW_PANE_CUSTOM_CONTENT_MIN_WIDTH: f64 = 48.0;
+pub const TOP_NAVIGATION_VIEW_OVERFLOW_BUTTON_WIDTH: f64 = 40.0;
+pub const TOP_NAVIGATION_VIEW_OVERFLOW_BUTTON_HEIGHT: f64 = 40.0;
+pub const TOP_NAVIGATION_VIEW_SETTINGS_BUTTON_WIDTH: f64 = 40.0;
+pub const TOP_NAVIGATION_VIEW_SETTINGS_BUTTON_HEIGHT: f64 = 40.0;
+pub const NAVIGATION_VIEW_ITEM_ON_LEFT_MIN_HEIGHT: f64 = 36.0;
+pub const NAVIGATION_VIEW_PANE_HEADER_ROW_MIN_HEIGHT: f64 = 40.0;
+pub const NAVIGATION_VIEW_ITEM_ON_LEFT_ICON_BOX_HEIGHT: f64 = 16.0;
+pub const NAVIGATION_VIEW_SELECTION_INDICATOR_WIDTH: f64 = 3.0;
+pub const NAVIGATION_VIEW_SELECTION_INDICATOR_HEIGHT: f64 = 16.0;
+pub const NAVIGATION_VIEW_SELECTION_INDICATOR_RADIUS: f64 = 2.0;
+pub const NAVIGATION_VIEW_ITEM_SEPARATOR_HEIGHT: f64 = 1.0;
+pub const TOP_NAVIGATION_VIEW_ITEM_SEPARATOR_WIDTH: f64 = 1.0;
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_TOGGLE_BORDER_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_ITEM_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_ITEM_ON_LEFT_ICON_BOX_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_ITEM_BUTTON_MARGIN: [f64; 4] = [4.0, 2.0, 4.0, 2.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_ITEM_INNER_HEADER_MARGIN: [f64; 4] = [16.0, 0.0, 16.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_INNER_HEADER_MARGIN: [f64; 4] = [12.0, 0.0, 12.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_MINIMAL_HEADER_MARGIN: [f64; 4] = [-24.0, 44.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_BUTTON_HOLDER_GRID_MARGIN: [f64; 4] = [0.0, 4.0, 0.0, 4.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_PANE_CONTENT_GRID_MARGIN: [f64; 4] = [-1.0, 3.0, -1.0, 3.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_CONTENT_GRID_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_MINIMAL_CONTENT_GRID_BORDER_THICKNESS: [f64; 4] = [0.0, 1.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_CONTENT_GRID_BORDER_THICKNESS: [f64; 4] = [0.0, 1.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_TOP_NAV_GRID_MARGIN: [f64; 4] = [4.0, 0.0, 4.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_HEADER_MARGIN: [f64; 4] = [56.0, 44.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_CONTENT_PRESENTER_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_CONTENT_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_MINIMAL_CONTENT_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_CONTENT_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_PANE_TITLE_PRESENTER_MARGIN: [f64; 4] = [8.0, 4.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_ITEM_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_ITEM_SEPARATOR_MARGIN: [f64; 4] = [0.0, 3.0, 0.0, 4.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_COMPACT_ITEM_SEPARATOR_MARGIN: [f64; 4] = [0.0, 3.0, 0.0, 4.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_SEPARATOR_MARGIN: [f64; 4] = [3.0, 0.0, 4.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_OVERFLOW_BUTTON_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_ITEM_CONTENT_PRESENTER_MARGIN: [f64; 4] = [4.0, -1.0, 8.0, -1.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_COMPACT_ITEM_CONTENT_PRESENTER_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_CONTENT_PRESENTER_MARGIN: [f64; 4] = [8.0, -1.0, 12.0, -1.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_CONTENT_ONLY_CONTENT_PRESENTER_MARGIN: [f64; 4] =
+    [12.0, 0.0, 12.0, 0.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_ITEM_EXPAND_CHEVRON_MARGIN: [f64; 4] = [0.0, 0.0, -14.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_EXPAND_CHEVRON_MARGIN: [f64; 4] = [-16.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_ICON_ONLY_EXPAND_CHEVRON_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_CONTENT_ONLY_EXPAND_CHEVRON_MARGIN: [f64; 4] =
+    [-12.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_ON_OVERFLOW_CONTENT_PRESENTER_MARGIN: [f64; 4] =
+    [12.0, 0.0, 20.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_ON_OVERFLOW_NO_ICON_CONTENT_PRESENTER_MARGIN: [f64; 4] =
+    [16.0, 0.0, 20.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_ON_OVERFLOW_EXPAND_CHEVRON_MARGIN: [f64; 4] =
+    [-4.0, 0.0, -8.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_ITEM_ON_OVERFLOW_EXPAND_CHEVRON_PADDING: [f64; 4] =
+    [12.0, 0.0, 12.0, 0.0];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const NAVIGATION_VIEW_CONTENT_GRID_CORNER_RADIUS: [f64; 4] = [8.0, 0.0, 0.0, 0.0];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const TOP_NAVIGATION_VIEW_CONTENT_GRID_CORNER_RADIUS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const NAVIGATION_VIEW_MINIMAL_CONTENT_GRID_CORNER_RADIUS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TOP_NAVIGATION_VIEW_OVERFLOW_MENU_PADDING: [f64; 4] = [0.0, 2.0, 0.0, 2.0];
+/// Left, top, right, bottom.
+pub const NAVIGATION_VIEW_ITEM_CHILDREN_MENU_FLYOUT_PADDING: [f64; 4] = [0.0, 2.0, 0.0, 2.0];
+pub const NAVIGATION_VIEW_ITEM_EXPANDED_GLYPH_FONT_SIZE: f64 = 8.0;
+/// Theme-dependent resources of `FlyoutPresenter_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct FlyoutPresenterResources {
+    /// The resolved `FlyoutPresenterBackground` resource.
+    pub flyout_presenter_background: AcrylicBrushResources,
+    /// The resolved `FlyoutBorderThemeBrush` resource.
+    pub flyout_border_theme_brush: Color,
+}
+
+impl FlyoutPresenterResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                flyout_presenter_background: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                flyout_border_theme_brush: Color::from_argb(15, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                flyout_presenter_background: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                flyout_border_theme_brush: Color::from_argb(51, 0, 0, 0),
+            },
+        }
+    }
+}
+pub const FLYOUT_THEME_MAX_HEIGHT: f64 = 758.0;
+pub const FLYOUT_THEME_MAX_WIDTH: f64 = 456.0;
+pub const FLYOUT_THEME_MIN_HEIGHT: f64 = 40.0;
+pub const FLYOUT_THEME_MIN_WIDTH: f64 = 96.0;
+/// Left, top, right, bottom.
+pub const FLYOUT_CONTENT_PADDING: [f64; 4] = [16.0, 15.0, 16.0, 17.0];
+/// Left, top, right, bottom.
+pub const FLYOUT_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Theme-dependent resources of `NavigationBackButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct NavigationBackButtonResources {
+    /// The resolved `NavigationViewBackButtonBackground` resource.
+    pub navigation_view_back_button_background: Color,
+    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
+    pub system_control_background_base_low_brush: Color,
+    /// The resolved `NavigationViewItemForeground` resource.
+    pub navigation_view_item_foreground: Color,
+}
+
+impl NavigationBackButtonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                navigation_view_back_button_background: Color::from_argb(0, 255, 255, 255),
+                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
+                navigation_view_item_foreground: Color::from_argb(255, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                navigation_view_back_button_background: Color::from_argb(0, 255, 255, 255),
+                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
+                navigation_view_item_foreground: Color::from_argb(255, 255, 255, 255),
+            },
+        }
+    }
+}
+pub const NAVIGATION_BACK_BUTTON_WIDTH: f64 = 40.0;
+pub const NAVIGATION_BACK_BUTTON_HEIGHT: f64 = 36.0;

@@ -1,6 +1,6 @@
 //! XAML `TickBar` (`dxaml/xcp/dxaml/lib/TickBar_Partial.cpp`): the tick marks of a `Slider`, one physical pixel each, laid out by `ArrangeOverride` from the slider's `TickFrequency`, its range, its thumb length and its direction.
 
-use crate::{Brush, Orientation, less_than, less_than_or_close};
+use crate::{Orientation, less_than, less_than_or_close};
 use reveal_embedder::{Canvas, Color, Rect, Size};
 use reveal_foundation::App;
 use reveal_rendering::CustomPainter;
@@ -163,8 +163,7 @@ impl CustomPainter for TickBarPainter {
                 Rect::from_ltwh(0.0, offset, size.width(), thickness)
             }),
         };
-        let paint =
-            Brush::Solid(bar.fill).fill(Rect::from_ltwh(0.0, 0.0, size.width(), size.height()));
+        let paint = reveal_embedder::Paint::from_color(bar.fill.into());
         for offset in bar.tick_offsets(final_length) {
             canvas.draw_rect(tick_rect(offset, thickness, size), &paint);
         }

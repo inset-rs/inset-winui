@@ -2,6 +2,7 @@
 
 use reveal_foundation::{App, Handle, Listener};
 use reveal_rendering::HitTestBehavior;
+use reveal_scheduler::{FrameCallback, SchedulerBinding};
 use reveal_services::{KeyEvent, LogicalKeyboardKey};
 use reveal_widgets::*;
 use std::{any::TypeId, collections::HashMap, fmt, rc::Rc};
@@ -32,6 +33,10 @@ pub struct CommonStates {
     pub click: Listener,
     pub builder: StatesBuilder,
     pub is_enabled: bool,
+    /// Whether sequential keyboard navigation stops on this control.
+    pub is_tab_stop: bool,
+    /// An optional owner-managed focus node for container lookup and arrow navigation.
+    pub focus_node: Option<AnyFocusNode>,
     /// `ButtonBase::SetAcceptsReturn`: whether Enter activates as Space does. `ButtonBase::Initialize` sets it; `CheckBox` and `RadioButton` clear it.
     pub accepts_return: bool,
     pub key: Option<KeyRef>,
@@ -46,6 +51,8 @@ impl CommonStates {
             click,
             builder: Rc::new(builder),
             is_enabled: true,
+            is_tab_stop: true,
+            focus_node: None,
             accepts_return: true,
             key: None,
         }
@@ -58,6 +65,18 @@ impl CommonStates {
 
     pub fn is_enabled(mut self, enabled: bool) -> CommonStates {
         self.is_enabled = enabled;
+        self
+    }
+
+    /// XAML `IsTabStop`; pointer and programmatic focus remain available.
+    pub fn is_tab_stop(mut self, value: bool) -> Self {
+        self.is_tab_stop = value;
+        self
+    }
+
+    /// Uses a caller-owned node; the caller disposes it after this widget unmounts.
+    pub fn focus_node(mut self, node: AnyFocusNode) -> Self {
+        self.focus_node = Some(node);
         self
     }
 
@@ -82,6 +101,7 @@ pub struct CommonStatesData {
     hovered: bool,
     focused: bool,
     focus_node: Option<AnyFocusNode>,
+    owns_focus_node: bool,
     pointer_down: bool,
     space_or_enter_key_down: bool,
     gamepad_a_key_down: bool,
@@ -100,6 +120,7 @@ impl StatefulWidget for CommonStates {
             hovered: false,
             focused: false,
             focus_node: None,
+            owns_focus_node: false,
             pointer_down: false,
             space_or_enter_key_down: false,
             gamepad_a_key_down: false,
@@ -215,7 +236,10 @@ impl State for CommonStatesData {
     reveal_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
-        let node = FocusNode::new(app).as_node();
+        let external = self.widget(app).focus_node;
+        let node = external.unwrap_or_else(|| FocusNode::new(app).as_node());
+        app.get_mut(self).owns_focus_node = external.is_none();
+        node.set_skip_traversal(app, !self.widget(app).is_tab_stop);
         node.set_on_key_event(
             app,
             Some(Rc::new(move |app, _, event| self.on_key_event(app, event))),
@@ -235,15 +259,48 @@ impl State for CommonStatesData {
 
     fn dispose(self: Handle<Self>, app: &mut App) {
         if let Some(node) = app.get_mut(self).focus_node.take() {
-            node.dispose(app);
-            app.destroy(node.id());
+            if app.get(self).owns_focus_node {
+                node.dispose(app);
+                app.destroy(node.id());
+            } else {
+                node.set_on_key_event(app, None);
+            }
         }
         for action in std::mem::take(&mut app.get_mut(self).actions).into_values() {
             app.destroy(action.id());
         }
     }
 
-    fn did_update_widget(self: Handle<Self>, app: &mut App, _old_widget: &CommonStates) {
+    fn did_update_widget(self: Handle<Self>, app: &mut App, old_widget: &CommonStates) {
+        if old_widget.focus_node != self.widget(app).focus_node {
+            if let Some(node) = app.get_mut(self).focus_node.take() {
+                if app.get(self).owns_focus_node {
+                    node.dispose(app);
+                    // FocusableActionDetector detaches the previous node when its child updates.
+                    SchedulerBinding::add_post_frame_callback(
+                        app,
+                        FrameCallback::new(move |app, _| {
+                            if app.contains(node.id()) {
+                                app.destroy(node.id());
+                            }
+                        }),
+                    );
+                } else {
+                    node.set_on_key_event(app, None);
+                }
+            }
+            let external = self.widget(app).focus_node;
+            let node = external.unwrap_or_else(|| FocusNode::new(app).as_node());
+            node.set_on_key_event(
+                app,
+                Some(Rc::new(move |app, _, event| self.on_key_event(app, event))),
+            );
+            app.get_mut(self).focus_node = Some(node);
+            app.get_mut(self).owns_focus_node = external.is_none();
+        }
+        if let Some(node) = app.get(self).focus_node {
+            node.set_skip_traversal(app, !self.widget(app).is_tab_stop);
+        }
         if !self.widget(app).is_enabled {
             self.clear_state_flags(app);
             app.get_mut(self).hovered = false;

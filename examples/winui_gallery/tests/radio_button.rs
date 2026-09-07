@@ -5,7 +5,7 @@ use common::Fixture;
 
 #[test]
 fn radio_button_checks_once_per_group_and_switches_theme() {
-    let mut fixture = Fixture::new([900, 2000]);
+    let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::RadioButton);
     fixture.find("RadioButton: Option 2");
     fixture.find("Checked 0 times");
     fixture.tap("Option 1");

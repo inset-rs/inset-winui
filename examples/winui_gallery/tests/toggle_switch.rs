@@ -89,7 +89,8 @@ fn drag(fixture: &mut Fixture, from: Offset, steps: &[f64]) {
 
 #[test]
 fn toggle_switch_drags_toggle_past_half_the_track() {
-    let mut fixture = Fixture::new([900, 2000]);
+    let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::ToggleSwitch);
+    fixture.ensure_visible("Airplane mode off");
     fixture.find("Clicked 0 times · wifi true · airplane false");
 
     // Airplane mode is off. Dragged 30 pt right (past the touch slop, then on), the knob is

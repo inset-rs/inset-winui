@@ -218,7 +218,9 @@ impl RenderObject for RenderGrid {
 
         // Measure: every child's desired size against what its cell offers.
         let desired = layout.measure(&placements, constraints.biggest(), |index, available| {
-            RenderGrid::dry_layout_child(app, children[index], available)
+            let child = children[index];
+            child.layout(app, BoxConstraints::loose(available), true);
+            child.size(app)
         });
         let size = constraints.constrain(desired);
 

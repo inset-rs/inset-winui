@@ -1,22 +1,51 @@
-//! `ToggleButton` (two-state, three-state, disabled unchecked and checked), `RepeatButton` held against a counter, and `HyperlinkButton`; each keeps its demo state in its own widget and reports it in a status label.
-use crate::{column, label, row, section};
+//! `ToggleButton` states, `RepeatButton` timing and `HyperlinkButton` content.
+
+use crate::{column, example, example_row, label, row, section};
 use reveal_foundation::{App, Handle, Listener};
 use reveal_widgets::*;
 use reveal_winui::*;
+use std::time::Duration;
 
-pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
-    let mut sections = section("ToggleButton", resources, ToggleButtonDemo.into_widget());
-    sections.extend(section(
+/// Builds the ToggleButton examples and their retained state.
+pub fn toggle_button(resources: &ThemeResources) -> Vec<WidgetRef> {
+    section(
+        "ToggleButton",
+        resources,
+        example(
+            "States",
+            "The second button cycles through checked, indeterminate and unchecked states.",
+            resources,
+            ToggleButtonDemo.into_widget(),
+        ),
+    )
+}
+
+/// Builds the RepeatButton examples and their counter.
+pub fn repeat_button(resources: &ThemeResources) -> Vec<WidgetRef> {
+    section(
         "RepeatButton",
         resources,
-        RepeatButtonDemo.into_widget(),
-    ));
-    sections.extend(section(
+        example(
+            "Timing",
+            "Hold a button to compare the default delay and interval with a faster custom timing.",
+            resources,
+            RepeatButtonDemo.into_widget(),
+        ),
+    )
+}
+
+/// Builds the HyperlinkButton examples and their counter.
+pub fn hyperlink_button(resources: &ThemeResources) -> Vec<WidgetRef> {
+    section(
         "HyperlinkButton",
         resources,
-        HyperlinkButtonDemo.into_widget(),
-    ));
-    sections
+        example(
+            "Content and enabled state",
+            "HyperlinkButton accepts text or composed widget content while retaining link styling.",
+            resources,
+            HyperlinkButtonDemo.into_widget(),
+        ),
+    )
 }
 
 /// The status label under each demo, in the secondary text colour.
@@ -29,6 +58,7 @@ fn status(app: &mut App, context: BuildContext, text: String) -> WidgetRef {
     )
 }
 
+/// Formats the three possible `ToggleButton` values for the status label.
 fn describe(is_checked: Option<bool>) -> &'static str {
     match is_checked {
         Some(true) => "checked",
@@ -37,15 +67,25 @@ fn describe(is_checked: Option<bool>) -> &'static str {
     }
 }
 
+/// Stateful content for the two-state, three-state and disabled toggle examples.
 #[derive(Debug)]
 struct ToggleButtonDemo;
+
+/// Retains the values shown by `ToggleButtonDemo`.
 struct ToggleButtonDemoState {
+    /// Widget lifecycle data.
     state: StateData<ToggleButtonDemo>,
+
+    /// Value of the ordinary two-state button.
     two_state: Option<bool>,
+
+    /// Value of the three-state button.
     three_state: Option<bool>,
 }
+
 impl StatefulWidget for ToggleButtonDemo {
     type State = ToggleButtonDemoState;
+
     fn create_state(&self) -> ToggleButtonDemoState {
         ToggleButtonDemoState {
             state: StateData::new(),
@@ -54,14 +94,17 @@ impl StatefulWidget for ToggleButtonDemo {
         }
     }
 }
+
 impl State for ToggleButtonDemoState {
     type Widget = ToggleButtonDemo;
+
     reveal_widgets::state_accessors!();
+
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let (two_state, three_state) = (app.get(self).two_state, app.get(self).three_state);
         column(
             vec![
-                row(
+                example_row(
                     vec![
                         ToggleButton::text("Toggle me", two_state, move |app, value| {
                             self.set_state(app, |s| s.two_state = value)
@@ -96,14 +139,22 @@ impl State for ToggleButtonDemoState {
     }
 }
 
+/// Stateful content for the repeat timing and counter examples.
 #[derive(Debug)]
 struct RepeatButtonDemo;
+
+/// Retains the number of repeat activations shown by `RepeatButtonDemo`.
 struct RepeatButtonDemoState {
+    /// Widget lifecycle data.
     state: StateData<RepeatButtonDemo>,
+
+    /// Number of activations received by the enabled repeat buttons.
     clicks: u32,
 }
+
 impl StatefulWidget for RepeatButtonDemo {
     type State = RepeatButtonDemoState;
+
     fn create_state(&self) -> RepeatButtonDemoState {
         RepeatButtonDemoState {
             state: StateData::new(),
@@ -111,17 +162,24 @@ impl StatefulWidget for RepeatButtonDemo {
         }
     }
 }
+
 impl State for RepeatButtonDemoState {
     type Widget = RepeatButtonDemo;
+
     reveal_widgets::state_accessors!();
+
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let clicks = app.get(self).clicks;
         let click = Listener::new(move |app| self.set_state(app, |s| s.clicks += 1));
         column(
             vec![
-                row(
+                example_row(
                     vec![
-                        RepeatButton::text("Hold me", click).into_widget(),
+                        RepeatButton::text("Hold me", click.clone()).into_widget(),
+                        RepeatButton::text("Fast repeat", click)
+                            .delay(Duration::from_millis(350))
+                            .interval(Duration::from_millis(120))
+                            .into_widget(),
                         RepeatButton::text("Disabled repeat", Listener::new(|_| {}))
                             .is_enabled(false)
                             .into_widget(),
@@ -135,14 +193,22 @@ impl State for RepeatButtonDemoState {
     }
 }
 
+/// Stateful content for the text and composed-content hyperlink examples.
 #[derive(Debug)]
 struct HyperlinkButtonDemo;
+
+/// Retains the number of enabled hyperlink activations shown in the status label.
 struct HyperlinkButtonDemoState {
+    /// Widget lifecycle data.
     state: StateData<HyperlinkButtonDemo>,
+
+    /// Number of activations received by the enabled text link.
     clicks: u32,
 }
+
 impl StatefulWidget for HyperlinkButtonDemo {
     type State = HyperlinkButtonDemoState;
+
     fn create_state(&self) -> HyperlinkButtonDemoState {
         HyperlinkButtonDemoState {
             state: StateData::new(),
@@ -150,17 +216,31 @@ impl StatefulWidget for HyperlinkButtonDemo {
         }
     }
 }
+
 impl State for HyperlinkButtonDemoState {
     type Widget = HyperlinkButtonDemo;
+
     reveal_widgets::state_accessors!();
+
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let clicks = app.get(self).clicks;
         let click = Listener::new(move |app| self.set_state(app, |s| s.clicks += 1));
         column(
             vec![
-                row(
+                example_row(
                     vec![
-                        HyperlinkButton::text("Learn more", click).into_widget(),
+                        HyperlinkButton::text("Learn more", click.clone()).into_widget(),
+                        HyperlinkButton::new(
+                            row(
+                                vec![
+                                    FluentIcon::new(FluentSymbol::Search).into_widget(),
+                                    Text::new("Icon link").into_widget(),
+                                ],
+                                8.0,
+                            ),
+                            click,
+                        )
+                        .into_widget(),
                         HyperlinkButton::text("Disabled link", Listener::new(|_| {}))
                             .is_enabled(false)
                             .into_widget(),

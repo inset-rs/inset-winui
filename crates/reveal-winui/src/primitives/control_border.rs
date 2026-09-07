@@ -3,7 +3,7 @@
 use crate::Brush;
 use reveal_embedder::{Canvas, Offset, RRect, Radius, Size};
 use reveal_foundation::App;
-use reveal_painting::{EdgeInsets, EdgeInsetsGeometry, draw_drrect, draw_rrect};
+use reveal_painting::{EdgeInsets, EdgeInsetsGeometry};
 use reveal_rendering::CustomPainter;
 use reveal_widgets::*;
 
@@ -144,16 +144,19 @@ impl CustomPainter for ControlBorderPainter {
             BackgroundSizing::InnerBorderEdge => inner,
             BackgroundSizing::OuterBorderEdge => outer,
         };
-        if self.background.representative_color().a > 0.0 {
-            draw_rrect(canvas, background_rect, &self.background.fill(bounds));
+        if matches!(self.background, Brush::Acrylic(_))
+            || self.background.representative_color().a > 0.0
+        {
+            self.background.paint_rrect(canvas, background_rect, bounds);
         }
         if self
             .border_thickness
             .iter()
             .any(|thickness| *thickness > 0.0)
-            && self.border_brush.representative_color().a > 0.0
+            && (matches!(self.border_brush, Brush::Acrylic(_))
+                || self.border_brush.representative_color().a > 0.0)
         {
-            draw_drrect(canvas, outer, inner, &self.border_brush.fill(bounds));
+            self.border_brush.paint_drrect(canvas, outer, inner, bounds);
         }
     }
 

@@ -70,7 +70,9 @@ impl Driver {
             frame_requested: Cell::new(false),
             deadline: Cell::new(None),
         });
-        let shell = Shell::new(platform.clone(), winui_gallery::run);
+        let shell = Shell::new(platform.clone(), |app| {
+            winui_gallery::run_feature(app, winui_gallery::Feature::RepeatButton)
+        });
         let mut driver = Driver {
             platform,
             shell,

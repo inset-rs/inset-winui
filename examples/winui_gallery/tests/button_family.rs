@@ -18,7 +18,7 @@ fn hold(fixture: &mut Fixture, duration: Duration) {
 
 #[test]
 fn button_family_toggles_repeats_navigates_and_switches_theme() {
-    let mut fixture = Fixture::new([900, 2000]);
+    let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::ToggleButton);
     fixture.find("ToggleButton: unchecked · three-state unchecked");
 
     // `OnToggleImpl`: unchecked → checked → unchecked in two-state mode.
@@ -38,6 +38,8 @@ fn button_family_toggles_repeats_navigates_and_switches_theme() {
     // A disabled toggle button ignores the pointer.
     fixture.tap("Disabled checked");
     fixture.find("ToggleButton: unchecked · three-state unchecked");
+
+    fixture.navigate(winui_gallery::Feature::RepeatButton);
 
     // `ClickMode_Press`: one click on the press, then one at `Delay` (500 ms) and one every `Interval` (33 ms) while held: 700 ms gives repeats at 500, 533, …, 698.
     let hold_me = fixture.find("Hold me");
@@ -61,10 +63,13 @@ fn button_family_toggles_repeats_navigates_and_switches_theme() {
     fixture.pump();
     fixture.find("RepeatButton: 8 clicks");
 
+    fixture.navigate(winui_gallery::Feature::HyperlinkButton);
     fixture.tap("Learn more");
     fixture.find("HyperlinkButton: 1 clicks");
     fixture.tap("Disabled link");
     fixture.find("HyperlinkButton: 1 clicks");
+
+    fixture.navigate(winui_gallery::Feature::ToggleButton);
 
     // Leave the two-state button checked so the captures show the `Checked` row.
     fixture.tap("Toggle me");
@@ -79,7 +84,7 @@ fn button_family_toggles_repeats_navigates_and_switches_theme() {
 /// The same hold with a mouse: the press starts the repeat, the hover before it does not.
 #[test]
 fn repeat_button_repeats_under_a_mouse() {
-    let mut fixture = Fixture::new([900, 2000]);
+    let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::RepeatButton);
     let hold_me = fixture.find("Hold me");
     fixture.send_mouse(PointerChange::Add, hold_me - Offset::new(50.0, 50.0), 0);
     fixture.send_mouse(PointerChange::Hover, hold_me, 0);

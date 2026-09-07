@@ -10,7 +10,10 @@ use crate::{
 use reveal_embedder::{Color, FontWeight};
 use reveal_foundation::{App, Listener};
 use reveal_widgets::*;
-use std::fmt;
+use std::{fmt, rc::Rc};
+
+/// A source control template receiving the button state and its content.
+pub type ButtonTemplate = Rc<dyn Fn(&mut App, BuildContext, ControlStates, WidgetRef) -> WidgetRef>;
 
 /// XAML `ButtonBorderThemeThickness`.
 pub const BUTTON_BORDER_THICKNESS: f64 = 1.0;
@@ -117,20 +120,35 @@ impl ButtonStyle {
 /// XAML `Button`: `Content` shown in the style's bezel, `Click` raised on activation.
 #[derive(Clone)]
 pub struct Button {
+    /// Content presented inside the selected control template.
     pub content: WidgetRef,
+    /// Raised when the button activates.
     pub click: Listener,
+    /// The standard source style used when no template override is supplied.
     pub style: ButtonStyle,
+    /// Whether pointer and keyboard input can activate this button.
     pub is_enabled: bool,
+    /// Whether sequential keyboard navigation stops here.
+    pub is_tab_stop: bool,
+    /// Optional caller-owned focus node used by composite controls.
+    pub focus_node: Option<AnyFocusNode>,
+    /// An alternate source template, such as TabView's close button chrome.
+    pub template: Option<ButtonTemplate>,
+    /// Identity retained across parent rebuilds.
     pub key: Option<KeyRef>,
 }
 
 impl Button {
+    /// Creates a button with content and a Click callback.
     pub fn new<K>(content: impl IntoWidget<K>, click: Listener) -> Button {
         Button {
             content: content.into_widget(),
             click,
             style: ButtonStyle::Default,
             is_enabled: true,
+            is_tab_stop: true,
+            focus_node: None,
+            template: None,
             key: None,
         }
     }
@@ -140,6 +158,7 @@ impl Button {
         Button::new(Text::new(text), click)
     }
 
+    /// Selects one of the standard source styles.
     pub fn style(mut self, style: ButtonStyle) -> Button {
         self.style = style;
         self
@@ -151,6 +170,28 @@ impl Button {
         self
     }
 
+    /// Sets the source `IsTabStop` property.
+    pub fn is_tab_stop(mut self, value: bool) -> Self {
+        self.is_tab_stop = value;
+        self
+    }
+
+    /// Uses a focus node whose lifetime is owned by the enclosing control.
+    pub fn focus_node(mut self, node: AnyFocusNode) -> Self {
+        self.focus_node = Some(node);
+        self
+    }
+
+    /// Replaces presentation while retaining ButtonBase input and activation.
+    pub fn template(
+        mut self,
+        builder: impl Fn(&mut App, BuildContext, ControlStates, WidgetRef) -> WidgetRef + 'static,
+    ) -> Self {
+        self.template = Some(Rc::new(builder));
+        self
+    }
+
+    /// Sets the identity retained across parent rebuilds.
     pub fn key(mut self, key: KeyRef) -> Button {
         self.key = Some(key);
         self
@@ -173,11 +214,20 @@ impl StatelessWidget for Button {
 
     fn build(&self, _app: &mut App, _context: BuildContext) -> WidgetRef {
         let (content, style) = (self.content.clone(), self.style);
-        CommonStates::new(self.click.clone(), move |app, context, states| {
-            template(app, context, style, content.clone(), states)
+        let custom_template = self.template.clone();
+        let mut states = CommonStates::new(self.click.clone(), move |app, context, states| {
+            if let Some(builder) = &custom_template {
+                builder(app, context, states, content.clone())
+            } else {
+                template(app, context, style, content.clone(), states)
+            }
         })
         .is_enabled(self.is_enabled)
-        .into_widget()
+        .is_tab_stop(self.is_tab_stop);
+        if let Some(node) = self.focus_node {
+            states = states.focus_node(node);
+        }
+        states.into_widget()
     }
 }
 

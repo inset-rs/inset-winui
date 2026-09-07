@@ -11,6 +11,7 @@ use std::time::Duration;
 fn label_bounds(fixture: &Fixture, text: &str) -> Rect {
     let elements = fixture.elements();
     let app = fixture.cell.borrow();
+    let mut result = None;
     for element in elements {
         if let Some(object) = element.render_object(&app)
             && let Some(paragraph) = object.downcast::<RenderParagraph>(&app)
@@ -19,10 +20,15 @@ fn label_bounds(fixture: &Fixture, text: &str) -> Rect {
             let object = object.as_box().unwrap();
             let size = object.size(&app);
             let origin = object.local_to_global(&app, Offset::ZERO, None);
-            return Rect::from_ltwh(origin.dx(), origin.dy(), size.width(), size.height());
+            result = Some(Rect::from_ltwh(
+                origin.dx(),
+                origin.dy(),
+                size.width(),
+                size.height(),
+            ));
         }
     }
-    panic!("missing label {text}")
+    result.unwrap_or_else(|| panic!("missing label {text}"))
 }
 
 /// The point on the track of the horizontal slider under `header` at `fraction` of its clickable length: `MoveThumbToPoint` maps the track less the thumb, from half a thumb in, onto the range.
@@ -54,7 +60,7 @@ fn drag(fixture: &mut Fixture, from: Offset, to: Offset) {
 
 #[test]
 fn slider_presses_drags_snaps_and_switches_theme() {
-    let mut fixture = Fixture::new([900, 2600]);
+    let mut fixture = Fixture::for_feature([900, 2600], winui_gallery::Feature::Slider);
     fixture.find("Slider: 42 · stepped 50 · vertical 30");
 
     // A press three quarters along the track: `MoveThumbToPoint` gives 0 + 0.75 × 100.
@@ -89,7 +95,7 @@ fn slider_presses_drags_snaps_and_switches_theme() {
 /// A mouse press focuses the slider, which shows the focus ring mid-press; the drag that follows must still reach the slider (the pointer's hit-test path is cached at the press).
 #[test]
 fn mouse_drag_keeps_moving_the_thumb_after_focus_arrives() {
-    let mut fixture = Fixture::new([900, 2600]);
+    let mut fixture = Fixture::for_feature([900, 2600], winui_gallery::Feature::Slider);
     fixture.find("Slider: 42 · stepped 50 · vertical 30");
     let volume = label_bounds(&fixture, "Volume");
     let thumb = track_point(volume, 0.42);
@@ -98,6 +104,12 @@ fn mouse_drag_keeps_moving_the_thumb_after_focus_arrives() {
     fixture.pump();
     fixture.send_mouse(PointerChange::Down, thumb, 1);
     fixture.pump();
+    fixture.find("42");
+    let tip = label_bounds(&fixture, "42");
+    assert!(
+        tip.bottom < thumb.dy() - SLIDER_HORIZONTAL_THUMB_HEIGHT / 2.0,
+        "tip={tip:?} thumb={thumb:?}"
+    );
     // Ten moves to 20 % further along the clickable track: `OnThumbDragDelta` adds 20.
     let end = track_point(volume, 0.62);
     for step in 1..=10 {
@@ -107,6 +119,8 @@ fn mouse_drag_keeps_moving_the_thumb_after_focus_arrives() {
         fixture.send_mouse(PointerChange::Move, point, 1);
         fixture.pump();
     }
+    fixture.find("62");
+    fixture.capture("slider-value-tooltip-drag");
     fixture.send_mouse(PointerChange::Up, end, 0);
     fixture.pump();
     fixture.find("Slider: 62 · stepped 50 · vertical 30");
