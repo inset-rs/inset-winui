@@ -19,26 +19,39 @@ use reveal_widgets::*;
 /// XAML `Grid`.
 #[derive(Debug, Default)]
 pub struct Grid {
+    /// Identifies this panel across parent rebuilds.
     pub key: Option<KeyRef>,
+    /// The rows and their Auto, pixel or star lengths; an empty collection uses a single cell.
     pub row_definitions: Vec<RowDefinition>,
+    /// The columns and their Auto, pixel or star lengths; an empty collection uses a single cell.
     pub column_definitions: Vec<ColumnDefinition>,
+    /// The distance between adjacent rows.
     pub row_spacing: f64,
+    /// The distance between adjacent columns.
     pub column_spacing: f64,
+    /// The panel fill; `None` leaves it unpainted.
     pub background: Option<Brush>,
+    /// The brush used to draw the panel border.
     pub border_brush: Option<Brush>,
-    pub border_thickness: f64,
-    pub corner_radius: f64,
+    /// Left, top, right, bottom.
+    pub border_thickness: [f64; 4],
+    /// Top-left, top-right, bottom-right, bottom-left.
+    pub corner_radius: [f64; 4],
+    /// Whether the panel background extends beneath the border.
     pub background_sizing: BackgroundSizing,
     /// Left, top, right, bottom, inside the border.
     pub padding: [f64; 4],
+    /// Children positioned with `GridCell` attached row, column and span values.
     pub children: Vec<WidgetRef>,
 }
 
 impl Grid {
+    /// Creates an empty Grid with no row or column definitions.
     pub fn new() -> Grid {
         Grid::default()
     }
 
+    /// Sets the panel identity.
     pub fn key(mut self, key: KeyRef) -> Grid {
         self.key = Some(key);
         self
@@ -85,13 +98,25 @@ impl Grid {
 
     /// XAML `BorderThickness`.
     pub fn border_thickness(mut self, thickness: f64) -> Grid {
+        self.border_thickness = [thickness; 4];
+        self
+    }
+
+    /// XAML `BorderThickness`, in left, top, right, bottom order.
+    pub fn border_thickness_ltrb(mut self, thickness: [f64; 4]) -> Grid {
         self.border_thickness = thickness;
         self
     }
 
     /// XAML `CornerRadius`.
     pub fn corner_radius(mut self, radius: f64) -> Grid {
-        self.corner_radius = radius;
+        self.corner_radius = [radius; 4];
+        self
+    }
+
+    /// XAML `CornerRadius`, in top-left, top-right, bottom-right, bottom-left order.
+    pub fn corner_radius_corners(mut self, radii: [f64; 4]) -> Grid {
+        self.corner_radius = radii;
         self
     }
 
@@ -107,6 +132,7 @@ impl Grid {
         self
     }
 
+    /// Sets the panel children in paint order.
     pub fn children(mut self, children: impl IntoIterator<Item = WidgetRef>) -> Grid {
         self.children = children.into_iter().collect();
         self
@@ -115,7 +141,10 @@ impl Grid {
     fn has_chrome(&self) -> bool {
         self.background.is_some()
             || self.border_brush.is_some()
-            || self.border_thickness > 0.0
+            || self
+                .border_thickness
+                .iter()
+                .any(|thickness| *thickness > 0.0)
             || self.padding != [0.0; 4]
     }
 }
@@ -138,8 +167,8 @@ impl StatelessWidget for Grid {
             self.background.unwrap_or(none),
             self.border_brush.unwrap_or(none),
         )
-        .border_thickness(self.border_thickness)
-        .corner_radius(self.corner_radius)
+        .border_thickness_ltrb(self.border_thickness)
+        .corner_radius_corners(self.corner_radius)
         .background_sizing(self.background_sizing)
         .padding(self.padding)
         .child(panel)
@@ -202,12 +231,16 @@ impl MultiChildRenderObjectWidget for GridPanel {
 /// The attached properties `Grid.Row`, `Grid.Column`, `Grid.RowSpan` and `Grid.ColumnSpan` on a child of a `Grid`.
 #[derive(Debug)]
 pub struct GridCell {
+    /// Identifies this child placement across parent rebuilds.
     pub key: Option<KeyRef>,
+    /// Attached row, column and span values used by the parent Grid.
     pub placement: CellPlacement,
+    /// The widget arranged within the selected cell or span.
     pub child: WidgetRef,
 }
 
 impl GridCell {
+    /// Places a child in row zero, column zero, spanning one row and one column.
     pub fn new<K>(child: impl IntoWidget<K>) -> GridCell {
         GridCell {
             key: None,
@@ -216,6 +249,7 @@ impl GridCell {
         }
     }
 
+    /// Sets the identity of this child placement.
     pub fn key(mut self, key: KeyRef) -> GridCell {
         self.key = Some(key);
         self

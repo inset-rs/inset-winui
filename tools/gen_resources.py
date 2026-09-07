@@ -4,8 +4,10 @@
 usage: gen_resources.py <microsoft-ui-xaml root> <output .rs> <Control ...>
 
 Reads controls/dev/CommonStyles/Common_themeresources_any.xaml (the Fluent base
-tokens) and one <Control>_themeresources.xaml per named control, resolves every
-StaticResource alias down to a literal, and emits one Rust struct per file with
+tokens) and one <Control>_themeresources.xaml per named control, preferring
+CommonStyles and then controls/dev/<Control>. Missing shared aliases resolve
+through Common_themeresources.xaml and the base generic.xaml dictionary.
+Emits one Rust struct per file with
 a `for_theme` constructor for the Light and Dark (XAML "Default") dictionaries.
 High contrast is not emitted: its values are the OS's system colours.
 """
@@ -39,9 +41,41 @@ def parse_color(text):
     return (a, r, g, b)
 
 
-def read_dictionaries(path):
+def resource_references(element):
+    references = []
+    for node in element.iter():
+        if local(node.tag) == 'StaticResource' and node.get('ResourceKey'):
+            references.append(node.get('ResourceKey'))
+        for value in node.attrib.values():
+            references.extend(re.findall(r'\{(?:StaticResource|ThemeResource) (\w+)\}', value))
+    return references
+
+
+def control_source(root, control):
+    filename = f'{control}_themeresources.xaml'
+    candidates = (root / 'controls/dev/CommonStyles' / filename,
+                  root / 'controls/dev' / control / filename)
+    for path in candidates:
+        if path.is_file():
+            return path
+    raise FileNotFoundError(f'No resource dictionary for {control}: {candidates}')
+
+
+def read_dictionaries(path, keys=None):
     """Returns {theme: {key: (kind, value)}} for one resource file."""
     root = ET.parse(path).getroot()
+    # Legacy generic.xaml contains controls we do not port. Read just the
+    # requested resources and their alias dependencies when used as a fallback.
+    if keys is not None:
+        keys = set(keys)
+        while True:
+            dependencies = set()
+            for element in root.iter():
+                if element.get(X_KEY) in keys:
+                    dependencies.update(resource_references(element))
+            if dependencies <= keys:
+                break
+            keys.update(dependencies)
     themes = {}
     for theme_dict in root.iter(P + 'ResourceDictionary'):
         key = theme_dict.get(X_KEY)
@@ -50,7 +84,7 @@ def read_dictionaries(path):
         entries = themes.setdefault(key, {})
         for element in theme_dict:
             name = element.get(X_KEY)
-            if name is None:
+            if name is None or (keys is not None and name not in keys):
                 continue
             kind = local(element.tag)
             if kind == 'StaticResource':
@@ -75,7 +109,7 @@ def read_dictionaries(path):
     shared = {}
     for element in root:
         name = element.get(X_KEY)
-        if name is None:
+        if name is None or (keys is not None and name not in keys):
             continue
         plain = plain_value(local(element.tag), (element.text or '').strip())
         if plain is not None:
@@ -83,7 +117,7 @@ def read_dictionaries(path):
     # A size both themes define identically is a constant too.
     light, dark = themes.get('Light', {}), themes.get('Default', {})
     for name, value in light.items():
-        if value[0] in ('f64', 'thickness', 'corner', 'duration_ms', 'spline', 'enum') and dark.get(name) == value:
+        if value[0] in ('f64', 'thickness', 'corner', 'duration_ms', 'duration_ns', 'spline', 'enum') and dark.get(name) == value:
             shared.setdefault(name, value)
     return themes, shared
 
@@ -103,7 +137,8 @@ def plain_value(kind, text):
         return ('corner', parts if len(parts) == 4 else parts * 4)
     if kind == 'String' and re.match(r'\d\d:\d\d:\d\d', text):
         h, m, s = text.split(':')
-        return ('duration_ms', round(float(s) * 1000 + float(m) * 60000 + float(h) * 3600000))
+        nanoseconds = round((float(s) + float(m) * 60 + float(h) * 3600) * 1_000_000_000)
+        return ('duration_ms', nanoseconds // 1_000_000) if nanoseconds % 1_000_000 == 0 else ('duration_ns', nanoseconds)
     if kind == 'String' and re.match(r'^[\d., -]+$', text):
         return ('spline', [float(v) for v in text.split(',')])
     if kind in ('BackgroundSizing', 'FontWeight'):
@@ -161,6 +196,8 @@ def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
         light = resolve(themes.get('Light', {}), base_themes.get('Light', {}), key)
         dark = resolve(themes.get('Default', {}), base_themes.get('Default', {}), key)
         if light is None or dark is None:
+            missing = ', '.join(theme for theme, value in (('Light', light), ('Default', dark)) if value is None)
+            print(f'warning: {source}: unresolved resource {key} ({missing}); not emitted', file=sys.stderr)
             continue
         kinds = {light[0], dark[0]}
         if kinds <= {'color', 'accent'}:
@@ -199,6 +236,8 @@ def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
             out.append(f'/// Top-left, top-right, bottom-right, bottom-left.\npub const {name}: [f64; 4] = {value};')
         elif kind == 'duration_ms':
             out.append(f'pub const {name}: Duration = Duration::from_millis({value});')
+        elif kind == 'duration_ns':
+            out.append(f'pub const {name}: Duration = Duration::from_nanos({value});')
         elif kind == 'spline':
             out.append(f'/// Cubic Bézier control points (x1, y1, x2, y2).\npub const {name}: [f64; 4] = {value};')
         elif kind == 'enum':
@@ -213,6 +252,7 @@ def main():
     root, output, controls = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3:]
     styles = root / 'controls/dev/CommonStyles'
     base_themes, base_shared = read_dictionaries(styles / 'Common_themeresources_any.xaml')
+    common_themes, _ = read_dictionaries(styles / 'Common_themeresources.xaml')
     out = ['//! Generated by tools/gen_resources.py from microsoft-ui-xaml; do not edit by hand.',
            '//! Colours are ARGB literals resolved through every StaticResource alias in the',
            '//! XAML theme dictionaries; the XAML "Default" dictionary is the dark theme.',
@@ -221,9 +261,22 @@ def main():
     common_keys = [k for k, v in base_themes['Light'].items() if v[0] in ('color', 'gradient')]
     emit_struct(out, 'CommonResources', common_keys, base_themes, {}, base_shared, 'Common_themeresources_any.xaml')
     for control in controls:
-        themes, shared = read_dictionaries(styles / f'{control}_themeresources.xaml')
+        source = control_source(root, control)
+        themes, shared = read_dictionaries(source)
+        references = resource_references(ET.parse(source).getroot())
+        legacy_themes, _ = read_dictionaries(root / 'dxaml/xcp/dxaml/themes/generic.xaml', references)
+        fallback = {theme: {**legacy_themes.get(theme, {}), **common_themes.get(theme, {}), **base_themes.get(theme, {})}
+                    for theme in ('Light', 'Default')}
         keys = list(themes.get('Light', {}).keys())
-        emit_struct(out, f'{control}Resources', keys, themes, base_themes, shared, f'{control}_themeresources.xaml')
+        # Expose system brushes used directly by a template, as well as its
+        # named resources. Fluent common tokens retain their existing accessor.
+        template_references = [key for element in ET.parse(source).getroot()
+                               if local(element.tag) == 'Style'
+                               for key in resource_references(element)]
+        for key in template_references:
+            if key not in keys and key not in base_themes.get('Light', {}) and key in legacy_themes.get('Light', {}):
+                keys.append(key)
+        emit_struct(out, f'{control}Resources', keys, themes, fallback, shared, source.name)
     output.write_text('\n'.join(out) + '\n')
     subprocess.run(['rustfmt', '--edition', '2024', str(output)], check=True)
     print(f'wrote {output}')

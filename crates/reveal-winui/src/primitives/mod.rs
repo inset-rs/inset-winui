@@ -8,3 +8,6 @@ pub use color_transition::*;
 pub use common_states::*;
 pub use control_border::*;
 pub use focus_visual::*;
+
+mod size_observer;
+pub use size_observer::*;

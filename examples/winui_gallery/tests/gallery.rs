@@ -5,7 +5,7 @@ use common::Fixture;
 
 #[test]
 fn gallery_renders_activates_and_switches_theme() {
-    let mut fixture = Fixture::new([900, 2000]);
+    let mut fixture = Fixture::new([900, 2500]);
     fixture.capture("light");
     fixture.tap("Standard");
     fixture.find("Clicked 1 times · wifi true · airplane false");
@@ -23,4 +23,11 @@ fn gallery_renders_activates_and_switches_theme() {
     fixture.tap("Dark theme");
     fixture.find("Light theme");
     fixture.capture("dark");
+    fixture.tap("Close pane");
+    fixture.find("Open pane");
+    fixture.tap("Open pane");
+    fixture.find("Close pane");
+    fixture.pump();
+    fixture.find("CompactInline · PaneOpened");
+    fixture.capture("split_view_gallery_open");
 }

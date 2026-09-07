@@ -1751,6 +1751,7 @@ pub const REPEAT_BUTTON_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
 /// Theme-dependent resources of `Slider_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SliderResources {
+    pub slider_container_background: Color,
     pub slider_container_background_pointer_over: Color,
     pub slider_container_background_pressed: Color,
     pub slider_container_background_disabled: Color,
@@ -1800,6 +1801,7 @@ impl SliderResources {
     pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
         match theme {
             Theme::Light => Self {
+                slider_container_background: Color::from_argb(0, 255, 255, 255),
                 slider_container_background_pointer_over: Color::from_argb(0, 255, 255, 255),
                 slider_container_background_pressed: Color::from_argb(0, 255, 255, 255),
                 slider_container_background_disabled: Color::from_argb(0, 255, 255, 255),
@@ -1865,6 +1867,7 @@ impl SliderResources {
                 slider_header_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
             },
             Theme::Dark => Self {
+                slider_container_background: Color::from_argb(0, 0, 0, 0),
                 slider_container_background_pointer_over: Color::from_argb(0, 255, 255, 255),
                 slider_container_background_pressed: Color::from_argb(0, 255, 255, 255),
                 slider_container_background_disabled: Color::from_argb(0, 255, 255, 255),
@@ -1959,6 +1962,7 @@ pub const SLIDER_HEADER_THEME_FONT_WEIGHT: FontWeight = FontWeight::NORMAL;
 #[derive(Clone, Debug, PartialEq)]
 pub struct ToolTipResources {
     pub tool_tip_foreground: Color,
+    pub tool_tip_background: Color,
     pub tool_tip_border_brush: Color,
     pub tool_tip_background_theme_brush: Color,
     pub tool_tip_border_theme_brush: Color,
@@ -1970,6 +1974,7 @@ impl ToolTipResources {
         match theme {
             Theme::Light => Self {
                 tool_tip_foreground: Color::from_argb(228, 0, 0, 0),
+                tool_tip_background: Color::from_argb(255, 242, 242, 242),
                 tool_tip_border_brush: Color::from_argb(15, 0, 0, 0),
                 tool_tip_background_theme_brush: Color::from_argb(255, 255, 255, 255),
                 tool_tip_border_theme_brush: Color::from_argb(255, 128, 128, 128),
@@ -1978,6 +1983,7 @@ impl ToolTipResources {
             },
             Theme::Dark => Self {
                 tool_tip_foreground: Color::from_argb(255, 255, 255, 255),
+                tool_tip_background: Color::from_argb(255, 43, 43, 43),
                 tool_tip_border_brush: Color::from_argb(51, 0, 0, 0),
                 tool_tip_background_theme_brush: Color::from_argb(255, 255, 255, 255),
                 tool_tip_border_theme_brush: Color::from_argb(255, 128, 128, 128),
@@ -2026,3 +2032,39 @@ impl CornerRadiusResources {
 pub const CONTROL_CORNER_RADIUS: [f64; 4] = [4.0, 4.0, 4.0, 4.0];
 /// Top-left, top-right, bottom-right, bottom-left.
 pub const OVERLAY_CORNER_RADIUS: [f64; 4] = [8.0, 8.0, 8.0, 8.0];
+/// Theme-dependent resources of `SplitView_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SplitViewResources {
+    pub split_view_light_dismiss_overlay_background: Color,
+    pub system_control_foreground_transparent_brush: Color,
+    pub system_control_page_background_chrome_low_brush: Color,
+}
+impl SplitViewResources {
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                split_view_light_dismiss_overlay_background: Color::from_argb(153, 255, 255, 255),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_page_background_chrome_low_brush: Color::from_argb(
+                    255, 242, 242, 242,
+                ),
+            },
+            Theme::Dark => Self {
+                split_view_light_dismiss_overlay_background: Color::from_argb(153, 0, 0, 0),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_page_background_chrome_low_brush: Color::from_argb(255, 23, 23, 23),
+            },
+        }
+    }
+}
+pub const SPLIT_VIEW_OPEN_PANE_THEME_LENGTH: f64 = 320.0;
+pub const SPLIT_VIEW_COMPACT_PANE_THEME_LENGTH: f64 = 48.0;
+/// Left, top, right, bottom.
+pub const SPLIT_VIEW_LEFT_BORDER_THEME_THICKNESS: [f64; 4] = [0.0, 0.0, 1.0, 0.0];
+/// Left, top, right, bottom.
+pub const SPLIT_VIEW_RIGHT_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 0.0, 0.0, 0.0];
+pub const SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION: Duration = Duration::from_millis(200);
+pub const SPLIT_VIEW_PANE_ANIMATION_OPEN_PRE_DURATION: Duration = Duration::from_nanos(199990000);
+pub const SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION: Duration = Duration::from_millis(100);
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const SPLIT_VIEW_PANE_ROOT_CORNER_RADIUS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];

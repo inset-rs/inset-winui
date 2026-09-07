@@ -110,6 +110,10 @@ impl ThemeResources {
         SliderResources::for_theme(self.theme, &self.accent)
     }
 
+    pub fn split_view(&self) -> SplitViewResources {
+        SplitViewResources::for_theme(self.theme, &self.accent)
+    }
+
     pub fn tool_tip(&self) -> ToolTipResources {
         ToolTipResources::for_theme(self.theme, &self.accent)
     }

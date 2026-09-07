@@ -8,6 +8,7 @@ use reveal_painting::{EdgeInsetsGeometry, PaintingBinding};
 use reveal_rendering::{CrossAxisAlignment, MainAxisSize};
 use reveal_widgets::*;
 use reveal_winui::*;
+use std::rc::Rc;
 
 /// Registers the bundled Selawik faces under the kit's font family.
 pub fn install_fonts(app: &mut App) {
@@ -26,12 +27,19 @@ pub fn install_fonts(app: &mut App) {
 /// The kit needs only the widgets layer: `WidgetsApp` supplies the view, media query, focus and text direction, and the gallery is its one page.
 pub fn run(app: &mut App) {
     install_fonts(app);
+    let page = OverlayEntry::new(
+        app,
+        Rc::new(|_, _| Gallery.into_widget()),
+        false,
+        true,
+        false,
+    );
     run_app(
         app,
         WidgetsApp::new(AccentPalette::default().base)
             .title("WinUI Gallery")
             .debug_show_checked_mode_banner(false)
-            .builder(|_, _, _| Gallery.into_widget())
+            .builder(move |_, _, _| Overlay::new().initial_entries([page]).into_widget())
             .into_widget(),
     );
 }
@@ -123,6 +131,7 @@ impl State for GalleryState {
             )
             .into_widget(),
         ));
+        children.extend(sections::split_view::build(&resources));
 
         let body = column(children, 16.0);
         let page = ColoredBox::new(resources.common.solid_background_fill_color_base).child(

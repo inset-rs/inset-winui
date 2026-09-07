@@ -18,10 +18,6 @@ Ported against: aa3207e6
   Reason: framework — XAML snaps row and column sizes to physical pixels; reveal has no layout rounding.
   Affect: star cells can land on fractional pixels where Windows snaps them.
 
-- Change: `Grid`'s border thickness and padding are uniform.
-  Reason: language — the panel's chrome is one widget rather than four per-side properties.
-  Affect: a per-side `BorderThickness` is not expressible yet.
-
 ## toggle_switch.rs → `ToggleSwitch`
 
 - Change: `ToggleSwitch`'s knob travels 167 ms on the fast-out-slow-in spline.
@@ -74,6 +70,24 @@ Ported against: aa3207e6
   Reason: os — the property defaults live in the generated type table, not the repository.
   Affect: none if the published defaults hold. Trigger: the table, or a Windows machine.
 
+## split_view.rs, split_view_visuals.rs → `SplitView`
+
+- Change: `SplitView` uses reveal's root `Overlay` and native modal tap recognition for light dismissal.
+  Reason: framework — reveal supplies `OverlayPortal` and a gesture arena instead of XAML's owned Popup and pointer routing.
+  Affect: an open overlay pane requires an `Overlay` ancestor; dismissal happens on a recognized tap, including outside the SplitView bounds, rather than an outer-layer raw pointer press.
+
+- Change: Auto `OpenPaneLength` (`f64::NAN`) updates from the pane's size after layout.
+  Reason: framework — reveal builds the template before measuring its children, so `SizeObserver` reports the measured width after the frame.
+  Affect: first layout and content-width changes can take one additional frame to settle; pane content stays mounted across explicit/Auto changes and open/closed states.
+
+- Change: pane lifecycle notifications for caller-supplied property changes and outer-overlay updates run after the frame.
+  Reason: framework — reveal forbids updating ancestors and showing an overlay while building a child.
+  Affect: `PaneOpening` and explicit `PaneClosing` handlers run after the first layout of the new state, followed by `PaneOpened`/`PaneClosed` at transition completion; a light-dismiss `PaneClosing` still runs before the close request and can cancel it, while initial values render settled without lifecycle events.
+
+- Change: `SplitView` uses native focus scopes and restores the saved focus node without a WinUI `FocusState` reason.
+  Reason: framework — reveal's focus API represents the target and traversal policy but not XAML's pointer/keyboard/programmatic focus reason.
+  Affect: overlay Tab traversal stays in the pane and closing restores the prior target, while focus-highlight decisions follow reveal's native policy.
+
 ## Deferred
 
 - `RepeatButton` `ClickMode`: fixed at `Press`. Trigger: a `ClickMode` on `CommonStates`.
@@ -84,6 +98,7 @@ Ported against: aa3207e6
 - `Grid` children with `Visibility="Collapsed"` (zero size, still in the cell), written as omitting the child.
 - `Slider`'s value tool tip: the `ToolTip` control is not ported. Trigger: `ToolTip` on an overlay, with the thumb-relative placement of `ToolTipService`.
 - `Slider` focus engagement and gamepad keys. Trigger: gamepad or remote input.
+- `SplitView` Windows system-back integration, element sounds, Xbox automatic dimming and special cross-pane gamepad XY traversal. Desktop Auto overlay is transparent; Escape and GamepadB dismiss. Trigger: a host supplying those platform facilities.
 - `Slider` `LargeChange`: no key uses it in the source; not exposed. Trigger: the automation peer.
 - Right-to-left mirroring of templates and of `Slider`'s arrow keys. Trigger: `Directionality` wired through the templates.
 - `CheckBox`'s animated sweep into the indeterminate state, written as the bar appearing at once. Trigger: a recording from a Windows machine.
