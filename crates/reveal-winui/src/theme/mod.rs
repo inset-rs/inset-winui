@@ -89,6 +89,30 @@ impl ThemeResources {
     pub fn check_box(&self) -> CheckBoxResources {
         CheckBoxResources::for_theme(self.theme, &self.accent)
     }
+
+    pub fn radio_button(&self) -> RadioButtonResources {
+        RadioButtonResources::for_theme(self.theme, &self.accent)
+    }
+
+    pub fn toggle_button(&self) -> ToggleButtonResources {
+        ToggleButtonResources::for_theme(self.theme, &self.accent)
+    }
+
+    pub fn hyperlink_button(&self) -> HyperlinkButtonResources {
+        HyperlinkButtonResources::for_theme(self.theme, &self.accent)
+    }
+
+    pub fn repeat_button(&self) -> RepeatButtonResources {
+        RepeatButtonResources::for_theme(self.theme, &self.accent)
+    }
+
+    pub fn slider(&self) -> SliderResources {
+        SliderResources::for_theme(self.theme, &self.accent)
+    }
+
+    pub fn tool_tip(&self) -> ToolTipResources {
+        ToolTipResources::for_theme(self.theme, &self.accent)
+    }
 }
 
 /// Sets the theme and accent for a subtree; XAML `FrameworkElement.RequestedTheme` plus the accent the OS would supply.

@@ -1653,23 +1653,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "reveal-cupertino"
-version = "0.1.0"
-dependencies = [
- "indexmap",
- "reveal-animation",
- "reveal-embedder",
- "reveal-foundation",
- "reveal-gestures",
- "reveal-painting",
- "reveal-physics",
- "reveal-rendering",
- "reveal-scheduler",
- "reveal-services",
- "reveal-widgets",
-]
-
-[[package]]
 name = "reveal-embedder"
 version = "0.1.0"
 dependencies = [
@@ -2288,7 +2271,6 @@ dependencies = [
 name = "valo-dl"
 version = "0.4.0"
 dependencies = [
- "naga",
  "valo-geometry",
  "valo-text",
  "wgpu",
@@ -3018,7 +3000,6 @@ dependencies = [
 name = "winui_gallery"
 version = "0.1.0"
 dependencies = [
- "reveal-cupertino",
  "reveal-embedder",
  "reveal-embedder-winit",
  "reveal-foundation",

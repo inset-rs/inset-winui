@@ -10,6 +10,7 @@ a `for_theme` constructor for the Light and Dark (XAML "Default") dictionaries.
 High contrast is not emitted: its values are the OS's system colours.
 """
 import re
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -82,7 +83,7 @@ def read_dictionaries(path):
     # A size both themes define identically is a constant too.
     light, dark = themes.get('Light', {}), themes.get('Default', {})
     for name, value in light.items():
-        if value[0] in ('f64', 'thickness', 'corner', 'duration_ms', 'spline') and dark.get(name) == value:
+        if value[0] in ('f64', 'thickness', 'corner', 'duration_ms', 'spline', 'enum') and dark.get(name) == value:
             shared.setdefault(name, value)
     return themes, shared
 
@@ -105,6 +106,9 @@ def plain_value(kind, text):
         return ('duration_ms', round(float(s) * 1000 + float(m) * 60000 + float(h) * 3600000))
     if kind == 'String' and re.match(r'^[\d., -]+$', text):
         return ('spline', [float(v) for v in text.split(',')])
+    if kind in ('BackgroundSizing', 'FontWeight'):
+        # Enum-valued resources: the Rust enum shares the XAML names.
+        return ('enum', (kind, text.strip()))
     return None
 
 
@@ -197,6 +201,12 @@ def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
             out.append(f'pub const {name}: Duration = Duration::from_millis({value});')
         elif kind == 'spline':
             out.append(f'/// Cubic Bézier control points (x1, y1, x2, y2).\npub const {name}: [f64; 4] = {value};')
+        elif kind == 'enum':
+            enum, variant = value
+            # `FontWeight` in reveal is Flutter's: `FontWeight::NORMAL`, `BOLD`, `W600`...
+            if enum == 'FontWeight':
+                variant = {'Normal': 'NORMAL', 'Bold': 'BOLD', 'SemiBold': 'W600', 'Light': 'W300', 'SemiLight': 'W350', 'Medium': 'W500', 'Black': 'W900', 'Thin': 'W100', 'ExtraLight': 'W200', 'ExtraBold': 'W800'}[variant]
+            out.append(f'pub const {name}: {enum} = {enum}::{variant};')
 
 
 def main():
@@ -207,7 +217,7 @@ def main():
            '//! Colours are ARGB literals resolved through every StaticResource alias in the',
            '//! XAML theme dictionaries; the XAML "Default" dictionary is the dark theme.',
            '#![allow(clippy::excessive_precision, unused_variables)]',
-           'use super::{AccentPalette, Theme};', 'use reveal_embedder::Color;', 'use std::time::Duration;', '']
+           'use super::{AccentPalette, Theme};', 'use crate::BackgroundSizing;', 'use reveal_embedder::{Color, FontWeight};', 'use std::time::Duration;', '']
     common_keys = [k for k, v in base_themes['Light'].items() if v[0] in ('color', 'gradient')]
     emit_struct(out, 'CommonResources', common_keys, base_themes, {}, base_shared, 'Common_themeresources_any.xaml')
     for control in controls:
@@ -215,6 +225,7 @@ def main():
         keys = list(themes.get('Light', {}).keys())
         emit_struct(out, f'{control}Resources', keys, themes, base_themes, shared, f'{control}_themeresources.xaml')
     output.write_text('\n'.join(out) + '\n')
+    subprocess.run(['rustfmt', '--edition', '2024', str(output)], check=True)
     print(f'wrote {output}')
 
 

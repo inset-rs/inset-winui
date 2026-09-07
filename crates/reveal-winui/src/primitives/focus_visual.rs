@@ -68,16 +68,18 @@ impl FocusVisual {
 
 impl StatelessWidget for FocusVisual {
     fn build(&self, _app: &mut App, _context: BuildContext) -> WidgetRef {
-        if !self.visible {
-            return self.child.clone();
-        }
+        // The tree keeps the same shape whether the ring shows or not, so the child's elements
+        // (and a pointer's cached hit-test path through them) survive focus arriving mid-press.
         let [left, top, right, bottom] = self.margin;
         let ring = FocusRingPainter {
+            visible: self.visible,
             primary: Brush::Solid(FocusVisual::primary_color(self.theme)),
             secondary: Brush::Solid(FocusVisual::secondary_color(self.theme)),
             corner_radius: self.corner_radius - left.min(0.0),
         };
+        // Passthrough: the child sees the constraints it would see without the ring.
         Stack::new()
+            .fit(reveal_rendering::StackFit::Passthrough)
             .clip_behavior(reveal_embedder::Clip::None)
             .children(vec![
                 self.child.clone(),
@@ -94,6 +96,7 @@ impl StatelessWidget for FocusVisual {
 
 #[derive(Clone, Debug, PartialEq)]
 struct FocusRingPainter {
+    visible: bool,
     primary: Brush,
     secondary: Brush,
     corner_radius: f64,
@@ -101,6 +104,9 @@ struct FocusRingPainter {
 
 impl CustomPainter for FocusRingPainter {
     fn paint(&self, _app: &mut App, canvas: &mut Canvas, size: Size) {
+        if !self.visible {
+            return;
+        }
         let bounds = Offset::ZERO & size;
         let outer = RRect::from_rect_and_radius(bounds, Radius::circular(self.corner_radius));
         draw_rrect(
@@ -115,6 +121,11 @@ impl CustomPainter for FocusRingPainter {
                 .secondary
                 .stroke(bounds, FOCUS_VISUAL_SECONDARY_THICKNESS),
         );
+    }
+
+    /// The ring is drawn over the control but never in front of it for the pointer.
+    fn hit_test(&self, _app: &App, _position: Offset) -> Option<bool> {
+        Some(false)
     }
 
     fn should_repaint(&self, _app: &App, old_delegate: &dyn CustomPainter) -> bool {

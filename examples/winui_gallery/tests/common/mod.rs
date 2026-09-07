@@ -156,6 +156,25 @@ impl Fixture {
         drop(app);
         self.cell.checkpoint();
     }
+    /// A mouse event: hover moves have no buttons, a press and its moves carry the primary button.
+    pub fn send_mouse(&mut self, change: PointerChange, point: Offset, buttons: i64) {
+        let mut app = self.cell.borrow_mut();
+        GestureBinding::instance(&mut app).handle_pointer_data_packet(
+            &mut app,
+            PointerDataPacket::new(vec![PointerData {
+                change,
+                kind: PointerDeviceKind::Mouse,
+                time_stamp: self.at,
+                pointer_identifier: 7,
+                physical_x: point.dx(),
+                physical_y: point.dy(),
+                buttons,
+                ..Default::default()
+            }]),
+        );
+        drop(app);
+        self.cell.checkpoint();
+    }
     pub fn tap(&mut self, text: &str) {
         let p = self.find(text);
         self.send(PointerChange::Down, p);
@@ -170,7 +189,7 @@ impl Fixture {
             (self.view.size[0] * self.view.size[1] * 4) as usize
         );
         assert!(pixels.as_chunks::<4>().0.iter().all(|p| p[3] == 255));
-        if let Ok(dir) = std::env::var("APPLE_CAPTURE_DIR") {
+        if let Ok(dir) = std::env::var("WINUI_CAPTURE_DIR") {
             let dir = std::path::Path::new(&dir);
             std::fs::create_dir_all(dir).unwrap();
             valo_harness::write_png(&dir.join(format!("{name}.png")), self.view.size, &pixels);

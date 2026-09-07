@@ -1,0 +1,113 @@
+//! `Slider`: a press on the track moves the value to the pointer, a drag of the thumb moves it by the distance dragged, a stepped slider snaps, and both themes render.
+#![feature(arbitrary_self_types)]
+mod common;
+use common::Fixture;
+use reveal_embedder::{Offset, PointerChange, Rect};
+use reveal_rendering::RenderParagraph;
+use reveal_winui::*;
+use std::time::Duration;
+
+/// The bounds of the paragraph showing `text`. A slider's header fills the root grid's width, so its box is as wide as the slider and its bottom edge is where the `SliderTopHeaderMargin` starts.
+fn label_bounds(fixture: &Fixture, text: &str) -> Rect {
+    let elements = fixture.elements();
+    let app = fixture.cell.borrow();
+    for element in elements {
+        if let Some(object) = element.render_object(&app)
+            && let Some(paragraph) = object.downcast::<RenderParagraph>(&app)
+            && paragraph.text(&app).to_plain_text(true, true) == text
+        {
+            let object = object.as_box().unwrap();
+            let size = object.size(&app);
+            let origin = object.local_to_global(&app, Offset::ZERO, None);
+            return Rect::from_ltwh(origin.dx(), origin.dy(), size.width(), size.height());
+        }
+    }
+    panic!("missing label {text}")
+}
+
+/// The point on the track of the horizontal slider under `header` at `fraction` of its clickable length: `MoveThumbToPoint` maps the track less the thumb, from half a thumb in, onto the range.
+fn track_point(header: Rect, fraction: f64) -> Offset {
+    let thumb = SLIDER_HORIZONTAL_THUMB_WIDTH;
+    let x = header.left + thumb / 2.0 + fraction * (header.width() - thumb);
+    let y = header.bottom
+        + SLIDER_TOP_HEADER_MARGIN[3]
+        + SLIDER_PRE_CONTENT_MARGIN
+        + SLIDER_TRACK_THEME_HEIGHT / 2.0;
+    Offset::new(x, y)
+}
+
+fn press(fixture: &mut Fixture, point: Offset) {
+    fixture.send(PointerChange::Down, point);
+    fixture.at += Duration::from_millis(20);
+    fixture.send(PointerChange::Up, point);
+    fixture.pump();
+}
+
+fn drag(fixture: &mut Fixture, from: Offset, to: Offset) {
+    fixture.send(PointerChange::Down, from);
+    fixture.at += Duration::from_millis(20);
+    fixture.send(PointerChange::Move, to);
+    fixture.at += Duration::from_millis(20);
+    fixture.send(PointerChange::Up, to);
+    fixture.pump();
+}
+
+#[test]
+fn slider_presses_drags_snaps_and_switches_theme() {
+    let mut fixture = Fixture::new([900, 2600]);
+    fixture.find("Slider: 42 · stepped 50 · vertical 30");
+
+    // A press three quarters along the track: `MoveThumbToPoint` gives 0 + 0.75 × 100.
+    let volume = label_bounds(&fixture, "Volume");
+    press(&mut fixture, track_point(volume, 0.75));
+    fixture.find("Slider: 75 · stepped 50 · vertical 30");
+
+    // A drag of the thumb by a tenth of the clickable track: `OnThumbDragDelta` adds 10.
+    drag(
+        &mut fixture,
+        track_point(volume, 0.75),
+        track_point(volume, 0.85),
+    );
+    fixture.find("Slider: 85 · stepped 50 · vertical 30");
+
+    // A press at 33 % of a slider with `StepFrequency` 10 snaps to 30 (`GetClosestStep`).
+    let stepped = label_bounds(&fixture, "Stepped");
+    press(&mut fixture, track_point(stepped, 0.33));
+    fixture.find("Slider: 85 · stepped 30 · vertical 30");
+
+    // The disabled slider ignores the pointer.
+    let disabled = label_bounds(&fixture, "Disabled");
+    press(&mut fixture, track_point(disabled, 0.1));
+    fixture.find("Slider: 85 · stepped 30 · vertical 30");
+
+    fixture.capture("slider_light");
+    fixture.tap("Dark theme");
+    fixture.find("Light theme");
+    fixture.capture("slider_dark");
+}
+
+/// A mouse press focuses the slider, which shows the focus ring mid-press; the drag that follows must still reach the slider (the pointer's hit-test path is cached at the press).
+#[test]
+fn mouse_drag_keeps_moving_the_thumb_after_focus_arrives() {
+    let mut fixture = Fixture::new([900, 2600]);
+    fixture.find("Slider: 42 · stepped 50 · vertical 30");
+    let volume = label_bounds(&fixture, "Volume");
+    let thumb = track_point(volume, 0.42);
+    fixture.send_mouse(PointerChange::Add, thumb - Offset::new(40.0, 40.0), 0);
+    fixture.send_mouse(PointerChange::Hover, thumb, 0);
+    fixture.pump();
+    fixture.send_mouse(PointerChange::Down, thumb, 1);
+    fixture.pump();
+    // Ten moves to 20 % further along the clickable track: `OnThumbDragDelta` adds 20.
+    let end = track_point(volume, 0.62);
+    for step in 1..=10 {
+        let t = step as f64 / 10.0;
+        let point = Offset::new(thumb.dx() + (end.dx() - thumb.dx()) * t, thumb.dy());
+        fixture.at += Duration::from_millis(16);
+        fixture.send_mouse(PointerChange::Move, point, 1);
+        fixture.pump();
+    }
+    fixture.send_mouse(PointerChange::Up, end, 0);
+    fixture.pump();
+    fixture.find("Slider: 62 · stepped 50 · vertical 30");
+}

@@ -2,6 +2,7 @@
 
 use reveal_foundation::{App, Handle, Listener};
 use reveal_rendering::HitTestBehavior;
+use reveal_services::LogicalKeyboardKey;
 use reveal_widgets::*;
 use std::{any::TypeId, collections::HashMap, fmt, rc::Rc};
 
@@ -31,6 +32,8 @@ pub struct CommonStates {
     pub click: Listener,
     pub builder: StatesBuilder,
     pub is_enabled: bool,
+    /// `ButtonBase::SetAcceptsReturn`: whether Enter activates as Space does. `ButtonBase::Initialize` sets it; `CheckBox` and `RadioButton` clear it.
+    pub accepts_return: bool,
     pub key: Option<KeyRef>,
 }
 
@@ -43,8 +46,14 @@ impl CommonStates {
             click,
             builder: Rc::new(builder),
             is_enabled: true,
+            accepts_return: true,
             key: None,
         }
+    }
+
+    pub fn accepts_return(mut self, accepts_return: bool) -> CommonStates {
+        self.accepts_return = accepts_return;
+        self
     }
 
     pub fn is_enabled(mut self, enabled: bool) -> CommonStates {
@@ -62,6 +71,7 @@ impl fmt::Debug for CommonStates {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("CommonStates")
             .field("is_enabled", &self.is_enabled)
+            .field("accepts_return", &self.accepts_return)
             .finish_non_exhaustive()
     }
 }
@@ -163,7 +173,7 @@ impl State for CommonStatesData {
                 }))
                 .on_tap(Listener::new(move |app| self.activate(app)));
         }
-        FocusableActionDetector::new(gesture)
+        let detector = FocusableActionDetector::new(gesture)
             .enabled(widget.is_enabled)
             .actions(app.get(self).actions.clone())
             .on_show_focus_highlight(move |app, value| {
@@ -172,6 +182,26 @@ impl State for CommonStatesData {
             .on_show_hover_highlight(move |app, value| {
                 self.set_state(app, |state| state.hovered = value)
             })
-            .into_widget()
+            .into_widget();
+        if widget.accepts_return {
+            return detector;
+        }
+        // `KeyPress::ButtonBase::IsPress` with `AcceptsReturn` false: Enter is not a press. The
+        // app's shortcuts map Enter to `ActivateIntent`; a nearer binding to a do-nothing intent
+        // stops it before it reaches the action above.
+        let ignore = |key: LogicalKeyboardKey| -> (ShortcutActivatorRef, IntentRef) {
+            (
+                Rc::new(SingleActivator::new(key)),
+                Rc::new(DoNothingAndStopPropagationIntent),
+            )
+        };
+        Shortcuts::new(
+            vec![
+                ignore(LogicalKeyboardKey::ENTER),
+                ignore(LogicalKeyboardKey::NUMPAD_ENTER),
+            ],
+            detector,
+        )
+        .into_widget()
     }
 }

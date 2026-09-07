@@ -18,6 +18,8 @@ WinUI 3 (Fluent 2) on the reveal framework, ported from Microsoft's open source.
 
 ## Porting a control
 
+Bottom up: a panel or primitive a template needs is ported before the control that needs it, never stood in for by hand (`Grid` came after `ToggleSwitch`, which had to be transcribed twice). A primitive is designed for the controls that will use it, not only the first one.
+
 1. Generate its resources and add a `ThemeResources::<control>()` accessor.
 2. Transcribe the template from `<Control>_themeresources.xaml`.
 3. Take behaviour from `<Control>_Partial.cpp`.
@@ -32,7 +34,7 @@ WinUI 3 (Fluent 2) on the reveal framework, ported from Microsoft's open source.
 
 ## PORTING.md
 
-Each source folder that diverges from WinUI keeps a `PORTING.md`. An entry is Change / Reason / Affect, for a reader who knows Rust and WinUI's public surface; no visible Affect means identical, so no entry. Deferred items go under `## Deferred`, each with a trigger. The Reason is one of three, because each has its own way back:
+Each source folder keeps its own `PORTING.md` (`src/theme`, `src/primitives`, `src/controls`), with a section per file: `## toggle_switch.rs → ToggleSwitch`. An entry is Change / Reason / Affect, for a reader who knows Rust and WinUI's public surface; no visible Affect means identical, so no entry. An entry is three sentences: Change starts with its subject and says the idea, Reason names the kind and one fact, Affect says what a reader of the control would notice. Deferred items go under `## Deferred`, each with a trigger. The Reason is one of three, because each has its own way back:
 
 - `os` — Windows supplies it and this host does not: a value not in the repository, or a facility of the OS. Name the substitute; the trigger is a measurement or table from a Windows machine, or a host that provides it.
 - `framework` — reveal has no equivalent of the XAML mechanism. The trigger is the framework feature.

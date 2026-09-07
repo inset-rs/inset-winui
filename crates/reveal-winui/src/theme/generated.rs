@@ -3,7 +3,8 @@
 //! XAML theme dictionaries; the XAML "Default" dictionary is the dark theme.
 #![allow(clippy::excessive_precision, unused_variables)]
 use super::{AccentPalette, Theme};
-use reveal_embedder::Color;
+use crate::BackgroundSizing;
+use reveal_embedder::{Color, FontWeight};
 use std::time::Duration;
 
 /// Theme-dependent resources of `Common_themeresources_any.xaml`, resolved to literals; `Default` in XAML is the dark theme.
@@ -1098,6 +1099,900 @@ pub const CHECK_BOX_MIN_WIDTH: f64 = 120.0;
 pub const CHECK_BOX_PADDING: [f64; 4] = [8.0, 5.0, 0.0, 0.0];
 /// Left, top, right, bottom.
 pub const CHECK_BOX_FOCUS_VISUAL_MARGIN: [f64; 4] = [-7.0, -3.0, -7.0, -3.0];
+/// Theme-dependent resources of `RadioButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct RadioButtonResources {
+    pub radio_button_foreground: Color,
+    pub radio_button_foreground_pointer_over: Color,
+    pub radio_button_foreground_pressed: Color,
+    pub radio_button_foreground_disabled: Color,
+    pub radio_button_background: Color,
+    pub radio_button_background_pointer_over: Color,
+    pub radio_button_background_pressed: Color,
+    pub radio_button_background_disabled: Color,
+    pub radio_button_border_brush: Color,
+    pub radio_button_border_brush_pointer_over: Color,
+    pub radio_button_border_brush_pressed: Color,
+    pub radio_button_border_brush_disabled: Color,
+    pub radio_button_outer_ellipse_stroke: Color,
+    pub radio_button_outer_ellipse_stroke_pointer_over: Color,
+    pub radio_button_outer_ellipse_stroke_pressed: Color,
+    pub radio_button_outer_ellipse_stroke_disabled: Color,
+    pub radio_button_outer_ellipse_fill: Color,
+    pub radio_button_outer_ellipse_fill_pointer_over: Color,
+    pub radio_button_outer_ellipse_fill_pressed: Color,
+    pub radio_button_outer_ellipse_fill_disabled: Color,
+    pub radio_button_outer_ellipse_checked_stroke: Color,
+    pub radio_button_outer_ellipse_checked_stroke_pointer_over: Color,
+    pub radio_button_outer_ellipse_checked_stroke_pressed: Color,
+    pub radio_button_outer_ellipse_checked_stroke_disabled: Color,
+    pub radio_button_outer_ellipse_checked_fill: Color,
+    pub radio_button_outer_ellipse_checked_fill_pointer_over: Color,
+    pub radio_button_outer_ellipse_checked_fill_pressed: Color,
+    pub radio_button_outer_ellipse_checked_fill_disabled: Color,
+    pub radio_button_check_glyph_fill: Color,
+    pub radio_button_check_glyph_fill_pointer_over: Color,
+    pub radio_button_check_glyph_fill_pressed: Color,
+    pub radio_button_check_glyph_fill_disabled: Color,
+    pub radio_button_check_glyph_stroke: [(f64, Color); 2],
+    pub radio_button_check_glyph_stroke_pointer_over: [(f64, Color); 2],
+    pub radio_button_check_glyph_stroke_pressed: [(f64, Color); 2],
+    pub radio_button_check_glyph_stroke_disabled: [(f64, Color); 2],
+    pub radio_button_check_glyph_stroke_checked: [(f64, Color); 2],
+    pub radio_button_check_glyph_stroke_checked_pointer_over: [(f64, Color); 2],
+    pub radio_button_check_glyph_stroke_checked_pressed: [(f64, Color); 2],
+    pub radio_button_check_glyph_stroke_checked_disabled: [(f64, Color); 2],
+    pub radio_button_background_theme_brush: Color,
+    pub radio_button_border_theme_brush: Color,
+    pub radio_button_content_disabled_foreground_theme_brush: Color,
+    pub radio_button_content_foreground_theme_brush: Color,
+    pub radio_button_disabled_background_theme_brush: Color,
+    pub radio_button_disabled_border_theme_brush: Color,
+    pub radio_button_disabled_foreground_theme_brush: Color,
+    pub radio_button_foreground_theme_brush: Color,
+    pub radio_button_pointer_over_background_theme_brush: Color,
+    pub radio_button_pointer_over_border_theme_brush: Color,
+    pub radio_button_pointer_over_foreground_theme_brush: Color,
+    pub radio_button_pressed_background_theme_brush: Color,
+    pub radio_button_pressed_border_theme_brush: Color,
+    pub radio_button_pressed_foreground_theme_brush: Color,
+}
+impl RadioButtonResources {
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                radio_button_foreground: Color::from_argb(228, 0, 0, 0),
+                radio_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                radio_button_foreground_pressed: Color::from_argb(228, 0, 0, 0),
+                radio_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                radio_button_background: Color::from_argb(0, 255, 255, 255),
+                radio_button_background_pointer_over: Color::from_argb(0, 255, 255, 255),
+                radio_button_background_pressed: Color::from_argb(0, 255, 255, 255),
+                radio_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                radio_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                radio_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                radio_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                radio_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                radio_button_outer_ellipse_stroke: Color::from_argb(114, 0, 0, 0),
+                radio_button_outer_ellipse_stroke_pointer_over: Color::from_argb(114, 0, 0, 0),
+                radio_button_outer_ellipse_stroke_pressed: Color::from_argb(55, 0, 0, 0),
+                radio_button_outer_ellipse_stroke_disabled: Color::from_argb(55, 0, 0, 0),
+                radio_button_outer_ellipse_fill: Color::from_argb(6, 0, 0, 0),
+                radio_button_outer_ellipse_fill_pointer_over: Color::from_argb(15, 0, 0, 0),
+                radio_button_outer_ellipse_fill_pressed: Color::from_argb(24, 0, 0, 0),
+                radio_button_outer_ellipse_fill_disabled: Color::from_argb(0, 255, 255, 255),
+                radio_button_outer_ellipse_checked_stroke: accent.dark1,
+                radio_button_outer_ellipse_checked_stroke_pointer_over: accent.dark1,
+                radio_button_outer_ellipse_checked_stroke_pressed: accent.dark1,
+                radio_button_outer_ellipse_checked_stroke_disabled: Color::from_argb(55, 0, 0, 0),
+                radio_button_outer_ellipse_checked_fill: accent.dark1,
+                radio_button_outer_ellipse_checked_fill_pointer_over: accent.dark1,
+                radio_button_outer_ellipse_checked_fill_pressed: accent.dark1,
+                radio_button_outer_ellipse_checked_fill_disabled: Color::from_argb(55, 0, 0, 0),
+                radio_button_check_glyph_fill: Color::from_argb(255, 255, 255, 255),
+                radio_button_check_glyph_fill_pointer_over: Color::from_argb(255, 255, 255, 255),
+                radio_button_check_glyph_fill_pressed: Color::from_argb(255, 255, 255, 255),
+                radio_button_check_glyph_fill_disabled: Color::from_argb(255, 255, 255, 255),
+                radio_button_check_glyph_stroke: [
+                    (0.5, Color::from_argb(15, 0, 0, 0)),
+                    (0.7, Color::from_argb(41, 0, 0, 0)),
+                ],
+                radio_button_check_glyph_stroke_pointer_over: [
+                    (0.5, Color::from_argb(15, 0, 0, 0)),
+                    (0.7, Color::from_argb(41, 0, 0, 0)),
+                ],
+                radio_button_check_glyph_stroke_pressed: [
+                    (0.5, Color::from_argb(15, 0, 0, 0)),
+                    (0.7, Color::from_argb(41, 0, 0, 0)),
+                ],
+                radio_button_check_glyph_stroke_disabled: [
+                    (0.5, Color::from_argb(15, 0, 0, 0)),
+                    (0.7, Color::from_argb(41, 0, 0, 0)),
+                ],
+                radio_button_check_glyph_stroke_checked: [
+                    (0.33, Color::from_argb(102, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_checked_pointer_over: [
+                    (0.33, Color::from_argb(102, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_checked_pressed: [
+                    (0.33, Color::from_argb(102, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_checked_disabled: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                radio_button_background_theme_brush: Color::from_argb(204, 255, 255, 255),
+                radio_button_border_theme_brush: Color::from_argb(69, 0, 0, 0),
+                radio_button_content_disabled_foreground_theme_brush: Color::from_argb(
+                    102, 0, 0, 0,
+                ),
+                radio_button_content_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                radio_button_disabled_background_theme_brush: Color::from_argb(102, 202, 202, 202),
+                radio_button_disabled_border_theme_brush: Color::from_argb(38, 0, 0, 0),
+                radio_button_disabled_foreground_theme_brush: Color::from_argb(102, 0, 0, 0),
+                radio_button_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                radio_button_pointer_over_background_theme_brush: Color::from_argb(
+                    222, 255, 255, 255,
+                ),
+                radio_button_pointer_over_border_theme_brush: Color::from_argb(112, 0, 0, 0),
+                radio_button_pointer_over_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                radio_button_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
+                radio_button_pressed_border_theme_brush: Color::from_argb(255, 0, 0, 0),
+                radio_button_pressed_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+            },
+            Theme::Dark => Self {
+                radio_button_foreground: Color::from_argb(255, 255, 255, 255),
+                radio_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                radio_button_foreground_pressed: Color::from_argb(255, 255, 255, 255),
+                radio_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                radio_button_background: Color::from_argb(0, 255, 255, 255),
+                radio_button_background_pointer_over: Color::from_argb(0, 255, 255, 255),
+                radio_button_background_pressed: Color::from_argb(0, 255, 255, 255),
+                radio_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                radio_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                radio_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                radio_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                radio_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                radio_button_outer_ellipse_stroke: Color::from_argb(139, 255, 255, 255),
+                radio_button_outer_ellipse_stroke_pointer_over: Color::from_argb(
+                    139, 255, 255, 255,
+                ),
+                radio_button_outer_ellipse_stroke_pressed: Color::from_argb(40, 255, 255, 255),
+                radio_button_outer_ellipse_stroke_disabled: Color::from_argb(40, 255, 255, 255),
+                radio_button_outer_ellipse_fill: Color::from_argb(25, 0, 0, 0),
+                radio_button_outer_ellipse_fill_pointer_over: Color::from_argb(11, 255, 255, 255),
+                radio_button_outer_ellipse_fill_pressed: Color::from_argb(18, 255, 255, 255),
+                radio_button_outer_ellipse_fill_disabled: Color::from_argb(0, 255, 255, 255),
+                radio_button_outer_ellipse_checked_stroke: accent.light2,
+                radio_button_outer_ellipse_checked_stroke_pointer_over: accent.light2,
+                radio_button_outer_ellipse_checked_stroke_pressed: accent.light2,
+                radio_button_outer_ellipse_checked_stroke_disabled: Color::from_argb(
+                    40, 255, 255, 255,
+                ),
+                radio_button_outer_ellipse_checked_fill: accent.light2,
+                radio_button_outer_ellipse_checked_fill_pointer_over: accent.light2,
+                radio_button_outer_ellipse_checked_fill_pressed: accent.light2,
+                radio_button_outer_ellipse_checked_fill_disabled: Color::from_argb(
+                    40, 255, 255, 255,
+                ),
+                radio_button_check_glyph_fill: Color::from_argb(255, 0, 0, 0),
+                radio_button_check_glyph_fill_pointer_over: Color::from_argb(255, 0, 0, 0),
+                radio_button_check_glyph_fill_pressed: Color::from_argb(255, 0, 0, 0),
+                radio_button_check_glyph_fill_disabled: Color::from_argb(255, 0, 0, 0),
+                radio_button_check_glyph_stroke: [
+                    (0.7, Color::from_argb(24, 255, 255, 255)),
+                    (0.5, Color::from_argb(18, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_pointer_over: [
+                    (0.7, Color::from_argb(24, 255, 255, 255)),
+                    (0.5, Color::from_argb(18, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_pressed: [
+                    (0.7, Color::from_argb(24, 255, 255, 255)),
+                    (0.5, Color::from_argb(18, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_disabled: [
+                    (0.7, Color::from_argb(24, 255, 255, 255)),
+                    (0.5, Color::from_argb(18, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_checked: [
+                    (0.33, Color::from_argb(35, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_checked_pointer_over: [
+                    (0.33, Color::from_argb(35, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_checked_pressed: [
+                    (0.33, Color::from_argb(35, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                radio_button_check_glyph_stroke_checked_disabled: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                radio_button_background_theme_brush: Color::from_argb(204, 255, 255, 255),
+                radio_button_border_theme_brush: Color::from_argb(204, 255, 255, 255),
+                radio_button_content_disabled_foreground_theme_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                radio_button_content_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                radio_button_disabled_background_theme_brush: Color::from_argb(102, 255, 255, 255),
+                radio_button_disabled_border_theme_brush: Color::from_argb(102, 255, 255, 255),
+                radio_button_disabled_foreground_theme_brush: Color::from_argb(102, 0, 0, 0),
+                radio_button_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                radio_button_pointer_over_background_theme_brush: Color::from_argb(
+                    222, 255, 255, 255,
+                ),
+                radio_button_pointer_over_border_theme_brush: Color::from_argb(222, 255, 255, 255),
+                radio_button_pointer_over_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                radio_button_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                radio_button_pressed_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                radio_button_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+            },
+        }
+    }
+}
+pub const RADIO_BUTTON_CHECK_GLYPH_SIZE: f64 = 12.0;
+pub const RADIO_BUTTON_CHECK_GLYPH_POINTER_OVER_SIZE: f64 = 14.0;
+pub const RADIO_BUTTON_CHECK_GLYPH_PRESSED_OVER_SIZE: f64 = 10.0;
+pub const RADIO_BUTTON_BORDER_THEME_THICKNESS: f64 = 1.0;
+/// Theme-dependent resources of `ToggleButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ToggleButtonResources {
+    pub toggle_button_background: Color,
+    pub toggle_button_background_pointer_over: Color,
+    pub toggle_button_background_pressed: Color,
+    pub toggle_button_background_disabled: Color,
+    pub toggle_button_background_checked: Color,
+    pub toggle_button_background_checked_pointer_over: Color,
+    pub toggle_button_background_checked_pressed: Color,
+    pub toggle_button_background_checked_disabled: Color,
+    pub toggle_button_background_indeterminate: Color,
+    pub toggle_button_background_indeterminate_pointer_over: Color,
+    pub toggle_button_background_indeterminate_pressed: Color,
+    pub toggle_button_background_indeterminate_disabled: Color,
+    pub toggle_button_foreground: Color,
+    pub toggle_button_foreground_pointer_over: Color,
+    pub toggle_button_foreground_pressed: Color,
+    pub toggle_button_foreground_disabled: Color,
+    pub toggle_button_foreground_checked: Color,
+    pub toggle_button_foreground_checked_pointer_over: Color,
+    pub toggle_button_foreground_checked_pressed: Color,
+    pub toggle_button_foreground_checked_disabled: Color,
+    pub toggle_button_foreground_indeterminate: Color,
+    pub toggle_button_foreground_indeterminate_pointer_over: Color,
+    pub toggle_button_foreground_indeterminate_pressed: Color,
+    pub toggle_button_foreground_indeterminate_disabled: Color,
+    pub toggle_button_border_brush: [(f64, Color); 2],
+    pub toggle_button_border_brush_pointer_over: [(f64, Color); 2],
+    pub toggle_button_border_brush_pressed: Color,
+    pub toggle_button_border_brush_disabled: Color,
+    pub toggle_button_border_brush_checked: [(f64, Color); 2],
+    pub toggle_button_border_brush_checked_pointer_over: [(f64, Color); 2],
+    pub toggle_button_border_brush_checked_pressed: Color,
+    pub toggle_button_border_brush_checked_disabled: Color,
+    pub toggle_button_border_brush_indeterminate: [(f64, Color); 2],
+    pub toggle_button_border_brush_indeterminate_pointer_over: [(f64, Color); 2],
+    pub toggle_button_border_brush_indeterminate_pressed: Color,
+    pub toggle_button_border_brush_indeterminate_disabled: Color,
+    pub toggle_button_background_theme_brush: Color,
+    pub toggle_button_border_theme_brush: Color,
+    pub toggle_button_checked_background_theme_brush: Color,
+    pub toggle_button_checked_border_theme_brush: Color,
+    pub toggle_button_checked_disabled_background_theme_brush: Color,
+    pub toggle_button_checked_disabled_foreground_theme_brush: Color,
+    pub toggle_button_checked_foreground_theme_brush: Color,
+    pub toggle_button_checked_pointer_over_background_theme_brush: Color,
+    pub toggle_button_checked_pointer_over_border_theme_brush: Color,
+    pub toggle_button_checked_pressed_background_theme_brush: Color,
+    pub toggle_button_checked_pressed_border_theme_brush: Color,
+    pub toggle_button_checked_pressed_foreground_theme_brush: Color,
+    pub toggle_button_disabled_border_theme_brush: Color,
+    pub toggle_button_disabled_foreground_theme_brush: Color,
+    pub toggle_button_foreground_theme_brush: Color,
+    pub toggle_button_pointer_over_background_theme_brush: Color,
+    pub toggle_button_pressed_background_theme_brush: Color,
+    pub toggle_button_pressed_foreground_theme_brush: Color,
+}
+impl ToggleButtonResources {
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                toggle_button_background: Color::from_argb(179, 255, 255, 255),
+                toggle_button_background_pointer_over: Color::from_argb(128, 249, 249, 249),
+                toggle_button_background_pressed: Color::from_argb(77, 249, 249, 249),
+                toggle_button_background_disabled: Color::from_argb(77, 249, 249, 249),
+                toggle_button_background_checked: accent.dark1,
+                toggle_button_background_checked_pointer_over: accent.dark1,
+                toggle_button_background_checked_pressed: accent.dark1,
+                toggle_button_background_checked_disabled: Color::from_argb(55, 0, 0, 0),
+                toggle_button_background_indeterminate: Color::from_argb(179, 255, 255, 255),
+                toggle_button_background_indeterminate_pointer_over: Color::from_argb(
+                    128, 249, 249, 249,
+                ),
+                toggle_button_background_indeterminate_pressed: Color::from_argb(77, 249, 249, 249),
+                toggle_button_background_indeterminate_disabled: Color::from_argb(
+                    77, 249, 249, 249,
+                ),
+                toggle_button_foreground: Color::from_argb(228, 0, 0, 0),
+                toggle_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                toggle_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                toggle_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                toggle_button_foreground_checked: Color::from_argb(255, 255, 255, 255),
+                toggle_button_foreground_checked_pointer_over: Color::from_argb(255, 255, 255, 255),
+                toggle_button_foreground_checked_pressed: Color::from_argb(179, 255, 255, 255),
+                toggle_button_foreground_checked_disabled: Color::from_argb(255, 255, 255, 255),
+                toggle_button_foreground_indeterminate: Color::from_argb(228, 0, 0, 0),
+                toggle_button_foreground_indeterminate_pointer_over: Color::from_argb(228, 0, 0, 0),
+                toggle_button_foreground_indeterminate_pressed: Color::from_argb(158, 0, 0, 0),
+                toggle_button_foreground_indeterminate_disabled: Color::from_argb(92, 0, 0, 0),
+                toggle_button_border_brush: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                toggle_button_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                toggle_button_border_brush_pressed: Color::from_argb(15, 0, 0, 0),
+                toggle_button_border_brush_disabled: Color::from_argb(15, 0, 0, 0),
+                toggle_button_border_brush_checked: [
+                    (0.33, Color::from_argb(102, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                toggle_button_border_brush_checked_pointer_over: [
+                    (0.33, Color::from_argb(102, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                toggle_button_border_brush_checked_pressed: Color::from_argb(0, 255, 255, 255),
+                toggle_button_border_brush_checked_disabled: Color::from_argb(0, 255, 255, 255),
+                toggle_button_border_brush_indeterminate: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                toggle_button_border_brush_indeterminate_pointer_over: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                toggle_button_border_brush_indeterminate_pressed: Color::from_argb(15, 0, 0, 0),
+                toggle_button_border_brush_indeterminate_disabled: Color::from_argb(15, 0, 0, 0),
+                toggle_button_background_theme_brush: Color::from_argb(0, 0, 0, 0),
+                toggle_button_border_theme_brush: Color::from_argb(255, 0, 0, 0),
+                toggle_button_checked_background_theme_brush: Color::from_argb(255, 0, 0, 0),
+                toggle_button_checked_border_theme_brush: Color::from_argb(255, 0, 0, 0),
+                toggle_button_checked_disabled_background_theme_brush: Color::from_argb(
+                    102, 0, 0, 0,
+                ),
+                toggle_button_checked_disabled_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                toggle_button_checked_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                toggle_button_checked_pointer_over_background_theme_brush: Color::from_argb(
+                    153, 0, 0, 0,
+                ),
+                toggle_button_checked_pointer_over_border_theme_brush: Color::from_argb(
+                    153, 0, 0, 0,
+                ),
+                toggle_button_checked_pressed_background_theme_brush: Color::from_argb(0, 0, 0, 0),
+                toggle_button_checked_pressed_border_theme_brush: Color::from_argb(255, 0, 0, 0),
+                toggle_button_checked_pressed_foreground_theme_brush: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                toggle_button_disabled_border_theme_brush: Color::from_argb(102, 0, 0, 0),
+                toggle_button_disabled_foreground_theme_brush: Color::from_argb(102, 0, 0, 0),
+                toggle_button_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                toggle_button_pointer_over_background_theme_brush: Color::from_argb(33, 0, 0, 0),
+                toggle_button_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
+                toggle_button_pressed_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+            },
+            Theme::Dark => Self {
+                toggle_button_background: Color::from_argb(15, 255, 255, 255),
+                toggle_button_background_pointer_over: Color::from_argb(21, 255, 255, 255),
+                toggle_button_background_pressed: Color::from_argb(8, 255, 255, 255),
+                toggle_button_background_disabled: Color::from_argb(11, 255, 255, 255),
+                toggle_button_background_checked: accent.light2,
+                toggle_button_background_checked_pointer_over: accent.light2,
+                toggle_button_background_checked_pressed: accent.light2,
+                toggle_button_background_checked_disabled: Color::from_argb(40, 255, 255, 255),
+                toggle_button_background_indeterminate: Color::from_argb(15, 255, 255, 255),
+                toggle_button_background_indeterminate_pointer_over: Color::from_argb(
+                    21, 255, 255, 255,
+                ),
+                toggle_button_background_indeterminate_pressed: Color::from_argb(8, 255, 255, 255),
+                toggle_button_background_indeterminate_disabled: Color::from_argb(
+                    11, 255, 255, 255,
+                ),
+                toggle_button_foreground: Color::from_argb(255, 255, 255, 255),
+                toggle_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                toggle_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                toggle_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                toggle_button_foreground_checked: Color::from_argb(255, 0, 0, 0),
+                toggle_button_foreground_checked_pointer_over: Color::from_argb(255, 0, 0, 0),
+                toggle_button_foreground_checked_pressed: Color::from_argb(128, 0, 0, 0),
+                toggle_button_foreground_checked_disabled: Color::from_argb(135, 255, 255, 255),
+                toggle_button_foreground_indeterminate: Color::from_argb(255, 255, 255, 255),
+                toggle_button_foreground_indeterminate_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                toggle_button_foreground_indeterminate_pressed: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                toggle_button_foreground_indeterminate_disabled: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                toggle_button_border_brush: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                toggle_button_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                toggle_button_border_brush_pressed: Color::from_argb(18, 255, 255, 255),
+                toggle_button_border_brush_disabled: Color::from_argb(18, 255, 255, 255),
+                toggle_button_border_brush_checked: [
+                    (0.33, Color::from_argb(35, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                toggle_button_border_brush_checked_pointer_over: [
+                    (0.33, Color::from_argb(35, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                toggle_button_border_brush_checked_pressed: Color::from_argb(0, 255, 255, 255),
+                toggle_button_border_brush_checked_disabled: Color::from_argb(0, 255, 255, 255),
+                toggle_button_border_brush_indeterminate: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                toggle_button_border_brush_indeterminate_pointer_over: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                toggle_button_border_brush_indeterminate_pressed: Color::from_argb(
+                    18, 255, 255, 255,
+                ),
+                toggle_button_border_brush_indeterminate_disabled: Color::from_argb(
+                    18, 255, 255, 255,
+                ),
+                toggle_button_background_theme_brush: Color::from_argb(0, 0, 0, 0),
+                toggle_button_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                toggle_button_checked_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                toggle_button_checked_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                toggle_button_checked_disabled_background_theme_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                toggle_button_checked_disabled_foreground_theme_brush: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                toggle_button_checked_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                toggle_button_checked_pointer_over_background_theme_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                toggle_button_checked_pointer_over_border_theme_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                toggle_button_checked_pressed_background_theme_brush: Color::from_argb(0, 0, 0, 0),
+                toggle_button_checked_pressed_border_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                toggle_button_checked_pressed_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                toggle_button_disabled_border_theme_brush: Color::from_argb(102, 255, 255, 255),
+                toggle_button_disabled_foreground_theme_brush: Color::from_argb(102, 255, 255, 255),
+                toggle_button_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                toggle_button_pointer_over_background_theme_brush: Color::from_argb(
+                    33, 255, 255, 255,
+                ),
+                toggle_button_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                toggle_button_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const TOGGLE_BUTTON_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+pub const TOGGLE_BUTTON_CHECKED_STATE_BACKGROUND_SIZING: BackgroundSizing =
+    BackgroundSizing::OuterBorderEdge;
+/// Theme-dependent resources of `HyperlinkButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HyperlinkButtonResources {
+    pub hyperlink_button_foreground: Color,
+    pub hyperlink_button_foreground_pointer_over: Color,
+    pub hyperlink_button_foreground_pressed: Color,
+    pub hyperlink_button_foreground_disabled: Color,
+    pub hyperlink_button_background: Color,
+    pub hyperlink_button_background_pointer_over: Color,
+    pub hyperlink_button_background_pressed: Color,
+    pub hyperlink_button_background_disabled: Color,
+    pub hyperlink_button_border_brush: Color,
+    pub hyperlink_button_border_brush_pointer_over: Color,
+    pub hyperlink_button_border_brush_pressed: Color,
+    pub hyperlink_button_border_brush_disabled: Color,
+}
+impl HyperlinkButtonResources {
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                hyperlink_button_foreground: accent.dark2,
+                hyperlink_button_foreground_pointer_over: accent.dark3,
+                hyperlink_button_foreground_pressed: accent.dark1,
+                hyperlink_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                hyperlink_button_background: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                hyperlink_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                hyperlink_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+            },
+            Theme::Dark => Self {
+                hyperlink_button_foreground: accent.light3,
+                hyperlink_button_foreground_pointer_over: accent.light3,
+                hyperlink_button_foreground_pressed: accent.light2,
+                hyperlink_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                hyperlink_button_background: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                hyperlink_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                hyperlink_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                hyperlink_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const HYPERLINK_BUTTON_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Theme-dependent resources of `RepeatButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct RepeatButtonResources {
+    pub repeat_button_background: Color,
+    pub repeat_button_background_pointer_over: Color,
+    pub repeat_button_background_pressed: Color,
+    pub repeat_button_background_disabled: Color,
+    pub repeat_button_foreground: Color,
+    pub repeat_button_foreground_pointer_over: Color,
+    pub repeat_button_foreground_pressed: Color,
+    pub repeat_button_foreground_disabled: Color,
+    pub repeat_button_border_brush: [(f64, Color); 2],
+    pub repeat_button_border_brush_pointer_over: [(f64, Color); 2],
+    pub repeat_button_border_brush_pressed: Color,
+    pub repeat_button_border_brush_disabled: Color,
+    pub repeat_button_border_theme_brush: Color,
+    pub repeat_button_disabled_background_theme_brush: Color,
+    pub repeat_button_disabled_border_theme_brush: Color,
+    pub repeat_button_disabled_foreground_theme_brush: Color,
+    pub repeat_button_foreground_theme_brush: Color,
+    pub repeat_button_pointer_over_background_theme_brush: Color,
+    pub repeat_button_pointer_over_foreground_theme_brush: Color,
+    pub repeat_button_pressed_background_theme_brush: Color,
+    pub repeat_button_pressed_foreground_theme_brush: Color,
+}
+impl RepeatButtonResources {
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                repeat_button_background: Color::from_argb(179, 255, 255, 255),
+                repeat_button_background_pointer_over: Color::from_argb(128, 249, 249, 249),
+                repeat_button_background_pressed: Color::from_argb(77, 249, 249, 249),
+                repeat_button_background_disabled: Color::from_argb(77, 249, 249, 249),
+                repeat_button_foreground: Color::from_argb(228, 0, 0, 0),
+                repeat_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                repeat_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                repeat_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                repeat_button_border_brush: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                repeat_button_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                repeat_button_border_brush_pressed: Color::from_argb(15, 0, 0, 0),
+                repeat_button_border_brush_disabled: Color::from_argb(15, 0, 0, 0),
+                repeat_button_border_theme_brush: Color::from_argb(51, 0, 0, 0),
+                repeat_button_disabled_background_theme_brush: Color::from_argb(102, 202, 202, 202),
+                repeat_button_disabled_border_theme_brush: Color::from_argb(26, 0, 0, 0),
+                repeat_button_disabled_foreground_theme_brush: Color::from_argb(102, 0, 0, 0),
+                repeat_button_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                repeat_button_pointer_over_background_theme_brush: Color::from_argb(
+                    209, 205, 205, 205,
+                ),
+                repeat_button_pointer_over_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                repeat_button_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
+                repeat_button_pressed_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+            },
+            Theme::Dark => Self {
+                repeat_button_background: Color::from_argb(15, 255, 255, 255),
+                repeat_button_background_pointer_over: Color::from_argb(21, 255, 255, 255),
+                repeat_button_background_pressed: Color::from_argb(8, 255, 255, 255),
+                repeat_button_background_disabled: Color::from_argb(11, 255, 255, 255),
+                repeat_button_foreground: Color::from_argb(255, 255, 255, 255),
+                repeat_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                repeat_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                repeat_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                repeat_button_border_brush: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                repeat_button_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                repeat_button_border_brush_pressed: Color::from_argb(18, 255, 255, 255),
+                repeat_button_border_brush_disabled: Color::from_argb(18, 255, 255, 255),
+                repeat_button_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                repeat_button_disabled_background_theme_brush: Color::from_argb(0, 0, 0, 0),
+                repeat_button_disabled_border_theme_brush: Color::from_argb(102, 255, 255, 255),
+                repeat_button_disabled_foreground_theme_brush: Color::from_argb(102, 255, 255, 255),
+                repeat_button_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                repeat_button_pointer_over_background_theme_brush: Color::from_argb(
+                    33, 255, 255, 255,
+                ),
+                repeat_button_pointer_over_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                repeat_button_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                repeat_button_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const REPEAT_BUTTON_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Theme-dependent resources of `Slider_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SliderResources {
+    pub slider_container_background_pointer_over: Color,
+    pub slider_container_background_pressed: Color,
+    pub slider_container_background_disabled: Color,
+    pub slider_thumb_background: Color,
+    pub slider_thumb_background_pointer_over: Color,
+    pub slider_thumb_background_pressed: Color,
+    pub slider_thumb_background_disabled: Color,
+    pub slider_thumb_border_brush: [(f64, Color); 2],
+    pub slider_outer_thumb_background: Color,
+    pub slider_track_fill: Color,
+    pub slider_track_fill_pointer_over: Color,
+    pub slider_track_fill_pressed: Color,
+    pub slider_track_fill_disabled: Color,
+    pub slider_track_value_fill: Color,
+    pub slider_track_value_fill_pointer_over: Color,
+    pub slider_track_value_fill_pressed: Color,
+    pub slider_track_value_fill_disabled: Color,
+    pub slider_header_foreground: Color,
+    pub slider_header_foreground_disabled: Color,
+    pub slider_tick_bar_fill: Color,
+    pub slider_tick_bar_fill_disabled: Color,
+    pub slider_inline_tick_bar_fill: Color,
+    pub slider_border_theme_brush: Color,
+    pub slider_disabled_border_theme_brush: Color,
+    pub slider_thumb_background_theme_brush: Color,
+    pub slider_thumb_border_theme_brush: Color,
+    pub slider_thumb_disabled_background_theme_brush: Color,
+    pub slider_thumb_pointer_over_background_theme_brush: Color,
+    pub slider_thumb_pointer_over_border_theme_brush: Color,
+    pub slider_thumb_pressed_background_theme_brush: Color,
+    pub slider_thumb_pressed_border_theme_brush: Color,
+    pub slider_tick_mark_inline_background_theme_brush: Color,
+    pub slider_tick_mark_inline_disabled_foreground_theme_brush: Color,
+    pub slider_tickmark_outside_background_theme_brush: Color,
+    pub slider_tick_mark_outside_disabled_foreground_theme_brush: Color,
+    pub slider_track_background_theme_brush: Color,
+    pub slider_track_decrease_background_theme_brush: Color,
+    pub slider_track_decrease_disabled_background_theme_brush: Color,
+    pub slider_track_decrease_pointer_over_background_theme_brush: Color,
+    pub slider_track_decrease_pressed_background_theme_brush: Color,
+    pub slider_track_disabled_background_theme_brush: Color,
+    pub slider_track_pointer_over_background_theme_brush: Color,
+    pub slider_track_pressed_background_theme_brush: Color,
+    pub slider_header_foreground_theme_brush: Color,
+}
+impl SliderResources {
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                slider_container_background_pointer_over: Color::from_argb(0, 255, 255, 255),
+                slider_container_background_pressed: Color::from_argb(0, 255, 255, 255),
+                slider_container_background_disabled: Color::from_argb(0, 255, 255, 255),
+                slider_thumb_background: accent.dark1,
+                slider_thumb_background_pointer_over: accent.dark1,
+                slider_thumb_background_pressed: accent.dark1,
+                slider_thumb_background_disabled: Color::from_argb(55, 0, 0, 0),
+                slider_thumb_border_brush: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                slider_outer_thumb_background: Color::from_argb(255, 255, 255, 255),
+                slider_track_fill: Color::from_argb(114, 0, 0, 0),
+                slider_track_fill_pointer_over: Color::from_argb(114, 0, 0, 0),
+                slider_track_fill_pressed: Color::from_argb(114, 0, 0, 0),
+                slider_track_fill_disabled: Color::from_argb(81, 0, 0, 0),
+                slider_track_value_fill: accent.dark1,
+                slider_track_value_fill_pointer_over: accent.dark1,
+                slider_track_value_fill_pressed: accent.dark1,
+                slider_track_value_fill_disabled: Color::from_argb(55, 0, 0, 0),
+                slider_header_foreground: Color::from_argb(228, 0, 0, 0),
+                slider_header_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                slider_tick_bar_fill: Color::from_argb(114, 0, 0, 0),
+                slider_tick_bar_fill_disabled: Color::from_argb(81, 0, 0, 0),
+                slider_inline_tick_bar_fill: Color::from_argb(255, 255, 255, 255),
+                slider_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                slider_disabled_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                slider_thumb_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_thumb_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_thumb_disabled_background_theme_brush: Color::from_argb(255, 126, 126, 126),
+                slider_thumb_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                slider_thumb_pointer_over_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_thumb_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_thumb_pressed_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_tick_mark_inline_background_theme_brush: Color::from_argb(255, 0, 0, 0),
+                slider_tick_mark_inline_disabled_foreground_theme_brush: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                slider_tickmark_outside_background_theme_brush: Color::from_argb(
+                    128, 255, 255, 255,
+                ),
+                slider_tick_mark_outside_disabled_foreground_theme_brush: Color::from_argb(
+                    128, 255, 255, 255,
+                ),
+                slider_track_background_theme_brush: Color::from_argb(41, 255, 255, 255),
+                slider_track_decrease_background_theme_brush: Color::from_argb(255, 91, 46, 197),
+                slider_track_decrease_disabled_background_theme_brush: Color::from_argb(
+                    31, 255, 255, 255,
+                ),
+                slider_track_decrease_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 114, 75, 205,
+                ),
+                slider_track_decrease_pressed_background_theme_brush: Color::from_argb(
+                    255, 129, 82, 239,
+                ),
+                slider_track_disabled_background_theme_brush: Color::from_argb(41, 255, 255, 255),
+                slider_track_pointer_over_background_theme_brush: Color::from_argb(
+                    70, 255, 255, 255,
+                ),
+                slider_track_pressed_background_theme_brush: Color::from_argb(89, 255, 255, 255),
+                slider_header_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+            },
+            Theme::Dark => Self {
+                slider_container_background_pointer_over: Color::from_argb(0, 255, 255, 255),
+                slider_container_background_pressed: Color::from_argb(0, 255, 255, 255),
+                slider_container_background_disabled: Color::from_argb(0, 255, 255, 255),
+                slider_thumb_background: accent.light2,
+                slider_thumb_background_pointer_over: accent.light2,
+                slider_thumb_background_pressed: accent.light2,
+                slider_thumb_background_disabled: Color::from_argb(40, 255, 255, 255),
+                slider_thumb_border_brush: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                slider_outer_thumb_background: Color::from_argb(255, 69, 69, 69),
+                slider_track_fill: Color::from_argb(139, 255, 255, 255),
+                slider_track_fill_pointer_over: Color::from_argb(139, 255, 255, 255),
+                slider_track_fill_pressed: Color::from_argb(139, 255, 255, 255),
+                slider_track_fill_disabled: Color::from_argb(63, 255, 255, 255),
+                slider_track_value_fill: accent.light2,
+                slider_track_value_fill_pointer_over: accent.light2,
+                slider_track_value_fill_pressed: accent.light2,
+                slider_track_value_fill_disabled: Color::from_argb(40, 255, 255, 255),
+                slider_header_foreground: Color::from_argb(255, 255, 255, 255),
+                slider_header_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                slider_tick_bar_fill: Color::from_argb(139, 255, 255, 255),
+                slider_tick_bar_fill_disabled: Color::from_argb(63, 255, 255, 255),
+                slider_inline_tick_bar_fill: Color::from_argb(179, 30, 30, 30),
+                slider_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                slider_disabled_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                slider_thumb_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_thumb_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_thumb_disabled_background_theme_brush: Color::from_argb(255, 126, 126, 126),
+                slider_thumb_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                slider_thumb_pointer_over_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_thumb_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_thumb_pressed_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                slider_tick_mark_inline_background_theme_brush: Color::from_argb(255, 0, 0, 0),
+                slider_tick_mark_inline_disabled_foreground_theme_brush: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                slider_tickmark_outside_background_theme_brush: Color::from_argb(
+                    128, 255, 255, 255,
+                ),
+                slider_tick_mark_outside_disabled_foreground_theme_brush: Color::from_argb(
+                    128, 255, 255, 255,
+                ),
+                slider_track_background_theme_brush: Color::from_argb(41, 255, 255, 255),
+                slider_track_decrease_background_theme_brush: Color::from_argb(255, 91, 46, 197),
+                slider_track_decrease_disabled_background_theme_brush: Color::from_argb(
+                    31, 255, 255, 255,
+                ),
+                slider_track_decrease_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 114, 75, 205,
+                ),
+                slider_track_decrease_pressed_background_theme_brush: Color::from_argb(
+                    255, 129, 82, 239,
+                ),
+                slider_track_disabled_background_theme_brush: Color::from_argb(41, 255, 255, 255),
+                slider_track_pointer_over_background_theme_brush: Color::from_argb(
+                    70, 255, 255, 255,
+                ),
+                slider_track_pressed_background_theme_brush: Color::from_argb(89, 255, 255, 255),
+                slider_header_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const SLIDER_TOP_HEADER_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 4.0];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const SLIDER_TRACK_CORNER_RADIUS: [f64; 4] = [2.0, 2.0, 2.0, 2.0];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const SLIDER_THUMB_CORNER_RADIUS: [f64; 4] = [10.0, 10.0, 10.0, 10.0];
+pub const SLIDER_PRE_CONTENT_MARGIN: f64 = 14.0;
+pub const SLIDER_POST_CONTENT_MARGIN: f64 = 14.0;
+pub const SLIDER_INNER_THUMB_HEIGHT: f64 = 12.0;
+pub const SLIDER_HORIZONTAL_HEIGHT: f64 = 32.0;
+pub const SLIDER_VERTICAL_WIDTH: f64 = 32.0;
+pub const SLIDER_HORIZONTAL_THUMB_WIDTH: f64 = 18.0;
+pub const SLIDER_HORIZONTAL_THUMB_HEIGHT: f64 = 18.0;
+pub const SLIDER_VERTICAL_THUMB_WIDTH: f64 = 18.0;
+pub const SLIDER_VERTICAL_THUMB_HEIGHT: f64 = 18.0;
+pub const SLIDER_INNER_THUMB_WIDTH: f64 = 12.0;
+pub const SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT: f64 = 4.0;
+pub const SLIDER_TRACK_THEME_HEIGHT: f64 = 4.0;
+/// Left, top, right, bottom.
+pub const SLIDER_BORDER_THEME_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const SLIDER_HEADER_THEME_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 4.0];
+pub const SLIDER_HEADER_THEME_FONT_WEIGHT: FontWeight = FontWeight::NORMAL;
+/// Theme-dependent resources of `ToolTip_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ToolTipResources {
+    pub tool_tip_foreground: Color,
+    pub tool_tip_border_brush: Color,
+    pub tool_tip_background_theme_brush: Color,
+    pub tool_tip_border_theme_brush: Color,
+    pub tool_tip_foreground_theme_brush: Color,
+    pub tool_tip_foreground_brush: Color,
+}
+impl ToolTipResources {
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                tool_tip_foreground: Color::from_argb(228, 0, 0, 0),
+                tool_tip_border_brush: Color::from_argb(15, 0, 0, 0),
+                tool_tip_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                tool_tip_border_theme_brush: Color::from_argb(255, 128, 128, 128),
+                tool_tip_foreground_theme_brush: Color::from_argb(255, 102, 102, 102),
+                tool_tip_foreground_brush: Color::from_argb(228, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                tool_tip_foreground: Color::from_argb(255, 255, 255, 255),
+                tool_tip_border_brush: Color::from_argb(51, 0, 0, 0),
+                tool_tip_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                tool_tip_border_theme_brush: Color::from_argb(255, 128, 128, 128),
+                tool_tip_foreground_theme_brush: Color::from_argb(255, 102, 102, 102),
+                tool_tip_foreground_brush: Color::from_argb(255, 255, 255, 255),
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const TOOL_TIP_BORDER_PADDING: [f64; 4] = [9.0, 6.0, 9.0, 8.0];
+pub const TOOL_TIP_MAX_WIDTH: f64 = 320.0;
+pub const TOOL_TIP_CONTENT_THEME_FONT_SIZE: f64 = 12.0;
+/// Left, top, right, bottom.
+pub const TOOL_TIP_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
 /// Theme-dependent resources of `TextBlock_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct TextBlockResources {}

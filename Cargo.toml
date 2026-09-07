@@ -14,7 +14,6 @@ unsafe_code = "forbid"
 [workspace.dependencies]
 reveal-winui = { path = "crates/reveal-winui" }
 reveal-animation = { path = "../reveal-rs/crates/reveal-animation" }
-reveal-cupertino = { path = "../reveal-rs/crates/reveal-cupertino" }
 reveal-embedder = { path = "../reveal-rs/crates/reveal-embedder" }
 reveal-embedder-winit = { path = "../reveal-rs/crates/reveal-embedder-winit" }
 reveal-foundation = { path = "../reveal-rs/crates/reveal-foundation" }

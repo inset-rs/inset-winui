@@ -5,7 +5,7 @@ use common::Fixture;
 
 #[test]
 fn gallery_renders_activates_and_switches_theme() {
-    let mut fixture = Fixture::new([900, 640]);
+    let mut fixture = Fixture::new([900, 2000]);
     fixture.capture("light");
     fixture.tap("Standard");
     fixture.find("Clicked 1 times · wifi true · airplane false");
