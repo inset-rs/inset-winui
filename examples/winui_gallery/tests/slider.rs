@@ -92,10 +92,11 @@ fn slider_presses_drags_snaps_and_switches_theme() {
     fixture.capture("slider_dark");
 }
 
-/// A mouse press focuses the slider, which shows the focus ring mid-press; the drag that follows must still reach the slider (the pointer's hit-test path is cached at the press).
+/// A mouse drag updates the value and tooltip while leaving keyboard focus unchanged.
 #[test]
-fn mouse_drag_keeps_moving_the_thumb_after_focus_arrives() {
+fn mouse_drag_updates_the_thumb_without_acquiring_focus() {
     let mut fixture = Fixture::for_feature([900, 2600], winui_gallery::Feature::Slider);
+    let focus = reveal_widgets::primary_focus(&mut fixture.cell.borrow_mut());
     fixture.find("Slider: 42 · stepped 50 · vertical 30");
     let volume = label_bounds(&fixture, "Volume");
     let thumb = track_point(volume, 0.42);
@@ -124,4 +125,8 @@ fn mouse_drag_keeps_moving_the_thumb_after_focus_arrives() {
     fixture.send_mouse(PointerChange::Up, end, 0);
     fixture.pump();
     fixture.find("Slider: 62 · stepped 50 · vertical 30");
+    assert_eq!(
+        reveal_widgets::primary_focus(&mut fixture.cell.borrow_mut()),
+        focus,
+    );
 }

@@ -58,8 +58,12 @@ fn virtualized(axis: Axis) -> (Fixture, Probe) {
                     .scroll_direction(axis)
                     .controller(native)
                     .padding(EdgeInsetsGeometry::ZERO);
-                    ThemeScope::new(Theme::Light, ScrollMetricsObserver::new(controller, list))
-                        .into_widget()
+                    FocusScope::new(ThemeScope::new(
+                        Theme::Light,
+                        ScrollMetricsObserver::new(controller, list),
+                    ))
+                    .autofocus(true)
+                    .into_widget()
                 })
                 .into_widget(),
         );
@@ -141,7 +145,7 @@ fn native_mouse_wheel_and_keyboard_scroll_the_same_controller() {
     assert_eq!(controller.metrics(&f.cell.borrow()).offset, 100.0);
     controller.change_view(&mut f.cell.borrow_mut(), 0.0, true);
     settle(&mut f);
-    f.tap("Item 0");
+    f.focus("Item 0");
     for event in [
         KeyEvent::Down(KeyDownEvent::new(
             PhysicalKeyboardKey::PAGE_DOWN,

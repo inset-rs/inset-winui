@@ -10,7 +10,11 @@ Ported against: aa3207e6
 
 - Change: `CommonStates` uses native tap recognition instead of WinUI pointer capture.
   Reason: framework — Reveal resolves competing gestures through its gesture arena.
-  Affect: `CommonStates` cancels activation after movement beyond the tap threshold, even after the pointer returns inside, and starts focus on recognized tap-down.
+  Affect: `CommonStates` cancels activation after movement beyond the tap threshold, even after the pointer returns inside.
+
+- Change: `CommonStates` uses Reveal’s native focus-highlight policy.
+  Reason: framework — Flutter’s desktop focus policy groups mouse and keyboard input as traditional input.
+  Affect: `CommonStates` leaves keyboard focus where it was on a pointer click, as Flutter buttons do; keyboard traversal moves focus and shows its ring.
 
 ## color_transition.rs → `BrushTransition`
 

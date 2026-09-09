@@ -52,6 +52,10 @@ pub enum FluentSymbol {
     TextFont,
     /// A collection of symbols or features.
     Apps,
+    /// Switch to a dark theme.
+    WeatherMoon,
+    /// Switch to a light theme.
+    WeatherSunny,
     /// Add a tab or item.
     Add,
     /// Close a tab or dismiss a surface.
@@ -95,6 +99,8 @@ impl FluentSymbol {
             Self::ArrowRepeatAll => 61809,
             Self::TextFont => 63460,
             Self::Apps => 61747,
+            Self::WeatherMoon => 63613,
+            Self::WeatherSunny => 63649,
             Self::Add => 61704,
             Self::Dismiss => 62312,
             Self::ChevronLeft => 62121,

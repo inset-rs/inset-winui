@@ -224,9 +224,6 @@ impl RepeatButtonState {
         if !self.widget(app).is_enabled || event.buttons != K_PRIMARY_BUTTON {
             return;
         }
-        if let Some(node) = app.get(self).focus_node {
-            node.request_focus(app, None);
-        }
         self.set_state(app, |state| {
             state.pointer_over = true;
             state.pressed = true;

@@ -222,8 +222,6 @@ impl State for ToggleSwitchState {
         if is_enabled {
             tapped = tapped.on_tap(Listener::new(move |app| {
                 if !app.get(self).is_dragging {
-                    let node = app.get(self).focus_node.unwrap();
-                    node.request_focus(app, None);
                     self.toggle(app);
                 }
             }));
@@ -283,8 +281,6 @@ impl ToggleSwitchState {
 
     /// `DragStartedHandler`: the drag begins where the state left the knob (`GetTranslations`), shown pressed (`UpdateVisualState`).
     fn drag_started(self: Handle<Self>, app: &mut App) {
-        let node = app.get(self).focus_node.unwrap();
-        node.request_focus(app, None);
         let is_on = self.widget(app).is_on;
         self.set_state(app, |state| {
             state.is_dragging = true;

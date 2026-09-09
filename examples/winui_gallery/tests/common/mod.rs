@@ -235,6 +235,52 @@ impl Fixture {
         drop(app);
         self.cell.checkpoint();
     }
+
+    /// Traverses with Tab presses until the named control owns keyboard focus.
+    pub fn focus(&mut self, text: &str) {
+        use reveal_services::{
+            HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey,
+            PhysicalKeyboardKey,
+        };
+        let elements = self.onstage_elements();
+        let mut app = self.cell.borrow_mut();
+        let context = elements
+            .into_iter()
+            .find(|element| {
+                element
+                    .render_object(&app)
+                    .and_then(|object| object.downcast::<RenderParagraph>(&app))
+                    .is_some_and(|paragraph| paragraph.text(&app).to_plain_text(true, true) == text)
+            })
+            .unwrap_or_else(|| panic!("missing label {text}"));
+        let target = reveal_widgets::Focus::of(&mut app, context, false, false);
+        drop(app);
+        for _ in 0..100 {
+            if reveal_widgets::primary_focus(&mut self.cell.borrow_mut()) == Some(target) {
+                return;
+            }
+            for event in [
+                KeyEvent::Down(KeyDownEvent::new(
+                    PhysicalKeyboardKey::TAB,
+                    LogicalKeyboardKey::TAB,
+                    self.at,
+                )),
+                KeyEvent::Up(KeyUpEvent::new(
+                    PhysicalKeyboardKey::TAB,
+                    LogicalKeyboardKey::TAB,
+                    self.at,
+                )),
+            ] {
+                let mut app = self.cell.borrow_mut();
+                HardwareKeyboard::instance(&mut app).handle_key_event(&mut app, &event);
+                drop(app);
+                self.cell.checkpoint();
+            }
+            self.pump();
+        }
+        panic!("Tab traversal did not reach {text}");
+    }
+
     pub fn tap(&mut self, text: &str) {
         let p = self.find(text);
         self.send(PointerChange::Down, p);

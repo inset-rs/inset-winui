@@ -376,6 +376,11 @@ impl NavigationViewItemPresenter {
             .icon
             .clone()
             .unwrap_or_else(|| SizedBox::shrink().into_widget());
+        // IconBox scales the unconstrained content uniformly, as the source Viewbox does.
+        let mut icon_box = SizedBox::new().height(16.0);
+        if (top && self.item.has_content) || overflow {
+            icon_box = icon_box.width(16.0);
+        }
         let icon = SizedBox::new().width(icon_width).child(
             Align::new()
                 .alignment(if (top && self.item.has_content) || overflow {
@@ -383,7 +388,7 @@ impl NavigationViewItemPresenter {
                 } else {
                     Alignment::CENTER.into()
                 })
-                .child(SizedBox::new().width(16.0).height(16.0).child(icon)),
+                .child(icon_box.child(FittedBox::new().child(icon))),
         );
         let margin = if compact {
             NAVIGATION_VIEW_COMPACT_ITEM_CONTENT_PRESENTER_MARGIN

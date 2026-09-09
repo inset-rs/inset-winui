@@ -1451,6 +1451,7 @@ impl NavigationViewState {
         callback: Listener,
         enabled: bool,
         tooltip: &str,
+        focus_margin: [f64; 4],
     ) -> WidgetRef {
         ToolTipService::new(
             Button::new(
@@ -1460,7 +1461,9 @@ impl NavigationViewState {
                 callback,
             )
             .is_enabled(enabled)
-            .template(navigation_button_template),
+            .template(move |app, context, states, content| {
+                navigation_button_template(app, context, states, content, focus_margin)
+            }),
             ToolTip::text(tooltip),
         )
         .into_widget()
@@ -1506,6 +1509,7 @@ impl NavigationViewState {
                 }),
                 true,
                 "Search",
+                [-4.0, 0.0, -4.0, 0.0],
             );
             Column::new()
                 .main_axis_size(MainAxisSize::Min)
@@ -1953,6 +1957,7 @@ impl NavigationViewState {
             }),
             true,
             "More",
+            [0.0; 4],
         );
         let popup = IntrinsicWidth::new().child(
             Column::new()
@@ -2347,6 +2352,7 @@ fn navigation_button_template(
     context: BuildContext,
     states: ControlStates,
     content: WidgetRef,
+    focus_margin: [f64; 4],
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
     let r = resources.navigation_view();
@@ -2362,7 +2368,7 @@ fn navigation_button_template(
         CommonState::Disabled => (Color::new(0), r.navigation_view_button_foreground_disabled),
         _ => (Color::new(0), r.navigation_view_item_foreground),
     };
-    Padding::new(EdgeInsetsGeometry::only(4.0, 2.0, 4.0, 2.0))
+    let content = Padding::new(EdgeInsetsGeometry::only(4.0, 2.0, 4.0, 2.0))
         .child(
             SizedBox::new()
                 .width(PANE_TOGGLE_BUTTON_WIDTH)
@@ -2376,6 +2382,11 @@ fn navigation_button_template(
                         ))),
                 ),
         )
+        .into_widget();
+    FocusVisual::new(content, resources.theme)
+        .visible(states.focused)
+        .margin(focus_margin)
+        .corner_radius(CONTROL_CORNER_RADIUS[0])
         .into_widget()
 }
 

@@ -481,9 +481,6 @@ impl SliderState {
             };
         });
         let point = event.local_position();
-        if let Some(node) = app.get(self).focus_node {
-            node.request_focus(app, None);
-        }
         if self.hits_thumb(app, point) {
             // `OnThumbDragStarted`: the drag accumulates from the current value.
             let value = self.widget(app).range().value;

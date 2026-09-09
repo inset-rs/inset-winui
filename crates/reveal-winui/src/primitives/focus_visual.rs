@@ -1,4 +1,4 @@
-//! XAML's system focus visual (`UseSystemFocusVisuals="True"`): a two-pixel primary ring outside the control with a one-pixel secondary ring inside it, offset by the control's `FocusVisualMargin`, shown for keyboard focus only.
+//! XAML's system focus visual (`UseSystemFocusVisuals="True"`): a two-pixel primary ring outside the control with a one-pixel secondary ring inside it, offset by the control's `FocusVisualMargin`, shown when the control requests a focus highlight.
 
 use crate::{Brush, Theme};
 use reveal_embedder::{Canvas, Color, Offset, RRect, Radius, Size};

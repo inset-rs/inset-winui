@@ -246,11 +246,13 @@ struct TabContainer {
 impl TabContainer {
     /// Creates identity and focus handles without realizing the header or page.
     fn new(app: &mut App, id: &str) -> Self {
+        let content_focus = FocusScopeNode::new(app);
+        content_focus.set_traversal_edge_behavior(app, TraversalEdgeBehavior::ParentScope);
         Self {
             key: Rc::new(GlobalKey::labeled(format!("Tab {id}"))),
             tab_focus: FocusNode::new(app).as_node(),
             close_focus: FocusNode::new(app).as_node(),
-            content_focus: FocusScopeNode::new(app),
+            content_focus,
         }
     }
 
@@ -1188,9 +1190,8 @@ impl TabViewState {
                     .offstage(!selected)
                     .child(TickerMode::new(
                         selected,
-                        FocusScope::new(item.content.clone())
-                            .node(scope)
-                            .descendants_are_focusable(selected),
+                        ExcludeFocus::new(FocusScope::new(item.content.clone()).node(scope))
+                            .excluding(!selected),
                     ))
                     .key(Rc::new(ValueKey::new(item.id.clone())))
                     .into_widget()

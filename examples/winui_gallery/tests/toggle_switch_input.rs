@@ -20,11 +20,12 @@ fn send(fixture: &mut Fixture, key: LogicalKeyboardKey, physical: PhysicalKeyboa
 }
 
 #[test]
-fn switch_click_focuses_and_space_toggles_once_on_release() {
+fn keyboard_focused_switch_toggles_once_on_space_release() {
     let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::ToggleSwitch);
     fixture.ensure_visible("Airplane mode off");
     fixture.tap("Airplane mode off");
     fixture.find("Clicked 0 times · wifi true · airplane true");
+    fixture.focus("Airplane mode on");
     send(
         &mut fixture,
         LogicalKeyboardKey::SPACE,
@@ -58,6 +59,7 @@ fn switch_click_focuses_and_space_toggles_once_on_release() {
     }
     // Arrow navigation may have moved focus to a different control.
     fixture.tap("Airplane mode off");
+    fixture.focus("Airplane mode on");
     send(
         &mut fixture,
         LogicalKeyboardKey::GAME_BUTTON_A,
@@ -79,6 +81,7 @@ fn another_key_cancels_pending_space() {
     let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::ToggleSwitch);
     fixture.ensure_visible("Airplane mode off");
     fixture.tap("Airplane mode off");
+    fixture.focus("Airplane mode on");
     send(
         &mut fixture,
         LogicalKeyboardKey::SPACE,

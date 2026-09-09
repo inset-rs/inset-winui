@@ -201,7 +201,7 @@ fn losing_focus_cancels_a_held_button() {
 }
 
 #[test]
-fn a_mouse_click_focuses_the_button_for_subsequent_keyboard_activation() {
+fn a_mouse_click_leaves_focus_for_keyboard_navigation() {
     let mut fixture = Fixture::new(true);
     for change in [PointerChange::Add, PointerChange::Down, PointerChange::Up] {
         let mut app = fixture.cell.borrow_mut();
@@ -219,15 +219,17 @@ fn a_mouse_click_focuses_the_button_for_subsequent_keyboard_activation() {
         );
     }
     fixture.pump();
-    let node = fixture.node();
     {
         let mut app = fixture.cell.borrow_mut();
-        assert_eq!(
-            FocusManager::instance(&mut app).primary_focus(&app),
-            Some(node)
+        assert!(
+            FocusManager::instance(&mut app)
+                .primary_focus(&app)
+                .is_none()
         );
     }
     assert_eq!(fixture.clicks.get(), 1);
+    assert!(!fixture.states.get().focused);
+    fixture.focus();
     fixture.key(0, LogicalKeyboardKey::SPACE);
     fixture.key(2, LogicalKeyboardKey::SPACE);
     assert_eq!(fixture.clicks.get(), 2);

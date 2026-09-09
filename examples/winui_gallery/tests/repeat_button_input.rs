@@ -27,9 +27,10 @@ fn hold(fixture: &mut Fixture, millis: u64) {
 }
 
 #[test]
-fn pointer_focus_space_repeats_and_enter_clicks_once() {
+fn keyboard_focus_space_repeats_and_enter_clicks_once() {
     let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::RepeatButton);
     fixture.tap("Hold me");
+    fixture.focus("Hold me");
     fixture.find("RepeatButton: 1 clicks");
     send(
         &mut fixture,
@@ -102,6 +103,7 @@ fn pointer_focus_space_repeats_and_enter_clicks_once() {
 fn focus_loss_and_another_key_cancel_keyboard_repetition() {
     let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::RepeatButton);
     fixture.tap("Hold me");
+    fixture.focus("Hold me");
     send(
         &mut fixture,
         LogicalKeyboardKey::SPACE,
@@ -134,7 +136,7 @@ fn focus_loss_and_another_key_cancel_keyboard_repetition() {
         PhysicalKeyboardKey::SPACE,
         0,
     );
-    fixture.tap("Dark theme");
+    fixture.focus("Dark theme");
     hold(&mut fixture, 700);
     fixture.find("RepeatButton: 3 clicks");
     send(

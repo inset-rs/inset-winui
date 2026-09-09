@@ -184,7 +184,7 @@ pub(super) fn pane_toggle_template(
         ),
     };
     let margin = NAVIGATION_VIEW_ITEM_BUTTON_MARGIN;
-    Padding::new(EdgeInsetsGeometry::only(
+    let content = Padding::new(EdgeInsetsGeometry::only(
         margin[0], margin[1], margin[2], margin[3],
     ))
     .child(
@@ -220,7 +220,11 @@ pub(super) fn pane_toggle_template(
                 ]),
         ),
     )
-    .into_widget()
+    .into_widget();
+    FocusVisual::new(content, resources.theme)
+        .visible(states.focused)
+        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .into_widget()
 }
 
 /// NavigationBackButtonNormalStyle and SmallStyle differ only in their outer margin.
@@ -256,7 +260,7 @@ pub(super) fn back_button_template(
             r.navigation_view_item_foreground,
         ),
     };
-    Padding::new(EdgeInsetsGeometry::only(
+    let content = Padding::new(EdgeInsetsGeometry::only(
         4.0,
         2.0,
         if small { 0.0 } else { 4.0 },
@@ -278,5 +282,10 @@ pub(super) fn back_button_template(
                         .into_widget()]),
             ),
     )
-    .into_widget()
+    .into_widget();
+    FocusVisual::new(content, resources.theme)
+        .visible(states.focused)
+        .margin(BUTTON_FOCUS_VISUAL_MARGIN)
+        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .into_widget()
 }

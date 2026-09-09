@@ -333,8 +333,7 @@ fn pointer_reorder_preserves_selection_page_and_emits_no_external_events_by_defa
 fn keyboard_reorder_is_scoped_to_header_and_preserves_focused_identity() {
     let (mut f, p) = fixture(3);
     settle(&mut f);
-    let first = f.find("Tab 0");
-    click(&mut f, first);
+    f.focus("Tab 0");
     key(
         &mut f,
         true,
@@ -620,6 +619,7 @@ fn control_tab_moves_page_focus_and_close_recovers_adjacent_header_focus() {
     settle(&mut f);
     let page = f.find("Page 0 count 0");
     click(&mut f, page);
+    f.focus("Page 0 count 1");
     control_key(
         &mut f,
         PhysicalKeyboardKey::TAB,
@@ -662,9 +662,11 @@ fn control_tab_moves_page_focus_and_close_recovers_adjacent_header_focus() {
     f.find("Page 0 count 2");
     let tab = f.find("Tab 1");
     click(&mut f, tab);
+    f.focus("Tab 1");
     let adjacent_focus = primary_focus(&mut f.cell.borrow_mut());
     let tab = f.find("Tab 2");
     click(&mut f, tab);
+    f.focus("Tab 2");
     control_key(
         &mut f,
         PhysicalKeyboardKey::F4,
@@ -677,6 +679,7 @@ fn control_tab_moves_page_focus_and_close_recovers_adjacent_header_focus() {
     // Closing the last selected page while its content owns focus requires the deferred selection update.
     let page = f.find("Page 1 count 1");
     click(&mut f, page);
+    f.focus("Page 1 count 2");
     control_key(
         &mut f,
         PhysicalKeyboardKey::F4,

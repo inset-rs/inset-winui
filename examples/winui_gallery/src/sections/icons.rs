@@ -8,7 +8,7 @@ use reveal_widgets::*;
 use reveal_winui::*;
 
 /// Named symbols available to controls and gallery navigation.
-const SYMBOLS: [(FluentSymbol, &str); 26] = [
+const SYMBOLS: [(FluentSymbol, &str); 28] = [
     (FluentSymbol::CursorClick, "Cursor click"),
     (FluentSymbol::ToggleLeft, "Toggle"),
     (FluentSymbol::CheckboxChecked, "Checked"),
@@ -24,6 +24,8 @@ const SYMBOLS: [(FluentSymbol, &str); 26] = [
     (FluentSymbol::ArrowRepeatAll, "Repeat"),
     (FluentSymbol::TextFont, "Text"),
     (FluentSymbol::Apps, "Apps"),
+    (FluentSymbol::WeatherMoon, "Moon"),
+    (FluentSymbol::WeatherSunny, "Sun"),
     (FluentSymbol::Add, "Add"),
     (FluentSymbol::Dismiss, "Dismiss"),
     (FluentSymbol::ChevronLeft, "Chevron left"),

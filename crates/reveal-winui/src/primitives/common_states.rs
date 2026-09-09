@@ -1,4 +1,4 @@
-//! XAML's `CommonStates` visual state group (`Normal`, `PointerOver`, `Pressed`, `Disabled`) as the framework machinery that computes it from the pointer, plus keyboard focus for the system focus visual.
+//! XAML's `CommonStates` visual state group (`Normal`, `PointerOver`, `Pressed`, `Disabled`) as the framework machinery that computes it from the pointer, plus native focus highlighting for the system focus visual.
 
 use reveal_foundation::{App, Handle, Listener};
 use reveal_rendering::HitTestBehavior;
@@ -17,7 +17,7 @@ pub enum CommonState {
     Disabled,
 }
 
-/// What the state tracker knows: the common state and whether the keyboard focus visual shows.
+/// What the state tracker knows: the common state and whether the native focus highlight shows.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct ControlStates {
     pub common: CommonState,
@@ -68,7 +68,7 @@ impl CommonStates {
         self
     }
 
-    /// XAML `IsTabStop`; pointer and programmatic focus remain available.
+    /// XAML `IsTabStop`; programmatic focus remains available when traversal skips the control.
     pub fn is_tab_stop(mut self, value: bool) -> Self {
         self.is_tab_stop = value;
         self
@@ -317,9 +317,6 @@ impl State for CommonStatesData {
         if widget.is_enabled {
             gesture = gesture
                 .on_tap_down(Rc::new(move |app, _| {
-                    if let Some(node) = app.get(self).focus_node {
-                        node.request_focus(app, None);
-                    }
                     self.set_state(app, |state| {
                         state.pointer_down = true;
                         state.pressed = true;

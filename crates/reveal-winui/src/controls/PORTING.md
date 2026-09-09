@@ -2,7 +2,11 @@
 WinUI home: controls/dev/CommonStyles (templates), dxaml/xcp/dxaml/lib (`<Control>_Partial.cpp`), dxaml/xcp/core/core/elements
 Ported against: aa3207e6
 
-## mod.rs → caller-owned control values and events
+## mod.rs → shared control conventions
+
+- Change: `Button`, `CheckBox`, `RadioButton`, `ToggleButton`, `HyperlinkButton`, `RepeatButton`, `ToggleSwitch`, `Slider`, and navigation and tab item click handlers do not request keyboard focus on pointer activation.
+  Reason: framework — Flutter controls separate pointer activation from focus acquisition, and Reveal's native focus policy is used for this port.
+  Affect: These controls acquire focus and its highlight through keyboard traversal; a pointer click leaves any existing keyboard focus highlight in place.
 
 - Change: Public controls keep their values in the caller, and control events report requested values through closures.
   Reason: language — Rust has no XAML dependency-property writeback.

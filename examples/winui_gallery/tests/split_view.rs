@@ -186,7 +186,11 @@ fn fixture() -> (Fixture, Probe) {
             app,
             WidgetsApp::new(AccentPalette::default().base)
                 .debug_show_checked_mode_banner(false)
-                .builder(move |_, _, _| Overlay::new().initial_entries([entry]).into_widget())
+                .builder(move |_, _, _| {
+                    FocusScope::new(Overlay::new().initial_entries([entry]))
+                        .autofocus(true)
+                        .into_widget()
+                })
                 .into_widget(),
         );
     });
@@ -388,6 +392,7 @@ fn pane_state_survives_collapsing_and_auto_length_measures_its_child() {
 fn overlay_focus_returns_to_content_after_escape() {
     let (mut f, p) = fixture();
     f.tap("Content action");
+    f.focus("Content action");
     assert_eq!(p.content_clicks.get(), 1);
     update(&mut f, &p, |s| s.open = true);
     settle(&mut f);
@@ -473,6 +478,7 @@ fn resizing_an_open_overlay_uses_the_cancelable_dismissal_path() {
 fn changing_open_display_mode_restores_focus_without_reopening_the_pane() {
     let (mut f, p) = fixture();
     f.tap("Content action");
+    f.focus("Content action");
     update(&mut f, &p, |s| s.open = true);
     settle(&mut f);
     p.events.borrow_mut().clear();

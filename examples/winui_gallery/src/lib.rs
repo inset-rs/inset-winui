@@ -5,7 +5,7 @@ mod sections;
 pub use catalog::Feature;
 
 use reveal_embedder::Color;
-use reveal_foundation::{App, Handle, Listener, ValueKey};
+use reveal_foundation::{App, Handle, ValueKey};
 use reveal_painting::{Axis, EdgeInsetsGeometry, PaintingBinding};
 use reveal_rendering::{CrossAxisAlignment, MainAxisSize, StackFit};
 use reveal_widgets::*;
@@ -38,24 +38,22 @@ pub fn run(app: &mut App) {
 /// Starts the same gallery at a chosen feature, useful for focused host tests.
 pub fn run_feature(app: &mut App, feature: Feature) {
     install_fonts(app);
-    let page = OverlayEntry::new(
-        app,
-        Rc::new(move |_, _| {
-            Gallery {
-                initial_feature: feature,
-            }
-            .into_widget()
-        }),
-        false,
-        true,
-        false,
-    );
     run_app(
         app,
         WidgetsApp::new(AccentPalette::default().base)
             .title("WinUI Gallery")
             .debug_show_checked_mode_banner(false)
-            .builder(move |_, _, _| Overlay::new().initial_entries([page]).into_widget())
+            .page_route_builder(|app, settings, builder| {
+                let route = PageRouteBuilder::new(
+                    app,
+                    Rc::new(move |app, context, _, _| builder(app, context)),
+                )
+                .settings(app, RouteSettingsRef::Settings(settings.clone()));
+                PageRoute::as_page_route(route)
+            })
+            .home(Gallery {
+                initial_feature: feature,
+            })
             .into_widget(),
     );
 }
@@ -322,14 +320,24 @@ impl State for GalleryState {
             TextBlockStyle::Title,
             resources.common.text_fill_color_primary,
         ));
-        navigation.pane_footer = Some(
-            Padding::new(EdgeInsetsGeometry::all(16.0))
-                .child(Button::text(
+        navigation = navigation
+            .footer_menu_items(vec![
+                NavigationViewItem::text(
+                    "gallery-theme",
                     if dark { "Light theme" } else { "Dark theme" },
-                    Listener::new(move |app| self.set_state(app, |state| state.dark = !state.dark)),
-                ))
-                .into_widget(),
-        );
+                )
+                .icon(FluentIcon::new(if dark {
+                    FluentSymbol::WeatherSunny
+                } else {
+                    FluentSymbol::WeatherMoon
+                }))
+                .selects_on_invoked(false),
+            ])
+            .item_invoked(move |app, args| {
+                if args.item.id == "gallery-theme" {
+                    self.set_state(app, |state| state.dark = !state.dark);
+                }
+            });
         ThemeScope::new(
             theme,
             ColoredBox::new(resources.common.solid_background_fill_color_base).child(navigation),

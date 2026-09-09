@@ -113,7 +113,13 @@ pub(super) fn paint_acrylic(canvas: &mut Canvas, bounds: Rect, resources: Acryli
     canvas.save_layer_backdrop(
         Some(bounds.into()),
         &Paint::default(),
-        Backdrop::blur(30.0).background_color(fallback.into()),
+        Backdrop::new(reveal_embedder::valo::ImageFilter::compose(
+            reveal_embedder::valo::ImageFilter::blur(30.0, 30.0),
+            reveal_embedder::valo::ImageFilter::color(reveal_embedder::valo::ColorFilter::Blend(
+                fallback.into(),
+                BlendMode::DstOver,
+            )),
+        )),
     );
     // The Windows effect enum names are swapped by a documented compositor bug.
     // These are the semantic modes described by CombineNoiseWithTintEffect_Luminosity.

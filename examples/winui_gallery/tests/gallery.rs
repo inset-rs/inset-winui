@@ -144,3 +144,60 @@ fn navigation_demo_minimal_header_clears_back_and_toggle_buttons() {
     drop(app);
     f.capture("gallery_navigation_minimal_header");
 }
+
+#[test]
+fn theme_footer_remains_usable_when_the_pane_is_collapsed() {
+    use reveal_embedder::{Offset, PointerChange};
+    use reveal_widgets::downcast_widget;
+    use reveal_winui::{FluentSymbol, NavigationView};
+
+    let mut fixture = Fixture::new([1080, 780]);
+    fixture.tap("Standard");
+    fixture.tap("Dark theme");
+    fixture.find("Light theme");
+    fixture.capture("gallery_theme_expanded");
+
+    let toggle = Offset::new(24.0, 24.0);
+    fixture.send(PointerChange::Down, toggle);
+    fixture.send(PointerChange::Up, toggle);
+    fixture.pump();
+    // The default 20px icon is laid out at its natural size, then scaled to IconBox.
+    let elements = fixture.elements();
+    {
+        let app = fixture.cell.borrow();
+        let element = elements
+            .iter()
+            .find(|element| {
+                downcast_widget::<reveal_winui::FluentIcon>(element.widget(&app).as_ref())
+                    .is_some_and(|icon| icon.symbol == FluentSymbol::WeatherSunny)
+            })
+            .unwrap();
+        let render = element.find_render_object(&app).unwrap().as_box().unwrap();
+        let size = render.size(&app);
+        assert!(
+            size.height() > 16.0,
+            "icon content must not be constrained to 16px"
+        );
+        let origin = render.local_to_global(&app, Offset::ZERO, None);
+        let bottom = render.local_to_global(&app, Offset::new(0.0, size.height()), None);
+        assert!((bottom.dy() - origin.dy() - 16.0).abs() < 0.01);
+    }
+    let icon = fixture.find(&FluentSymbol::WeatherSunny.glyph().to_string());
+    assert!(icon.dx() < 48.0, "theme icon must fit in the compact rail");
+    fixture.send(PointerChange::Down, icon);
+    fixture.send(PointerChange::Up, icon);
+    fixture.pump();
+    fixture.find(&FluentSymbol::WeatherMoon.glyph().to_string());
+    fixture.find("Clicked 1 times · wifi true · airplane false");
+    fixture.capture("gallery_theme_compact");
+
+    let elements = fixture.elements();
+    let app = fixture.cell.borrow();
+    let navigation = elements
+        .iter()
+        .find_map(|element| downcast_widget::<NavigationView>(element.widget(&app).as_ref()))
+        .unwrap();
+    assert_eq!(navigation.selected_item.as_deref(), Some("Button"));
+    assert!(navigation.pane_footer.is_none());
+    assert!(!navigation.footer_menu_items[0].selects_on_invoked);
+}
