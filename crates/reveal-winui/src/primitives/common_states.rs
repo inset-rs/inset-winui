@@ -27,6 +27,9 @@ pub struct ControlStates {
 /// Builds the control's template for the current states.
 pub type StatesBuilder = Rc<dyn Fn(&mut App, BuildContext, ControlStates) -> WidgetRef>;
 
+/// Observes a ButtonBase.IsPressed transition.
+pub type PressedChangedCallback = Rc<dyn Fn(&mut App, bool)>;
+
 /// Tracks pointer over, press, keyboard activation and focus for a control and runs `click` on activation; the `ButtonBase` of XAML.
 #[derive(Clone)]
 pub struct CommonStates {
@@ -39,6 +42,8 @@ pub struct CommonStates {
     pub focus_node: Option<AnyFocusNode>,
     /// `ButtonBase::SetAcceptsReturn`: whether Enter activates as Space does. `ButtonBase::Initialize` sets it; `CheckBox` and `RadioButton` clear it.
     pub accepts_return: bool,
+    /// Observes ButtonBase.IsPressed transitions after the state has changed.
+    pub pressed_changed: Option<PressedChangedCallback>,
     pub key: Option<KeyRef>,
 }
 
@@ -54,6 +59,7 @@ impl CommonStates {
             is_tab_stop: true,
             focus_node: None,
             accepts_return: true,
+            pressed_changed: None,
             key: None,
         }
     }
@@ -77,6 +83,12 @@ impl CommonStates {
     /// Uses a caller-owned node; the caller disposes it after this widget unmounts.
     pub fn focus_node(mut self, node: AnyFocusNode) -> Self {
         self.focus_node = Some(node);
+        self
+    }
+
+    /// Observes the source IsPressed property without taking focus from the editor.
+    pub fn pressed_changed(mut self, callback: impl Fn(&mut App, bool) + 'static) -> Self {
+        self.pressed_changed = Some(Rc::new(callback));
         self
     }
 
@@ -130,8 +142,20 @@ impl StatefulWidget for CommonStates {
 }
 
 impl CommonStatesData {
+    /// Publishes IsPressed changes after updating the visual state.
+    fn update_states(self: Handle<Self>, app: &mut App, change: impl FnOnce(&mut Self)) {
+        let old_pressed = app.get(self).pressed;
+        self.set_state(app, change);
+        let pressed = app.get(self).pressed;
+        if old_pressed != pressed
+            && let Some(callback) = self.widget(app).pressed_changed.clone()
+        {
+            callback(app, pressed);
+        }
+    }
+
     fn clear_state_flags(self: Handle<Self>, app: &mut App) {
-        self.set_state(app, |state| {
+        self.update_states(app, |state| {
             state.pressed = false;
             state.pointer_down = false;
             state.space_or_enter_key_down = false;
@@ -160,14 +184,14 @@ impl CommonStatesData {
                         && !state.space_or_enter_key_down
                         && !state.gamepad_a_key_down
                     {
-                        self.set_state(app, |state| {
+                        self.update_states(app, |state| {
                             state.space_or_enter_key_down = is_space_or_enter;
                             state.gamepad_a_key_down = !is_space_or_enter;
                             state.pressed = true;
                         });
                     }
                 } else if state.space_or_enter_key_down || state.gamepad_a_key_down {
-                    self.set_state(app, |state| {
+                    self.update_states(app, |state| {
                         state.pressed = false;
                         state.space_or_enter_key_down = false;
                         state.gamepad_a_key_down = false;
@@ -184,7 +208,7 @@ impl CommonStatesData {
                     if app.get(self).pressed {
                         self.activate(app);
                     }
-                    self.set_state(app, |state| state.pressed = false);
+                    self.update_states(app, |state| state.pressed = false);
                 }
             }
             KeyEvent::Up(_) => {}
@@ -317,13 +341,13 @@ impl State for CommonStatesData {
         if widget.is_enabled {
             gesture = gesture
                 .on_tap_down(Rc::new(move |app, _| {
-                    self.set_state(app, |state| {
+                    self.update_states(app, |state| {
                         state.pointer_down = true;
                         state.pressed = true;
                     })
                 }))
                 .on_tap_up(Rc::new(move |app, _| {
-                    self.set_state(app, |state| {
+                    self.update_states(app, |state| {
                         state.pointer_down = false;
                         if !state.space_or_enter_key_down && !state.gamepad_a_key_down {
                             state.pressed = false;
@@ -331,7 +355,7 @@ impl State for CommonStatesData {
                     })
                 }))
                 .on_tap_cancel(Listener::new(move |app| {
-                    self.set_state(app, |state| {
+                    self.update_states(app, |state| {
                         state.pointer_down = false;
                         state.pressed = false;
                     })
@@ -353,10 +377,10 @@ impl State for CommonStatesData {
             })
             .actions(app.get(self).actions.clone())
             .on_show_focus_highlight(move |app, value| {
-                self.set_state(app, |state| state.focused = value)
+                self.update_states(app, |state| state.focused = value)
             })
             .on_show_hover_highlight(move |app, value| {
-                self.set_state(app, |state| state.hovered = value)
+                self.update_states(app, |state| state.hovered = value)
             })
             .into_widget()
     }

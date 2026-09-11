@@ -18,3 +18,5 @@ pub mod acrylic;
 
 pub mod icons;
 pub mod typography;
+
+pub mod text_input;

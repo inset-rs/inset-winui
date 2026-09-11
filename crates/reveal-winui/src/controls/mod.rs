@@ -1,4 +1,10 @@
 mod button;
+mod text_box;
+mod password_box;
+mod text_control;
+mod text_edit_menu;
+pub use text_box::*;
+pub use password_box::*;
 mod check_box;
 mod grid;
 mod hyperlink_button;

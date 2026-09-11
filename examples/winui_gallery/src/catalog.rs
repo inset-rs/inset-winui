@@ -7,6 +7,10 @@ use reveal_winui::FluentSymbol;
 pub enum Feature {
     /// Standard, accent and disabled buttons.
     Button,
+    /// Plain and multiline text entry.
+    TextBox,
+    /// Concealed entry and password reveal modes.
+    PasswordBox,
     /// Switch content, headers and dragging.
     ToggleSwitch,
     /// Pixel, auto and star layout.
@@ -41,8 +45,10 @@ pub enum Feature {
 
 impl Feature {
     /// Display order in the navigation pane.
-    pub const ALL: [Self; 16] = [
+    pub const ALL: [Self; 18] = [
         Self::Button,
+        Self::TextBox,
+        Self::PasswordBox,
         Self::ToggleSwitch,
         Self::Grid,
         Self::CheckBox,
@@ -64,6 +70,8 @@ impl Feature {
     pub fn title(self) -> &'static str {
         match self {
             Self::Button => "Button",
+            Self::TextBox => "TextBox",
+            Self::PasswordBox => "PasswordBox",
             Self::ToggleSwitch => "ToggleSwitch",
             Self::Grid => "Grid",
             Self::CheckBox => "CheckBox",
@@ -86,6 +94,8 @@ impl Feature {
     pub fn symbol(self) -> FluentSymbol {
         match self {
             Self::Button => FluentSymbol::CursorClick,
+            Self::TextBox => FluentSymbol::TextField,
+            Self::PasswordBox => FluentSymbol::LockClosed,
             Self::ToggleSwitch => FluentSymbol::ToggleLeft,
             Self::Grid => FluentSymbol::Grid,
             Self::CheckBox => FluentSymbol::CheckboxChecked,
@@ -108,6 +118,8 @@ impl Feature {
     pub fn description(self) -> &'static str {
         match self {
             Self::Button => "Activate an action using the pointer or keyboard.",
+            Self::TextBox => "Enter and edit text, select words, and explore multiline input.",
+            Self::PasswordBox => "Enter a password and compare Peek, Hidden and Visible reveal modes.",
             Self::ToggleSwitch => "Switch settings on and off, or drag the thumb.",
             Self::Grid => "Arrange content with fixed, content-sized and proportional tracks.",
             Self::CheckBox => "Choose independent options, including an indeterminate state.",

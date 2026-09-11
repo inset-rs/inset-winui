@@ -39,8 +39,25 @@ impl View for CaptureView {
 }
 struct Host {
     view: Rc<CaptureView>,
+    /// In-memory platform clipboard for headless editing tests.
+    clipboard: RefCell<Option<String>>,
 }
 impl Platform for Host {
+    fn clipboard_set_data(&self, text: &str) {
+        *self.clipboard.borrow_mut() = Some(text.to_owned());
+    }
+
+    fn clipboard_get_data(&self) -> Option<String> {
+        self.clipboard.borrow().clone()
+    }
+
+    fn clipboard_has_strings(&self) -> bool {
+        self.clipboard
+            .borrow()
+            .as_ref()
+            .is_some_and(|text| !text.is_empty())
+    }
+
     fn target_platform(&self) -> TargetPlatform {
         TargetPlatform::MacOS
     }
@@ -66,6 +83,12 @@ pub struct Fixture {
     pub cell: Rc<AppCell>,
     pub view: Rc<CaptureView>,
     pub at: Duration,
+    /// Gesture identifiers increase on each down, as in the engine converter.
+    next_pointer: i64,
+    /// Identifier of the current touch gesture, shared with manually constructed packets.
+    pub touch_pointer: i64,
+    /// Identifier of the current mouse gesture, shared with manually constructed packets.
+    pub mouse_pointer: i64,
 }
 impl Fixture {
     /// Mounts the whole gallery.
@@ -93,7 +116,10 @@ impl Fixture {
             renderer: RefCell::new(Context::new(device, queue)),
             pixels: RefCell::new(Vec::new()),
         });
-        let cell = AppCell::with_platform(Rc::new(Host { view: view.clone() }));
+        let cell = AppCell::with_platform(Rc::new(Host {
+            view: view.clone(),
+            clipboard: RefCell::new(None),
+        }));
         {
             let mut app = cell.borrow_mut();
             reveal_painting::PaintingBinding::instance(&mut app).install_fonts(&mut app, |fonts| {
@@ -106,6 +132,9 @@ impl Fixture {
             cell,
             view,
             at: Duration::ZERO,
+            next_pointer: 0,
+            touch_pointer: 0,
+            mouse_pointer: 0,
         };
         result.pump();
         result
@@ -200,6 +229,10 @@ impl Fixture {
     }
 
     pub fn send(&mut self, change: PointerChange, point: Offset) {
+        if change == PointerChange::Down {
+            self.next_pointer += 1;
+            self.touch_pointer = self.next_pointer;
+        }
         let mut app = self.cell.borrow_mut();
         GestureBinding::instance(&mut app).handle_pointer_data_packet(
             &mut app,
@@ -207,7 +240,7 @@ impl Fixture {
                 change,
                 kind: PointerDeviceKind::Touch,
                 time_stamp: self.at,
-                pointer_identifier: 1,
+                pointer_identifier: self.touch_pointer,
                 physical_x: point.dx(),
                 physical_y: point.dy(),
                 ..Default::default()
@@ -218,6 +251,10 @@ impl Fixture {
     }
     /// A mouse event: hover moves have no buttons, a press and its moves carry the primary button.
     pub fn send_mouse(&mut self, change: PointerChange, point: Offset, buttons: i64) {
+        if change == PointerChange::Down {
+            self.next_pointer += 1;
+            self.mouse_pointer = self.next_pointer;
+        }
         let mut app = self.cell.borrow_mut();
         GestureBinding::instance(&mut app).handle_pointer_data_packet(
             &mut app,
@@ -225,7 +262,7 @@ impl Fixture {
                 change,
                 kind: PointerDeviceKind::Mouse,
                 time_stamp: self.at,
-                pointer_identifier: 7,
+                pointer_identifier: self.mouse_pointer,
                 physical_x: point.dx(),
                 physical_y: point.dy(),
                 buttons,

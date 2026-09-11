@@ -211,7 +211,7 @@ fn simple_viewport_receives_native_touch_drag_and_reports_its_content_extent() {
                 change: PointerChange::Move,
                 kind: PointerDeviceKind::Touch,
                 time_stamp: f.at,
-                pointer_identifier: 1,
+                pointer_identifier: f.touch_pointer,
                 physical_x: 100.0,
                 physical_y: y,
                 physical_delta_y: dy,

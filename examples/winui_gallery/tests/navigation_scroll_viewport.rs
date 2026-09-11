@@ -101,7 +101,7 @@ fn native_thumb_drag_and_track_press_change_the_same_controller() {
             PointerDataPacket::new(vec![PointerData {
                 change: PointerChange::Move,
                 kind: PointerDeviceKind::Mouse,
-                pointer_identifier: 7,
+                pointer_identifier: f.mouse_pointer,
                 physical_x: 254.0,
                 physical_y: y,
                 physical_delta_y: 20.0,

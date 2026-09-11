@@ -63,7 +63,7 @@ fn send_move(fixture: &mut Fixture, from: Offset, by: f64) -> Offset {
             change: PointerChange::Move,
             kind: PointerDeviceKind::Touch,
             time_stamp: fixture.at,
-            pointer_identifier: 1,
+            pointer_identifier: fixture.touch_pointer,
             physical_x: to.dx(),
             physical_y: to.dy(),
             physical_delta_x: by,

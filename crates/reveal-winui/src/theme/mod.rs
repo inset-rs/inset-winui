@@ -96,6 +96,16 @@ impl ThemeResources {
         ButtonResources::for_theme(self.theme, &self.accent)
     }
 
+    /// The text editor's brushes, including its focused elevation border.
+    pub fn text_box(&self) -> TextBoxResources {
+        TextBoxResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The password editor's shared text-control and reveal-button brushes.
+    pub fn password_box(&self) -> PasswordBoxResources {
+        PasswordBoxResources::for_theme(self.theme, &self.accent)
+    }
+
     pub fn toggle_switch(&self) -> ToggleSwitchResources {
         ToggleSwitchResources::for_theme(self.theme, &self.accent)
     }

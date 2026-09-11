@@ -203,6 +203,8 @@ impl GalleryState {
     ) -> WidgetRef {
         let examples = match feature {
             Feature::Button => sections::button::build(self, resources),
+            Feature::TextBox => sections::text_input::text_box(resources),
+            Feature::PasswordBox => sections::text_input::password_box(resources),
             Feature::ToggleSwitch => sections::toggle_switch::build(self, app, resources),
             Feature::Grid => sections::grid::build(resources),
             Feature::CheckBox => sections::check_box::build(resources),

@@ -425,6 +425,14 @@ pub const CONTROL_NORMAL_ANIMATION_DURATION: Duration = Duration::from_millis(25
 pub const CONTROL_FAST_ANIMATION_DURATION: Duration = Duration::from_millis(167);
 pub const CONTROL_FAST_ANIMATION_AFTER_DURATION: Duration = Duration::from_millis(168);
 pub const CONTROL_FASTER_ANIMATION_DURATION: Duration = Duration::from_millis(83);
+/// Left, top, right, bottom.
+pub const DATE_TIME_FLYOUT_BORDER_PADDING: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TEXT_CONTROL_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const TEXT_CONTROL_BORDER_THEME_THICKNESS_FOCUSED: [f64; 4] = [1.0, 1.0, 1.0, 2.0];
+/// Left, top, right, bottom.
+pub const TEXT_CONTROL_THEME_PADDING: [f64; 4] = [10.0, 5.0, 6.0, 6.0];
 /// Theme-dependent resources of `Button_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ButtonResources {
@@ -2690,6 +2698,8 @@ pub struct ToolTipResources {
     pub tool_tip_background_brush: AcrylicBrushResources,
     /// The resolved `SystemControlBackgroundChromeMediumLowBrush` resource.
     pub system_control_background_chrome_medium_low_brush: Color,
+    /// The resolved `AcrylicInAppFillColorDefaultBrush` resource.
+    pub acrylic_in_app_fill_color_default_brush: AcrylicBrushResources,
     /// The resolved `SystemControlForegroundBaseHighBrush` resource.
     pub system_control_foreground_base_high_brush: Color,
 }
@@ -2715,6 +2725,12 @@ impl ToolTipResources {
                 system_control_background_chrome_medium_low_brush: Color::from_argb(
                     255, 242, 242, 242,
                 ),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
                 system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
             },
             Theme::Dark => Self {
@@ -2734,6 +2750,12 @@ impl ToolTipResources {
                 system_control_background_chrome_medium_low_brush: Color::from_argb(
                     255, 43, 43, 43,
                 ),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
                 system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
             },
         }
@@ -3350,6 +3372,8 @@ pub struct ScrollBarResources {
     pub scroll_bar_thumb_background_color: Color,
     /// The resolved `ScrollBarPanningThumbBackgroundColor` resource.
     pub scroll_bar_panning_thumb_background_color: Color,
+    /// The resolved `AcrylicInAppFillColorDefaultBrush` resource.
+    pub acrylic_in_app_fill_color_default_brush: AcrylicBrushResources,
     /// The resolved `SystemControlTransparentBrush` resource.
     pub system_control_transparent_brush: Color,
     /// The resolved `SystemControlBackgroundListLowBrush` resource.
@@ -3477,6 +3501,12 @@ impl ScrollBarResources {
                 scroll_bar_track_border_theme_brush: Color::from_argb(89, 213, 213, 213),
                 scroll_bar_thumb_background_color: Color::from_argb(114, 0, 0, 0),
                 scroll_bar_panning_thumb_background_color: Color::from_argb(114, 0, 0, 0),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
                 system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
                 system_control_background_list_low_brush: Color::from_argb(25, 0, 0, 0),
                 system_control_background_base_medium_brush: Color::from_argb(153, 0, 0, 0),
@@ -3592,6 +3622,12 @@ impl ScrollBarResources {
                 scroll_bar_track_border_theme_brush: Color::from_argb(89, 213, 213, 213),
                 scroll_bar_thumb_background_color: Color::from_argb(139, 255, 255, 255),
                 scroll_bar_panning_thumb_background_color: Color::from_argb(139, 255, 255, 255),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
                 system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
                 system_control_background_list_low_brush: Color::from_argb(25, 255, 255, 255),
                 system_control_background_base_medium_brush: Color::from_argb(153, 255, 255, 255),
@@ -3774,6 +3810,8 @@ pub struct NavigationViewResources {
     pub navigation_view_button_foreground_pressed: Color,
     /// The resolved `NavigationViewButtonForegroundDisabled` resource.
     pub navigation_view_button_foreground_disabled: Color,
+    /// The resolved `AcrylicInAppFillColorDefaultBrush` resource.
+    pub acrylic_in_app_fill_color_default_brush: AcrylicBrushResources,
     /// The resolved `SystemControlTransparentBrush` resource.
     pub system_control_transparent_brush: Color,
     /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
@@ -3900,6 +3938,12 @@ impl NavigationViewResources {
                 navigation_view_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
                 navigation_view_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
                 navigation_view_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
                 system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
                 system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
                 system_control_highlight_list_low_reveal_background_brush: Color::from_argb(
@@ -4041,6 +4085,12 @@ impl NavigationViewResources {
                 ),
                 navigation_view_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
                 navigation_view_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
                 system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
                 system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
                 system_control_highlight_list_low_reveal_background_brush: Color::from_argb(
@@ -4190,6 +4240,8 @@ pub struct FlyoutPresenterResources {
     pub flyout_presenter_background: AcrylicBrushResources,
     /// The resolved `FlyoutBorderThemeBrush` resource.
     pub flyout_border_theme_brush: Color,
+    /// The resolved `AcrylicInAppFillColorDefaultBrush` resource.
+    pub acrylic_in_app_fill_color_default_brush: AcrylicBrushResources,
 }
 
 impl FlyoutPresenterResources {
@@ -4204,6 +4256,12 @@ impl FlyoutPresenterResources {
                     fallback_color: Color::from_argb(255, 249, 249, 249),
                 },
                 flyout_border_theme_brush: Color::from_argb(15, 0, 0, 0),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
             },
             Theme::Dark => Self {
                 flyout_presenter_background: AcrylicBrushResources {
@@ -4213,6 +4271,12 @@ impl FlyoutPresenterResources {
                     fallback_color: Color::from_argb(255, 44, 44, 44),
                 },
                 flyout_border_theme_brush: Color::from_argb(51, 0, 0, 0),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
             },
         }
     }
@@ -4234,6 +4298,16 @@ pub struct NavigationBackButtonResources {
     pub system_control_background_base_low_brush: Color,
     /// The resolved `NavigationViewItemForeground` resource.
     pub navigation_view_item_foreground: Color,
+    /// The resolved `NavigationViewButtonBackgroundPointerOver` resource.
+    pub navigation_view_button_background_pointer_over: Color,
+    /// The resolved `NavigationViewButtonForegroundPointerOver` resource.
+    pub navigation_view_button_foreground_pointer_over: Color,
+    /// The resolved `NavigationViewButtonBackgroundPressed` resource.
+    pub navigation_view_button_background_pressed: Color,
+    /// The resolved `NavigationViewButtonForegroundPressed` resource.
+    pub navigation_view_button_foreground_pressed: Color,
+    /// The resolved `NavigationViewButtonForegroundDisabled` resource.
+    pub navigation_view_button_foreground_disabled: Color,
 }
 
 impl NavigationBackButtonResources {
@@ -4243,15 +4317,1685 @@ impl NavigationBackButtonResources {
             Theme::Light => Self {
                 navigation_view_back_button_background: Color::from_argb(0, 255, 255, 255),
                 system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
-                navigation_view_item_foreground: Color::from_argb(255, 0, 0, 0),
+                navigation_view_item_foreground: Color::from_argb(228, 0, 0, 0),
+                navigation_view_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                navigation_view_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                navigation_view_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                navigation_view_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                navigation_view_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
             },
             Theme::Dark => Self {
                 navigation_view_back_button_background: Color::from_argb(0, 255, 255, 255),
                 system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
                 navigation_view_item_foreground: Color::from_argb(255, 255, 255, 255),
+                navigation_view_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                navigation_view_button_foreground_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                navigation_view_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                navigation_view_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                navigation_view_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
             },
         }
     }
 }
 pub const NAVIGATION_BACK_BUTTON_WIDTH: f64 = 40.0;
 pub const NAVIGATION_BACK_BUTTON_HEIGHT: f64 = 36.0;
+/// Theme-dependent resources of `TextBox_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct TextBoxResources {
+    /// The resolved `TextBoxForegroundHeaderThemeBrush` resource.
+    pub text_box_foreground_header_theme_brush: Color,
+    /// The resolved `TextBoxPlaceholderTextThemeBrush` resource.
+    pub text_box_placeholder_text_theme_brush: Color,
+    /// The resolved `TextBoxBackgroundThemeBrush` resource.
+    pub text_box_background_theme_brush: Color,
+    /// The resolved `TextBoxBorderThemeBrush` resource.
+    pub text_box_border_theme_brush: Color,
+    /// The resolved `TextBoxButtonBackgroundThemeBrush` resource.
+    pub text_box_button_background_theme_brush: Color,
+    /// The resolved `TextBoxButtonBorderThemeBrush` resource.
+    pub text_box_button_border_theme_brush: Color,
+    /// The resolved `TextBoxButtonForegroundThemeBrush` resource.
+    pub text_box_button_foreground_theme_brush: Color,
+    /// The resolved `TextBoxButtonPointerOverBackgroundThemeBrush` resource.
+    pub text_box_button_pointer_over_background_theme_brush: Color,
+    /// The resolved `TextBoxButtonPointerOverBorderThemeBrush` resource.
+    pub text_box_button_pointer_over_border_theme_brush: Color,
+    /// The resolved `TextBoxButtonPointerOverForegroundThemeBrush` resource.
+    pub text_box_button_pointer_over_foreground_theme_brush: Color,
+    /// The resolved `TextBoxButtonPressedBackgroundThemeBrush` resource.
+    pub text_box_button_pressed_background_theme_brush: Color,
+    /// The resolved `TextBoxButtonPressedBorderThemeBrush` resource.
+    pub text_box_button_pressed_border_theme_brush: Color,
+    /// The resolved `TextBoxButtonPressedForegroundThemeBrush` resource.
+    pub text_box_button_pressed_foreground_theme_brush: Color,
+    /// The resolved `TextBoxDisabledBackgroundThemeBrush` resource.
+    pub text_box_disabled_background_theme_brush: Color,
+    /// The resolved `TextBoxDisabledBorderThemeBrush` resource.
+    pub text_box_disabled_border_theme_brush: Color,
+    /// The resolved `TextBoxDisabledForegroundThemeBrush` resource.
+    pub text_box_disabled_foreground_theme_brush: Color,
+    /// The resolved `TextBoxForegroundThemeBrush` resource.
+    pub text_box_foreground_theme_brush: Color,
+    /// The resolved `TemporaryTextFillColorDisabled` resource.
+    pub temporary_text_fill_color_disabled: Color,
+    /// The resolved `TextControlBackground` resource.
+    pub text_control_background: Color,
+    /// The resolved `TextControlBackgroundPointerOver` resource.
+    pub text_control_background_pointer_over: Color,
+    /// The resolved `TextControlBackgroundFocused` resource.
+    pub text_control_background_focused: Color,
+    /// The resolved `TextControlBackgroundDisabled` resource.
+    pub text_control_background_disabled: Color,
+    /// The resolved `TextControlBorderBrush` resource.
+    pub text_control_border_brush: [(f64, Color); 2],
+    /// The resolved `TextControlBorderBrushPointerOver` resource.
+    pub text_control_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `TextControlBorderBrushFocused` resource.
+    pub text_control_border_brush_focused: [(f64, Color); 2],
+    /// The resolved `TextControlBorderBrushDisabled` resource.
+    pub text_control_border_brush_disabled: Color,
+    /// The resolved `TextControlForeground` resource.
+    pub text_control_foreground: Color,
+    /// The resolved `TextControlForegroundPointerOver` resource.
+    pub text_control_foreground_pointer_over: Color,
+    /// The resolved `TextControlForegroundFocused` resource.
+    pub text_control_foreground_focused: Color,
+    /// The resolved `TextControlForegroundDisabled` resource.
+    pub text_control_foreground_disabled: Color,
+    /// The resolved `TextControlPlaceholderForeground` resource.
+    pub text_control_placeholder_foreground: Color,
+    /// The resolved `TextControlPlaceholderForegroundPointerOver` resource.
+    pub text_control_placeholder_foreground_pointer_over: Color,
+    /// The resolved `TextControlPlaceholderForegroundFocused` resource.
+    pub text_control_placeholder_foreground_focused: Color,
+    /// The resolved `TextControlPlaceholderForegroundDisabled` resource.
+    pub text_control_placeholder_foreground_disabled: Color,
+    /// The resolved `TextControlSelectionHighlightColor` resource.
+    pub text_control_selection_highlight_color: Color,
+    /// The resolved `TextControlButtonBackgroundPointerOver` resource.
+    pub text_control_button_background_pointer_over: Color,
+    /// The resolved `TextControlButtonBackgroundPressed` resource.
+    pub text_control_button_background_pressed: Color,
+    /// The resolved `TextControlButtonBorderBrush` resource.
+    pub text_control_button_border_brush: Color,
+    /// The resolved `TextControlButtonBorderBrushPointerOver` resource.
+    pub text_control_button_border_brush_pointer_over: Color,
+    /// The resolved `TextControlButtonBorderBrushPressed` resource.
+    pub text_control_button_border_brush_pressed: Color,
+    /// The resolved `TextControlButtonForeground` resource.
+    pub text_control_button_foreground: Color,
+    /// The resolved `TextControlButtonForegroundPointerOver` resource.
+    pub text_control_button_foreground_pointer_over: Color,
+    /// The resolved `TextControlButtonForegroundPressed` resource.
+    pub text_control_button_foreground_pressed: Color,
+    /// The resolved `TextControlElevationBorderBrush` resource.
+    pub text_control_elevation_border_brush: [(f64, Color); 2],
+    /// The resolved `TextControlElevationBorderFocusedBrush` resource.
+    pub text_control_elevation_border_focused_brush: [(f64, Color); 2],
+    /// The resolved `SystemControlBackgroundAltHighBrush` resource.
+    pub system_control_background_alt_high_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumBrush` resource.
+    pub system_control_foreground_base_medium_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumHighBrush` resource.
+    pub system_control_highlight_base_medium_high_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumHighBrush` resource.
+    pub system_control_foreground_base_medium_high_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumLowBrush` resource.
+    pub system_control_foreground_base_medium_low_brush: Color,
+    /// The resolved `TextControlButtonBackground` resource.
+    pub text_control_button_background: Color,
+    /// The resolved `TextControlHeaderForegroundDisabled` resource.
+    pub text_control_header_foreground_disabled: Color,
+    /// The resolved `TextControlHeaderForeground` resource.
+    pub text_control_header_foreground: Color,
+    /// The resolved `SystemControlDescriptionTextForegroundBrush` resource.
+    pub system_control_description_text_foreground_brush: Color,
+}
+
+impl TextBoxResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                text_box_foreground_header_theme_brush: Color::from_argb(255, 0, 0, 0),
+                text_box_placeholder_text_theme_brush: Color::from_argb(171, 0, 0, 0),
+                text_box_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                text_box_border_theme_brush: Color::from_argb(163, 0, 0, 0),
+                text_box_button_background_theme_brush: Color::from_argb(0, 0, 0, 0),
+                text_box_button_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                text_box_button_foreground_theme_brush: Color::from_argb(153, 0, 0, 0),
+                text_box_button_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 222, 222, 222,
+                ),
+                text_box_button_pointer_over_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                text_box_button_pointer_over_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                text_box_button_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
+                text_box_button_pressed_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                text_box_button_pressed_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                text_box_disabled_background_theme_brush: Color::from_argb(102, 202, 202, 202),
+                text_box_disabled_border_theme_brush: Color::from_argb(38, 0, 0, 0),
+                text_box_disabled_foreground_theme_brush: Color::from_argb(255, 102, 102, 102),
+                text_box_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                temporary_text_fill_color_disabled: Color::from_argb(92, 1, 1, 1),
+                text_control_background: Color::from_argb(179, 255, 255, 255),
+                text_control_background_pointer_over: Color::from_argb(128, 249, 249, 249),
+                text_control_background_focused: Color::from_argb(255, 255, 255, 255),
+                text_control_background_disabled: Color::from_argb(77, 249, 249, 249),
+                text_control_border_brush: [
+                    (0.5, Color::from_argb(114, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_border_brush_pointer_over: [
+                    (0.5, Color::from_argb(114, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_border_brush_focused: [
+                    (1.0, accent.dark1),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_border_brush_disabled: Color::from_argb(15, 0, 0, 0),
+                text_control_foreground: Color::from_argb(228, 0, 0, 0),
+                text_control_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                text_control_foreground_focused: Color::from_argb(228, 0, 0, 0),
+                text_control_foreground_disabled: Color::from_argb(92, 1, 1, 1),
+                text_control_placeholder_foreground: Color::from_argb(158, 0, 0, 0),
+                text_control_placeholder_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                text_control_placeholder_foreground_focused: Color::from_argb(158, 0, 0, 0),
+                text_control_placeholder_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                text_control_selection_highlight_color: accent.base,
+                text_control_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                text_control_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                text_control_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                text_control_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                text_control_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                text_control_button_foreground: Color::from_argb(158, 0, 0, 0),
+                text_control_button_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                text_control_button_foreground_pressed: Color::from_argb(114, 0, 0, 0),
+                text_control_elevation_border_brush: [
+                    (0.5, Color::from_argb(114, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_elevation_border_focused_brush: [
+                    (1.0, accent.dark1),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                system_control_background_alt_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_highlight_base_medium_high_brush: Color::from_argb(204, 0, 0, 0),
+                system_control_foreground_base_medium_high_brush: Color::from_argb(204, 0, 0, 0),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_foreground_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                text_control_button_background: Color::from_argb(0, 0, 0, 0),
+                text_control_header_foreground_disabled: Color::from_argb(102, 0, 0, 0),
+                text_control_header_foreground: Color::from_argb(255, 0, 0, 0),
+                system_control_description_text_foreground_brush: Color::from_argb(153, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                text_box_foreground_header_theme_brush: Color::from_argb(255, 255, 255, 255),
+                text_box_placeholder_text_theme_brush: Color::from_argb(171, 0, 0, 0),
+                text_box_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                text_box_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                text_box_button_background_theme_brush: Color::from_argb(0, 0, 0, 0),
+                text_box_button_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                text_box_button_foreground_theme_brush: Color::from_argb(153, 255, 255, 255),
+                text_box_button_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 222, 222, 222,
+                ),
+                text_box_button_pointer_over_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                text_box_button_pointer_over_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                text_box_button_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
+                text_box_button_pressed_border_theme_brush: Color::from_argb(0, 0, 0, 0),
+                text_box_button_pressed_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                text_box_disabled_background_theme_brush: Color::from_argb(0, 0, 0, 0),
+                text_box_disabled_border_theme_brush: Color::from_argb(102, 255, 255, 255),
+                text_box_disabled_foreground_theme_brush: Color::from_argb(255, 102, 102, 102),
+                text_box_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                temporary_text_fill_color_disabled: Color::from_argb(93, 254, 254, 254),
+                text_control_background: Color::from_argb(15, 255, 255, 255),
+                text_control_background_pointer_over: Color::from_argb(21, 255, 255, 255),
+                text_control_background_focused: Color::from_argb(179, 30, 30, 30),
+                text_control_background_disabled: Color::from_argb(11, 255, 255, 255),
+                text_control_border_brush: [
+                    (0.5, Color::from_argb(139, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_border_brush_pointer_over: [
+                    (0.5, Color::from_argb(139, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_border_brush_focused: [
+                    (1.0, accent.light2),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_border_brush_disabled: Color::from_argb(18, 255, 255, 255),
+                text_control_foreground: Color::from_argb(255, 255, 255, 255),
+                text_control_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                text_control_foreground_focused: Color::from_argb(255, 255, 255, 255),
+                text_control_foreground_disabled: Color::from_argb(93, 254, 254, 254),
+                text_control_placeholder_foreground: Color::from_argb(197, 255, 255, 255),
+                text_control_placeholder_foreground_pointer_over: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                text_control_placeholder_foreground_focused: Color::from_argb(197, 255, 255, 255),
+                text_control_placeholder_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                text_control_selection_highlight_color: accent.base,
+                text_control_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                text_control_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                text_control_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                text_control_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                text_control_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                text_control_button_foreground: Color::from_argb(197, 255, 255, 255),
+                text_control_button_foreground_pointer_over: Color::from_argb(197, 255, 255, 255),
+                text_control_button_foreground_pressed: Color::from_argb(135, 255, 255, 255),
+                text_control_elevation_border_brush: [
+                    (0.5, Color::from_argb(139, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_elevation_border_focused_brush: [
+                    (1.0, accent.light2),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                system_control_background_alt_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_highlight_base_medium_high_brush: Color::from_argb(
+                    204, 255, 255, 255,
+                ),
+                system_control_foreground_base_medium_high_brush: Color::from_argb(
+                    204, 255, 255, 255,
+                ),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_foreground_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                text_control_button_background: Color::from_argb(0, 0, 0, 0),
+                text_control_header_foreground_disabled: Color::from_argb(102, 255, 255, 255),
+                text_control_header_foreground: Color::from_argb(255, 255, 255, 255),
+                system_control_description_text_foreground_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+            },
+        }
+    }
+}
+pub const TEXT_CONTROL_THEME_MIN_HEIGHT: f64 = 32.0;
+pub const TEXT_CONTROL_THEME_MIN_WIDTH: f64 = 64.0;
+/// Left, top, right, bottom.
+pub const HELPER_BUTTON_THEME_PADDING: [f64; 4] = [0.0, 0.0, -2.0, 0.0];
+/// Left, top, right, bottom.
+pub const TEXT_BOX_TOP_HEADER_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 8.0];
+/// Left, top, right, bottom.
+pub const TEXT_BOX_INNER_BUTTON_MARGIN: [f64; 4] = [0.0, 4.0, 4.0, 4.0];
+pub const TEXT_BOX_ICON_FONT_SIZE: f64 = 12.0;
+/// Theme-dependent resources of `PasswordBox_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PasswordBoxResources {
+    /// The resolved `TextControlForeground` resource.
+    pub text_control_foreground: Color,
+    /// The resolved `TextControlBackground` resource.
+    pub text_control_background: Color,
+    /// The resolved `TextControlSelectionHighlightColor` resource.
+    pub text_control_selection_highlight_color: Color,
+    /// The resolved `TextControlBorderBrush` resource.
+    pub text_control_border_brush: [(f64, Color); 2],
+    /// The resolved `TextControlButtonBorderBrush` resource.
+    pub text_control_button_border_brush: Color,
+    /// The resolved `TextControlButtonBackground` resource.
+    pub text_control_button_background: Color,
+    /// The resolved `TextControlButtonBackgroundPointerOver` resource.
+    pub text_control_button_background_pointer_over: Color,
+    /// The resolved `TextControlButtonBorderBrushPointerOver` resource.
+    pub text_control_button_border_brush_pointer_over: Color,
+    /// The resolved `TextControlButtonForegroundPointerOver` resource.
+    pub text_control_button_foreground_pointer_over: Color,
+    /// The resolved `TextControlButtonBackgroundPressed` resource.
+    pub text_control_button_background_pressed: Color,
+    /// The resolved `TextControlButtonBorderBrushPressed` resource.
+    pub text_control_button_border_brush_pressed: Color,
+    /// The resolved `TextControlButtonForegroundPressed` resource.
+    pub text_control_button_foreground_pressed: Color,
+    /// The resolved `TextControlButtonForeground` resource.
+    pub text_control_button_foreground: Color,
+    /// The resolved `TextControlHeaderForegroundDisabled` resource.
+    pub text_control_header_foreground_disabled: Color,
+    /// The resolved `TextControlBackgroundDisabled` resource.
+    pub text_control_background_disabled: Color,
+    /// The resolved `TextControlBorderBrushDisabled` resource.
+    pub text_control_border_brush_disabled: Color,
+    /// The resolved `TextControlForegroundDisabled` resource.
+    pub text_control_foreground_disabled: Color,
+    /// The resolved `TextControlPlaceholderForegroundDisabled` resource.
+    pub text_control_placeholder_foreground_disabled: Color,
+    /// The resolved `TextControlBorderBrushPointerOver` resource.
+    pub text_control_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `TextControlBackgroundPointerOver` resource.
+    pub text_control_background_pointer_over: Color,
+    /// The resolved `TextControlPlaceholderForegroundPointerOver` resource.
+    pub text_control_placeholder_foreground_pointer_over: Color,
+    /// The resolved `TextControlForegroundPointerOver` resource.
+    pub text_control_foreground_pointer_over: Color,
+    /// The resolved `TextControlPlaceholderForegroundFocused` resource.
+    pub text_control_placeholder_foreground_focused: Color,
+    /// The resolved `TextControlBackgroundFocused` resource.
+    pub text_control_background_focused: Color,
+    /// The resolved `TextControlBorderBrushFocused` resource.
+    pub text_control_border_brush_focused: [(f64, Color); 2],
+    /// The resolved `TextControlForegroundFocused` resource.
+    pub text_control_foreground_focused: Color,
+    /// The resolved `TextControlHeaderForeground` resource.
+    pub text_control_header_foreground: Color,
+    /// The resolved `TextControlPlaceholderForeground` resource.
+    pub text_control_placeholder_foreground: Color,
+    /// The resolved `SystemControlDescriptionTextForegroundBrush` resource.
+    pub system_control_description_text_foreground_brush: Color,
+}
+
+impl PasswordBoxResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                text_control_foreground: Color::from_argb(228, 0, 0, 0),
+                text_control_background: Color::from_argb(179, 255, 255, 255),
+                text_control_selection_highlight_color: accent.base,
+                text_control_border_brush: [
+                    (0.5, Color::from_argb(114, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                text_control_button_background: Color::from_argb(0, 0, 0, 0),
+                text_control_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                text_control_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                text_control_button_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                text_control_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                text_control_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                text_control_button_foreground_pressed: Color::from_argb(114, 0, 0, 0),
+                text_control_button_foreground: Color::from_argb(158, 0, 0, 0),
+                text_control_header_foreground_disabled: Color::from_argb(102, 0, 0, 0),
+                text_control_background_disabled: Color::from_argb(77, 249, 249, 249),
+                text_control_border_brush_disabled: Color::from_argb(15, 0, 0, 0),
+                text_control_foreground_disabled: Color::from_argb(92, 1, 1, 1),
+                text_control_placeholder_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                text_control_border_brush_pointer_over: [
+                    (0.5, Color::from_argb(114, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_background_pointer_over: Color::from_argb(128, 249, 249, 249),
+                text_control_placeholder_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                text_control_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                text_control_placeholder_foreground_focused: Color::from_argb(158, 0, 0, 0),
+                text_control_background_focused: Color::from_argb(255, 255, 255, 255),
+                text_control_border_brush_focused: [
+                    (1.0, accent.dark1),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_foreground_focused: Color::from_argb(228, 0, 0, 0),
+                text_control_header_foreground: Color::from_argb(255, 0, 0, 0),
+                text_control_placeholder_foreground: Color::from_argb(158, 0, 0, 0),
+                system_control_description_text_foreground_brush: Color::from_argb(153, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                text_control_foreground: Color::from_argb(255, 255, 255, 255),
+                text_control_background: Color::from_argb(15, 255, 255, 255),
+                text_control_selection_highlight_color: accent.base,
+                text_control_border_brush: [
+                    (0.5, Color::from_argb(139, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                text_control_button_background: Color::from_argb(0, 0, 0, 0),
+                text_control_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                text_control_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                text_control_button_foreground_pointer_over: Color::from_argb(197, 255, 255, 255),
+                text_control_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                text_control_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                text_control_button_foreground_pressed: Color::from_argb(135, 255, 255, 255),
+                text_control_button_foreground: Color::from_argb(197, 255, 255, 255),
+                text_control_header_foreground_disabled: Color::from_argb(102, 255, 255, 255),
+                text_control_background_disabled: Color::from_argb(11, 255, 255, 255),
+                text_control_border_brush_disabled: Color::from_argb(18, 255, 255, 255),
+                text_control_foreground_disabled: Color::from_argb(93, 254, 254, 254),
+                text_control_placeholder_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                text_control_border_brush_pointer_over: [
+                    (0.5, Color::from_argb(139, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_background_pointer_over: Color::from_argb(21, 255, 255, 255),
+                text_control_placeholder_foreground_pointer_over: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                text_control_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                text_control_placeholder_foreground_focused: Color::from_argb(197, 255, 255, 255),
+                text_control_background_focused: Color::from_argb(179, 30, 30, 30),
+                text_control_border_brush_focused: [
+                    (1.0, accent.light2),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_foreground_focused: Color::from_argb(255, 255, 255, 255),
+                text_control_header_foreground: Color::from_argb(255, 255, 255, 255),
+                text_control_placeholder_foreground: Color::from_argb(197, 255, 255, 255),
+                system_control_description_text_foreground_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const PASSWORD_BOX_TOP_HEADER_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 8.0];
+pub const PASSWORD_BOX_ICON_FONT_SIZE: f64 = 12.0;
+/// Theme-dependent resources of `CommandBarFlyout_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct CommandBarFlyoutResources {
+    /// The resolved `CommandBarFlyoutBackground` resource.
+    pub command_bar_flyout_background: Color,
+    /// The resolved `CommandBarFlyoutForeground` resource.
+    pub command_bar_flyout_foreground: Color,
+    /// The resolved `CommandBarFlyoutBorderBrush` resource.
+    pub command_bar_flyout_border_brush: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonBackground` resource.
+    pub command_bar_flyout_app_bar_button_background: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonBackgroundPointerOver` resource.
+    pub command_bar_flyout_app_bar_button_background_pointer_over: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonBackgroundPressed` resource.
+    pub command_bar_flyout_app_bar_button_background_pressed: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonBackgroundDisabled` resource.
+    pub command_bar_flyout_app_bar_button_background_disabled: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonForeground` resource.
+    pub command_bar_flyout_app_bar_button_foreground: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonForegroundPointerOver` resource.
+    pub command_bar_flyout_app_bar_button_foreground_pointer_over: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonForegroundPressed` resource.
+    pub command_bar_flyout_app_bar_button_foreground_pressed: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonForegroundDisabled` resource.
+    pub command_bar_flyout_app_bar_button_foreground_disabled: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonKeyboardTextLabelForeground` resource.
+    pub command_bar_flyout_app_bar_button_keyboard_text_label_foreground: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonKeyboardTextLabelForegroundPointerOver` resource.
+    pub command_bar_flyout_app_bar_button_keyboard_text_label_foreground_pointer_over: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonKeyboardTextLabelForegroundPressed` resource.
+    pub command_bar_flyout_app_bar_button_keyboard_text_label_foreground_pressed: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonSubItemChevronForeground` resource.
+    pub command_bar_flyout_app_bar_button_sub_item_chevron_foreground: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonSubItemChevronPointerOverForeground` resource.
+    pub command_bar_flyout_app_bar_button_sub_item_chevron_pointer_over_foreground: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonSubItemChevronPressedForeground` resource.
+    pub command_bar_flyout_app_bar_button_sub_item_chevron_pressed_foreground: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonSubItemChevronSubMenuOpenedForeground` resource.
+    pub command_bar_flyout_app_bar_button_sub_item_chevron_sub_menu_opened_foreground: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonSubItemChevronDisabledForeground` resource.
+    pub command_bar_flyout_app_bar_button_sub_item_chevron_disabled_foreground: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonBackgroundChecked` resource.
+    pub command_bar_flyout_app_bar_button_background_checked: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonBackgroundCheckedPointerOver` resource.
+    pub command_bar_flyout_app_bar_button_background_checked_pointer_over: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonBackgroundCheckedPressed` resource.
+    pub command_bar_flyout_app_bar_button_background_checked_pressed: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonBackgroundCheckedDisabled` resource.
+    pub command_bar_flyout_app_bar_button_background_checked_disabled: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonForegroundChecked` resource.
+    pub command_bar_flyout_app_bar_button_foreground_checked: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonForegroundCheckedPointerOver` resource.
+    pub command_bar_flyout_app_bar_button_foreground_checked_pointer_over: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonForegroundCheckedPressed` resource.
+    pub command_bar_flyout_app_bar_button_foreground_checked_pressed: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonForegroundCheckedDisabled` resource.
+    pub command_bar_flyout_app_bar_button_foreground_checked_disabled: Color,
+    /// The resolved `CommandBarFlyoutAppBarButtonBorderBrush` resource.
+    pub command_bar_flyout_app_bar_button_border_brush: Color,
+    /// The resolved `CommandBarFlyoutButtonBackground` resource.
+    pub command_bar_flyout_button_background: Color,
+    /// The resolved `DesktopAcrylicTransparentBrush` resource.
+    pub desktop_acrylic_transparent_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
+    pub system_control_background_base_low_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlForegroundTransparentBrush` resource.
+    pub system_control_foreground_transparent_brush: Color,
+    /// The resolved `SystemControlHighlightListLowBrush` resource.
+    pub system_control_highlight_list_low_brush: Color,
+    /// The resolved `SystemControlHighlightListMediumBrush` resource.
+    pub system_control_highlight_list_medium_brush: Color,
+    /// The resolved `SystemControlHighlightAltBaseHighBrush` resource.
+    pub system_control_highlight_alt_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlHighlightAccentBrush` resource.
+    pub system_control_highlight_accent_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumLowBrush` resource.
+    pub system_control_highlight_base_medium_low_brush: Color,
+    /// The resolved `SystemControlHighlightAltChromeWhiteBrush` resource.
+    pub system_control_highlight_alt_chrome_white_brush: Color,
+    /// The resolved `CommandBarEllipsisIconForegroundDisabled` resource.
+    pub command_bar_ellipsis_icon_foreground_disabled: Color,
+}
+
+impl CommandBarFlyoutResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                command_bar_flyout_background: Color::from_argb(0, 0, 0, 0),
+                command_bar_flyout_foreground: Color::from_argb(228, 0, 0, 0),
+                command_bar_flyout_border_brush: Color::from_argb(15, 0, 0, 0),
+                command_bar_flyout_app_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                command_bar_flyout_app_bar_button_background_pointer_over: Color::from_argb(
+                    9, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                command_bar_flyout_app_bar_button_background_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_foreground: Color::from_argb(228, 0, 0, 0),
+                command_bar_flyout_app_bar_button_foreground_pointer_over: Color::from_argb(
+                    228, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_foreground_pressed: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_foreground_disabled: Color::from_argb(
+                    92, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_keyboard_text_label_foreground: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_keyboard_text_label_foreground_pointer_over:
+                    Color::from_argb(158, 0, 0, 0),
+                command_bar_flyout_app_bar_button_keyboard_text_label_foreground_pressed:
+                    Color::from_argb(114, 0, 0, 0),
+                command_bar_flyout_app_bar_button_sub_item_chevron_foreground: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_sub_item_chevron_pointer_over_foreground:
+                    Color::from_argb(158, 0, 0, 0),
+                command_bar_flyout_app_bar_button_sub_item_chevron_pressed_foreground:
+                    Color::from_argb(114, 0, 0, 0),
+                command_bar_flyout_app_bar_button_sub_item_chevron_sub_menu_opened_foreground:
+                    Color::from_argb(158, 0, 0, 0),
+                command_bar_flyout_app_bar_button_sub_item_chevron_disabled_foreground:
+                    Color::from_argb(92, 0, 0, 0),
+                command_bar_flyout_app_bar_button_background_checked: accent.dark1,
+                command_bar_flyout_app_bar_button_background_checked_pointer_over: accent.dark1,
+                command_bar_flyout_app_bar_button_background_checked_pressed: accent.dark1,
+                command_bar_flyout_app_bar_button_background_checked_disabled: Color::from_argb(
+                    55, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_foreground_checked: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_foreground_checked_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_foreground_checked_pressed: Color::from_argb(
+                    179, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_foreground_checked_disabled: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                command_bar_flyout_button_background: Color::from_argb(0, 0, 0, 0),
+                desktop_acrylic_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_list_low_brush: Color::from_argb(25, 0, 0, 0),
+                system_control_highlight_list_medium_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_highlight_alt_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_highlight_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_highlight_alt_chrome_white_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                command_bar_ellipsis_icon_foreground_disabled: Color::from_argb(102, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                command_bar_flyout_background: Color::from_argb(0, 0, 0, 0),
+                command_bar_flyout_foreground: Color::from_argb(255, 255, 255, 255),
+                command_bar_flyout_border_brush: Color::from_argb(18, 255, 255, 255),
+                command_bar_flyout_app_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                command_bar_flyout_app_bar_button_background_pointer_over: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_background_pressed: Color::from_argb(
+                    10, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_background_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_foreground: Color::from_argb(255, 255, 255, 255),
+                command_bar_flyout_app_bar_button_foreground_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_foreground_pressed: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_foreground_disabled: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_keyboard_text_label_foreground: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_keyboard_text_label_foreground_pointer_over:
+                    Color::from_argb(197, 255, 255, 255),
+                command_bar_flyout_app_bar_button_keyboard_text_label_foreground_pressed:
+                    Color::from_argb(135, 255, 255, 255),
+                command_bar_flyout_app_bar_button_sub_item_chevron_foreground: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_sub_item_chevron_pointer_over_foreground:
+                    Color::from_argb(197, 255, 255, 255),
+                command_bar_flyout_app_bar_button_sub_item_chevron_pressed_foreground:
+                    Color::from_argb(135, 255, 255, 255),
+                command_bar_flyout_app_bar_button_sub_item_chevron_sub_menu_opened_foreground:
+                    Color::from_argb(197, 255, 255, 255),
+                command_bar_flyout_app_bar_button_sub_item_chevron_disabled_foreground:
+                    Color::from_argb(93, 255, 255, 255),
+                command_bar_flyout_app_bar_button_background_checked: accent.light2,
+                command_bar_flyout_app_bar_button_background_checked_pointer_over: accent.light2,
+                command_bar_flyout_app_bar_button_background_checked_pressed: accent.light2,
+                command_bar_flyout_app_bar_button_background_checked_disabled: Color::from_argb(
+                    40, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_foreground_checked: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_foreground_checked_pointer_over: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_foreground_checked_pressed: Color::from_argb(
+                    128, 0, 0, 0,
+                ),
+                command_bar_flyout_app_bar_button_foreground_checked_disabled: Color::from_argb(
+                    135, 255, 255, 255,
+                ),
+                command_bar_flyout_app_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                command_bar_flyout_button_background: Color::from_argb(0, 0, 0, 0),
+                desktop_acrylic_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_list_low_brush: Color::from_argb(25, 255, 255, 255),
+                system_control_highlight_list_medium_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_highlight_alt_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_highlight_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_highlight_alt_chrome_white_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                command_bar_ellipsis_icon_foreground_disabled: Color::from_argb(102, 255, 255, 255),
+            },
+        }
+    }
+}
+pub const APP_BAR_EXPAND_BUTTON_THEME_WIDTH: f64 = 48.0;
+/// Left, top, right, bottom.
+pub const COMMAND_BAR_FLYOUT_APP_BAR_BUTTON_INNER_BORDER_MARGIN: [f64; 4] = [2.0, 2.0, 2.0, 2.0];
+/// Left, top, right, bottom.
+pub const COMMAND_BAR_FLYOUT_APP_BAR_ELLIPSIS_BUTTON_INNER_BORDER_MARGIN: [f64; 4] =
+    [2.0, 2.0, 6.0, 2.0];
+/// Left, top, right, bottom.
+pub const COMMAND_BAR_FLYOUT_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const COMMAND_BAR_FLYOUT_BORDER_UP_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 0.0];
+/// Left, top, right, bottom.
+pub const COMMAND_BAR_FLYOUT_BORDER_DOWN_THEME_THICKNESS: [f64; 4] = [1.0, 0.0, 1.0, 1.0];
+/// Theme-dependent resources of `AppBarButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct AppBarButtonResources {
+    /// The resolved `AppBarButtonBackground` resource.
+    pub app_bar_button_background: Color,
+    /// The resolved `AppBarButtonBackgroundPointerOver` resource.
+    pub app_bar_button_background_pointer_over: Color,
+    /// The resolved `AppBarButtonBackgroundPressed` resource.
+    pub app_bar_button_background_pressed: Color,
+    /// The resolved `AppBarButtonBackgroundDisabled` resource.
+    pub app_bar_button_background_disabled: Color,
+    /// The resolved `AppBarButtonForeground` resource.
+    pub app_bar_button_foreground: Color,
+    /// The resolved `AppBarButtonForegroundPointerOver` resource.
+    pub app_bar_button_foreground_pointer_over: Color,
+    /// The resolved `AppBarButtonForegroundPressed` resource.
+    pub app_bar_button_foreground_pressed: Color,
+    /// The resolved `AppBarButtonForegroundDisabled` resource.
+    pub app_bar_button_foreground_disabled: Color,
+    /// The resolved `AppBarButtonBorderBrush` resource.
+    pub app_bar_button_border_brush: Color,
+    /// The resolved `AppBarButtonBorderBrushPointerOver` resource.
+    pub app_bar_button_border_brush_pointer_over: Color,
+    /// The resolved `AppBarButtonBorderBrushPressed` resource.
+    pub app_bar_button_border_brush_pressed: Color,
+    /// The resolved `AppBarButtonBorderBrushDisabled` resource.
+    pub app_bar_button_border_brush_disabled: Color,
+    /// The resolved `AppBarButtonKeyboardAcceleratorTextForeground` resource.
+    pub app_bar_button_keyboard_accelerator_text_foreground: Color,
+    /// The resolved `AppBarButtonKeyboardAcceleratorTextForegroundPointerOver` resource.
+    pub app_bar_button_keyboard_accelerator_text_foreground_pointer_over: Color,
+    /// The resolved `AppBarButtonKeyboardAcceleratorTextForegroundPressed` resource.
+    pub app_bar_button_keyboard_accelerator_text_foreground_pressed: Color,
+    /// The resolved `AppBarButtonKeyboardAcceleratorTextForegroundDisabled` resource.
+    pub app_bar_button_keyboard_accelerator_text_foreground_disabled: Color,
+    /// The resolved `AppBarButtonBackgroundSubMenuOpened` resource.
+    pub app_bar_button_background_sub_menu_opened: Color,
+    /// The resolved `AppBarButtonForegroundSubMenuOpened` resource.
+    pub app_bar_button_foreground_sub_menu_opened: Color,
+    /// The resolved `AppBarButtonKeyboardAcceleratorTextForegroundSubMenuOpened` resource.
+    pub app_bar_button_keyboard_accelerator_text_foreground_sub_menu_opened: Color,
+    /// The resolved `AppBarButtonBorderBrushSubMenuOpened` resource.
+    pub app_bar_button_border_brush_sub_menu_opened: Color,
+    /// The resolved `AppBarButtonSubItemChevronForeground` resource.
+    pub app_bar_button_sub_item_chevron_foreground: Color,
+    /// The resolved `AppBarButtonSubItemChevronForegroundPointerOver` resource.
+    pub app_bar_button_sub_item_chevron_foreground_pointer_over: Color,
+    /// The resolved `AppBarButtonSubItemChevronForegroundPressed` resource.
+    pub app_bar_button_sub_item_chevron_foreground_pressed: Color,
+    /// The resolved `AppBarButtonSubItemChevronForegroundSubMenuOpened` resource.
+    pub app_bar_button_sub_item_chevron_foreground_sub_menu_opened: Color,
+    /// The resolved `AppBarButtonSubItemChevronForegroundDisabled` resource.
+    pub app_bar_button_sub_item_chevron_foreground_disabled: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `SystemControlHighlightListLowBrush` resource.
+    pub system_control_highlight_list_low_brush: Color,
+    /// The resolved `SystemControlHighlightListMediumBrush` resource.
+    pub system_control_highlight_list_medium_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlHighlightAltBaseHighBrush` resource.
+    pub system_control_highlight_alt_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlForegroundTransparentBrush` resource.
+    pub system_control_foreground_transparent_brush: Color,
+    /// The resolved `SystemControlHighlightTransparentBrush` resource.
+    pub system_control_highlight_transparent_brush: Color,
+    /// The resolved `SystemControlDisabledTransparentBrush` resource.
+    pub system_control_disabled_transparent_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumBrush` resource.
+    pub system_control_foreground_base_medium_brush: Color,
+    /// The resolved `SystemControlHighlightAltBaseMediumBrush` resource.
+    pub system_control_highlight_alt_base_medium_brush: Color,
+    /// The resolved `SystemControlHighlightListAccentLowBrush` resource.
+    pub system_control_highlight_list_accent_low_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumHighBrush` resource.
+    pub system_control_foreground_base_medium_high_brush: Color,
+}
+
+impl AppBarButtonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                app_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                app_bar_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                app_bar_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground: Color::from_argb(228, 0, 0, 0),
+                app_bar_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                app_bar_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                app_bar_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                app_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_keyboard_accelerator_text_foreground: Color::from_argb(158, 0, 0, 0),
+                app_bar_button_keyboard_accelerator_text_foreground_pointer_over: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                app_bar_button_keyboard_accelerator_text_foreground_pressed: Color::from_argb(
+                    114, 0, 0, 0,
+                ),
+                app_bar_button_keyboard_accelerator_text_foreground_disabled: Color::from_argb(
+                    92, 0, 0, 0,
+                ),
+                app_bar_button_background_sub_menu_opened: Color::from_argb(9, 0, 0, 0),
+                app_bar_button_foreground_sub_menu_opened: Color::from_argb(228, 0, 0, 0),
+                app_bar_button_keyboard_accelerator_text_foreground_sub_menu_opened:
+                    Color::from_argb(158, 0, 0, 0),
+                app_bar_button_border_brush_sub_menu_opened: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_sub_item_chevron_foreground: Color::from_argb(158, 0, 0, 0),
+                app_bar_button_sub_item_chevron_foreground_pointer_over: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                app_bar_button_sub_item_chevron_foreground_pressed: Color::from_argb(114, 0, 0, 0),
+                app_bar_button_sub_item_chevron_foreground_sub_menu_opened: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                app_bar_button_sub_item_chevron_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_list_low_brush: Color::from_argb(25, 0, 0, 0),
+                system_control_highlight_list_medium_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_highlight_alt_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_highlight_alt_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_highlight_list_accent_low_brush: accent.base,
+                system_control_foreground_base_medium_high_brush: Color::from_argb(204, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                app_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                app_bar_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                app_bar_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground: Color::from_argb(255, 255, 255, 255),
+                app_bar_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                app_bar_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                app_bar_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                app_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_keyboard_accelerator_text_foreground: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                app_bar_button_keyboard_accelerator_text_foreground_pointer_over: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                app_bar_button_keyboard_accelerator_text_foreground_pressed: Color::from_argb(
+                    135, 255, 255, 255,
+                ),
+                app_bar_button_keyboard_accelerator_text_foreground_disabled: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                app_bar_button_background_sub_menu_opened: Color::from_argb(15, 255, 255, 255),
+                app_bar_button_foreground_sub_menu_opened: Color::from_argb(255, 255, 255, 255),
+                app_bar_button_keyboard_accelerator_text_foreground_sub_menu_opened:
+                    Color::from_argb(197, 255, 255, 255),
+                app_bar_button_border_brush_sub_menu_opened: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_sub_item_chevron_foreground: Color::from_argb(197, 255, 255, 255),
+                app_bar_button_sub_item_chevron_foreground_pointer_over: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                app_bar_button_sub_item_chevron_foreground_pressed: Color::from_argb(
+                    135, 255, 255, 255,
+                ),
+                app_bar_button_sub_item_chevron_foreground_sub_menu_opened: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                app_bar_button_sub_item_chevron_foreground_disabled: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_list_low_brush: Color::from_argb(25, 255, 255, 255),
+                system_control_highlight_list_medium_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_highlight_alt_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_highlight_alt_base_medium_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                system_control_highlight_list_accent_low_brush: accent.base,
+                system_control_foreground_base_medium_high_brush: Color::from_argb(
+                    204, 255, 255, 255,
+                ),
+            },
+        }
+    }
+}
+pub const APP_BAR_THEME_MIN_HEIGHT: f64 = 56.0;
+pub const APP_BAR_BUTTON_CONTENT_HEIGHT: f64 = 16.0;
+pub const APP_BAR_THEME_COMPACT_HEIGHT: f64 = 40.0;
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_CONTENT_VIEWBOX_MARGIN: [f64; 4] = [12.0, 16.0, 0.0, 10.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_CONTENT_VIEWBOX_COMPACT_MARGIN: [f64; 4] = [0.0, 12.0, 0.0, 12.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_CONTENT_VIEWBOX_COLLAPSED_MARGIN: [f64; 4] = [0.0, 16.0, 0.0, 2.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_OVERFLOW_TEXT_TOUCH_MARGIN: [f64; 4] = [0.0, 9.0, 0.0, 12.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_OVERFLOW_TEXT_LABEL_PADDING: [f64; 4] = [0.0, 5.0, 0.0, 8.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_TEXT_LABEL_MARGIN: [f64; 4] = [2.0, 0.0, 2.0, 8.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_TEXT_LABEL_ON_RIGHT_MARGIN: [f64; 4] = [8.0, 16.0, 12.0, 10.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_INNER_BORDER_MARGIN: [f64; 4] = [2.0, 6.0, 2.0, 6.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_INNER_BORDER_COMPACT_MARGIN: [f64; 4] = [2.0, 6.0, 2.0, 22.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_INNER_BORDER_OVERFLOW_MARGIN: [f64; 4] = [4.0, 0.0, 4.0, 0.0];
+pub const APP_BAR_BUTTON_LABEL_FONT_SIZE: f64 = 12.0;
+pub const APP_BAR_BUTTON_SUB_ITEM_CHEVRON_FONT_SIZE: f64 = 8.0;
+pub const APP_BAR_BUTTON_SECONDARY_SUB_ITEM_CHEVRON_FONT_SIZE: f64 = 12.0;
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_SUB_ITEM_CHEVRON_MARGIN: [f64; 4] = [-23.0, 20.0, 12.0, 0.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_SUB_ITEM_CHEVRON_LABEL_ON_RIGHT_MARGIN: [f64; 4] = [-7.0, 20.0, 12.0, 0.0];
+/// Left, top, right, bottom.
+pub const APP_BAR_BUTTON_SECONDARY_SUB_ITEM_CHEVRON_MARGIN: [f64; 4] = [0.0, 0.0, 16.0, 0.0];
+/// Theme-dependent resources of `AcrylicBrush_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct AcrylicThemeResources {
+    /// The resolved `SystemChromeMediumHighColor` resource.
+    pub system_chrome_medium_high_color: Color,
+    /// The resolved `SystemChromeAltMediumHighColor` resource.
+    pub system_chrome_alt_medium_high_color: Color,
+    /// The resolved `SystemChromeAltHighColor` resource.
+    pub system_chrome_alt_high_color: Color,
+    /// The resolved `SystemControlAcrylicWindowBrush` resource.
+    pub system_control_acrylic_window_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAcrylicElementBrush` resource.
+    pub system_control_acrylic_element_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAccentAcrylicWindowAccentMediumHighBrush` resource.
+    pub system_control_accent_acrylic_window_accent_medium_high_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAccentAcrylicElementAccentMediumHighBrush` resource.
+    pub system_control_accent_acrylic_element_accent_medium_high_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAccentDark1AcrylicWindowAccentDark1Brush` resource.
+    pub system_control_accent_dark1_acrylic_window_accent_dark1_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAccentDark1AcrylicElementAccentDark1Brush` resource.
+    pub system_control_accent_dark1_acrylic_element_accent_dark1_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAccentDark2AcrylicWindowAccentDark2MediumHighBrush` resource.
+    pub system_control_accent_dark2_acrylic_window_accent_dark2_medium_high_brush:
+        AcrylicBrushResources,
+    /// The resolved `SystemControlAccentDark2AcrylicElementAccentDark2MediumHighBrush` resource.
+    pub system_control_accent_dark2_acrylic_element_accent_dark2_medium_high_brush:
+        AcrylicBrushResources,
+    /// The resolved `SystemControlAcrylicWindowMediumHighBrush` resource.
+    pub system_control_acrylic_window_medium_high_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAcrylicElementMediumHighBrush` resource.
+    pub system_control_acrylic_element_medium_high_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlChromeMediumLowAcrylicWindowMediumBrush` resource.
+    pub system_control_chrome_medium_low_acrylic_window_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlChromeMediumLowAcrylicElementMediumBrush` resource.
+    pub system_control_chrome_medium_low_acrylic_element_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseHighAcrylicWindowBrush` resource.
+    pub system_control_base_high_acrylic_window_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseHighAcrylicElementBrush` resource.
+    pub system_control_base_high_acrylic_element_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseHighAcrylicWindowMediumHighBrush` resource.
+    pub system_control_base_high_acrylic_window_medium_high_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseHighAcrylicElementMediumHighBrush` resource.
+    pub system_control_base_high_acrylic_element_medium_high_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseHighAcrylicWindowMediumBrush` resource.
+    pub system_control_base_high_acrylic_window_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseHighAcrylicElementMediumBrush` resource.
+    pub system_control_base_high_acrylic_element_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlChromeLowAcrylicWindowBrush` resource.
+    pub system_control_chrome_low_acrylic_window_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlChromeLowAcrylicElementBrush` resource.
+    pub system_control_chrome_low_acrylic_element_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlChromeMediumAcrylicWindowMediumBrush` resource.
+    pub system_control_chrome_medium_acrylic_window_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlChromeMediumAcrylicElementMediumBrush` resource.
+    pub system_control_chrome_medium_acrylic_element_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlChromeHighAcrylicWindowMediumBrush` resource.
+    pub system_control_chrome_high_acrylic_window_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlChromeHighAcrylicElementMediumBrush` resource.
+    pub system_control_chrome_high_acrylic_element_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseLowAcrylicWindowBrush` resource.
+    pub system_control_base_low_acrylic_window_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseLowAcrylicElementBrush` resource.
+    pub system_control_base_low_acrylic_element_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseMediumLowAcrylicWindowMediumBrush` resource.
+    pub system_control_base_medium_low_acrylic_window_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlBaseMediumLowAcrylicElementMediumBrush` resource.
+    pub system_control_base_medium_low_acrylic_element_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAltLowAcrylicWindowBrush` resource.
+    pub system_control_alt_low_acrylic_window_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAltLowAcrylicElementBrush` resource.
+    pub system_control_alt_low_acrylic_element_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAltMediumLowAcrylicWindowMediumBrush` resource.
+    pub system_control_alt_medium_low_acrylic_window_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAltMediumLowAcrylicElementMediumBrush` resource.
+    pub system_control_alt_medium_low_acrylic_element_medium_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAltHighAcrylicWindowBrush` resource.
+    pub system_control_alt_high_acrylic_window_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlAltHighAcrylicElementBrush` resource.
+    pub system_control_alt_high_acrylic_element_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlTransientBorderBrush` resource.
+    pub system_control_transient_border_brush: Color,
+    /// The resolved `AcrylicBackgroundFillColorDefaultBrush` resource.
+    pub acrylic_background_fill_color_default_brush: AcrylicBrushResources,
+    /// The resolved `AcrylicInAppFillColorDefaultBrush` resource.
+    pub acrylic_in_app_fill_color_default_brush: AcrylicBrushResources,
+    /// The resolved `AcrylicBackgroundFillColorDefaultInverseBrush` resource.
+    pub acrylic_background_fill_color_default_inverse_brush: AcrylicBrushResources,
+    /// The resolved `AcrylicInAppFillColorDefaultInverseBrush` resource.
+    pub acrylic_in_app_fill_color_default_inverse_brush: AcrylicBrushResources,
+    /// The resolved `AcrylicBackgroundFillColorBaseBrush` resource.
+    pub acrylic_background_fill_color_base_brush: AcrylicBrushResources,
+    /// The resolved `AcrylicInAppFillColorBaseBrush` resource.
+    pub acrylic_in_app_fill_color_base_brush: AcrylicBrushResources,
+    /// The resolved `AccentAcrylicBackgroundFillColorDefaultBrush` resource.
+    pub accent_acrylic_background_fill_color_default_brush: AcrylicBrushResources,
+    /// The resolved `AccentAcrylicInAppFillColorDefaultBrush` resource.
+    pub accent_acrylic_in_app_fill_color_default_brush: AcrylicBrushResources,
+    /// The resolved `AccentAcrylicBackgroundFillColorBaseBrush` resource.
+    pub accent_acrylic_background_fill_color_base_brush: AcrylicBrushResources,
+    /// The resolved `AccentAcrylicInAppFillColorBaseBrush` resource.
+    pub accent_acrylic_in_app_fill_color_base_brush: AcrylicBrushResources,
+    /// The resolved `DesktopAcrylicTransparentBrush` resource.
+    pub desktop_acrylic_transparent_brush: Color,
+    /// The resolved `SystemChromeMediumColor` resource.
+    pub system_chrome_medium_color: Color,
+    /// The resolved `SystemChromeMediumLowColor` resource.
+    pub system_chrome_medium_low_color: Color,
+    /// The resolved `SystemBaseHighColor` resource.
+    pub system_base_high_color: Color,
+    /// The resolved `SystemChromeLowColor` resource.
+    pub system_chrome_low_color: Color,
+    /// The resolved `SystemChromeHighColor` resource.
+    pub system_chrome_high_color: Color,
+    /// The resolved `SystemBaseLowColor` resource.
+    pub system_base_low_color: Color,
+    /// The resolved `SystemBaseMediumLowColor` resource.
+    pub system_base_medium_low_color: Color,
+    /// The resolved `SystemAltLowColor` resource.
+    pub system_alt_low_color: Color,
+    /// The resolved `SystemAltMediumLowColor` resource.
+    pub system_alt_medium_low_color: Color,
+    /// The resolved `SystemAltHighColor` resource.
+    pub system_alt_high_color: Color,
+}
+
+impl AcrylicThemeResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                system_chrome_medium_high_color: Color::from_argb(255, 230, 230, 230),
+                system_chrome_alt_medium_high_color: Color::from_argb(204, 255, 255, 255),
+                system_chrome_alt_high_color: Color::from_argb(255, 255, 255, 255),
+                system_control_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 230, 230, 230),
+                },
+                system_control_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 230, 230, 230),
+                },
+                system_control_accent_acrylic_window_accent_medium_high_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.base,
+                        tint_opacity: 0.7,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.base,
+                    },
+                system_control_accent_acrylic_element_accent_medium_high_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.base,
+                        tint_opacity: 0.7,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.base,
+                    },
+                system_control_accent_dark1_acrylic_window_accent_dark1_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.dark1,
+                        tint_opacity: 0.8,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.dark1,
+                    },
+                system_control_accent_dark1_acrylic_element_accent_dark1_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.dark1,
+                        tint_opacity: 0.8,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.dark1,
+                    },
+                system_control_accent_dark2_acrylic_window_accent_dark2_medium_high_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.dark2,
+                        tint_opacity: 0.7,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.dark2,
+                    },
+                system_control_accent_dark2_acrylic_element_accent_dark2_medium_high_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.dark2,
+                        tint_opacity: 0.7,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.dark2,
+                    },
+                system_control_acrylic_window_medium_high_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.7,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 230, 230, 230),
+                },
+                system_control_acrylic_element_medium_high_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.7,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 230, 230, 230),
+                },
+                system_control_chrome_medium_low_acrylic_window_medium_brush:
+                    AcrylicBrushResources {
+                        tint_color: Color::from_argb(255, 255, 255, 255),
+                        tint_opacity: 0.6,
+                        tint_luminosity_opacity: None,
+                        fallback_color: Color::from_argb(255, 242, 242, 242),
+                    },
+                system_control_chrome_medium_low_acrylic_element_medium_brush:
+                    AcrylicBrushResources {
+                        tint_color: Color::from_argb(255, 255, 255, 255),
+                        tint_opacity: 0.6,
+                        tint_luminosity_opacity: None,
+                        fallback_color: Color::from_argb(255, 242, 242, 242),
+                    },
+                system_control_base_high_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 0, 0, 0),
+                },
+                system_control_base_high_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 0, 0, 0),
+                },
+                system_control_base_high_acrylic_window_medium_high_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.7,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 0, 0, 0),
+                },
+                system_control_base_high_acrylic_element_medium_high_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.7,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 0, 0, 0),
+                },
+                system_control_base_high_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 0, 0, 0),
+                },
+                system_control_base_high_acrylic_element_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 0, 0, 0),
+                },
+                system_control_chrome_low_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 242, 242, 242),
+                },
+                system_control_chrome_low_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 242, 242, 242),
+                },
+                system_control_chrome_medium_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 230, 230, 230),
+                },
+                system_control_chrome_medium_acrylic_element_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 230, 230, 230),
+                },
+                system_control_chrome_high_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 204, 204, 204),
+                },
+                system_control_chrome_high_acrylic_element_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 204, 204, 204),
+                },
+                system_control_base_low_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(51, 0, 0, 0),
+                },
+                system_control_base_low_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(51, 0, 0, 0),
+                },
+                system_control_base_medium_low_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(102, 0, 0, 0),
+                },
+                system_control_base_medium_low_acrylic_element_medium_brush:
+                    AcrylicBrushResources {
+                        tint_color: Color::from_argb(255, 255, 255, 255),
+                        tint_opacity: 0.6,
+                        tint_luminosity_opacity: None,
+                        fallback_color: Color::from_argb(102, 0, 0, 0),
+                    },
+                system_control_alt_low_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(51, 255, 255, 255),
+                },
+                system_control_alt_low_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(51, 255, 255, 255),
+                },
+                system_control_alt_medium_low_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(102, 255, 255, 255),
+                },
+                system_control_alt_medium_low_acrylic_element_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(102, 255, 255, 255),
+                },
+                system_control_alt_high_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 255, 255, 255),
+                },
+                system_control_alt_high_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 255, 255, 255),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 255, 255, 255),
+                },
+                system_control_transient_border_brush: Color::from_argb(255, 0, 0, 0),
+                acrylic_background_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                acrylic_background_fill_color_default_inverse_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                acrylic_in_app_fill_color_default_inverse_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                acrylic_background_fill_color_base_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 243, 243, 243),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.9),
+                    fallback_color: Color::from_argb(255, 238, 238, 238),
+                },
+                acrylic_in_app_fill_color_base_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 243, 243, 243),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.9),
+                    fallback_color: Color::from_argb(255, 238, 238, 238),
+                },
+                accent_acrylic_background_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: accent.light3,
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: Some(0.9),
+                    fallback_color: accent.light3,
+                },
+                accent_acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: accent.light3,
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: Some(0.9),
+                    fallback_color: accent.light3,
+                },
+                accent_acrylic_background_fill_color_base_brush: AcrylicBrushResources {
+                    tint_color: accent.light3,
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: Some(0.9),
+                    fallback_color: accent.light3,
+                },
+                accent_acrylic_in_app_fill_color_base_brush: AcrylicBrushResources {
+                    tint_color: accent.light3,
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: Some(0.9),
+                    fallback_color: accent.light3,
+                },
+                desktop_acrylic_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_chrome_medium_color: Color::from_argb(255, 230, 230, 230),
+                system_chrome_medium_low_color: Color::from_argb(255, 242, 242, 242),
+                system_base_high_color: Color::from_argb(255, 0, 0, 0),
+                system_chrome_low_color: Color::from_argb(255, 242, 242, 242),
+                system_chrome_high_color: Color::from_argb(255, 204, 204, 204),
+                system_base_low_color: Color::from_argb(51, 0, 0, 0),
+                system_base_medium_low_color: Color::from_argb(102, 0, 0, 0),
+                system_alt_low_color: Color::from_argb(51, 255, 255, 255),
+                system_alt_medium_low_color: Color::from_argb(102, 255, 255, 255),
+                system_alt_high_color: Color::from_argb(255, 255, 255, 255),
+            },
+            Theme::Dark => Self {
+                system_chrome_medium_high_color: Color::from_argb(255, 50, 50, 50),
+                system_chrome_alt_medium_high_color: Color::from_argb(204, 31, 31, 31),
+                system_chrome_alt_high_color: Color::from_argb(255, 28, 28, 28),
+                system_control_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 31, 31, 31),
+                },
+                system_control_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 31, 31, 31),
+                },
+                system_control_accent_acrylic_window_accent_medium_high_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.base,
+                        tint_opacity: 0.7,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.base,
+                    },
+                system_control_accent_acrylic_element_accent_medium_high_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.base,
+                        tint_opacity: 0.7,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.base,
+                    },
+                system_control_accent_dark1_acrylic_window_accent_dark1_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.dark1,
+                        tint_opacity: 0.8,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.dark1,
+                    },
+                system_control_accent_dark1_acrylic_element_accent_dark1_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.dark1,
+                        tint_opacity: 0.8,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.dark1,
+                    },
+                system_control_accent_dark2_acrylic_window_accent_dark2_medium_high_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.dark2,
+                        tint_opacity: 0.7,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.dark2,
+                    },
+                system_control_accent_dark2_acrylic_element_accent_dark2_medium_high_brush:
+                    AcrylicBrushResources {
+                        tint_color: accent.dark2,
+                        tint_opacity: 0.7,
+                        tint_luminosity_opacity: None,
+                        fallback_color: accent.dark2,
+                    },
+                system_control_acrylic_window_medium_high_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.7,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 31, 31, 31),
+                },
+                system_control_acrylic_element_medium_high_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.7,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 31, 31, 31),
+                },
+                system_control_chrome_medium_low_acrylic_window_medium_brush:
+                    AcrylicBrushResources {
+                        tint_color: Color::from_argb(255, 28, 28, 28),
+                        tint_opacity: 0.6,
+                        tint_luminosity_opacity: None,
+                        fallback_color: Color::from_argb(255, 43, 43, 43),
+                    },
+                system_control_chrome_medium_low_acrylic_element_medium_brush:
+                    AcrylicBrushResources {
+                        tint_color: Color::from_argb(255, 28, 28, 28),
+                        tint_opacity: 0.6,
+                        tint_luminosity_opacity: None,
+                        fallback_color: Color::from_argb(255, 43, 43, 43),
+                    },
+                system_control_base_high_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 255, 255, 255),
+                },
+                system_control_base_high_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 255, 255, 255),
+                },
+                system_control_base_high_acrylic_window_medium_high_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.7,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 255, 255, 255),
+                },
+                system_control_base_high_acrylic_element_medium_high_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.7,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 255, 255, 255),
+                },
+                system_control_base_high_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 255, 255, 255),
+                },
+                system_control_base_high_acrylic_element_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 255, 255, 255),
+                },
+                system_control_chrome_low_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 23, 23, 23),
+                },
+                system_control_chrome_low_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 23, 23, 23),
+                },
+                system_control_chrome_medium_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 31, 31, 31),
+                },
+                system_control_chrome_medium_acrylic_element_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 31, 31, 31),
+                },
+                system_control_chrome_high_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 118, 118, 118),
+                },
+                system_control_chrome_high_acrylic_element_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 118, 118, 118),
+                },
+                system_control_base_low_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(51, 255, 255, 255),
+                },
+                system_control_base_low_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(51, 255, 255, 255),
+                },
+                system_control_base_medium_low_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(102, 255, 255, 255),
+                },
+                system_control_base_medium_low_acrylic_element_medium_brush:
+                    AcrylicBrushResources {
+                        tint_color: Color::from_argb(255, 28, 28, 28),
+                        tint_opacity: 0.6,
+                        tint_luminosity_opacity: None,
+                        fallback_color: Color::from_argb(102, 255, 255, 255),
+                    },
+                system_control_alt_low_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(51, 0, 0, 0),
+                },
+                system_control_alt_low_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(51, 0, 0, 0),
+                },
+                system_control_alt_medium_low_acrylic_window_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(102, 0, 0, 0),
+                },
+                system_control_alt_medium_low_acrylic_element_medium_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.6,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(102, 0, 0, 0),
+                },
+                system_control_alt_high_acrylic_window_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 0, 0, 0),
+                },
+                system_control_alt_high_acrylic_element_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 28, 28, 28),
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: None,
+                    fallback_color: Color::from_argb(255, 0, 0, 0),
+                },
+                system_control_transient_border_brush: Color::from_argb(255, 0, 0, 0),
+                acrylic_background_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                acrylic_background_fill_color_default_inverse_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                acrylic_in_app_fill_color_default_inverse_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                acrylic_background_fill_color_base_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 32, 32, 32),
+                    tint_opacity: 0.5,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 28, 28, 28),
+                },
+                acrylic_in_app_fill_color_base_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 32, 32, 32),
+                    tint_opacity: 0.5,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 28, 28, 28),
+                },
+                accent_acrylic_background_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: accent.dark1,
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: Some(0.8),
+                    fallback_color: accent.dark1,
+                },
+                accent_acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: accent.dark1,
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: Some(0.8),
+                    fallback_color: accent.dark1,
+                },
+                accent_acrylic_background_fill_color_base_brush: AcrylicBrushResources {
+                    tint_color: accent.dark2,
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: Some(0.8),
+                    fallback_color: accent.dark2,
+                },
+                accent_acrylic_in_app_fill_color_base_brush: AcrylicBrushResources {
+                    tint_color: accent.dark2,
+                    tint_opacity: 0.8,
+                    tint_luminosity_opacity: Some(0.8),
+                    fallback_color: accent.dark2,
+                },
+                desktop_acrylic_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_chrome_medium_color: Color::from_argb(255, 31, 31, 31),
+                system_chrome_medium_low_color: Color::from_argb(255, 43, 43, 43),
+                system_base_high_color: Color::from_argb(255, 255, 255, 255),
+                system_chrome_low_color: Color::from_argb(255, 23, 23, 23),
+                system_chrome_high_color: Color::from_argb(255, 118, 118, 118),
+                system_base_low_color: Color::from_argb(51, 255, 255, 255),
+                system_base_medium_low_color: Color::from_argb(102, 255, 255, 255),
+                system_alt_low_color: Color::from_argb(51, 0, 0, 0),
+                system_alt_medium_low_color: Color::from_argb(102, 0, 0, 0),
+                system_alt_high_color: Color::from_argb(255, 0, 0, 0),
+            },
+        }
+    }
+}

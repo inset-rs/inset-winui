@@ -78,6 +78,12 @@ pub enum FluentSymbol {
     Settings,
     /// Open the overflow menu.
     More,
+    /// Temporarily reveal concealed text.
+    Eye,
+    /// Editable text input.
+    TextField,
+    /// Password or protected input.
+    LockClosed,
 }
 
 impl FluentSymbol {
@@ -112,6 +118,9 @@ impl FluentSymbol {
             Self::Back => 61787,
             Self::Settings => 63145,
             Self::More => 59428,
+            Self::Eye => 58866,
+            Self::TextField => 63455,
+            Self::LockClosed => 59279,
         })
         .unwrap()
     }

@@ -18,6 +18,46 @@ Ported against: aa3207e6
   Reason: language — Rust uses typed closures instead of XAML template resources.
   Affect: A `Button` caller can supply `.template(...)` without replacing the button’s input behavior.
 
+## text_control.rs → TextBoxBase
+
+- Change: `TextBox` and `PasswordBox` use Reveal's EditableText, selection gestures, controllers and input formatters as their editing engine.
+  Reason: framework — WinUI delegates editing to Windows RichEdit, while Reveal supplies Flutter's editor.
+  Affect: Text selection, keyboard shortcuts, IME composition, length enforcement and undo follow the native Flutter behavior.
+
+- Change: `TextBox.text_changed`, `PasswordBox.password_changed` and `TextBox.selection_changed` report native user edits after the controller updates, and the TextBox clear button also reports its action.
+  Reason: framework — Flutter's formatter and controller events do not provide WinUI's cancelable changing-event and undo-reset contracts.
+  Affect: Applications validate user edits through input formatters and observe all assignments through the controller; BeforeTextChanging, TextChanging and cancelable SelectionChanging are not exposed.
+
+- Change: `TextControl` updates helper-button availability and square sizing through SizeObserver after layout.
+  Reason: framework — Reveal's layout notifications run after the frame instead of inside XAML arrangement.
+  Affect: A clear or reveal button can settle its visibility or width on the frame following a size change.
+
+## text_box.rs → TextBox
+
+- Change: `TextBox` wraps multiline text even when TextWrapping is NoWrap.
+  Reason: framework — Flutter's multiline layout does not provide independent wrapping and two-axis editor scrolling.
+  Affect: AcceptsReturn=true preserves explicit line breaks and wraps long lines within the editor width.
+
+- Change: `TextBox` receives a caller-owned TextEditingController instead of a mutable Text dependency property.
+  Reason: language — controller ownership supplies a stable mutable editing value across immutable widget rebuilds.
+  Affect: Callers read or assign text and selection through the controller and dispose it after the editor unmounts.
+
+## password_box.rs → PasswordBox
+
+- Change: `PasswordBox` keeps its password in a native TextEditingController.
+  Reason: os — WinUI's additional CryptProtectMemory storage is a Windows facility outside the native Flutter editing engine.
+  Affect: The field conceals text visually and disables copying and cutting, but the controller contains an ordinary text value.
+
+## text_edit_menu.rs → TextCommandBarFlyout desktop commands
+
+- Change: `TextBox` and `PasswordBox` show their desktop command list through EditableText's context-menu overlay and layout delegate.
+  Reason: framework — Reveal's native editor owns selection-toolbar lifetime and placement instead of XAML's separate-window CommandBarFlyout.
+  Affect: Menus stay inside the application view and use native placement and editing shortcuts, with the source desktop command order and availability.
+
+- Change: `TextEditMenu` uses in-window acrylic for its background and opens without a popup theme animation.
+  Reason: os — the Windows system backdrop and popup theme animation are not available through the native overlay host.
+  Affect: The menu samples the application scene instead of the desktop behind the window and appears immediately.
+
 ## grid/render_grid.rs → `Grid`
 
 - Change: `Grid` gives each child its whole grid cell, with alignment expressed by child wrappers.
@@ -223,7 +263,7 @@ Ported against: aa3207e6
 - CheckBox indeterminate sweep animation remains deferred. Trigger: A recording from Windows is available.
 - ProgressBar, ProgressRing, additional TextBlock styles, Expander, InfoBar and dialogs remain deferred. Trigger: The next control port is selected.
 - Mica wallpaper backdrops remain deferred. Trigger: A host material path supplies the wallpaper processing absent from the source.
-- Text input controls remain deferred. Trigger: An editing-engine decision addresses the Windows RichEdit dependency.
+- Text controls’ spell-check suggestion menus, touch command-bar presentation, input-scope-specific soft keyboards and OS credential/autofill integration remain deferred. Trigger: The corresponding native services or additional control ports are available.
 - TabView tear-out, caption regions, window movement and cross-window drag transport remain deferred. Trigger: A host provides window management and native drag transport.
 - TabView gamepad focus, focus engagement, high-contrast adaptation and automation remain deferred. Trigger: The corresponding input, theme and accessibility facilities are available.
 - TabView insertion, removal and reorder animations remain deferred. Trigger: Windows timing is verified or a host animation service is available.

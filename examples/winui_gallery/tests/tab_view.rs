@@ -280,7 +280,7 @@ fn move_tab_pointer(f: &mut Fixture, from: Offset, to: Offset) {
             change: PointerChange::Move,
             kind: PointerDeviceKind::Mouse,
             time_stamp: f.at,
-            pointer_identifier: 7,
+            pointer_identifier: f.mouse_pointer,
             physical_x: to.dx(),
             physical_y: to.dy(),
             physical_delta_x: to.dx() - from.dx(),
