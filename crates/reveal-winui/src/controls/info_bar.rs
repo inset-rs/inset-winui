@@ -628,7 +628,7 @@ fn severity_brushes(
             r.info_bar_warning_severity_background_brush,
             r.info_bar_warning_severity_icon_background,
             r.info_bar_warning_severity_icon_foreground,
-            FluentSymbol::Warning,
+            FluentSymbol::ErrorCircle,
         ),
         InfoBarSeverity::Error => (
             r.info_bar_error_severity_background_brush,

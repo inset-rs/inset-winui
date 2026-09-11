@@ -290,7 +290,7 @@ Ported against: aa3207e6
 
 - Change: `InfoBar` draws its status icons with the bundled replacement font over a colored circle.
   Reason: os — the original matching foreground and background symbols belong to a font supplied with Windows.
-  Affect: The replacement icon shapes differ from Windows; the warning triangle currently does not match the circular background and needs correction.
+  Affect: The replacement icon shapes differ from Windows, while the warning uses an exclamation mark inside a circle that matches its circular background.
 
 - Change: `InfoBar` accepts a widget-building callback to customize its close button.
   Reason: language — a Rust callback receives the button’s current state and content in place of a XAML style declaration.

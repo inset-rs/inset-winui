@@ -30,6 +30,8 @@ pub enum FluentSymbol {
     DismissCircle,
     /// A warning status.
     Warning,
+    /// An exclamation mark inside a circle.
+    ErrorCircle,
     /// Progress or elapsed time.
     Timer,
     /// Collapsible sections.
@@ -107,6 +109,7 @@ impl FluentSymbol {
             Self::CheckmarkCircle => 62103,
             Self::DismissCircle => 62316,
             Self::Warning => 63592,
+            Self::ErrorCircle => 62448,
             Self::Timer => 60808,
             Self::ChevronDownUp => 983404,
             Self::CursorClick => 58437,

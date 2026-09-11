@@ -387,7 +387,7 @@ fn info_bar_status_glyphs_keep_their_natural_line_height() {
         if ![
             reveal_winui::FluentSymbol::Info,
             reveal_winui::FluentSymbol::CheckmarkCircle,
-            reveal_winui::FluentSymbol::Warning,
+            reveal_winui::FluentSymbol::ErrorCircle,
             reveal_winui::FluentSymbol::DismissCircle,
         ]
         .iter()
