@@ -106,6 +106,21 @@ impl ThemeResources {
         PasswordBoxResources::for_theme(self.theme, &self.accent)
     }
 
+    /// ProgressBar's track and status colors.
+    pub fn progress_bar(&self) -> ProgressBarResources {
+        ProgressBarResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// Expander's header, chevron and content colors.
+    pub fn expander(&self) -> ExpanderResources {
+        ExpanderResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// InfoBar's severity and content colors.
+    pub fn info_bar(&self) -> InfoBarResources {
+        InfoBarResources::for_theme(self.theme, &self.accent)
+    }
+
     pub fn toggle_switch(&self) -> ToggleSwitchResources {
         ToggleSwitchResources::for_theme(self.theme, &self.accent)
     }

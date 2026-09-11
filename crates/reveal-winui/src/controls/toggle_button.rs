@@ -126,6 +126,10 @@ pub fn next_is_checked(is_checked: Option<bool>, is_three_state: bool) -> Option
 /// The `Checked`, `Unchecked` and `Indeterminate` events as one handler, given the value the button wants.
 pub type ToggleButtonCheckedHandler = Rc<dyn Fn(&mut App, Option<bool>)>;
 
+/// Builds a source ToggleButton template while retaining native toggle and keyboard behavior.
+pub type ToggleButtonTemplate =
+    Rc<dyn Fn(&mut App, BuildContext, Option<bool>, Option<WidgetRef>, ControlStates) -> WidgetRef>;
+
 /// XAML `ToggleButton`: `IsChecked` (`Some(true)`, `Some(false)` or `None` for indeterminate) with `IsThreeState`, `Content`, and `Click` after each toggle.
 #[derive(Clone)]
 pub struct ToggleButton {
@@ -138,6 +142,10 @@ pub struct ToggleButton {
     /// XAML `Click`, raised after the toggle as `ToggleButton::OnClick` does.
     pub click: Option<Listener>,
     pub is_enabled: bool,
+
+    /// Optional source template used by compound controls such as Expander.
+    pub template: Option<ToggleButtonTemplate>,
+
     pub key: Option<KeyRef>,
 }
 
@@ -153,6 +161,7 @@ impl ToggleButton {
             is_three_state: false,
             click: None,
             is_enabled: true,
+            template: None,
             key: None,
         }
     }
@@ -190,6 +199,22 @@ impl ToggleButton {
         self
     }
 
+    /// Sets an alternate ControlTemplate without changing the toggle behavior.
+    pub fn template(
+        mut self,
+        builder: impl Fn(
+            &mut App,
+            BuildContext,
+            Option<bool>,
+            Option<WidgetRef>,
+            ControlStates,
+        ) -> WidgetRef
+        + 'static,
+    ) -> Self {
+        self.template = Some(Rc::new(builder));
+        self
+    }
+
     pub fn key(mut self, key: KeyRef) -> ToggleButton {
         self.key = Some(key);
         self
@@ -222,8 +247,13 @@ impl StatelessWidget for ToggleButton {
                 click.call(app);
             }
         });
+        let custom_template = self.template.clone();
         CommonStates::new(on_click, move |app, context, states| {
-            template(app, context, is_checked, content.clone(), states)
+            if let Some(builder) = &custom_template {
+                builder(app, context, is_checked, content.clone(), states)
+            } else {
+                template(app, context, is_checked, content.clone(), states)
+            }
         })
         .is_enabled(self.is_enabled)
         .into_widget()

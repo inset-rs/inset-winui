@@ -22,6 +22,19 @@ pub fn install_icon_font(app: &mut App) {
 /// These names intentionally do not promise Segoe's private-use glyph mapping.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum FluentSymbol {
+    /// General information.
+    Info,
+    /// Successful completion.
+    CheckmarkCircle,
+    /// An error status.
+    DismissCircle,
+    /// A warning status.
+    Warning,
+    /// Progress or elapsed time.
+    Timer,
+    /// Collapsible sections.
+    ChevronDownUp,
+
     /// Activate an action.
     CursorClick,
     /// Switch a setting.
@@ -90,6 +103,12 @@ impl FluentSymbol {
     /// The glyph from the bundled revision's `codepoints.json`.
     pub fn glyph(self) -> char {
         char::from_u32(match self {
+            Self::Info => 62626,
+            Self::CheckmarkCircle => 62103,
+            Self::DismissCircle => 62316,
+            Self::Warning => 63592,
+            Self::Timer => 60808,
+            Self::ChevronDownUp => 983404,
             Self::CursorClick => 58437,
             Self::ToggleLeft => 60816,
             Self::CheckboxChecked => 62093,

@@ -5,6 +5,12 @@ use reveal_winui::FluentSymbol;
 /// A gallery destination with its own retained examples and scroll position.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Feature {
+    /// Determinate and animated progress states.
+    ProgressBar,
+    /// Expandable content in either direction.
+    Expander,
+    /// Inline notifications and cancelable closing.
+    InfoBar,
     /// Standard, accent and disabled buttons.
     Button,
     /// Plain and multiline text entry.
@@ -45,7 +51,7 @@ pub enum Feature {
 
 impl Feature {
     /// Display order in the navigation pane.
-    pub const ALL: [Self; 18] = [
+    pub const ALL: [Self; 21] = [
         Self::Button,
         Self::TextBox,
         Self::PasswordBox,
@@ -57,6 +63,9 @@ impl Feature {
         Self::RepeatButton,
         Self::HyperlinkButton,
         Self::Slider,
+        Self::ProgressBar,
+        Self::Expander,
+        Self::InfoBar,
         Self::SplitView,
         Self::Acrylic,
         Self::ToolTip,
@@ -80,6 +89,9 @@ impl Feature {
             Self::RepeatButton => "RepeatButton",
             Self::HyperlinkButton => "HyperlinkButton",
             Self::Slider => "Slider",
+            Self::ProgressBar => "ProgressBar",
+            Self::Expander => "Expander",
+            Self::InfoBar => "InfoBar",
             Self::SplitView => "SplitView",
             Self::Acrylic => "Acrylic",
             Self::ToolTip => "ToolTip",
@@ -104,6 +116,9 @@ impl Feature {
             Self::RepeatButton => FluentSymbol::ArrowRepeatAll,
             Self::HyperlinkButton => FluentSymbol::Link,
             Self::Slider => FluentSymbol::Options,
+            Self::ProgressBar => FluentSymbol::Timer,
+            Self::Expander => FluentSymbol::ChevronDownUp,
+            Self::InfoBar => FluentSymbol::Info,
             Self::SplitView => FluentSymbol::PanelLeft,
             Self::Acrylic => FluentSymbol::Layer,
             Self::ToolTip => FluentSymbol::TooltipQuote,
@@ -119,7 +134,9 @@ impl Feature {
         match self {
             Self::Button => "Activate an action using the pointer or keyboard.",
             Self::TextBox => "Enter and edit text, select words, and explore multiline input.",
-            Self::PasswordBox => "Enter a password and compare Peek, Hidden and Visible reveal modes.",
+            Self::PasswordBox => {
+                "Enter a password and compare Peek, Hidden and Visible reveal modes."
+            }
             Self::ToggleSwitch => "Switch settings on and off, or drag the thumb.",
             Self::Grid => "Arrange content with fixed, content-sized and proportional tracks.",
             Self::CheckBox => "Choose independent options, including an indeterminate state.",
@@ -128,6 +145,11 @@ impl Feature {
             Self::RepeatButton => "Hold the button to repeat its action.",
             Self::HyperlinkButton => "Present an action as a text link.",
             Self::Slider => "Adjust a value continuously or in steps.",
+            Self::ProgressBar => {
+                "Show completion or ongoing work, including paused and error states."
+            }
+            Self::Expander => "Reveal related content above or below a header.",
+            Self::InfoBar => "Show inline feedback with severity, actions and cancelable closing.",
             Self::SplitView => "Explore inline, compact and overlay pane layouts.",
             Self::Acrylic => {
                 "Blur and tint the scene behind a surface while keeping its content sharp."

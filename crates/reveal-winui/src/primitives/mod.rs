@@ -23,3 +23,6 @@ pub(crate) use anchored_flyout::*;
 
 mod margin;
 pub use margin::*;
+
+mod info_bar_panel;
+pub use info_bar_panel::*;

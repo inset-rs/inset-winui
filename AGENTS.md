@@ -38,8 +38,18 @@ Faithful WinUI behavior remains the aim, especially where later controls depend 
 
 ## PORTING.md
 
-Each source folder keeps its own `PORTING.md` (`src/theme`, `src/primitives`, `src/controls`), with a section per file: `## toggle_switch.rs → ToggleSwitch`. An entry is Change / Reason / Affect, for a reader who knows Rust and WinUI's public surface; no visible Affect means identical, so no entry. An entry is three sentences: Change starts with its subject and says the idea, Reason names the kind and one fact, Affect says what a reader of the control would notice. Deferred items go under `## Deferred`, each with a trigger. The Reason is one of three, because each has its own way back:
+Each source folder keeps its own `PORTING.md` (`src/theme`, `src/primitives`, `src/controls`), with a section per file: `## toggle_switch.rs → ToggleSwitch`. An entry is Change / Reason / Affect, for a reader who knows Flutter and Rust but not WinUI internals; no visible Affect means identical, so no entry. An entry is three sentences: Change starts with its subject and says the idea, Reason names the kind and one fact, Affect says what a reader of the control would notice. Deferred items go under `## Deferred`, each with a trigger. The Reason is one of three, because each has its own way back:
 
 - `os` — Windows supplies it and this host does not: a value not in the repository, or a facility of the OS. Name the substitute; the trigger is a measurement or table from a Windows machine, or a host that provides it.
 - `framework` — reveal has no equivalent of the XAML mechanism. The trigger is the framework feature.
 - `language` — Rust has no counterpart of the XAML or C++ shape. The Affect says what a caller writes differently.
+
+Start Change with the concrete type, constant or variant being described, then explain the behavior in ordinary language. Keep source symbol names as references, not as substitutes for an explanation. Avoid unnamed subjects such as “dragging a switch” and session-specific shorthand. Reason explains the underlying cause, rather than merely saying an API is missing; Affect describes what the user sees or what application code must do.
+
+For example:
+
+- Change: `ToggleSwitch` waits for enough pointer movement to distinguish a drag from a tap before moving its knob.
+  Reason: framework — Flutter recognizers first decide whether the press is a tap or a drag, while WinUI’s draggable knob starts tracking on press.
+  Affect: `ToggleSwitch` keeps its knob still for the first 18 px of touch movement, and shorter movement remains a tap.
+
+The type name identifies the code; the rest explains the difference without requiring the reader to know WinUI's internal classes or this conversation.

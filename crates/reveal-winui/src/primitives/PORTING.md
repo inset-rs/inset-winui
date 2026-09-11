@@ -1,26 +1,28 @@
 # reveal-winui/src/primitives
+Audience: readers familiar with Flutter and Rust; the headings identify the corresponding WinUI code.
+
 WinUI home: `ContentPresenter`, `Border`, `BrushTransition`, `VisualStateManager` and the system focus visual, in dxaml/xcp
 Ported against: aa3207e6
 
 ## common_states.rs → `ButtonBase`
 
-- Change: `CommonStates` handles activation keys before application shortcuts, including repeats and rejected Enter presses.
-  Reason: framework — Reveal otherwise converts these events into activation intents.
-  Affect: `CommonStates` prevents held keys and Enter with `AcceptsReturn` disabled from activating an ancestor shortcut.
+- Change: `CommonStates` consumes activation keys even when they do not produce a click.
+  Reason: framework — Reveal routes keyboard events through nested shortcut handlers, so a rejected key can otherwise activate an enclosing control.
+  Affect: Holding an activation key does not repeatedly trigger an enclosing shortcut, and a button configured to reject Enter still consumes that key.
 
-- Change: `CommonStates` uses native tap recognition instead of WinUI pointer capture.
-  Reason: framework — Reveal resolves competing gestures through its gesture arena.
-  Affect: `CommonStates` cancels activation after movement beyond the tap threshold, even after the pointer returns inside.
+- Change: `CommonStates` handles button presses with Flutter tap recognition instead of keeping all pointer events until release.
+  Reason: framework — Reveal lets tap, drag and scroll recognizers compete for the same press, whereas WinUI can capture the pointer directly for the control.
+  Affect: Moving too far cancels the click, even if the pointer returns inside the button before release.
 
-- Change: `CommonStates` uses Reveal’s native focus-highlight policy.
-  Reason: framework — Flutter’s desktop focus policy groups mouse and keyboard input as traditional input.
-  Affect: `CommonStates` leaves keyboard focus where it was on a pointer click, as Flutter buttons do; keyboard traversal moves focus and shows its ring.
+- Change: `CommonStates` leaves keyboard focus on the previously focused widget when a button is clicked.
+  Reason: framework — Reveal tracks keyboard-focus highlighting separately from clicks, and the kit follows Flutter buttons by leaving focus unchanged on pointer activation.
+  Affect: Tab moves focus and shows a focus ring; a mouse click does not move that ring to the clicked button.
 
 ## color_transition.rs → `BrushTransition`
 
-- Change: `ColorTransition` uses linear easing.
-  Reason: os — Windows supplies the source transition’s easing.
-  Affect: `ColorTransition`’s 83 ms background fade is linear.
+- Change: `ColorTransition` fades background colors at a constant rate.
+  Reason: os — Windows chooses how the original fade speeds up and slows down, and those parameters are not provided in the source.
+  Affect: The 83 ms fade can progress differently from the Windows fade.
 
 ## focus_visual.rs → system focus visual
 
@@ -32,57 +34,63 @@ Ported against: aa3207e6
 
 - Change: `FluentIcon` uses the bundled Fluent System Icons font for built-in symbols.
   Reason: os — Segoe Fluent Icons ships with Windows.
-  Affect: `FluentIcon` glyph shapes and optical metrics differ slightly from Windows.
+  Affect: Icons can differ in shape, spacing and alignment from the Windows icons.
 
 ## scroll_viewport.rs → `ScrollViewer`
 
-- Change: `ScrollViewport` uses Reveal’s native viewports and controllers.
-  Reason: framework — Reveal has no XAML DirectManipulation scrolling stack.
-  Affect: `ScrollViewport` inertia, overscroll and input motion follow Reveal, including its 100 ms animated scroll commands.
+- Change: `ScrollViewport` uses Flutter viewports, controllers and physics for scrolling.
+  Reason: framework — WinUI relies on a Windows service for scrolling gestures and motion, while Reveal already supplies Flutter’s scrolling implementation.
+  Affect: Scrolling momentum and behavior at the ends follow Flutter, and scroll commands animate over 100 ms.
 
 ## anchored_flyout.rs → attached `Flyout` and `FlyoutPresenter`
 
-- Change: `AnchoredFlyout` uses a root overlay and native focus scope for navigation flyouts.
-  Reason: framework — Reveal has no separate-window XAML popup.
-  Affect: `AnchoredFlyout` remains inside the application window and restores focus to a surviving opener when dismissed.
+- Change: `AnchoredFlyout` opens navigation menus in the application’s Overlay and uses a FocusScope.
+  Reason: framework — WinUI can create a separate popup window, while a Flutter Overlay draws inside the existing window.
+  Affect: A menu cannot extend outside the window, and closing it returns focus to its opening button if that button still exists.
 
-- Change: `AnchoredFlyout` is measured once on its preferred side or the opposite side.
-  Reason: framework — Reveal’s layout delegate measures each child once, while WinUI can retry all four sides.
-  Affect: `AnchoredFlyout` can choose a different side or size in crowded layouts, with long menus scrolling in the available space.
+- Change: `AnchoredFlyout` checks its preferred side of the opening button and the opposite side, rather than all four sides.
+  Reason: framework — the native custom-layout callback permits one child measurement per pass, while WinUI’s popup-placement code can measure again for several candidate positions.
+  Affect: Near a window edge, a menu can appear on a different side or at a different size than on Windows.
 
-- Change: `AnchoredFlyout` appears and disappears without a theme transition.
-  Reason: os — Windows supplies `PopupThemeTransition` timing.
+- Change: `AnchoredFlyout` opens and closes immediately instead of animating its appearance.
+  Reason: os — the source asks Windows to choose the popup animation through `PopupThemeTransition`, without specifying its duration and motion in the template.
   Affect: `AnchoredFlyout` opens and closes immediately.
 
 ## margin.rs → `FrameworkElement` layout
 
-- Change: `Margin` uses native logical-pixel layout for signed margins.
-  Reason: framework — Reveal does not apply XAML’s layout-rounding policy.
-  Affect: `Margin` can produce fractional-scale edges that differ from Windows pixel rounding.
+- Change: `Margin` preserves fractional spacing instead of snapping its edges to physical pixels.
+  Reason: framework — XAML rounds layout measurements using the display scale, while Reveal passes logical-pixel measurements through without that rounding step.
+  Affect: At fractional display scales, the spacing can end between physical pixels instead of on a pixel boundary.
 
 ## acrylic.rs → `AcrylicBrush`
 
-- Change: `Brush::Acrylic` omits the source’s wrapped noise texture at 2% opacity.
-  Reason: framework — Reveal has no host image-upload path for Valo images, although tiled image shaders are available.
+- Change: `Brush::Acrylic` omits the faint repeating noise image drawn over the blurred background.
+  Reason: framework — Reveal’s host interface cannot yet upload the noise image to its renderer, Valo, although that renderer can repeat an uploaded image.
   Affect: `Brush::Acrylic` surfaces lack the source’s fine grain.
 
-- Change: `Brush::Acrylic` does not switch automatically to its fallback when system material policy changes.
+- Change: `Brush::Acrylic` does not automatically replace its blurred background with a solid color when the operating system disables visual effects.
   Reason: os — this host does not report Windows battery and advanced-effects policy changes.
-  Affect: `Brush::Acrylic` callers select the fallback explicitly with `Brush::Solid(recipe.fallback_color)`.
+  Affect: Applications must select the solid replacement color themselves.
 
-- Change: `Brush::Acrylic` applies a replacement recipe’s tint immediately.
-  Reason: language — immutable recipe values do not retain mutable brush-property transition state.
-  Affect: `Brush::Acrylic` tint changes do not run the source’s 500 ms transition.
+- Change: `Brush::Acrylic` changes its tint immediately when the application supplies a new color.
+  Reason: framework — the port stores material settings as values and has no persistent brush object to animate between replacements.
+  Affect: `Brush::Acrylic` tint changes jump to the new color instead of fading over 500 ms.
 
 ## brush.rs → `Brush`
 
-- Change: `Brush` uses shape-aware fill and stroke methods instead of returning a Paint value.
-  Reason: framework — Valo represents backdrop sampling as a layer rather than a paint.
-  Affect: `Brush` callers use methods such as `paint_rrect`, `paint_drrect` and `paint_oval` to draw the brush.
+- Change: `Brush` paints the shape itself instead of returning a Paint for the caller to draw with.
+  Reason: framework — acrylic must sample the scene already drawn behind the shape, which Reveal’s renderer, Valo, expresses through a compositing layer rather than an ordinary fill or stroke.
+  Affect: Callers ask the helper to paint a rounded rectangle, a border or an oval instead of passing a Paint to Canvas.
+
+## info_bar_panel.rs → `InfoBarPanel`
+
+- Change: `InfoBarPanel` receives the intended height of a single row as an explicit input.
+  Reason: framework — WinUI reads this setting from the parent, but Flutter layout constraints describe the space available to a child, not the settings used to size its parent.
+  Affect: When using the panel directly, pass the container’s minimum height minus the panel’s top and bottom margins as `parent_min_height`; the full notification control does this automatically.
 
 ## Deferred
 
 - Navigation flyout opening and closing animations remain deferred. Trigger: A Windows timing measurement or equivalent host transition is available.
-- Acrylic’s wrapped noise texture remains deferred. Trigger: Host image-upload support for Valo images is available.
+- The blurred background’s repeating noise image remains deferred. Trigger: Reveal can upload that image to the renderer.
 - Automatic acrylic fallback policy remains deferred. Trigger: A host reports battery and advanced-effects policy changes.
-- Acrylic tint transitions remain deferred. Trigger: Mutable brush-property transition state is available.
+- Animated tint changes remain deferred. Trigger: The background implementation stores the old and new colors and an animation between them.

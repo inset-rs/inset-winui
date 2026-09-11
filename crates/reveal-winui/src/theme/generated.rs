@@ -5999,3 +5999,336 @@ impl AcrylicThemeResources {
         }
     }
 }
+/// Theme-dependent resources of `ProgressBar_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ProgressBarResources {
+    /// The resolved `ProgressBarForeground` resource.
+    pub progress_bar_foreground: Color,
+    /// The resolved `ProgressBarBackground` resource.
+    pub progress_bar_background: Color,
+    /// The resolved `ProgressBarBorderBrush` resource.
+    pub progress_bar_border_brush: Color,
+    /// The resolved `ProgressBarPausedForegroundColor` resource.
+    pub progress_bar_paused_foreground_color: Color,
+    /// The resolved `ProgressBarErrorForegroundColor` resource.
+    pub progress_bar_error_foreground_color: Color,
+}
+
+impl ProgressBarResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                progress_bar_foreground: accent.dark1,
+                progress_bar_background: Color::from_argb(114, 0, 0, 0),
+                progress_bar_border_brush: Color::from_argb(15, 0, 0, 0),
+                progress_bar_paused_foreground_color: Color::from_argb(255, 157, 93, 0),
+                progress_bar_error_foreground_color: Color::from_argb(255, 196, 43, 28),
+            },
+            Theme::Dark => Self {
+                progress_bar_foreground: accent.light2,
+                progress_bar_background: Color::from_argb(139, 255, 255, 255),
+                progress_bar_border_brush: Color::from_argb(18, 255, 255, 255),
+                progress_bar_paused_foreground_color: Color::from_argb(255, 252, 225, 0),
+                progress_bar_error_foreground_color: Color::from_argb(255, 255, 153, 164),
+            },
+        }
+    }
+}
+pub const PROGRESS_BAR_MIN_HEIGHT: f64 = 3.0;
+pub const PROGRESS_BAR_TRACK_HEIGHT: f64 = 1.0;
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const PROGRESS_BAR_CORNER_RADIUS: [f64; 4] = [1.5, 1.5, 1.5, 1.5];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const PROGRESS_BAR_TRACK_CORNER_RADIUS: [f64; 4] = [0.5, 0.5, 0.5, 0.5];
+/// Left, top, right, bottom.
+pub const PROGRESS_BAR_BORDER_THEME_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Theme-dependent resources of `Expander_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ExpanderResources {
+    /// The resolved `ExpanderHeaderBackground` resource.
+    pub expander_header_background: Color,
+    /// The resolved `ExpanderHeaderForeground` resource.
+    pub expander_header_foreground: Color,
+    /// The resolved `ExpanderHeaderForegroundPointerOver` resource.
+    pub expander_header_foreground_pointer_over: Color,
+    /// The resolved `ExpanderHeaderForegroundPressed` resource.
+    pub expander_header_foreground_pressed: Color,
+    /// The resolved `ExpanderHeaderBorderBrush` resource.
+    pub expander_header_border_brush: Color,
+    /// The resolved `ExpanderHeaderBorderPointerOverBrush` resource.
+    pub expander_header_border_pointer_over_brush: Color,
+    /// The resolved `ExpanderHeaderBorderPressedBrush` resource.
+    pub expander_header_border_pressed_brush: Color,
+    /// The resolved `ExpanderHeaderDisabledForeground` resource.
+    pub expander_header_disabled_foreground: Color,
+    /// The resolved `ExpanderHeaderDisabledBorderBrush` resource.
+    pub expander_header_disabled_border_brush: Color,
+    /// The resolved `ExpanderChevronBackground` resource.
+    pub expander_chevron_background: Color,
+    /// The resolved `ExpanderChevronPointerOverBackground` resource.
+    pub expander_chevron_pointer_over_background: Color,
+    /// The resolved `ExpanderChevronPressedBackground` resource.
+    pub expander_chevron_pressed_background: Color,
+    /// The resolved `ExpanderChevronForeground` resource.
+    pub expander_chevron_foreground: Color,
+    /// The resolved `ExpanderChevronPointerOverForeground` resource.
+    pub expander_chevron_pointer_over_foreground: Color,
+    /// The resolved `ExpanderChevronPressedForeground` resource.
+    pub expander_chevron_pressed_foreground: Color,
+    /// The resolved `ExpanderChevronBorderBrush` resource.
+    pub expander_chevron_border_brush: Color,
+    /// The resolved `ExpanderChevronBorderPointerOverBrush` resource.
+    pub expander_chevron_border_pointer_over_brush: Color,
+    /// The resolved `ExpanderChevronBorderPressedBrush` resource.
+    pub expander_chevron_border_pressed_brush: Color,
+    /// The resolved `ExpanderContentBackground` resource.
+    pub expander_content_background: Color,
+    /// The resolved `ExpanderContentBorderBrush` resource.
+    pub expander_content_border_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+}
+
+impl ExpanderResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                expander_header_background: Color::from_argb(179, 255, 255, 255),
+                expander_header_foreground: Color::from_argb(228, 0, 0, 0),
+                expander_header_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                expander_header_foreground_pressed: Color::from_argb(228, 0, 0, 0),
+                expander_header_border_brush: Color::from_argb(15, 0, 0, 0),
+                expander_header_border_pointer_over_brush: Color::from_argb(15, 0, 0, 0),
+                expander_header_border_pressed_brush: Color::from_argb(15, 0, 0, 0),
+                expander_header_disabled_foreground: Color::from_argb(92, 0, 0, 0),
+                expander_header_disabled_border_brush: Color::from_argb(15, 0, 0, 0),
+                expander_chevron_background: Color::from_argb(0, 255, 255, 255),
+                expander_chevron_pointer_over_background: Color::from_argb(9, 0, 0, 0),
+                expander_chevron_pressed_background: Color::from_argb(6, 0, 0, 0),
+                expander_chevron_foreground: Color::from_argb(228, 0, 0, 0),
+                expander_chevron_pointer_over_foreground: Color::from_argb(228, 0, 0, 0),
+                expander_chevron_pressed_foreground: Color::from_argb(228, 0, 0, 0),
+                expander_chevron_border_brush: Color::from_argb(0, 255, 255, 255),
+                expander_chevron_border_pointer_over_brush: Color::from_argb(0, 255, 255, 255),
+                expander_chevron_border_pressed_brush: Color::from_argb(0, 255, 255, 255),
+                expander_content_background: Color::from_argb(128, 246, 246, 246),
+                expander_content_border_brush: Color::from_argb(15, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                expander_header_background: Color::from_argb(13, 255, 255, 255),
+                expander_header_foreground: Color::from_argb(255, 255, 255, 255),
+                expander_header_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                expander_header_foreground_pressed: Color::from_argb(255, 255, 255, 255),
+                expander_header_border_brush: Color::from_argb(25, 0, 0, 0),
+                expander_header_border_pointer_over_brush: Color::from_argb(25, 0, 0, 0),
+                expander_header_border_pressed_brush: Color::from_argb(25, 0, 0, 0),
+                expander_header_disabled_foreground: Color::from_argb(93, 255, 255, 255),
+                expander_header_disabled_border_brush: Color::from_argb(25, 0, 0, 0),
+                expander_chevron_background: Color::from_argb(0, 255, 255, 255),
+                expander_chevron_pointer_over_background: Color::from_argb(15, 255, 255, 255),
+                expander_chevron_pressed_background: Color::from_argb(10, 255, 255, 255),
+                expander_chevron_foreground: Color::from_argb(255, 255, 255, 255),
+                expander_chevron_pointer_over_foreground: Color::from_argb(255, 255, 255, 255),
+                expander_chevron_pressed_foreground: Color::from_argb(255, 255, 255, 255),
+                expander_chevron_border_brush: Color::from_argb(0, 255, 255, 255),
+                expander_chevron_border_pointer_over_brush: Color::from_argb(0, 255, 255, 255),
+                expander_chevron_border_pressed_brush: Color::from_argb(0, 255, 255, 255),
+                expander_content_background: Color::from_argb(8, 255, 255, 255),
+                expander_content_border_brush: Color::from_argb(25, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+            },
+        }
+    }
+}
+pub const EXPANDER_MIN_HEIGHT: f64 = 48.0;
+/// Left, top, right, bottom.
+pub const EXPANDER_HEADER_PADDING: [f64; 4] = [16.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const EXPANDER_CHEVRON_MARGIN: [f64; 4] = [20.0, 0.0, 8.0, 0.0];
+pub const EXPANDER_CHEVRON_BUTTON_SIZE: f64 = 32.0;
+pub const EXPANDER_CHEVRON_GLYPH_SIZE: f64 = 12.0;
+/// Left, top, right, bottom.
+pub const EXPANDER_CONTENT_PADDING: [f64; 4] = [16.0, 16.0, 16.0, 16.0];
+/// Left, top, right, bottom.
+pub const EXPANDER_CONTENT_DOWN_BORDER_THICKNESS: [f64; 4] = [1.0, 0.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const EXPANDER_CONTENT_UP_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 0.0];
+/// Left, top, right, bottom.
+pub const EXPANDER_HEADER_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const EXPANDER_CHEVRON_BORDER_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Theme-dependent resources of `InfoBar_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct InfoBarResources {
+    /// The resolved `InfoBarErrorSeverityBackgroundBrush` resource.
+    pub info_bar_error_severity_background_brush: Color,
+    /// The resolved `InfoBarWarningSeverityBackgroundBrush` resource.
+    pub info_bar_warning_severity_background_brush: Color,
+    /// The resolved `InfoBarSuccessSeverityBackgroundBrush` resource.
+    pub info_bar_success_severity_background_brush: Color,
+    /// The resolved `InfoBarInformationalSeverityBackgroundBrush` resource.
+    pub info_bar_informational_severity_background_brush: Color,
+    /// The resolved `InfoBarErrorSeverityIconBackground` resource.
+    pub info_bar_error_severity_icon_background: Color,
+    /// The resolved `InfoBarWarningSeverityIconBackground` resource.
+    pub info_bar_warning_severity_icon_background: Color,
+    /// The resolved `InfoBarSuccessSeverityIconBackground` resource.
+    pub info_bar_success_severity_icon_background: Color,
+    /// The resolved `InfoBarInformationalSeverityIconBackground` resource.
+    pub info_bar_informational_severity_icon_background: Color,
+    /// The resolved `InfoBarErrorSeverityIconForeground` resource.
+    pub info_bar_error_severity_icon_foreground: Color,
+    /// The resolved `InfoBarWarningSeverityIconForeground` resource.
+    pub info_bar_warning_severity_icon_foreground: Color,
+    /// The resolved `InfoBarSuccessSeverityIconForeground` resource.
+    pub info_bar_success_severity_icon_foreground: Color,
+    /// The resolved `InfoBarInformationalSeverityIconForeground` resource.
+    pub info_bar_informational_severity_icon_foreground: Color,
+    /// The resolved `InfoBarTitleForeground` resource.
+    pub info_bar_title_foreground: Color,
+    /// The resolved `InfoBarMessageForeground` resource.
+    pub info_bar_message_foreground: Color,
+    /// The resolved `InfoBarHyperlinkButtonForeground` resource.
+    pub info_bar_hyperlink_button_foreground: Color,
+    /// The resolved `InfoBarBorderBrush` resource.
+    pub info_bar_border_brush: Color,
+    /// The resolved `SystemControlTransientBorderBrush` resource.
+    pub system_control_transient_border_brush: Color,
+    /// The resolved `AppBarButtonBackground` resource.
+    pub app_bar_button_background: Color,
+    /// The resolved `AppBarButtonBackgroundPointerOver` resource.
+    pub app_bar_button_background_pointer_over: Color,
+    /// The resolved `AppBarButtonBackgroundPressed` resource.
+    pub app_bar_button_background_pressed: Color,
+    /// The resolved `AppBarButtonBackgroundDisabled` resource.
+    pub app_bar_button_background_disabled: Color,
+    /// The resolved `AppBarButtonForeground` resource.
+    pub app_bar_button_foreground: Color,
+    /// The resolved `AppBarButtonForegroundPointerOver` resource.
+    pub app_bar_button_foreground_pointer_over: Color,
+    /// The resolved `AppBarButtonForegroundPressed` resource.
+    pub app_bar_button_foreground_pressed: Color,
+    /// The resolved `AppBarButtonForegroundDisabled` resource.
+    pub app_bar_button_foreground_disabled: Color,
+    /// The resolved `AppBarButtonBorderBrush` resource.
+    pub app_bar_button_border_brush: Color,
+    /// The resolved `AppBarButtonBorderBrushPointerOver` resource.
+    pub app_bar_button_border_brush_pointer_over: Color,
+    /// The resolved `AppBarButtonBorderBrushPressed` resource.
+    pub app_bar_button_border_brush_pressed: Color,
+    /// The resolved `AppBarButtonBorderBrushDisabled` resource.
+    pub app_bar_button_border_brush_disabled: Color,
+}
+
+impl InfoBarResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                info_bar_error_severity_background_brush: Color::from_argb(255, 253, 231, 233),
+                info_bar_warning_severity_background_brush: Color::from_argb(255, 255, 244, 206),
+                info_bar_success_severity_background_brush: Color::from_argb(255, 223, 246, 221),
+                info_bar_informational_severity_background_brush: Color::from_argb(
+                    128, 246, 246, 246,
+                ),
+                info_bar_error_severity_icon_background: Color::from_argb(255, 196, 43, 28),
+                info_bar_warning_severity_icon_background: Color::from_argb(255, 157, 93, 0),
+                info_bar_success_severity_icon_background: Color::from_argb(255, 15, 123, 15),
+                info_bar_informational_severity_icon_background: accent.base,
+                info_bar_error_severity_icon_foreground: Color::from_argb(255, 255, 255, 255),
+                info_bar_warning_severity_icon_foreground: Color::from_argb(255, 255, 255, 255),
+                info_bar_success_severity_icon_foreground: Color::from_argb(255, 255, 255, 255),
+                info_bar_informational_severity_icon_foreground: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                info_bar_title_foreground: Color::from_argb(228, 0, 0, 0),
+                info_bar_message_foreground: Color::from_argb(228, 0, 0, 0),
+                info_bar_hyperlink_button_foreground: accent.dark2,
+                info_bar_border_brush: Color::from_argb(15, 0, 0, 0),
+                system_control_transient_border_brush: Color::from_argb(255, 0, 0, 0),
+                app_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                app_bar_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                app_bar_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground: Color::from_argb(228, 0, 0, 0),
+                app_bar_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                app_bar_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                app_bar_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                app_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+            },
+            Theme::Dark => Self {
+                info_bar_error_severity_background_brush: Color::from_argb(255, 68, 39, 38),
+                info_bar_warning_severity_background_brush: Color::from_argb(255, 67, 53, 25),
+                info_bar_success_severity_background_brush: Color::from_argb(255, 57, 61, 27),
+                info_bar_informational_severity_background_brush: Color::from_argb(
+                    8, 255, 255, 255,
+                ),
+                info_bar_error_severity_icon_background: Color::from_argb(255, 255, 153, 164),
+                info_bar_warning_severity_icon_background: Color::from_argb(255, 252, 225, 0),
+                info_bar_success_severity_icon_background: Color::from_argb(255, 108, 203, 95),
+                info_bar_informational_severity_icon_background: accent.light2,
+                info_bar_error_severity_icon_foreground: Color::from_argb(228, 0, 0, 0),
+                info_bar_warning_severity_icon_foreground: Color::from_argb(228, 0, 0, 0),
+                info_bar_success_severity_icon_foreground: Color::from_argb(228, 0, 0, 0),
+                info_bar_informational_severity_icon_foreground: Color::from_argb(228, 0, 0, 0),
+                info_bar_title_foreground: Color::from_argb(255, 255, 255, 255),
+                info_bar_message_foreground: Color::from_argb(255, 255, 255, 255),
+                info_bar_hyperlink_button_foreground: accent.light3,
+                info_bar_border_brush: Color::from_argb(25, 0, 0, 0),
+                system_control_transient_border_brush: Color::from_argb(255, 0, 0, 0),
+                app_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                app_bar_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                app_bar_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground: Color::from_argb(255, 255, 255, 255),
+                app_bar_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                app_bar_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                app_bar_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                app_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+            },
+        }
+    }
+}
+pub const INFO_BAR_TITLE_FONT_SIZE: f64 = 14.0;
+pub const INFO_BAR_TITLE_FONT_WEIGHT: FontWeight = FontWeight::W600;
+pub const INFO_BAR_MESSAGE_FONT_SIZE: f64 = 14.0;
+pub const INFO_BAR_MESSAGE_FONT_WEIGHT: FontWeight = FontWeight::NORMAL;
+pub const INFO_BAR_MIN_HEIGHT: f64 = 48.0;
+pub const INFO_BAR_CLOSE_BUTTON_SIZE: f64 = 38.0;
+pub const INFO_BAR_CLOSE_BUTTON_GLYPH_SIZE: f64 = 16.0;
+/// Left, top, right, bottom.
+pub const INFO_BAR_HYPERLINK_BUTTON_MARGIN: [f64; 4] = [-12.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_CONTENT_ROOT_PADDING: [f64; 4] = [16.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_ICON_MARGIN: [f64; 4] = [0.0, 16.0, 14.0, 16.0];
+pub const INFO_BAR_ICON_FONT_SIZE: f64 = 16.0;
+/// Left, top, right, bottom.
+pub const INFO_BAR_PANEL_MARGIN: [f64; 4] = [0.0, 0.0, 16.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_PANEL_HORIZONTAL_ORIENTATION_PADDING: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_PANEL_VERTICAL_ORIENTATION_PADDING: [f64; 4] = [0.0, 14.0, 0.0, 18.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_TITLE_HORIZONTAL_ORIENTATION_MARGIN: [f64; 4] = [0.0, 14.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_TITLE_VERTICAL_ORIENTATION_MARGIN: [f64; 4] = [0.0, 14.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_MESSAGE_HORIZONTAL_ORIENTATION_MARGIN: [f64; 4] = [12.0, 14.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_MESSAGE_VERTICAL_ORIENTATION_MARGIN: [f64; 4] = [0.0, 4.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_ACTION_HORIZONTAL_ORIENTATION_MARGIN: [f64; 4] = [16.0, 8.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_ACTION_VERTICAL_ORIENTATION_MARGIN: [f64; 4] = [0.0, 12.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const INFO_BAR_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
