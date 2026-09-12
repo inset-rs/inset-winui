@@ -216,6 +216,8 @@ impl GalleryState {
             Feature::HyperlinkButton => sections::button_family::hyperlink_button(resources),
             Feature::Slider => sections::slider::build(resources),
             Feature::ProgressBar => sections::progress_bar::build(resources),
+            Feature::InfoBadge => sections::info_badge::build(resources),
+            Feature::ProgressRing => sections::progress_ring::build(resources),
             Feature::Expander => sections::expander::build(resources),
             Feature::InfoBar => sections::info_bar::build(resources),
             Feature::SplitView => sections::split_view::build(resources),
@@ -296,7 +298,7 @@ impl State for GalleryState {
                 .into_iter()
                 .map(|feature| {
                     NavigationViewItem::text(feature.title(), feature.title())
-                        .icon(FluentIcon::new(feature.symbol()).font_size(16.0))
+                        .icon(FontIcon::symbol(feature.symbol()).font_size(16.0))
                 })
                 .collect(),
             Some(selected.title().to_owned()),
@@ -333,7 +335,7 @@ impl State for GalleryState {
                     "gallery-theme",
                     if dark { "Light theme" } else { "Dark theme" },
                 )
-                .icon(FluentIcon::new(if dark {
+                .icon(FontIcon::symbol(if dark {
                     FluentSymbol::WeatherSunny
                 } else {
                     FluentSymbol::WeatherMoon

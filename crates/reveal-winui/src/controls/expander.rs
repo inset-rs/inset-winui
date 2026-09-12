@@ -495,7 +495,7 @@ fn expander_header(
         CONTROL_NORMAL_ANIMATION_DURATION,
     )
     .child(
-        FluentIcon::new(FluentSymbol::ChevronDown)
+        FontIcon::symbol(FluentSymbol::ChevronDown)
             .font_size(EXPANDER_CHEVRON_GLYPH_SIZE)
             .foreground(chevron_foreground),
     );

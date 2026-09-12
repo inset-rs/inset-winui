@@ -1128,7 +1128,7 @@ impl TabViewState {
                 .add_tab_button_click
                 .unwrap_or_else(|| Listener::new(|_| {}));
             let button = Button::new(
-                FluentIcon::new(FluentSymbol::Add).font_size(TAB_VIEW_ITEM_ADD_BUTTON_FONT_SIZE),
+                FontIcon::symbol(FluentSymbol::Add).font_size(TAB_VIEW_ITEM_ADD_BUTTON_FONT_SIZE),
                 click,
             )
             .focus_node(app.get(self).add_focus.unwrap())

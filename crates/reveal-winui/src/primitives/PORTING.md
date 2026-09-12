@@ -21,8 +21,8 @@ Ported against: aa3207e6
 ## color_transition.rs → `BrushTransition`
 
 - Change: `ColorTransition` fades background colors at a constant rate.
-  Reason: os — Windows chooses how the original fade speeds up and slows down, and those parameters are not provided in the source.
-  Affect: The 83 ms fade can progress differently from the Windows fade.
+  Reason: os — Windows chooses how the original fade speeds up and slows down, and the template states only its length, `ControlFasterAnimationDuration`.
+  Affect: A control’s background reaches its new color after the same 83 ms as on Windows, but passes through different colors on the way.
 
 ## focus_visual.rs → system focus visual
 
@@ -30,17 +30,29 @@ Ported against: aa3207e6
   Reason: os — XAML obtains these colours from the system palette.
   Affect: `FocusVisual` rings ignore high-contrast palette changes.
 
-## fluent_icon.rs → `FontIcon`
+## icon.rs → `IconElement`, `FontIcon` and `PathIcon`
 
-- Change: `FluentIcon` uses the bundled Fluent System Icons font for built-in symbols.
-  Reason: os — Segoe Fluent Icons ships with Windows.
-  Affect: Icons can differ in shape, spacing and alignment from the Windows icons.
+- Change: `FontIcon` uses the bundled Fluent System Icons font by default.
+  Reason: os — WinUI's default icon fonts ship with Windows and are not bundled with this kit.
+  Affect: Icons can differ in shape, spacing and alignment from Windows, and applications can select another font with `font_family`.
+
+- Change: `FluentSymbol` provides names for the bundled icons rather than accepting WinUI's `Symbol` enumeration.
+  Reason: os — WinUI's enumeration identifies characters in Windows icon fonts, whose character mappings differ from the bundled font.
+  Affect: Applications choose a `FluentSymbol` or supply a character to `FontIcon`; they cannot pass WinUI `Symbol` values directly.
+
+- Change: `PathIcon` accepts a path built in Rust rather than a XAML path string.
+  Reason: language — the XAML parser converts text into geometry, while this API receives geometry constructed with `PathBuilder`.
+  Affect: Applications pass the path to `PathIcon::new` and use `fill_rule` to choose how overlapping contours are filled.
+
+- Change: `FontIcon` and `PathIcon` can be passed directly to controls that accept icons.
+  Reason: framework — WinUI uses separate `IconSource` objects to create an icon element for each parent, while Reveal widgets are reusable descriptions of their rendered content.
+  Affect: Applications reuse the icon widget instead of constructing a separate `FontIconSource` or `PathIconSource` object.
 
 ## scroll_viewport.rs → `ScrollViewer`
 
-- Change: `ScrollViewport` uses Flutter viewports, controllers and physics for scrolling.
-  Reason: framework — WinUI relies on a Windows service for scrolling gestures and motion, while Reveal already supplies Flutter’s scrolling implementation.
-  Affect: Scrolling momentum and behavior at the ends follow Flutter, and scroll commands animate over 100 ms.
+- Change: `ScrollViewport` uses Flutter's scrolling gestures and motion.
+  Reason: framework — WinUI delegates touch scrolling and inertia to the Windows DirectManipulation service, while Reveal provides Flutter's scrolling implementation.
+  Affect: Scrolling momentum and behavior at the ends follow Flutter, and programmatic scroll commands animate over 100 ms.
 
 ## anchored_flyout.rs → attached `Flyout` and `FlyoutPresenter`
 
@@ -54,7 +66,7 @@ Ported against: aa3207e6
 
 - Change: `AnchoredFlyout` opens and closes immediately instead of animating its appearance.
   Reason: os — the source asks Windows to choose the popup animation through `PopupThemeTransition`, without specifying its duration and motion in the template.
-  Affect: `AnchoredFlyout` opens and closes immediately.
+  Affect: A navigation menu appears at full size in a single frame, without the slide and fade Windows gives a popup.
 
 ## margin.rs → `FrameworkElement` layout
 
@@ -100,6 +112,8 @@ Ported against: aa3207e6
 
 ## Deferred
 
+- `BitmapIcon` and `ImageIcon` remain deferred. Trigger: Image loading is integrated with the kit's supported hosts, including foreground-color tinting for monochrome `BitmapIcon` images.
+- `AnimatedIcon` remains deferred. Trigger: The kit can reproduce the icon animations that WinUI plays through Windows Composition.
 - Navigation flyout opening and closing animations remain deferred. Trigger: A Windows timing measurement or equivalent host transition is available.
 - The blurred background’s repeating noise image remains deferred. Trigger: Reveal can upload that image to the renderer.
 - Automatic acrylic fallback policy remains deferred. Trigger: A host reports battery and advanced-effects policy changes.

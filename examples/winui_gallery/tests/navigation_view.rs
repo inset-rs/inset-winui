@@ -52,7 +52,7 @@ impl State for PageState {
             (0..state.item_count)
                 .map(|i| {
                     NavigationViewItem::text(i.to_string(), format!("Destination {i}"))
-                        .icon(FluentIcon::new(FluentSymbol::Settings))
+                        .icon(FontIcon::symbol(FluentSymbol::Settings))
                 })
                 .collect(),
             state.selected.clone(),
@@ -170,7 +170,7 @@ fn top_overflow_selection_promotes_and_resize_recovers() {
         s.width = 620.0;
     });
     f.capture("navigation_top_light");
-    // The overflow button is the More FluentIcon, identified independently of tooltip timing.
+    // The overflow button is the More FontIcon, identified independently of tooltip timing.
     let point = {
         let elements = f.elements();
         let app = f.cell.borrow();
@@ -178,8 +178,8 @@ fn top_overflow_selection_promotes_and_resize_recovers() {
             .into_iter()
             .find_map(|e| {
                 let widget = e.widget(&app);
-                let icon = downcast_widget::<FluentIcon>(&**widget)?;
-                if icon.symbol != FluentSymbol::More {
+                let icon = downcast_widget::<FontIcon>(&**widget)?;
+                if icon.glyph != FluentSymbol::More.glyph().to_string() {
                     return None;
                 }
                 let b = e.find_render_object(&app)?.as_box()?;

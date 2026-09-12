@@ -455,7 +455,7 @@ impl NavigationViewItemPresenter {
         if show_chevron {
             let callback = self.on_expansion_toggled.clone();
             let enabled = self.item.is_enabled;
-            let glyph = FluentIcon::new(FluentSymbol::ChevronDown)
+            let glyph = FontIcon::symbol(FluentSymbol::ChevronDown)
                 .font_size(NAVIGATION_VIEW_ITEM_EXPANDED_GLYPH_FONT_SIZE);
             let glyph = AnimatedRotation::new(
                 if self.is_expanded { 0.5 } else { 0.0 },

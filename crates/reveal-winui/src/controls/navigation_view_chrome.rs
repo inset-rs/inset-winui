@@ -199,7 +199,7 @@ pub(super) fn pane_toggle_template(
                 .children([
                     GridCell::new(
                         Center::new().child(
-                            FluentIcon::new(FluentSymbol::Navigation)
+                            FontIcon::symbol(FluentSymbol::Navigation)
                                 .font_size(16.0)
                                 .foreground(foreground),
                         ),

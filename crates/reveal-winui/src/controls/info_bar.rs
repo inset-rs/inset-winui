@@ -510,7 +510,7 @@ impl State for InfoBarState {
                                         .corner_radius(INFO_BAR_ICON_FONT_SIZE / 2.0),
                                 )
                                 .into_widget(),
-                            FluentIcon::new(symbol)
+                            FontIcon::symbol(symbol)
                                 .font_size(INFO_BAR_ICON_FONT_SIZE)
                                 .foreground(icon_foreground)
                                 .into_widget(),
@@ -545,7 +545,7 @@ impl State for InfoBarState {
         }
         if widget.is_closable {
             let mut button = Button::new(
-                FluentIcon::new(FluentSymbol::Dismiss).font_size(INFO_BAR_CLOSE_BUTTON_GLYPH_SIZE),
+                FontIcon::symbol(FluentSymbol::Dismiss).font_size(INFO_BAR_CLOSE_BUTTON_GLYPH_SIZE),
                 Listener::new(move |app| self.close_button(app)),
             )
             .template(close_button_template);

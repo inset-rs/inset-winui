@@ -168,8 +168,10 @@ fn theme_footer_remains_usable_when_the_pane_is_collapsed() {
         let element = elements
             .iter()
             .find(|element| {
-                downcast_widget::<reveal_winui::FluentIcon>(element.widget(&app).as_ref())
-                    .is_some_and(|icon| icon.symbol == FluentSymbol::WeatherSunny)
+                downcast_widget::<reveal_winui::FontIcon>(element.widget(&app).as_ref())
+                    .is_some_and(|icon| {
+                        icon.glyph == FluentSymbol::WeatherSunny.glyph().to_string()
+                    })
             })
             .unwrap();
         let render = element.find_render_object(&app).unwrap().as_box().unwrap();

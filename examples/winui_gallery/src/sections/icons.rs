@@ -1,7 +1,11 @@
-//! Fluent symbol sizes, inherited colors and directional mirroring.
+//! Fluent symbol sizes, inherited colors, directional mirroring, glyphs named by codepoint
+//! and geometry icons.
 
 use crate::{column, example, example_row, label, section};
-use reveal_embedder::TextDirection;
+use std::sync::Arc;
+
+use reveal_embedder::valo::{Point, Rect as ValoRect};
+use reveal_embedder::{FillRule, Path, PathBuilder, TextDirection};
 use reveal_foundation::{App, Handle, Listener};
 use reveal_rendering::{CrossAxisAlignment, MainAxisSize};
 use reveal_widgets::*;
@@ -37,6 +41,17 @@ const SYMBOLS: [(FluentSymbol, &str); 28] = [
     (FluentSymbol::Back, "Back"),
     (FluentSymbol::Settings, "Settings"),
     (FluentSymbol::More, "More"),
+];
+
+/// Glyphs of the bundled icon font that the catalog enum does not name, shown the way
+/// `FontIcon.Glyph` takes any character of any family.
+const GLYPHS: [(u32, &str); 6] = [
+    (62586, "heart"),
+    (61942, "bookmark"),
+    (57935, "calendar"),
+    (62727, "mail"),
+    (62555, "globe"),
+    (62910, "person"),
 ];
 
 /// Builds the symbol feature page.
@@ -122,7 +137,7 @@ impl State for IconDemoState {
                                             .cross_axis_alignment(CrossAxisAlignment::Center)
                                             .spacing(10.0)
                                             .children([
-                                                FluentIcon::new(symbol)
+                                                FontIcon::symbol(symbol)
                                                     .font_size(size)
                                                     .foreground(foreground)
                                                     .into_widget(),
@@ -154,11 +169,11 @@ impl State for IconDemoState {
                     },
                     example_row(
                         vec![
-                            FluentIcon::new(FluentSymbol::Back)
+                            FontIcon::symbol(FluentSymbol::Back)
                                 .font_size(32.0)
                                 .mirrored_when_right_to_left(true)
                                 .into_widget(),
-                            FluentIcon::new(FluentSymbol::ChevronRight)
+                            FontIcon::symbol(FluentSymbol::ChevronRight)
                                 .font_size(32.0)
                                 .mirrored_when_right_to_left(true)
                                 .into_widget(),
@@ -169,6 +184,39 @@ impl State for IconDemoState {
                 .into_widget(),
             ],
             20.0,
+        );
+        let glyphs = example_row(
+            GLYPHS
+                .into_iter()
+                .map(|(codepoint, name)| {
+                    Column::new()
+                        .main_axis_size(MainAxisSize::Min)
+                        .cross_axis_alignment(CrossAxisAlignment::Center)
+                        .spacing(10.0)
+                        .children([
+                            FontIcon::new(char::from_u32(codepoint).unwrap().to_string())
+                                .font_size(24.0)
+                                .foreground(foreground)
+                                .into_widget(),
+                            label(name, TextBlockStyle::Caption, foreground),
+                        ])
+                        .into_widget()
+                })
+                .collect(),
+            24.0,
+        );
+        let geometry = example_row(
+            vec![
+                PathIcon::new(triangle())
+                    .foreground(foreground)
+                    .into_widget(),
+                PathIcon::new(ring()).foreground(foreground).into_widget(),
+                PathIcon::new(ring())
+                    .fill_rule(FillRule::NonZero)
+                    .foreground(foreground)
+                    .into_widget(),
+            ],
+            24.0,
         );
         column(
             vec![
@@ -184,8 +232,40 @@ impl State for IconDemoState {
                     &r,
                     direction,
                 ),
+                example(
+                    "Glyphs by codepoint",
+                    "FontIcon draws any glyph of any installed family, not only the named symbols.",
+                    &r,
+                    glyphs,
+                ),
+                example(
+                    "Geometry icons",
+                    "PathIcon fills a geometry with the icon foreground. The middle ring uses the \
+                     source default even-odd fill rule, which leaves its centre open; the right \
+                     one fills by winding instead.",
+                    &r,
+                    geometry,
+                ),
             ],
             24.0,
         )
     }
+}
+
+/// A triangle pointing along the reading direction, at the icon's own coordinates.
+fn triangle() -> Arc<Path> {
+    let mut path = PathBuilder::new();
+    path.move_to(Point::new(0.0, 0.0));
+    path.line_to(Point::new(28.0, 16.0));
+    path.line_to(Point::new(0.0, 32.0));
+    path.close();
+    path.build()
+}
+
+/// Two concentric squares, so the fill rule decides whether the centre is filled.
+fn ring() -> Arc<Path> {
+    let mut path = PathBuilder::new();
+    path.rect(ValoRect::new(0.0, 0.0, 32.0, 32.0));
+    path.rect(ValoRect::new(8.0, 8.0, 16.0, 16.0));
+    path.build()
 }

@@ -114,7 +114,7 @@ impl ScrollBarViewportState {
                 for increase in [false, true] {
                     let controller = widget.controller;
                     let button = RepeatButton::new(
-                        FluentIcon::new(if vertical {
+                        FontIcon::symbol(if vertical {
                             if increase {
                                 FluentSymbol::ChevronDown
                             } else {

@@ -22,7 +22,9 @@ pub mod typography;
 pub mod text_input;
 
 pub mod expander;
+pub mod info_badge;
 pub mod info_bar;
 pub mod progress_bar;
+pub mod progress_ring;
 
 pub mod flyout;

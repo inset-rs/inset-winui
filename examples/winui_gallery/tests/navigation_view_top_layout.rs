@@ -120,8 +120,8 @@ fn overflow(f: &Fixture) -> bool {
     let app = f.cell.borrow();
     elements.into_iter().any(|e| {
         let widget = e.widget(&app);
-        downcast_widget::<FluentIcon>(&**widget)
-            .is_some_and(|icon| icon.symbol == FluentSymbol::More)
+        downcast_widget::<FontIcon>(&**widget)
+            .is_some_and(|icon| icon.glyph == FluentSymbol::More.glyph().to_string())
             && onstage(&app, e)
     })
 }

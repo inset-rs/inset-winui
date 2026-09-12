@@ -5,7 +5,7 @@
 
 use crate::{
     Brush, CONTROL_CORNER_RADIUS, ColumnDefinition, CommonState, ControlBorder, ControlStates,
-    FluentIcon, FluentSymbol, FocusVisual, Grid, GridCell, GridLength, RepeatButton,
+    FluentSymbol, FocusVisual, FontIcon, Grid, GridCell, GridLength, RepeatButton,
     ScrollMetricsObserver, ScrollViewportController, TAB_VIEW_BUTTON_BORDER_THICKNESS,
     TAB_VIEW_ITEM_LEFT_SCROLL_BUTTON_CONTAINER_PADDING,
     TAB_VIEW_ITEM_RIGHT_SCROLL_BUTTON_CONTAINER_PADDING, TAB_VIEW_ITEM_SCROLL_BUTON_FONT_SIZE,
@@ -108,7 +108,7 @@ impl TabScrollViewer {
             ] {
                 let controller = self.controller;
                 let button = RepeatButton::new(
-                    FluentIcon::new(if increase {
+                    FontIcon::symbol(if increase {
                         FluentSymbol::ChevronRight
                     } else {
                         FluentSymbol::ChevronLeft

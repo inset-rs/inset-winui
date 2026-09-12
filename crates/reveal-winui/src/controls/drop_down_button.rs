@@ -167,7 +167,7 @@ fn template(
                 Padding::new(EdgeInsetsGeometry::from_ltrb(8.0, 0.0, 0.0, 0.0)).child(
                     SizedBox::new().width(12.0).height(12.0).child(
                         Center::new().child(
-                            FluentIcon::new(FluentSymbol::ChevronDown)
+                            FontIcon::symbol(FluentSymbol::ChevronDown)
                                 .font_size(8.0)
                                 .foreground(chevron),
                         ),

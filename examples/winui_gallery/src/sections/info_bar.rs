@@ -182,7 +182,7 @@ impl State for InfoBarDemoState {
                         vec![
                             InfoBar::new(true, |_, _| {})
                                 .title("Scheduled update")
-                                .icon_source(FluentIcon::new(FluentSymbol::Timer))
+                                .icon_source(FontIcon::symbol(FluentSymbol::Timer))
                                 .is_closable(false)
                                 .into_widget(),
                             InfoBar::new(true, |_, _| {})

@@ -208,7 +208,7 @@ pub(super) fn item_template(
             GridCell::new(Margin::new(
                 [0.0, 0.0, 16.0, 0.0],
                 Opacity::new(if checked { 1.0 } else { 0.0 }).child(
-                    FluentIcon::new(if matches!(item.kind, MenuFlyoutItemKind::Radio { .. }) {
+                    FontIcon::symbol(if matches!(item.kind, MenuFlyoutItemKind::Radio { .. }) {
                         FluentSymbol::RadioButton
                     } else {
                         FluentSymbol::Checkmark
@@ -267,7 +267,7 @@ pub(super) fn item_template(
         children.push(
             GridCell::new(Margin::new(
                 MENU_FLYOUT_ITEM_CHEVRON_MARGIN,
-                FluentIcon::new(FluentSymbol::ChevronRight)
+                FontIcon::symbol(FluentSymbol::ChevronRight)
                     .font_size(12.0)
                     .foreground(colors.chevron)
                     .mirrored_when_right_to_left(true),

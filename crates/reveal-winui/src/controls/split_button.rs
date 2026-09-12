@@ -297,7 +297,7 @@ impl SplitButtonState {
                 .height(12.0)
                 .child(
                     Center::new().child(
-                        FluentIcon::new(FluentSymbol::ChevronDown)
+                        FontIcon::symbol(FluentSymbol::ChevronDown)
                             .font_size(8.0)
                             .foreground(foreground),
                     ),

@@ -38,13 +38,13 @@ pub fn build(state: Handle<GalleryState>, resources: &ThemeResources) -> Vec<Wid
         resources,
         example_row(
             vec![
-                Button::new(FluentIcon::new(FluentSymbol::Add), click.clone())
+                Button::new(FontIcon::symbol(FluentSymbol::Add), click.clone())
                     .style(ButtonStyle::Accent)
                     .into_widget(),
                 Button::new(
                     row(
                         vec![
-                            FluentIcon::new(FluentSymbol::Settings).into_widget(),
+                            FontIcon::symbol(FluentSymbol::Settings).into_widget(),
                             Text::new("Custom content").into_widget(),
                         ],
                         8.0,

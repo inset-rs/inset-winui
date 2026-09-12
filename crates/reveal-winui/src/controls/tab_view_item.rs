@@ -285,7 +285,7 @@ impl TabViewItemHeader {
             |text| Text::new(text.clone()).into_widget(),
         );
         visual.item.icon_source = self.item.icon_source.as_ref().and_then(|icon| {
-            downcast_widget::<FluentIcon>(icon.as_ref()).map(|icon| {
+            downcast_widget::<FontIcon>(icon.as_ref()).map(|icon| {
                 let mut icon = icon.clone();
                 icon.key = None;
                 icon.into_widget()
@@ -425,7 +425,7 @@ impl TabViewItemHeader {
             let theme_kind = theme.theme;
             let close = if interactive {
                 Button::new(
-                    FluentIcon::new(FluentSymbol::Dismiss)
+                    FontIcon::symbol(FluentSymbol::Dismiss)
                         .font_size(TAB_VIEW_ITEM_HEADER_CLOSE_FONT_SIZE),
                     self.close.clone(),
                 )
@@ -451,7 +451,7 @@ impl TabViewItemHeader {
                         common: CommonState::Normal,
                         focused: false,
                     },
-                    FluentIcon::new(FluentSymbol::Dismiss)
+                    FontIcon::symbol(FluentSymbol::Dismiss)
                         .font_size(TAB_VIEW_ITEM_HEADER_CLOSE_FONT_SIZE)
                         .into_widget(),
                     close_background,

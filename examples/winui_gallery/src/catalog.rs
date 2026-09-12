@@ -11,10 +11,14 @@ pub enum Feature {
     DropDownButton,
     /// Determinate and animated progress states.
     ProgressBar,
+    /// A ring that fills to a value or turns while work lasts.
+    ProgressRing,
     /// Expandable content in either direction.
     Expander,
     /// Inline notifications and cancelable closing.
     InfoBar,
+    /// Counts, icons and dots that mark status.
+    InfoBadge,
     /// Standard, accent and disabled buttons.
     Button,
     /// Plain and multiline text entry.
@@ -55,7 +59,7 @@ pub enum Feature {
 
 impl Feature {
     /// Display order in the navigation pane.
-    pub const ALL: [Self; 23] = [
+    pub const ALL: [Self; 25] = [
         Self::Button,
         Self::DropDownButton,
         Self::Flyout,
@@ -70,8 +74,10 @@ impl Feature {
         Self::HyperlinkButton,
         Self::Slider,
         Self::ProgressBar,
+        Self::ProgressRing,
         Self::Expander,
         Self::InfoBar,
+        Self::InfoBadge,
         Self::SplitView,
         Self::Acrylic,
         Self::ToolTip,
@@ -98,8 +104,10 @@ impl Feature {
             Self::HyperlinkButton => "HyperlinkButton",
             Self::Slider => "Slider",
             Self::ProgressBar => "ProgressBar",
+            Self::ProgressRing => "ProgressRing",
             Self::Expander => "Expander",
             Self::InfoBar => "InfoBar",
+            Self::InfoBadge => "InfoBadge",
             Self::SplitView => "SplitView",
             Self::Acrylic => "Acrylic",
             Self::ToolTip => "ToolTip",
@@ -127,8 +135,10 @@ impl Feature {
             Self::HyperlinkButton => FluentSymbol::Link,
             Self::Slider => FluentSymbol::Options,
             Self::ProgressBar => FluentSymbol::Timer,
+            Self::ProgressRing => FluentSymbol::SpinnerIos,
             Self::Expander => FluentSymbol::ChevronDownUp,
             Self::InfoBar => FluentSymbol::Info,
+            Self::InfoBadge => FluentSymbol::Circle,
             Self::SplitView => FluentSymbol::PanelLeft,
             Self::Acrylic => FluentSymbol::Layer,
             Self::ToolTip => FluentSymbol::TooltipQuote,
@@ -160,8 +170,10 @@ impl Feature {
             Self::ProgressBar => {
                 "Show completion or ongoing work, including paused and error states."
             }
+            Self::ProgressRing => "Show progress as a ring, filled to a value or turning.",
             Self::Expander => "Reveal related content above or below a header.",
             Self::InfoBar => "Show inline feedback with severity, actions and cancelable closing.",
+            Self::InfoBadge => "Mark status with a count, an icon or a dot.",
             Self::SplitView => "Explore inline, compact and overlay pane layouts.",
             Self::Acrylic => {
                 "Blur and tint the scene behind a surface while keeping its content sharp."

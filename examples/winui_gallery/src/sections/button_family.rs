@@ -233,7 +233,7 @@ impl State for HyperlinkButtonDemoState {
                         HyperlinkButton::new(
                             row(
                                 vec![
-                                    FluentIcon::new(FluentSymbol::Search).into_widget(),
+                                    FontIcon::symbol(FluentSymbol::Search).into_widget(),
                                     Text::new("Icon link").into_widget(),
                                 ],
                                 8.0,

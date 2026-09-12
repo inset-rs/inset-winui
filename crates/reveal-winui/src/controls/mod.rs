@@ -1,3 +1,6 @@
+mod info_badge;
+pub use info_badge::*;
+
 mod info_bar;
 pub use info_bar::*;
 
@@ -6,6 +9,9 @@ pub use expander::*;
 
 mod progress_bar;
 pub use progress_bar::*;
+
+mod progress_ring;
+pub use progress_ring::*;
 
 mod button;
 mod password_box;

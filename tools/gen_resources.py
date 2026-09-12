@@ -247,6 +247,10 @@ def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
             fields.append((snake(key), 'AcrylicBrushResources'))
             values['Light'].append(acrylic_literal(light[1]))
             values['Default'].append(acrylic_literal(dark[1]))
+        elif light != dark:
+            # A size, duration or spline each theme states differently has no
+            # constant to be emitted as, and the struct holds brushes only.
+            print(f'warning: {source}: {key} differs by theme ({light[1]} light, {dark[1]} dark); not emitted', file=sys.stderr)
     out.append(f'/// Theme-dependent resources of `{source}`, resolved to literals; `Default` in XAML is the dark theme.')
     out.append('#[derive(Clone, Debug, PartialEq)]')
     out.append(f'pub struct {struct_name} {{')
@@ -301,7 +305,9 @@ def main():
            '//! XAML theme dictionaries; the XAML "Default" dictionary is the dark theme.',
            '#![allow(clippy::excessive_precision, unused_variables)]',
            'use super::{AccentPalette, AcrylicBrushResources, Theme};', 'use crate::BackgroundSizing;', 'use reveal_embedder::{Color, FontWeight};', 'use std::time::Duration;', '']
-    common_keys = [k for k, v in base_themes['Light'].items() if v[0] in ('color', 'gradient')]
+    # Brush keys alias a colour rather than stating one, so the alias kind belongs
+    # in the shared struct as much as a literal colour does.
+    common_keys = [k for k, v in base_themes['Light'].items() if v[0] in ('color', 'gradient', 'alias')]
     emit_struct(out, 'CommonResources', common_keys, base_themes, {}, base_shared, 'Common_themeresources_any.xaml')
     sources = [(control, control_source(root, control)) for control in controls]
     # Control dictionaries share named resources in WinUI's merged theme dictionary.

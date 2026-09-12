@@ -318,7 +318,7 @@ impl TextControlState {
                                 .corner_radius(corner)
                                 .child(
                                     Center::new().child(
-                                        FluentIcon::new(if password {
+                                        FontIcon::symbol(if password {
                                             FluentSymbol::Eye
                                         } else {
                                             FluentSymbol::Dismiss

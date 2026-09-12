@@ -14,7 +14,7 @@ WinUI 3's controls on reveal, ported from `/Users/mac/code/microsoft-ui-xaml`. S
 
 ## Adding a control
 
-1. Add its `<Control>` to the generator's arguments and regenerate `theme/generated.rs` (from the workspace root: `python3 tools/gen_resources.py /Users/mac/code/microsoft-ui-xaml crates/reveal-winui/src/theme/generated.rs Button ToggleSwitch CheckBox RadioButton ToggleButton HyperlinkButton RepeatButton Slider ToolTip TextBlock CornerRadius SplitView TabView ScrollBar NavigationView FlyoutPresenter NavigationBackButton <Control>`; it runs `rustfmt` on the output); add a `ThemeResources::<control>()` accessor.
+1. Add its `<Control>` to the generator's arguments and regenerate `theme/generated.rs`; the workspace `README.md` carries the current command line, and the generator runs `rustfmt` on its output. Add a `ThemeResources::<control>()` accessor.
 2. Read `controls/dev/CommonStyles/<Control>_themeresources.xaml`: transcribe the template's elements in order (name them in comments), a XAML `Grid` as a `Grid` with the same definitions and `GridCell` placements (a child aligned or sized inside its cell gets an `Align` / `SizedBox`), take every brush from the generated resources by state, and every duration and spline from the generated constants.
 3. Read `dxaml/xcp/dxaml/lib/<Control>_Partial.cpp` for behaviour (what toggles, when `Click` fires, drag thresholds).
 4. Add a gallery section and a GPU test, and an entry in the folder's `PORTING.md` for anything the source leaves to the OS.

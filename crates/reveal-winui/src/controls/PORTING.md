@@ -222,15 +222,15 @@ Ported against: aa3207e6
 
 - Change: `NavigationView` receives its items and selection from the application, with a unique identity for each item that stays the same across rebuilds.
   Reason: framework — Reveal rebuilds item descriptions from owner state instead of mutating a XAML item collection on the control.
-  Affect: `NavigationView` callers handle selection and invocation separately and keep ids unique, and must not use `NavigationView::SETTINGS_ITEM_ID` (`"__navigation_settings"`) for their own items.
+  Affect: Applications update `selected_item` in `selection_changed` and use `item_invoked` for activation, including activating an already selected item; item ids must remain unique and reserve `NavigationView::SETTINGS_ITEM_ID` for the built-in Settings item.
 
 - Change: `NavigationView` uses Flutter gestures and focus handling, and reports pane changes after layout.
   Reason: framework — WinUI routes input events through its control objects, while this port composes the gesture, focus and pane widgets described above.
   Affect: Starting a scroll can cancel an item click, and application code receives pane-change callbacks after the frame.
 
-- Change: `NavigationView` accepts general widgets in its search and badge slots rather than requiring particular control types.
-  Reason: framework — Reveal composes child widgets directly, and the kit has not yet ported the AutoSuggestBox and InfoBadge controls required by those XAML slots.
-  Affect: `NavigationView` lets applications supply their own editor and badge widgets rather than AutoSuggestBox or InfoBadge controls.
+- Change: `NavigationView` accepts any widget for its search field and item badges.
+  Reason: framework — Reveal composes ordinary child widgets, while WinUI requires `AutoSuggestBox` for search and `InfoBadge` for badges.
+  Affect: Applications can use the kit's `InfoBadge` or a custom badge, and supply their own search editor until `AutoSuggestBox` is ported.
 
 - Change: `NavigationView` decides which top-level items fit and which go into the overflow menu after measuring them.
   Reason: framework — the widget tree is built before item widths are measured, so moving items between the main row and overflow requires a subsequent build.
@@ -300,32 +300,17 @@ Ported against: aa3207e6
   Reason: framework — WinUI command objects also report whether an action is available, while the kit’s button callbacks only perform the action.
   Affect: Applications capture action arguments in their callback, but the button does not automatically disable itself when that action becomes unavailable.
 
-## Deferred
+## progress_ring.rs → `ProgressRing`
 
-- Repeat buttons always activate on press rather than release. Trigger: A consumer needs release-time activation in the shared button handler.
-- Arrow keys do not yet move between radio buttons in a group. Trigger: The group provides a list of buttons that can receive focus.
-- Keeping the slider’s header widget mounted while its header is absent remains deferred. Trigger: A consumer needs that hidden header state to survive.
-- ToggleSwitch state-color fades remain deferred. Trigger: The duration for each supported state change is identified from the source or measured on Windows.
-- ToggleSwitch tap bounds still include the header. Trigger: A source review of hit areas using native gestures is available.
-- ToggleSwitch knob animation timing remains unverified. Trigger: A recording from Windows is available.
-- Collapsed Grid children are omitted rather than retained at zero size. Trigger: A consumer needs retained collapsed children.
-- RepeatButton timer-rate verification remains deferred. Trigger: A Windows click-rate measurement is available.
-- HyperlinkButton does not expose NavigateUri. Trigger: A host URL launcher is available.
-- Slider default-value verification for StepFrequency, TickFrequency and SnapsTo remains deferred. Trigger: The Windows type table or a runtime measurement is available.
-- Slider gamepad operation, including switching between navigating controls and adjusting the slider’s value, remains deferred. Trigger: A host supplies gamepad or remote-control input.
-- The slider’s larger value step for accessibility actions remains deferred. Trigger: Accessibility support uses that step.
-- SplitView system-back handling, element sounds and Xbox focus/dimming behavior remain deferred. Trigger: A host exposes those facilities.
-- Template and Slider-key right-to-left mirroring remain deferred. Trigger: A consumer needs right-to-left layout, prompting a source comparison of each affected template and keyboard direction.
-- CheckBox indeterminate sweep animation remains deferred. Trigger: A recording from Windows is available.
-- ProgressRing, additional TextBlock styles and dialogs remain deferred. Trigger: The next control port is selected.
-- Mica wallpaper backdrops remain deferred. Trigger: A host material path supplies the wallpaper processing absent from the source.
-- Text controls’ spell-check suggestion menus, touch command-bar presentation, input-scope-specific soft keyboards and OS credential/autofill integration remain deferred. Trigger: The corresponding native services or additional control ports are available.
-- TabView tear-out, caption regions, window movement and cross-window drag transport remain deferred. Trigger: A host provides window management and native drag transport.
-- Tab gamepad navigation and interaction, high-contrast colors and accessibility support remain deferred. Trigger: The corresponding input, theme and accessibility support is available.
-- TabView insertion, removal and reorder animations remain deferred. Trigger: Windows timing is verified or a host animation service is available.
-- Navigation integration with title-bar space, window borders, system sounds and page-change animations remains deferred. Trigger: The host exposes the corresponding window or animation support.
-- Navigation by gamepad shoulder buttons, directional focus movement, accessibility and high-contrast colors remain deferred. Trigger: The corresponding input, accessibility and theme support is available.
-- Standalone ScrollViewer and ScrollBar APIs remain deferred. Trigger: A consumer needs those public controls beyond NavigationView’s internal adapters.
+- Change: `ProgressRing` supports the built-in loading and percentage animations, but does not accept a custom animation.
+  Reason: framework — WinUI plays replaceable animation objects through Windows Composition, while this port draws the two built-in animations directly with Reveal's canvas and animation clock.
+  Affect: Applications can change the range, value, activity and colors, but cannot replace the animation through WinUI's `DeterminateSource` or `IndeterminateSource` properties.
+
+## info_badge.rs → `InfoBadge`
+
+- Change: `InfoBadgeStyle` selects the badge's background color but does not supply an icon or icon-specific padding.
+  Reason: os — WinUI's named icon styles depend on symbols from the Windows icon font, which this kit replaces with the bundled Fluent System Icons font.
+  Affect: Applications supply `icon_source` themselves and use 4 logical pixels of top padding, 2 at the bottom and none on either side when reproducing the attention or informational icon styles.
 
 ## flyout/mod.rs → `Flyout` and `FlyoutBase`
 
@@ -356,3 +341,33 @@ Ported against: aa3207e6
 - Change: `DropDownButton` uses a static Fluent chevron for the source animated icon.
   Reason: os — the Windows animated-chevron asset has no matching animation in the bundled Fluent font.
   Affect: The chevron changes color on hover and press but does not animate its shape.
+
+## Deferred
+
+- `ProgressRing` starts its arc at twelve o'clock, but that starting point remains unverified against Windows. Trigger: A Windows capture establishes where the original ellipse starts drawing its arc.
+
+- Repeat buttons always activate on press rather than release. Trigger: A consumer needs release-time activation in the shared button handler.
+- Arrow keys do not yet move between radio buttons in a group. Trigger: The group provides a list of buttons that can receive focus.
+- Keeping the slider’s header widget mounted while its header is absent remains deferred. Trigger: A consumer needs that hidden header state to survive.
+- ToggleSwitch state-color fades remain deferred. Trigger: The duration for each supported state change is identified from the source or measured on Windows.
+- ToggleSwitch tap bounds still include the header. Trigger: A source review of hit areas using native gestures is available.
+- ToggleSwitch knob animation timing remains unverified. Trigger: A recording from Windows is available.
+- Collapsed Grid children are omitted rather than retained at zero size. Trigger: A consumer needs retained collapsed children.
+- RepeatButton timer-rate verification remains deferred. Trigger: A Windows click-rate measurement is available.
+- HyperlinkButton does not expose NavigateUri. Trigger: A host URL launcher is available.
+- Slider default-value verification for StepFrequency, TickFrequency and SnapsTo remains deferred. Trigger: The Windows type table or a runtime measurement is available.
+- Slider gamepad operation, including switching between navigating controls and adjusting the slider’s value, remains deferred. Trigger: A host supplies gamepad or remote-control input.
+- The slider’s larger value step for accessibility actions remains deferred. Trigger: Accessibility support uses that step.
+- SplitView system-back handling, element sounds and Xbox focus/dimming behavior remain deferred. Trigger: A host exposes those facilities.
+- Template and Slider-key right-to-left mirroring remain deferred. Trigger: A consumer needs right-to-left layout, prompting a source comparison of each affected template and keyboard direction.
+- CheckBox indeterminate sweep animation remains deferred. Trigger: A recording from Windows is available.
+- `RatingControl` remains deferred because the bundled icon font supplies outlined stars but no filled stars for selected ratings. Trigger: A matching filled-star glyph is bundled.
+- Additional TextBlock styles and dialogs remain deferred. Trigger: The next control port is selected.
+- Mica wallpaper backdrops remain deferred. Trigger: A host material path supplies the wallpaper processing absent from the source.
+- Text controls’ spell-check suggestion menus, touch command-bar presentation, input-scope-specific soft keyboards and OS credential/autofill integration remain deferred. Trigger: The corresponding native services or additional control ports are available.
+- TabView tear-out, caption regions, window movement and cross-window drag transport remain deferred. Trigger: A host provides window management and native drag transport.
+- Tab gamepad navigation and interaction, high-contrast colors and accessibility support remain deferred. Trigger: The corresponding input, theme and accessibility support is available.
+- TabView insertion, removal and reorder animations remain deferred. Trigger: Windows timing is verified or a host animation service is available.
+- Navigation integration with title-bar space, window borders, system sounds and page-change animations remains deferred. Trigger: The host exposes the corresponding window or animation support.
+- Navigation by gamepad shoulder buttons, directional focus movement, accessibility and high-contrast colors remain deferred. Trigger: The corresponding input, accessibility and theme support is available.
+- Standalone ScrollViewer and ScrollBar APIs remain deferred. Trigger: A consumer needs those public controls beyond NavigationView’s internal adapters.

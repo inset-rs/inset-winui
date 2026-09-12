@@ -152,7 +152,7 @@ impl State for TabViewDemoState {
                             text,
                         )),
                     )
-                    .icon_source(FluentIcon::new(FluentSymbol::Settings))
+                    .icon_source(FontIcon::symbol(FluentSymbol::Settings))
                     .is_enabled(*id != 2)
                     .is_closable(*id != 3)
                 })

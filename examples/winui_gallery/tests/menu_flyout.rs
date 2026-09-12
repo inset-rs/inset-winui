@@ -31,7 +31,7 @@ fn items(probe: Rc<Probe>) -> Vec<MenuFlyoutItem> {
             "Open document",
             Listener::new(move |_| invoke.calls.set(invoke.calls.get() + 1)),
         )
-        .icon(FluentIcon::new(FluentSymbol::Add))
+        .icon(FontIcon::symbol(FluentSymbol::Add))
         .keyboard_accelerator_text_override("Ctrl+O"),
         MenuFlyoutItem::separator(),
         MenuFlyoutItem::new(

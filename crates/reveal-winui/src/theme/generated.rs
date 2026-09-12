@@ -176,6 +176,186 @@ pub struct CommonResources {
     pub system_fill_color_solid_attention_background: Color,
     /// The resolved `SystemFillColorSolidNeutralBackground` resource.
     pub system_fill_color_solid_neutral_background: Color,
+    /// The resolved `TextFillColorPrimaryBrush` resource.
+    pub text_fill_color_primary_brush: Color,
+    /// The resolved `TextFillColorSecondaryBrush` resource.
+    pub text_fill_color_secondary_brush: Color,
+    /// The resolved `TextFillColorTertiaryBrush` resource.
+    pub text_fill_color_tertiary_brush: Color,
+    /// The resolved `TextFillColorDisabledBrush` resource.
+    pub text_fill_color_disabled_brush: Color,
+    /// The resolved `TextFillColorInverseBrush` resource.
+    pub text_fill_color_inverse_brush: Color,
+    /// The resolved `AccentTextFillColorPrimaryBrush` resource.
+    pub accent_text_fill_color_primary_brush: Color,
+    /// The resolved `AccentTextFillColorSecondaryBrush` resource.
+    pub accent_text_fill_color_secondary_brush: Color,
+    /// The resolved `AccentTextFillColorTertiaryBrush` resource.
+    pub accent_text_fill_color_tertiary_brush: Color,
+    /// The resolved `AccentTextFillColorDisabledBrush` resource.
+    pub accent_text_fill_color_disabled_brush: Color,
+    /// The resolved `TextOnAccentFillColorSelectedTextBrush` resource.
+    pub text_on_accent_fill_color_selected_text_brush: Color,
+    /// The resolved `TextOnAccentFillColorPrimaryBrush` resource.
+    pub text_on_accent_fill_color_primary_brush: Color,
+    /// The resolved `TextOnAccentFillColorSecondaryBrush` resource.
+    pub text_on_accent_fill_color_secondary_brush: Color,
+    /// The resolved `TextOnAccentFillColorDisabledBrush` resource.
+    pub text_on_accent_fill_color_disabled_brush: Color,
+    /// The resolved `ControlFillColorDefaultBrush` resource.
+    pub control_fill_color_default_brush: Color,
+    /// The resolved `ControlFillColorSecondaryBrush` resource.
+    pub control_fill_color_secondary_brush: Color,
+    /// The resolved `ControlFillColorTertiaryBrush` resource.
+    pub control_fill_color_tertiary_brush: Color,
+    /// The resolved `ControlFillColorQuarternaryBrush` resource.
+    pub control_fill_color_quarternary_brush: Color,
+    /// The resolved `ControlFillColorDisabledBrush` resource.
+    pub control_fill_color_disabled_brush: Color,
+    /// The resolved `ControlFillColorTransparentBrush` resource.
+    pub control_fill_color_transparent_brush: Color,
+    /// The resolved `ControlFillColorInputActiveBrush` resource.
+    pub control_fill_color_input_active_brush: Color,
+    /// The resolved `ControlStrongFillColorDefaultBrush` resource.
+    pub control_strong_fill_color_default_brush: Color,
+    /// The resolved `ControlStrongFillColorDisabledBrush` resource.
+    pub control_strong_fill_color_disabled_brush: Color,
+    /// The resolved `ControlSolidFillColorDefaultBrush` resource.
+    pub control_solid_fill_color_default_brush: Color,
+    /// The resolved `SubtleFillColorTransparentBrush` resource.
+    pub subtle_fill_color_transparent_brush: Color,
+    /// The resolved `SubtleFillColorSecondaryBrush` resource.
+    pub subtle_fill_color_secondary_brush: Color,
+    /// The resolved `SubtleFillColorTertiaryBrush` resource.
+    pub subtle_fill_color_tertiary_brush: Color,
+    /// The resolved `SubtleFillColorDisabledBrush` resource.
+    pub subtle_fill_color_disabled_brush: Color,
+    /// The resolved `ControlAltFillColorTransparentBrush` resource.
+    pub control_alt_fill_color_transparent_brush: Color,
+    /// The resolved `ControlAltFillColorSecondaryBrush` resource.
+    pub control_alt_fill_color_secondary_brush: Color,
+    /// The resolved `ControlAltFillColorTertiaryBrush` resource.
+    pub control_alt_fill_color_tertiary_brush: Color,
+    /// The resolved `ControlAltFillColorQuarternaryBrush` resource.
+    pub control_alt_fill_color_quarternary_brush: Color,
+    /// The resolved `ControlAltFillColorDisabledBrush` resource.
+    pub control_alt_fill_color_disabled_brush: Color,
+    /// The resolved `ControlOnImageFillColorDefaultBrush` resource.
+    pub control_on_image_fill_color_default_brush: Color,
+    /// The resolved `ControlOnImageFillColorSecondaryBrush` resource.
+    pub control_on_image_fill_color_secondary_brush: Color,
+    /// The resolved `ControlOnImageFillColorTertiaryBrush` resource.
+    pub control_on_image_fill_color_tertiary_brush: Color,
+    /// The resolved `ControlOnImageFillColorDisabledBrush` resource.
+    pub control_on_image_fill_color_disabled_brush: Color,
+    /// The resolved `AccentFillColorSelectedTextBackgroundBrush` resource.
+    pub accent_fill_color_selected_text_background_brush: Color,
+    /// The resolved `AccentFillColorDefaultBrush` resource.
+    pub accent_fill_color_default_brush: Color,
+    /// The resolved `AccentFillColorSecondaryBrush` resource.
+    pub accent_fill_color_secondary_brush: Color,
+    /// The resolved `AccentFillColorTertiaryBrush` resource.
+    pub accent_fill_color_tertiary_brush: Color,
+    /// The resolved `AccentFillColorDisabledBrush` resource.
+    pub accent_fill_color_disabled_brush: Color,
+    /// The resolved `ControlStrokeColorDefaultBrush` resource.
+    pub control_stroke_color_default_brush: Color,
+    /// The resolved `ControlStrokeColorSecondaryBrush` resource.
+    pub control_stroke_color_secondary_brush: Color,
+    /// The resolved `ControlStrokeColorOnAccentDefaultBrush` resource.
+    pub control_stroke_color_on_accent_default_brush: Color,
+    /// The resolved `ControlStrokeColorOnAccentSecondaryBrush` resource.
+    pub control_stroke_color_on_accent_secondary_brush: Color,
+    /// The resolved `ControlStrokeColorOnAccentTertiaryBrush` resource.
+    pub control_stroke_color_on_accent_tertiary_brush: Color,
+    /// The resolved `ControlStrokeColorOnAccentDisabledBrush` resource.
+    pub control_stroke_color_on_accent_disabled_brush: Color,
+    /// The resolved `ControlStrokeColorForStrongFillWhenOnImageBrush` resource.
+    pub control_stroke_color_for_strong_fill_when_on_image_brush: Color,
+    /// The resolved `CardStrokeColorDefaultBrush` resource.
+    pub card_stroke_color_default_brush: Color,
+    /// The resolved `CardStrokeColorDefaultSolidBrush` resource.
+    pub card_stroke_color_default_solid_brush: Color,
+    /// The resolved `ControlStrongStrokeColorDefaultBrush` resource.
+    pub control_strong_stroke_color_default_brush: Color,
+    /// The resolved `ControlStrongStrokeColorDisabledBrush` resource.
+    pub control_strong_stroke_color_disabled_brush: Color,
+    /// The resolved `SurfaceStrokeColorDefaultBrush` resource.
+    pub surface_stroke_color_default_brush: Color,
+    /// The resolved `SurfaceStrokeColorFlyoutBrush` resource.
+    pub surface_stroke_color_flyout_brush: Color,
+    /// The resolved `SurfaceStrokeColorInverseBrush` resource.
+    pub surface_stroke_color_inverse_brush: Color,
+    /// The resolved `DividerStrokeColorDefaultBrush` resource.
+    pub divider_stroke_color_default_brush: Color,
+    /// The resolved `FocusStrokeColorOuterBrush` resource.
+    pub focus_stroke_color_outer_brush: Color,
+    /// The resolved `FocusStrokeColorInnerBrush` resource.
+    pub focus_stroke_color_inner_brush: Color,
+    /// The resolved `CardBackgroundFillColorDefaultBrush` resource.
+    pub card_background_fill_color_default_brush: Color,
+    /// The resolved `CardBackgroundFillColorSecondaryBrush` resource.
+    pub card_background_fill_color_secondary_brush: Color,
+    /// The resolved `CardBackgroundFillColorTertiaryBrush` resource.
+    pub card_background_fill_color_tertiary_brush: Color,
+    /// The resolved `SmokeFillColorDefaultBrush` resource.
+    pub smoke_fill_color_default_brush: Color,
+    /// The resolved `LayerFillColorDefaultBrush` resource.
+    pub layer_fill_color_default_brush: Color,
+    /// The resolved `LayerFillColorAltBrush` resource.
+    pub layer_fill_color_alt_brush: Color,
+    /// The resolved `LayerOnAcrylicFillColorDefaultBrush` resource.
+    pub layer_on_acrylic_fill_color_default_brush: Color,
+    /// The resolved `LayerOnAccentAcrylicFillColorDefaultBrush` resource.
+    pub layer_on_accent_acrylic_fill_color_default_brush: Color,
+    /// The resolved `LayerOnMicaBaseAltFillColorDefaultBrush` resource.
+    pub layer_on_mica_base_alt_fill_color_default_brush: Color,
+    /// The resolved `LayerOnMicaBaseAltFillColorSecondaryBrush` resource.
+    pub layer_on_mica_base_alt_fill_color_secondary_brush: Color,
+    /// The resolved `LayerOnMicaBaseAltFillColorTertiaryBrush` resource.
+    pub layer_on_mica_base_alt_fill_color_tertiary_brush: Color,
+    /// The resolved `LayerOnMicaBaseAltFillColorTransparentBrush` resource.
+    pub layer_on_mica_base_alt_fill_color_transparent_brush: Color,
+    /// The resolved `SolidBackgroundFillColorBaseBrush` resource.
+    pub solid_background_fill_color_base_brush: Color,
+    /// The resolved `SolidBackgroundFillColorSecondaryBrush` resource.
+    pub solid_background_fill_color_secondary_brush: Color,
+    /// The resolved `SolidBackgroundFillColorTertiaryBrush` resource.
+    pub solid_background_fill_color_tertiary_brush: Color,
+    /// The resolved `SolidBackgroundFillColorQuarternaryBrush` resource.
+    pub solid_background_fill_color_quarternary_brush: Color,
+    /// The resolved `SolidBackgroundFillColorQuinaryBrush` resource.
+    pub solid_background_fill_color_quinary_brush: Color,
+    /// The resolved `SolidBackgroundFillColorSenaryBrush` resource.
+    pub solid_background_fill_color_senary_brush: Color,
+    /// The resolved `SolidBackgroundFillColorBaseAltBrush` resource.
+    pub solid_background_fill_color_base_alt_brush: Color,
+    /// The resolved `SystemFillColorAttentionBrush` resource.
+    pub system_fill_color_attention_brush: Color,
+    /// The resolved `SystemFillColorSuccessBrush` resource.
+    pub system_fill_color_success_brush: Color,
+    /// The resolved `SystemFillColorCautionBrush` resource.
+    pub system_fill_color_caution_brush: Color,
+    /// The resolved `SystemFillColorCriticalBrush` resource.
+    pub system_fill_color_critical_brush: Color,
+    /// The resolved `SystemFillColorNeutralBrush` resource.
+    pub system_fill_color_neutral_brush: Color,
+    /// The resolved `SystemFillColorSolidNeutralBrush` resource.
+    pub system_fill_color_solid_neutral_brush: Color,
+    /// The resolved `SystemFillColorAttentionBackgroundBrush` resource.
+    pub system_fill_color_attention_background_brush: Color,
+    /// The resolved `SystemFillColorSuccessBackgroundBrush` resource.
+    pub system_fill_color_success_background_brush: Color,
+    /// The resolved `SystemFillColorCautionBackgroundBrush` resource.
+    pub system_fill_color_caution_background_brush: Color,
+    /// The resolved `SystemFillColorCriticalBackgroundBrush` resource.
+    pub system_fill_color_critical_background_brush: Color,
+    /// The resolved `SystemFillColorNeutralBackgroundBrush` resource.
+    pub system_fill_color_neutral_background_brush: Color,
+    /// The resolved `SystemFillColorSolidAttentionBackgroundBrush` resource.
+    pub system_fill_color_solid_attention_background_brush: Color,
+    /// The resolved `SystemFillColorSolidNeutralBackgroundBrush` resource.
+    pub system_fill_color_solid_neutral_background_brush: Color,
     /// The resolved `ControlElevationBorderBrush` resource.
     pub control_elevation_border_brush: [(f64, Color); 2],
     /// The resolved `CircleElevationBorderBrush` resource.
@@ -290,6 +470,108 @@ impl CommonResources {
                 system_fill_color_neutral_background: Color::from_argb(6, 0, 0, 0),
                 system_fill_color_solid_attention_background: Color::from_argb(255, 247, 247, 247),
                 system_fill_color_solid_neutral_background: Color::from_argb(255, 243, 243, 243),
+                text_fill_color_primary_brush: Color::from_argb(228, 0, 0, 0),
+                text_fill_color_secondary_brush: Color::from_argb(158, 0, 0, 0),
+                text_fill_color_tertiary_brush: Color::from_argb(114, 0, 0, 0),
+                text_fill_color_disabled_brush: Color::from_argb(92, 0, 0, 0),
+                text_fill_color_inverse_brush: Color::from_argb(255, 255, 255, 255),
+                accent_text_fill_color_primary_brush: accent.dark2,
+                accent_text_fill_color_secondary_brush: accent.dark3,
+                accent_text_fill_color_tertiary_brush: accent.dark1,
+                accent_text_fill_color_disabled_brush: Color::from_argb(92, 0, 0, 0),
+                text_on_accent_fill_color_selected_text_brush: Color::from_argb(255, 255, 255, 255),
+                text_on_accent_fill_color_primary_brush: Color::from_argb(255, 255, 255, 255),
+                text_on_accent_fill_color_secondary_brush: Color::from_argb(179, 255, 255, 255),
+                text_on_accent_fill_color_disabled_brush: Color::from_argb(255, 255, 255, 255),
+                control_fill_color_default_brush: Color::from_argb(179, 255, 255, 255),
+                control_fill_color_secondary_brush: Color::from_argb(128, 249, 249, 249),
+                control_fill_color_tertiary_brush: Color::from_argb(77, 249, 249, 249),
+                control_fill_color_quarternary_brush: Color::from_argb(194, 243, 243, 243),
+                control_fill_color_disabled_brush: Color::from_argb(77, 249, 249, 249),
+                control_fill_color_transparent_brush: Color::from_argb(0, 255, 255, 255),
+                control_fill_color_input_active_brush: Color::from_argb(255, 255, 255, 255),
+                control_strong_fill_color_default_brush: Color::from_argb(114, 0, 0, 0),
+                control_strong_fill_color_disabled_brush: Color::from_argb(81, 0, 0, 0),
+                control_solid_fill_color_default_brush: Color::from_argb(255, 255, 255, 255),
+                subtle_fill_color_transparent_brush: Color::from_argb(0, 255, 255, 255),
+                subtle_fill_color_secondary_brush: Color::from_argb(9, 0, 0, 0),
+                subtle_fill_color_tertiary_brush: Color::from_argb(6, 0, 0, 0),
+                subtle_fill_color_disabled_brush: Color::from_argb(0, 255, 255, 255),
+                control_alt_fill_color_transparent_brush: Color::from_argb(0, 255, 255, 255),
+                control_alt_fill_color_secondary_brush: Color::from_argb(6, 0, 0, 0),
+                control_alt_fill_color_tertiary_brush: Color::from_argb(15, 0, 0, 0),
+                control_alt_fill_color_quarternary_brush: Color::from_argb(24, 0, 0, 0),
+                control_alt_fill_color_disabled_brush: Color::from_argb(0, 255, 255, 255),
+                control_on_image_fill_color_default_brush: Color::from_argb(201, 255, 255, 255),
+                control_on_image_fill_color_secondary_brush: Color::from_argb(255, 243, 243, 243),
+                control_on_image_fill_color_tertiary_brush: Color::from_argb(255, 235, 235, 235),
+                control_on_image_fill_color_disabled_brush: Color::from_argb(0, 255, 255, 255),
+                accent_fill_color_selected_text_background_brush: accent.base,
+                accent_fill_color_default_brush: accent.dark1,
+                accent_fill_color_secondary_brush: accent.dark1,
+                accent_fill_color_tertiary_brush: accent.dark1,
+                accent_fill_color_disabled_brush: Color::from_argb(55, 0, 0, 0),
+                control_stroke_color_default_brush: Color::from_argb(15, 0, 0, 0),
+                control_stroke_color_secondary_brush: Color::from_argb(41, 0, 0, 0),
+                control_stroke_color_on_accent_default_brush: Color::from_argb(20, 255, 255, 255),
+                control_stroke_color_on_accent_secondary_brush: Color::from_argb(102, 0, 0, 0),
+                control_stroke_color_on_accent_tertiary_brush: Color::from_argb(55, 0, 0, 0),
+                control_stroke_color_on_accent_disabled_brush: Color::from_argb(15, 0, 0, 0),
+                control_stroke_color_for_strong_fill_when_on_image_brush: Color::from_argb(
+                    89, 255, 255, 255,
+                ),
+                card_stroke_color_default_brush: Color::from_argb(15, 0, 0, 0),
+                card_stroke_color_default_solid_brush: Color::from_argb(255, 235, 235, 235),
+                control_strong_stroke_color_default_brush: Color::from_argb(114, 0, 0, 0),
+                control_strong_stroke_color_disabled_brush: Color::from_argb(55, 0, 0, 0),
+                surface_stroke_color_default_brush: Color::from_argb(102, 117, 117, 117),
+                surface_stroke_color_flyout_brush: Color::from_argb(15, 0, 0, 0),
+                surface_stroke_color_inverse_brush: Color::from_argb(21, 255, 255, 255),
+                divider_stroke_color_default_brush: Color::from_argb(15, 0, 0, 0),
+                focus_stroke_color_outer_brush: Color::from_argb(228, 0, 0, 0),
+                focus_stroke_color_inner_brush: Color::from_argb(179, 255, 255, 255),
+                card_background_fill_color_default_brush: Color::from_argb(179, 255, 255, 255),
+                card_background_fill_color_secondary_brush: Color::from_argb(128, 246, 246, 246),
+                card_background_fill_color_tertiary_brush: Color::from_argb(255, 255, 255, 255),
+                smoke_fill_color_default_brush: Color::from_argb(77, 0, 0, 0),
+                layer_fill_color_default_brush: Color::from_argb(128, 255, 255, 255),
+                layer_fill_color_alt_brush: Color::from_argb(255, 255, 255, 255),
+                layer_on_acrylic_fill_color_default_brush: Color::from_argb(64, 255, 255, 255),
+                layer_on_accent_acrylic_fill_color_default_brush: Color::from_argb(
+                    64, 255, 255, 255,
+                ),
+                layer_on_mica_base_alt_fill_color_default_brush: Color::from_argb(
+                    179, 255, 255, 255,
+                ),
+                layer_on_mica_base_alt_fill_color_secondary_brush: Color::from_argb(10, 0, 0, 0),
+                layer_on_mica_base_alt_fill_color_tertiary_brush: Color::from_argb(
+                    255, 249, 249, 249,
+                ),
+                layer_on_mica_base_alt_fill_color_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                solid_background_fill_color_base_brush: Color::from_argb(255, 243, 243, 243),
+                solid_background_fill_color_secondary_brush: Color::from_argb(255, 238, 238, 238),
+                solid_background_fill_color_tertiary_brush: Color::from_argb(255, 249, 249, 249),
+                solid_background_fill_color_quarternary_brush: Color::from_argb(255, 255, 255, 255),
+                solid_background_fill_color_quinary_brush: Color::from_argb(255, 253, 253, 253),
+                solid_background_fill_color_senary_brush: Color::from_argb(255, 255, 255, 255),
+                solid_background_fill_color_base_alt_brush: Color::from_argb(255, 218, 218, 218),
+                system_fill_color_attention_brush: accent.base,
+                system_fill_color_success_brush: Color::from_argb(255, 15, 123, 15),
+                system_fill_color_caution_brush: Color::from_argb(255, 157, 93, 0),
+                system_fill_color_critical_brush: Color::from_argb(255, 196, 43, 28),
+                system_fill_color_neutral_brush: Color::from_argb(114, 0, 0, 0),
+                system_fill_color_solid_neutral_brush: Color::from_argb(255, 138, 138, 138),
+                system_fill_color_attention_background_brush: Color::from_argb(128, 246, 246, 246),
+                system_fill_color_success_background_brush: Color::from_argb(255, 223, 246, 221),
+                system_fill_color_caution_background_brush: Color::from_argb(255, 255, 244, 206),
+                system_fill_color_critical_background_brush: Color::from_argb(255, 253, 231, 233),
+                system_fill_color_neutral_background_brush: Color::from_argb(6, 0, 0, 0),
+                system_fill_color_solid_attention_background_brush: Color::from_argb(
+                    255, 247, 247, 247,
+                ),
+                system_fill_color_solid_neutral_background_brush: Color::from_argb(
+                    255, 243, 243, 243,
+                ),
                 control_elevation_border_brush: [
                     (0.33, Color::from_argb(41, 0, 0, 0)),
                     (1.0, Color::from_argb(15, 0, 0, 0)),
@@ -395,6 +677,106 @@ impl CommonResources {
                 system_fill_color_neutral_background: Color::from_argb(8, 255, 255, 255),
                 system_fill_color_solid_attention_background: Color::from_argb(255, 46, 46, 46),
                 system_fill_color_solid_neutral_background: Color::from_argb(255, 46, 46, 46),
+                text_fill_color_primary_brush: Color::from_argb(255, 255, 255, 255),
+                text_fill_color_secondary_brush: Color::from_argb(197, 255, 255, 255),
+                text_fill_color_tertiary_brush: Color::from_argb(135, 255, 255, 255),
+                text_fill_color_disabled_brush: Color::from_argb(93, 255, 255, 255),
+                text_fill_color_inverse_brush: Color::from_argb(228, 0, 0, 0),
+                accent_text_fill_color_primary_brush: accent.light3,
+                accent_text_fill_color_secondary_brush: accent.light3,
+                accent_text_fill_color_tertiary_brush: accent.light2,
+                accent_text_fill_color_disabled_brush: Color::from_argb(93, 255, 255, 255),
+                text_on_accent_fill_color_selected_text_brush: Color::from_argb(255, 255, 255, 255),
+                text_on_accent_fill_color_primary_brush: Color::from_argb(255, 0, 0, 0),
+                text_on_accent_fill_color_secondary_brush: Color::from_argb(128, 0, 0, 0),
+                text_on_accent_fill_color_disabled_brush: Color::from_argb(135, 255, 255, 255),
+                control_fill_color_default_brush: Color::from_argb(15, 255, 255, 255),
+                control_fill_color_secondary_brush: Color::from_argb(21, 255, 255, 255),
+                control_fill_color_tertiary_brush: Color::from_argb(8, 255, 255, 255),
+                control_fill_color_quarternary_brush: Color::from_argb(15, 255, 255, 255),
+                control_fill_color_disabled_brush: Color::from_argb(11, 255, 255, 255),
+                control_fill_color_transparent_brush: Color::from_argb(0, 255, 255, 255),
+                control_fill_color_input_active_brush: Color::from_argb(179, 30, 30, 30),
+                control_strong_fill_color_default_brush: Color::from_argb(139, 255, 255, 255),
+                control_strong_fill_color_disabled_brush: Color::from_argb(63, 255, 255, 255),
+                control_solid_fill_color_default_brush: Color::from_argb(255, 69, 69, 69),
+                subtle_fill_color_transparent_brush: Color::from_argb(0, 255, 255, 255),
+                subtle_fill_color_secondary_brush: Color::from_argb(15, 255, 255, 255),
+                subtle_fill_color_tertiary_brush: Color::from_argb(10, 255, 255, 255),
+                subtle_fill_color_disabled_brush: Color::from_argb(0, 255, 255, 255),
+                control_alt_fill_color_transparent_brush: Color::from_argb(0, 255, 255, 255),
+                control_alt_fill_color_secondary_brush: Color::from_argb(25, 0, 0, 0),
+                control_alt_fill_color_tertiary_brush: Color::from_argb(11, 255, 255, 255),
+                control_alt_fill_color_quarternary_brush: Color::from_argb(18, 255, 255, 255),
+                control_alt_fill_color_disabled_brush: Color::from_argb(0, 255, 255, 255),
+                control_on_image_fill_color_default_brush: Color::from_argb(179, 28, 28, 28),
+                control_on_image_fill_color_secondary_brush: Color::from_argb(255, 26, 26, 26),
+                control_on_image_fill_color_tertiary_brush: Color::from_argb(255, 19, 19, 19),
+                control_on_image_fill_color_disabled_brush: Color::from_argb(255, 30, 30, 30),
+                accent_fill_color_selected_text_background_brush: accent.base,
+                accent_fill_color_default_brush: accent.light2,
+                accent_fill_color_secondary_brush: accent.light2,
+                accent_fill_color_tertiary_brush: accent.light2,
+                accent_fill_color_disabled_brush: Color::from_argb(40, 255, 255, 255),
+                control_stroke_color_default_brush: Color::from_argb(18, 255, 255, 255),
+                control_stroke_color_secondary_brush: Color::from_argb(24, 255, 255, 255),
+                control_stroke_color_on_accent_default_brush: Color::from_argb(20, 255, 255, 255),
+                control_stroke_color_on_accent_secondary_brush: Color::from_argb(35, 0, 0, 0),
+                control_stroke_color_on_accent_tertiary_brush: Color::from_argb(55, 0, 0, 0),
+                control_stroke_color_on_accent_disabled_brush: Color::from_argb(51, 0, 0, 0),
+                control_stroke_color_for_strong_fill_when_on_image_brush: Color::from_argb(
+                    107, 0, 0, 0,
+                ),
+                card_stroke_color_default_brush: Color::from_argb(25, 0, 0, 0),
+                card_stroke_color_default_solid_brush: Color::from_argb(255, 28, 28, 28),
+                control_strong_stroke_color_default_brush: Color::from_argb(139, 255, 255, 255),
+                control_strong_stroke_color_disabled_brush: Color::from_argb(40, 255, 255, 255),
+                surface_stroke_color_default_brush: Color::from_argb(102, 117, 117, 117),
+                surface_stroke_color_flyout_brush: Color::from_argb(51, 0, 0, 0),
+                surface_stroke_color_inverse_brush: Color::from_argb(15, 0, 0, 0),
+                divider_stroke_color_default_brush: Color::from_argb(21, 255, 255, 255),
+                focus_stroke_color_outer_brush: Color::from_argb(255, 255, 255, 255),
+                focus_stroke_color_inner_brush: Color::from_argb(179, 0, 0, 0),
+                card_background_fill_color_default_brush: Color::from_argb(13, 255, 255, 255),
+                card_background_fill_color_secondary_brush: Color::from_argb(8, 255, 255, 255),
+                card_background_fill_color_tertiary_brush: Color::from_argb(18, 255, 255, 255),
+                smoke_fill_color_default_brush: Color::from_argb(77, 0, 0, 0),
+                layer_fill_color_default_brush: Color::from_argb(76, 58, 58, 58),
+                layer_fill_color_alt_brush: Color::from_argb(13, 255, 255, 255),
+                layer_on_acrylic_fill_color_default_brush: Color::from_argb(9, 255, 255, 255),
+                layer_on_accent_acrylic_fill_color_default_brush: Color::from_argb(
+                    9, 255, 255, 255,
+                ),
+                layer_on_mica_base_alt_fill_color_default_brush: Color::from_argb(115, 58, 58, 58),
+                layer_on_mica_base_alt_fill_color_secondary_brush: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                layer_on_mica_base_alt_fill_color_tertiary_brush: Color::from_argb(255, 44, 44, 44),
+                layer_on_mica_base_alt_fill_color_transparent_brush: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                solid_background_fill_color_base_brush: Color::from_argb(255, 32, 32, 32),
+                solid_background_fill_color_secondary_brush: Color::from_argb(255, 28, 28, 28),
+                solid_background_fill_color_tertiary_brush: Color::from_argb(255, 40, 40, 40),
+                solid_background_fill_color_quarternary_brush: Color::from_argb(255, 44, 44, 44),
+                solid_background_fill_color_quinary_brush: Color::from_argb(255, 51, 51, 51),
+                solid_background_fill_color_senary_brush: Color::from_argb(255, 55, 55, 55),
+                solid_background_fill_color_base_alt_brush: Color::from_argb(255, 10, 10, 10),
+                system_fill_color_attention_brush: accent.light2,
+                system_fill_color_success_brush: Color::from_argb(255, 108, 203, 95),
+                system_fill_color_caution_brush: Color::from_argb(255, 252, 225, 0),
+                system_fill_color_critical_brush: Color::from_argb(255, 255, 153, 164),
+                system_fill_color_neutral_brush: Color::from_argb(139, 255, 255, 255),
+                system_fill_color_solid_neutral_brush: Color::from_argb(255, 157, 157, 157),
+                system_fill_color_attention_background_brush: Color::from_argb(8, 255, 255, 255),
+                system_fill_color_success_background_brush: Color::from_argb(255, 57, 61, 27),
+                system_fill_color_caution_background_brush: Color::from_argb(255, 67, 53, 25),
+                system_fill_color_critical_background_brush: Color::from_argb(255, 68, 39, 38),
+                system_fill_color_neutral_background_brush: Color::from_argb(8, 255, 255, 255),
+                system_fill_color_solid_attention_background_brush: Color::from_argb(
+                    255, 46, 46, 46,
+                ),
+                system_fill_color_solid_neutral_background_brush: Color::from_argb(255, 46, 46, 46),
                 control_elevation_border_brush: [
                     (0.33, Color::from_argb(24, 255, 255, 255)),
                     (1.0, Color::from_argb(18, 255, 255, 255)),
@@ -6043,6 +6425,39 @@ pub const PROGRESS_BAR_CORNER_RADIUS: [f64; 4] = [1.5, 1.5, 1.5, 1.5];
 pub const PROGRESS_BAR_TRACK_CORNER_RADIUS: [f64; 4] = [0.5, 0.5, 0.5, 0.5];
 /// Left, top, right, bottom.
 pub const PROGRESS_BAR_BORDER_THEME_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Theme-dependent resources of `ProgressRing_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ProgressRingResources {
+    /// The resolved `ProgressRingForegroundThemeBrush` resource.
+    pub progress_ring_foreground_theme_brush: Color,
+    /// The resolved `ProgressRingBackgroundThemeBrush` resource.
+    pub progress_ring_background_theme_brush: Color,
+    /// The resolved `SystemControlHighlightAccentBrush` resource.
+    pub system_control_highlight_accent_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
+    pub system_control_background_base_low_brush: Color,
+}
+
+impl ProgressRingResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                progress_ring_foreground_theme_brush: accent.dark1,
+                progress_ring_background_theme_brush: Color::from_argb(0, 255, 255, 255),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                progress_ring_foreground_theme_brush: accent.light2,
+                progress_ring_background_theme_brush: Color::from_argb(0, 255, 255, 255),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
+            },
+        }
+    }
+}
+pub const PROGRESS_RING_STROKE_THICKNESS: f64 = 4.0;
 /// Theme-dependent resources of `Expander_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ExpanderResources {
@@ -7299,3 +7714,52 @@ impl RadioMenuFlyoutItemResources {
         }
     }
 }
+/// Theme-dependent resources of `InfoBadge_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct InfoBadgeResources {
+    /// The resolved `InfoBadgeForeground` resource.
+    pub info_badge_foreground: Color,
+    /// The resolved `InfoBadgeBackground` resource.
+    pub info_badge_background: Color,
+    /// The resolved `SystemControlHighlightAltChromeWhiteBrush` resource.
+    pub system_control_highlight_alt_chrome_white_brush: Color,
+    /// The resolved `SystemControlHighlightAccentBrush` resource.
+    pub system_control_highlight_accent_brush: Color,
+}
+
+impl InfoBadgeResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                info_badge_foreground: Color::from_argb(255, 255, 255, 255),
+                info_badge_background: accent.dark1,
+                system_control_highlight_alt_chrome_white_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                system_control_highlight_accent_brush: accent.base,
+            },
+            Theme::Dark => Self {
+                info_badge_foreground: Color::from_argb(255, 0, 0, 0),
+                info_badge_background: accent.light2,
+                system_control_highlight_alt_chrome_white_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                system_control_highlight_accent_brush: accent.base,
+            },
+        }
+    }
+}
+pub const INFO_BADGE_MIN_HEIGHT: f64 = 4.0;
+pub const INFO_BADGE_MIN_WIDTH: f64 = 4.0;
+pub const INFO_BADGE_MAX_HEIGHT: f64 = 16.0;
+pub const INFO_BADGE_VALUE_FONT_SIZE: f64 = 11.0;
+pub const INFO_BADGE_ICON_WIDTH: f64 = 12.0;
+/// Left, top, right, bottom.
+pub const INFO_BADGE_PADDING: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const ICON_INFO_BADGE_FONT_ICON_MARGIN: [f64; 4] = [4.0, 0.0, 4.0, 2.0];
+/// Left, top, right, bottom.
+pub const VALUE_INFO_BADGE_TEXT_MARGIN: [f64; 4] = [4.0, 0.0, 4.0, 2.0];
+/// Left, top, right, bottom.
+pub const ICON_INFO_BADGE_ICON_MARGIN: [f64; 4] = [4.0, 4.0, 4.0, 4.0];

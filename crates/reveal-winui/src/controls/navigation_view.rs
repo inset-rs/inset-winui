@@ -492,7 +492,7 @@ impl NavigationViewState {
         if widget.is_settings_visible {
             let mut settings =
                 NavigationViewItem::text(NavigationView::SETTINGS_ITEM_ID, "Settings")
-                    .icon(FluentIcon::new(FluentSymbol::Settings));
+                    .icon(FontIcon::symbol(FluentSymbol::Settings));
             if widget.pane_display_mode == NavigationViewPaneDisplayMode::Top {
                 settings = settings
                     .without_content()
@@ -1455,7 +1455,7 @@ impl NavigationViewState {
     ) -> WidgetRef {
         ToolTipService::new(
             Button::new(
-                FluentIcon::new(icon)
+                FontIcon::symbol(icon)
                     .font_size(16.0)
                     .mirrored_when_right_to_left(true),
                 callback,
@@ -1770,7 +1770,7 @@ impl NavigationViewState {
             };
             let small = chrome.overlay && !close;
             let button = Button::new(
-                FluentIcon::new(FluentSymbol::Back)
+                FontIcon::symbol(FluentSymbol::Back)
                     .font_size(16.0)
                     .mirrored_when_right_to_left(true),
                 callback,
@@ -2129,7 +2129,7 @@ impl NavigationViewState {
         if widget.is_pane_visible && chrome.show_back {
             let width = chrome.back_width;
             let button = Button::new(
-                FluentIcon::new(FluentSymbol::Back)
+                FontIcon::symbol(FluentSymbol::Back)
                     .font_size(16.0)
                     .mirrored_when_right_to_left(true),
                 widget

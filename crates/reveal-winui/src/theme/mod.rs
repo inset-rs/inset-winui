@@ -111,9 +111,19 @@ impl ThemeResources {
         ProgressBarResources::for_theme(self.theme, &self.accent)
     }
 
+    /// ProgressRing's arc and track colors.
+    pub fn progress_ring(&self) -> ProgressRingResources {
+        ProgressRingResources::for_theme(self.theme, &self.accent)
+    }
+
     /// Expander's header, chevron and content colors.
     pub fn expander(&self) -> ExpanderResources {
         ExpanderResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// InfoBadge's accent fill and the foreground on it.
+    pub fn info_badge(&self) -> InfoBadgeResources {
+        InfoBadgeResources::for_theme(self.theme, &self.accent)
     }
 
     /// InfoBar's severity and content colors.

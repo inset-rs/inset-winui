@@ -148,9 +148,9 @@ impl State for NavigationDemoState {
         );
         let items = vec![
             NavigationViewItem::text("overview", "Overview")
-                .icon(FluentIcon::new(FluentSymbol::Navigation)),
+                .icon(FontIcon::symbol(FluentSymbol::Navigation)),
             NavigationViewItem::text("library", "Library")
-                .icon(FluentIcon::new(FluentSymbol::More))
+                .icon(FontIcon::symbol(FluentSymbol::More))
                 .menu_items([
                     NavigationViewItem::text("recent", "Recent"),
                     NavigationViewItem::text("collections", "Collections").menu_items([
@@ -161,7 +161,7 @@ impl State for NavigationDemoState {
             NavigationViewItem::separator("divider"),
             NavigationViewItem::header("tools", "Tools"),
             NavigationViewItem::text("create", "Create new")
-                .icon(FluentIcon::new(FluentSymbol::Add))
+                .icon(FontIcon::symbol(FluentSymbol::Add))
                 .selects_on_invoked(false),
             NavigationViewItem::text("unavailable", "Unavailable").is_enabled(false),
         ];
@@ -207,7 +207,7 @@ impl State for NavigationDemoState {
         if footer {
             navigation = navigation
                 .footer_menu_items([NavigationViewItem::text("help", "Help")
-                    .icon(FluentIcon::new(FluentSymbol::More))]);
+                    .icon(FontIcon::symbol(FluentSymbol::More))]);
         }
         navigation.back_requested = Some(Listener::new(move |app| {
             self.set_state(app, |s| {

@@ -99,8 +99,8 @@ fn helper(f: &Fixture, symbol: FluentSymbol) -> Option<Offset> {
     let app = f.cell.borrow();
     elements.into_iter().find_map(|element| {
         let widget = element.widget(&app);
-        let icon = downcast_widget::<FluentIcon>(widget.as_ref())?;
-        if icon.symbol != symbol {
+        let icon = downcast_widget::<FontIcon>(widget.as_ref())?;
+        if icon.glyph != symbol.glyph().to_string() {
             return None;
         }
 

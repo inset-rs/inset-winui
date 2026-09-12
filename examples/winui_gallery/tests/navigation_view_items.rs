@@ -47,7 +47,7 @@ impl State for PageState {
         let items = vec![
             NavigationViewItem::header("section", "Section"),
             NavigationViewItem::text("parent", "Parent")
-                .icon(FluentIcon::new(FluentSymbol::Settings))
+                .icon(FontIcon::symbol(FluentSymbol::Settings))
                 .menu_items([NavigationViewItem::text("child", "Child")]),
             NavigationViewItem::separator("separator"),
             NavigationViewItem::text("disabled", "Disabled").is_enabled(false),
