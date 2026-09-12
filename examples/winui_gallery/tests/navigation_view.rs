@@ -1,10 +1,9 @@
 //! Adaptive and top navigation use the real native layout, input and overlay stack.
 #![feature(arbitrary_self_types)]
-mod common;
-use common::Fixture;
 use inset_foundation::{App, Handle, Listener};
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Clone, Debug, Default)]

@@ -1,6 +1,7 @@
 //! The expanded catalog exposes its symbols and retains independent example settings.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use inset_widgets::downcast_widget;

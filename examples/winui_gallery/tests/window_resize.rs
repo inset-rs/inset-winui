@@ -1,5 +1,7 @@
 //! Actual platform metrics changes exercise OverlayPortal layout during adaptive resizing.
 #![feature(arbitrary_self_types)]
+use inset_winui_test_support::gpu;
+
 use inset_embedder::valo::{Color, Context};
 use inset_embedder::{
     FontSource, Picture, Platform, SystemFontSource, TargetPlatform, View, ViewConstraints, ViewId,
@@ -73,7 +75,7 @@ impl Platform for Host {
 
 #[test]
 fn real_window_resize_relayouts_navigation_overlay() {
-    let (device, queue) = valo_harness::headless_device().expect("GPU required");
+    let (device, queue) = gpu::headless_device().expect("GPU required");
     let view = Rc::new(CaptureView {
         size: Cell::new([1200, 800]),
         renderer: RefCell::new(Context::new(device, queue)),
@@ -176,7 +178,7 @@ fn real_window_resize_relayouts_navigation_overlay() {
 
 #[test]
 fn real_gallery_window_resize_keeps_overlay_parent_data() {
-    let (device, queue) = valo_harness::headless_device().expect("GPU required");
+    let (device, queue) = gpu::headless_device().expect("GPU required");
     let view = Rc::new(CaptureView {
         size: Cell::new([1200, 800]),
         renderer: RefCell::new(Context::new(device, queue)),

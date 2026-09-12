@@ -1,14 +1,13 @@
 //! WinUI's absent-brush hit area and rounded child clipping.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::{Color, Offset, PointerChange};
 use inset_foundation::Listener;
 use inset_painting::Alignment;
 use inset_rendering::HitTestBehavior;
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc};
 
 fn fixture(background: Option<Brush>, rounded_child: bool) -> (Fixture, Rc<Cell<usize>>) {

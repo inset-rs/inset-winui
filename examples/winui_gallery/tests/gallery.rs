@@ -1,6 +1,7 @@
 //! The navigation gallery keeps one feature visible and retains visited demo state.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use winui_gallery::Feature;

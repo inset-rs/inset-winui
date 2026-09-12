@@ -1,8 +1,6 @@
 //! The system focus visual follows XAML's coerced focus state: programmatic focus after pointer input shows no ring, after keyboard input it does.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::{Offset, PointerChange, TextDirection};
 use inset_foundation::Listener;
 use inset_rendering::CrossAxisAlignment;
@@ -11,6 +9,7 @@ use inset_services::{
 };
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::rc::Rc;
 
 /// A menu bar whose header takes focus when its menu opens, above a plain button.

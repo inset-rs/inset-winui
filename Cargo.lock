@@ -856,6 +856,8 @@ dependencies = [
 [[package]]
 name = "inset-animation"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "63cd3783d043c5268d2d0bdd4c4968ce13296047cdf422a086c07ea697a64650"
 dependencies = [
  "inset-embedder",
  "inset-foundation",
@@ -866,6 +868,8 @@ dependencies = [
 [[package]]
 name = "inset-embedder"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12521021821ea92f4f4a4dde974d57a31871af9dbf47f3dd07c7ce9e13090fcd"
 dependencies = [
  "indexmap",
  "valo",
@@ -877,6 +881,8 @@ dependencies = [
 [[package]]
 name = "inset-embedder-winit"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d826ee95ddc1fe3d7186c5d324c9298947fd9bf6bbb45b4797ea4203bb4e72a"
 dependencies = [
  "arboard",
  "inset-embedder",
@@ -892,6 +898,8 @@ dependencies = [
 [[package]]
 name = "inset-foundation"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "86b4c23a110b7d6a50a0c883ee38bf0801f5d1a462947a444016d41813fa7536"
 dependencies = [
  "async-task",
  "indexmap",
@@ -902,6 +910,8 @@ dependencies = [
 [[package]]
 name = "inset-gestures"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "79f5183649db5ae4ec926c7672b8140a02def384d67fae40b9c0a7fb1e2bf155"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -913,6 +923,8 @@ dependencies = [
 [[package]]
 name = "inset-painting"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1ab31b8786a41b514cdcc9233a908171eec650eef850f2b3b33508a1d8dab4e7"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -923,6 +935,8 @@ dependencies = [
 [[package]]
 name = "inset-physics"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "49e9745c886b9648a462123ecd939cd788b3b93da11322e9ebdea4f4557a7bcb"
 dependencies = [
  "inset-embedder",
 ]
@@ -930,6 +944,8 @@ dependencies = [
 [[package]]
 name = "inset-rendering"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e9d9ee23a7ba19ac8a13b750e05189bc626c04c0467ad1a5a13b8bd59985f611"
 dependencies = [
  "indexmap",
  "inset-animation",
@@ -945,6 +961,8 @@ dependencies = [
 [[package]]
 name = "inset-scheduler"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc142d982d91f7e122da7f40ae70d470c8e158d7089f8b94e564d56d4506d3b4"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -954,6 +972,8 @@ dependencies = [
 [[package]]
 name = "inset-services"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "28baebf65281f9d137b9b8e5655b7232660b0f91accb6e5163a3bd32d69a1a9e"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -966,6 +986,8 @@ dependencies = [
 [[package]]
 name = "inset-shell"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a0f3d9abc08f98de1bd5b2f030305d62c3d98eaf5de6eac0dab08f0ebe02f62"
 dependencies = [
  "inset-embedder",
  "inset-foundation",
@@ -979,6 +1001,8 @@ dependencies = [
 [[package]]
 name = "inset-widgets"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed13fac6ca9ad7f358b32ab76f4a993d52719e2e7278010cd6fbb404407c2b51"
 dependencies = [
  "indexmap",
  "inset-animation",
@@ -1005,6 +1029,24 @@ dependencies = [
  "inset-scheduler",
  "inset-services",
  "inset-widgets",
+]
+
+[[package]]
+name = "inset-winui-test-support"
+version = "0.1.0"
+dependencies = [
+ "inset-animation",
+ "inset-embedder",
+ "inset-foundation",
+ "inset-gestures",
+ "inset-painting",
+ "inset-rendering",
+ "inset-scheduler",
+ "inset-services",
+ "inset-widgets",
+ "png 0.17.16",
+ "pollster",
+ "wgpu",
 ]
 
 [[package]]
@@ -2442,6 +2484,8 @@ checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
 [[package]]
 name = "valo"
 version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06f5e3a8117837ee7ed61c39c79aa1ab2a4e7493755a4ce4636020eabdffcba3"
 dependencies = [
  "objc2 0.6.4",
  "objc2-metal 0.3.2",
@@ -2500,6 +2544,8 @@ dependencies = [
 [[package]]
 name = "valo-dl"
 version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "039158d5e09493ab5e953b44a95c39355d73fe760a4272edd1418ff6a4f25b83"
 dependencies = [
  "valo-geometry",
  "valo-text",
@@ -2509,6 +2555,8 @@ dependencies = [
 [[package]]
 name = "valo-fontmgr"
 version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e970b07b08864cff162c399495ccb68b089fc9fd1458c9d3ffa00977ac83fc01"
 dependencies = [
  "core-foundation 0.10.1",
  "core-foundation-sys",
@@ -2521,24 +2569,17 @@ dependencies = [
 [[package]]
 name = "valo-geometry"
 version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6e1a97bcd8abceab6af5316cd824ac38cae692ab4239ba0bd6145408b33902d"
 dependencies = [
  "glam",
 ]
 
 [[package]]
-name = "valo-harness"
-version = "0.4.4"
-dependencies = [
- "png 0.17.16",
- "pollster",
- "valo",
- "wgpu",
- "winit",
-]
-
-[[package]]
 name = "valo-renderer"
 version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d51d2bb604cf3e02ee3a2d1bbf2f2c59a4b1a98d02d3284b9c273af782d6246"
 dependencies = [
  "bytemuck",
  "etagere",
@@ -2554,6 +2595,8 @@ dependencies = [
 [[package]]
 name = "valo-system-fonts"
 version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc9230b8c80d45ec68af0603a0554c094e6e6af70a8e7d2f8604d2bcadd74498"
 dependencies = [
  "valo-fontmgr",
  "valo-text",
@@ -2562,6 +2605,8 @@ dependencies = [
 [[package]]
 name = "valo-text"
 version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "28586f05b52a929719ee913cea5c4ac5ba8e8192cdf282140e894184f86a5334"
 dependencies = [
  "harfrust",
  "skrifa 0.35.0",
@@ -3248,7 +3293,7 @@ dependencies = [
  "inset-shell",
  "inset-widgets",
  "inset-winui",
- "valo-harness",
+ "inset-winui-test-support",
 ]
 
 [[package]]

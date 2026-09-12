@@ -2,6 +2,7 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
+use common::GalleryFixtureExt;
 use inset_embedder::{Offset, PointerChange, Rect};
 use inset_rendering::RenderParagraph;
 use inset_winui::*;

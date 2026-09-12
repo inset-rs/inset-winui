@@ -1,11 +1,10 @@
 //! Top navigation measures custom chrome and hidden items through the native layout tree.
 #![feature(arbitrary_self_types)]
-mod common;
-use common::Fixture;
 use inset_foundation::{App, Handle};
 use inset_rendering::{RenderBox, RenderParagraph};
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Debug)]

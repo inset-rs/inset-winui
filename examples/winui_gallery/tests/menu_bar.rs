@@ -1,6 +1,7 @@
 //! MenuBar pointer grouping, focus order, collection lifetime and source menu positioning.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use inset_embedder::{Offset, PointerChange, TextDirection};

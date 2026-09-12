@@ -7,12 +7,24 @@ import subprocess
 import sys
 from pathlib import Path
 
-from gen_resources import control_source, emit_struct, plain_value, read_dictionaries, resolve
+from gen_resources import DEFAULT_SOURCE, DEFAULT_OUTPUT, control_source, emit_struct, plain_value, read_dictionaries, resolve
 
 
 class ResourceGenerationTests(unittest.TestCase):
+    def test_default_control_list_reproduces_checked_in_resources(self):
+        if not DEFAULT_SOURCE.exists():
+            self.skipTest('local WinUI source checkout unavailable')
+        generator = Path(__file__).with_name('gen_resources.py').resolve()
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'resources.rs'
+            subprocess.run(
+                [sys.executable, str(generator), str(DEFAULT_SOURCE), str(output)],
+                cwd=directory, check=True, capture_output=True, text=True,
+            )
+            self.assertEqual(output.read_bytes(), DEFAULT_OUTPUT.read_bytes())
+
     def test_password_box_uses_sibling_fluent_text_box_brushes(self):
-        source = Path('/Users/mac/code/microsoft-ui-xaml')
+        source = DEFAULT_SOURCE
         if not source.exists():
             self.skipTest('local WinUI source checkout unavailable')
         generator = Path(__file__).with_name('gen_resources.py')
@@ -75,7 +87,7 @@ class ResourceGenerationTests(unittest.TestCase):
         self.assertEqual(plain_value('String', '00:00:00.2'), ('duration_ms', 200))
 
     def test_acrylic_alias_preserves_recipe_and_source_fallback(self):
-        source = Path('/Users/mac/code/microsoft-ui-xaml')
+        source = DEFAULT_SOURCE
         if not source.exists():
             self.skipTest('local WinUI source checkout unavailable')
         themes, _ = read_dictionaries(source / 'controls/dev/Materials/Acrylic/AcrylicBrush_themeresources.xaml')
@@ -130,7 +142,7 @@ class ResourceGenerationTests(unittest.TestCase):
         self.assertIn('Test.xaml: IconHeight differs by theme (9.0 light, 8.0 dark)', errors.getvalue())
 
     def test_brush_aliases_of_the_common_dictionary_reach_the_shared_struct(self):
-        source = Path('/Users/mac/code/microsoft-ui-xaml')
+        source = DEFAULT_SOURCE
         if not source.exists():
             self.skipTest('local WinUI source checkout unavailable')
         generator = Path(__file__).with_name('gen_resources.py')

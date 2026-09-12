@@ -1,7 +1,5 @@
 //! The gallery under a driver that behaves like the winit embedder: frames only when requested, timers only when the platform's `wake_at` deadline is reached, the app clock advanced only by frames and wakes.
 #![feature(arbitrary_self_types)]
-mod common;
-use common::CaptureView;
 use inset_embedder::valo::Context;
 use inset_embedder::{
     EmbedderClient, FontSource, Frame, Offset, Platform, PointerChange, PointerData,
@@ -10,6 +8,7 @@ use inset_embedder::{
 use inset_rendering::RenderParagraph;
 use inset_shell::Shell;
 use inset_widgets::WidgetsBinding;
+use inset_winui_test_support::CaptureView;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::time::{Duration, Instant};
@@ -56,7 +55,8 @@ struct Driver {
 }
 impl Driver {
     fn new() -> Driver {
-        let (device, queue) = valo_harness::headless_device().expect("GPU required");
+        let (device, queue) =
+            inset_winui_test_support::gpu::headless_device().expect("GPU required");
         let view = Rc::new(CaptureView {
             size: [900, 2000],
             renderer: RefCell::new(Context::new(device, queue)),

@@ -1,13 +1,12 @@
 //! NavigationView item templates and hierarchy through native input and GPU layout.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::{Offset, PointerChange, Rect};
 use inset_foundation::{App, Handle};
 use inset_rendering::RenderParagraph;
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Clone, Debug, Default)]

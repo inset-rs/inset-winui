@@ -1,13 +1,12 @@
 //! Selection must not paint its settled target before its first animation frame.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::PointerChange;
 use inset_foundation::{App, Handle};
 use inset_scheduler::SchedulerBinding;
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc, time::Duration};
 
 #[derive(Debug)]

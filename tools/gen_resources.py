@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Generates Rust theme resources from WinUI's XAML theme dictionaries.
 
-usage: gen_resources.py <microsoft-ui-xaml root> <output .rs> <Control ...>
+usage: gen_resources.py [microsoft-ui-xaml root] [output .rs] [Control ...]
+
+With no arguments, regenerates this kit from .reference/microsoft-ui-xaml using DEFAULT_CONTROLS. Explicit paths or a control subset are optional.
 
 Reads controls/dev/CommonStyles/Common_themeresources_any.xaml (the Fluent base
 tokens) and one <Control>_themeresources.xaml per named control, preferring
@@ -11,11 +13,53 @@ Emits one Rust struct per file with
 a `for_theme` constructor for the Light and Dark (XAML "Default") dictionaries.
 High contrast is not emitted: its values are the OS's system colours.
 """
+import argparse
 import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_SOURCE = REPO_ROOT / ".reference/microsoft-ui-xaml"
+DEFAULT_OUTPUT = REPO_ROOT / "crates/inset-winui/src/theme/generated.rs"
+
+# Control and supporting dictionaries used by the kit, in generation order.
+DEFAULT_CONTROLS = (
+    'Button',
+    'ToggleSwitch',
+    'CheckBox',
+    'RadioButton',
+    'ToggleButton',
+    'HyperlinkButton',
+    'RepeatButton',
+    'Slider',
+    'ToolTip',
+    'TextBlock',
+    'CornerRadius',
+    'SplitView',
+    'TabView',
+    'ScrollBar',
+    'NavigationView',
+    'FlyoutPresenter',
+    'NavigationBackButton',
+    'TextBox',
+    'PasswordBox',
+    'CommandBarFlyout',
+    'AppBarButton',
+    'AcrylicBrush',
+    'ProgressBar',
+    'Expander',
+    'InfoBar',
+    'MenuFlyout',
+    'DropDownButton',
+    'SplitButton',
+    'RadioMenuFlyoutItem',
+    'ProgressRing',
+    'InfoBadge',
+    'MenuBar',
+    'BreadcrumbBar',
+)
 
 NS = {
     'x': 'http://schemas.microsoft.com/winfx/2006/xaml',
@@ -300,14 +344,23 @@ def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
             out.append(f'/// Cubic Bézier control points (x1, y1, x2, y2).\npub const {name}: [f64; 4] = {value};')
         elif kind == 'enum':
             enum, variant = value
-            # `FontWeight` in reveal is Flutter's: `FontWeight::NORMAL`, `BOLD`, `W600`...
+            # `FontWeight` in Inset is Flutter's: `FontWeight::NORMAL`, `BOLD`, `W600`...
             if enum == 'FontWeight':
                 variant = {'Normal': 'NORMAL', 'Bold': 'BOLD', 'SemiBold': 'W600', 'Light': 'W300', 'SemiLight': 'W350', 'Medium': 'W500', 'Black': 'W900', 'Thin': 'W100', 'ExtraLight': 'W200', 'ExtraBold': 'W800'}[variant]
             out.append(f'pub const {name}: {enum} = {enum}::{variant};')
 
 
-def main():
-    root, output, controls = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3:]
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Generate the kit’s Rust theme resources from WinUI XAML.")
+    parser.add_argument('root', nargs='?', type=Path, default=DEFAULT_SOURCE,
+                        help='WinUI source checkout (default: .reference/microsoft-ui-xaml)')
+    parser.add_argument('output', nargs='?', type=Path, default=DEFAULT_OUTPUT,
+                        help='generated Rust file (default: this kit’s theme/generated.rs)')
+    parser.add_argument('controls', nargs='*',
+                        help='optional subset; defaults to the dictionaries in DEFAULT_CONTROLS')
+    args = parser.parse_args(argv)
+    root, output = args.root, args.output
+    controls = args.controls or DEFAULT_CONTROLS
     styles = root / 'controls/dev/CommonStyles'
     base_themes, base_shared = read_dictionaries(styles / 'Common_themeresources_any.xaml')
     common_themes, common_shared = read_dictionaries(styles / 'Common_themeresources.xaml')

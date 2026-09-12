@@ -1,7 +1,5 @@
 //! Slider's source value converter, keyboard tooltip, and opt-out behavior.
 #![feature(arbitrary_self_types)]
-mod common;
-use common::Fixture;
 use inset_foundation::{App, Handle};
 use inset_rendering::RenderParagraph;
 use inset_services::{
@@ -9,6 +7,7 @@ use inset_services::{
 };
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc};
 #[derive(Debug)]
 struct Page(Rc<Cell<Option<Handle<PageState>>>>);

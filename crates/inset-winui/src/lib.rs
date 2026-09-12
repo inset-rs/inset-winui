@@ -1,4 +1,6 @@
-//! WinUI 3's controls on reveal, ported from Microsoft's open source (`/Users/mac/code/microsoft-ui-xaml`): the Fluent theme resources, the control templates as widget trees, their visual states and the motion the templates declare.
+//! WinUI 3 controls and Fluent styling for the Inset UI framework.
+//!
+//! See the [repository](https://github.com/inset-rs/inset-winui) for setup and the gallery.
 #![feature(arbitrary_self_types)]
 mod controls;
 mod primitives;

@@ -1,6 +1,7 @@
 //! GPU checks for feedback controls, retained content and adaptive notification layout.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use inset_widgets::downcast_widget;

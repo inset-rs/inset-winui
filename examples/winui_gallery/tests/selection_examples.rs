@@ -1,6 +1,7 @@
 //! Gallery property choices update independent examples without changing their neighbors.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use winui_gallery::Feature;

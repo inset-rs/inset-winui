@@ -2,6 +2,7 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
+use common::GalleryFixtureExt;
 
 #[test]
 fn radio_button_checks_once_per_group_and_switches_theme() {

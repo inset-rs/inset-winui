@@ -1,6 +1,7 @@
 //! Flutter click-focus behavior with the gallery's native route and window focus lifecycle.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use inset_embedder::{PointerChange, ViewFocusDirection, ViewFocusEvent, ViewFocusState};

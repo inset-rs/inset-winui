@@ -1,8 +1,6 @@
 //! MenuFlyout templates, checked values and source keyboard navigation.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_foundation::{Handle, Listener};
 use inset_painting::Alignment;
 use inset_services::{
@@ -10,6 +8,7 @@ use inset_services::{
 };
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Default)]

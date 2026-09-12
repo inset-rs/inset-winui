@@ -1,16 +1,15 @@
 //! Exercise the private TabView scrolling template without exposing it as public kit API.
 #![feature(arbitrary_self_types)]
-mod common;
 #[allow(dead_code)]
 #[path = "../../../crates/inset-winui/src/controls/scroll_tab_viewer.rs"]
 mod template;
 
-use common::Fixture;
 use inset_embedder::{Offset, PointerChange, Rect};
 use inset_foundation::{App, Handle, Listener};
 use inset_painting::{Axis, EdgeInsetsGeometry};
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc, time::Duration};
 use template::TabScrollViewer;
 

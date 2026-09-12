@@ -1,12 +1,11 @@
 //! Native drag/drop prerequisites exercised through real hit testing and pointer routing.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
 use inset_foundation::{App, Handle, Listener};
 use inset_gestures::GestureBinding;
 use inset_widgets::*;
+use inset_winui_test_support::Fixture;
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,

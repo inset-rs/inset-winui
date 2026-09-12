@@ -2,6 +2,7 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
+use common::GalleryFixtureExt;
 use inset_embedder::{Color, PointerChange};
 use inset_foundation::{App, Handle};
 use inset_painting::EdgeInsetsGeometry;

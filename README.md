@@ -1,22 +1,35 @@
-# inset-winui
+# Inset WinUI
 
-WinUI 3's controls, Fluent 2 look and motion on the Inset framework, ported from Microsoft's open source (`../microsoft-ui-xaml`). Desktop first; WinUI itself adapts by window size rather than by device, so there is no separate mobile idiom.
+WinUI controls and Fluent styling for [Inset](https://github.com/inset-rs/inset).
 
-Sibling checkouts this workspace expects: `../reveal-rs` (the framework, path dependencies), `../valo` (the renderer, on the branch reveal-rs is pinned to), `../microsoft-ui-xaml` (the spec).
+The library ports control templates, theme resources and behavior from [Microsoft’s WinUI](https://github.com/microsoft/microsoft-ui-xaml). Inset handles rendering, layout and input.
+
+## Try it
+
+Inset **requires nightly Rust**:
 
 ```sh
+rustup install nightly
 cargo run -p winui_gallery
-cargo test
-WINUI_CAPTURE_DIR=$PWD/output cargo test -p winui_gallery   # export what the tests rendered
-python3 tools/gen_resources.py ../microsoft-ui-xaml crates/inset-winui/src/theme/generated.rs Button ToggleSwitch CheckBox RadioButton ToggleButton HyperlinkButton RepeatButton Slider ToolTip TextBlock CornerRadius SplitView TabView ScrollBar NavigationView FlyoutPresenter NavigationBackButton TextBox PasswordBox CommandBarFlyout AppBarButton AcrylicBrush ProgressBar Expander InfoBar MenuFlyout DropDownButton SplitButton RadioMenuFlyoutItem ProgressRing InfoBadge MenuBar BreadcrumbBar
 ```
 
-The gallery uses NavigationView with a destination and icon for each feature. Each page groups examples into cards with settings for exploring control behavior, including navigation modes, tab options, slider ranges, and selection states. Typography and Icons pages demonstrate the type ramp and bundled Fluent symbols; the Acrylic page compares the material with its opaque fallback. Visited examples retain their state, and a theme switch stays in the pane footer.
+Run the gallery from this repository. Dependencies come from crates.io.
 
-The gallery includes TextBox and PasswordBox (native editing, selection, clipboard commands, multiline input and password reveal), TabView (selection, closing, sizing, scrolling and in-window drag/reorder) and NavigationView (adaptive left panes, hierarchy and top overflow), alongside the earlier button, slider and SplitView ports. Native framework and host differences are recorded in the source folders’ `PORTING.md` files.
+## Use it
 
-`AGENTS.md` has the porting rules; `crates/inset-winui/README.md` the shape of the code.
+```toml
+[dependencies]
+inset-winui = "0.1.0"
+```
 
-The gallery includes dedicated `SplitButton`, `ToggleSplitButton` and `MenuFlyout` pages with independent primary actions, checked choices and nested menus.
+Use controls inside an Inset `WidgetsApp`, with `ThemeScope` selecting the light or dark theme. Call `install_icon_font` once during application setup. Controls that show popups need an `Overlay` ancestor.
 
-`MenuBar` groups application commands under headers whose ids remain stable across rebuilds, with hover switching, keyboard navigation and a dedicated gallery page.
+The [gallery](https://github.com/inset-rs/inset-winui/tree/main/examples/winui_gallery) demonstrates application setup, font registration and control state.
+
+## Contributing
+
+Porting guidance, tests and resource generation: [AGENTS.md](https://github.com/inset-rs/inset-winui/blob/main/AGENTS.md).
+
+## License
+
+MIT. Microsoft’s source and the bundled icon font retain their [third-party notices](https://github.com/inset-rs/inset-winui/blob/main/crates/inset-winui/THIRD_PARTY.md).

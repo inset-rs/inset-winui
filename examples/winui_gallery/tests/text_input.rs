@@ -1,6 +1,7 @@
 //! Source text-control policies around the native editor, including focus and IME updates.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use inset_embedder::{Offset, PointerChange, TextAffinity, TextRange, TextSelection};

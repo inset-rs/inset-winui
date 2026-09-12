@@ -2,6 +2,7 @@
 //! and the inactive state that hides both.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::{Fixture, mount};
 use inset_embedder::{Color, TextDirection};

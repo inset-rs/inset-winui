@@ -1,6 +1,16 @@
 # inset-winui
 
-WinUI 3 (Fluent 2) on the Inset framework, ported from Microsoft's open source. The spec is the repository at `/Users/mac/code/microsoft-ui-xaml`; values and behaviour are read from it, not remembered or measured from screenshots, so that later controls do not drift from the source. Desktop first: WinUI adapts by window size, not by device, so there is no mobile idiom.
+WinUI 3 (Fluent 2) on the Inset framework, ported from Microsoft's open source. Read values and behavior from the source, not from memory or screenshots. Desktop first: WinUI adapts by window size, not by device.
+
+Reference checkouts live under `.reference/` at the repo root. That folder is not committed.
+
+- Microsoft UI XAML is the spec: `.reference/microsoft-ui-xaml`.
+
+If the checkout is missing, clone it there:
+
+```sh
+git clone https://github.com/microsoft/microsoft-ui-xaml.git .reference/microsoft-ui-xaml
+```
 
 ## The spec
 
@@ -11,10 +21,48 @@ WinUI 3 (Fluent 2) on the Inset framework, ported from Microsoft's open source. 
 
 ## How the code is shaped
 
-- `theme/generated.rs` holds every colour, brush, size, duration and spline of the XAML theme dictionaries, produced by `tools/gen_resources.py`; `{ThemeResource X}` in a template is the field `x`. It is generated rather than typed so a value cannot be mistyped or invented; a control whose resources are missing is added to the generator's arguments.
+- `theme/generated.rs` holds every colour, brush, size, duration and spline of the XAML theme dictionaries, produced by `tools/gen_resources.py`; `{ThemeResource X}` in a template is the field `x`. It is generated rather than typed so a value cannot be mistyped or invented; a control whose resources are missing is added to `DEFAULT_CONTROLS` in the generator.
 - A control file is a transcription of its `ControlTemplate`: the elements in order with their `x:Name`s in comments, each visual state group as an enum, the storyboards as the animations they declare. Its behaviour follows the C++ as closely as Inset allows.
 - What the repository leaves to Windows (accent shades, system colours, theme-animation timings, Segoe UI) has a substitute and a `PORTING.md` entry saying so. Text is Selawik, Microsoft's metric-compatible open substitute for Segoe UI, bundled with the gallery.
 - Widget construction follows `docs/widget-syntax.md`.
+
+## Development
+
+The workspace uses published Inset crates and nightly Rust. The gallery is `winui_gallery`; its pages demonstrate control behavior and application-owned state. Keep gallery-specific setup in its tests and reusable GPU helpers in the unpublished `inset-winui-test-support` crate, used through dev-dependencies.
+
+```sh
+cargo test --workspace
+cargo clippy --workspace --all-targets
+WINUI_CAPTURE_DIR=$PWD/output cargo test -p winui_gallery
+python3 -m unittest discover -s tools -p 'test_*.py'
+```
+
+## Theme resources
+
+Building the library needs no WinUI checkout or Python. Regeneration uses `.reference/microsoft-ui-xaml`:
+
+```sh
+python3 tools/gen_resources.py
+```
+
+The script owns the ordered `DEFAULT_CONTROLS` list and defaults to `crates/inset-winui/src/theme/generated.rs`. Add a newly needed dictionary to that list rather than extending a README command. Optional positional arguments override the source checkout, output file and control subset:
+
+```sh
+python3 tools/gen_resources.py /path/to/microsoft-ui-xaml /tmp/text-resources.rs TextBox PasswordBox
+```
+
+The default paths are relative to the script's repository, not the current working directory. Explicit relative paths are relative to the current working directory. Check that regeneration produces the intended resource changes and that the generator tests pass.
+
+## Release preparation
+
+Only `inset-winui` is published. The gallery and test-support crate remain unpublished. The library archive includes generated resources, its icon font, licenses and porting notes.
+
+```sh
+cargo package -p inset-winui --list
+cargo package -p inset-winui
+```
+
+Use `--allow-dirty` to inspect an archive of uncommitted preparation changes. Packaging verifies the crate without uploading it. Commits, pushes and publishing require an explicit user request; preparation alone does not authorize them.
 
 ## Porting a control
 

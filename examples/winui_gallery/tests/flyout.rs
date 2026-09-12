@@ -1,6 +1,7 @@
 //! Public Flyout placement, closing policy and retained presenter integration.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use inset_foundation::{Handle, Listener};

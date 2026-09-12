@@ -1,13 +1,12 @@
 //! NavigationView's back, toggle, title and header chrome through GPU layout and input.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::{Offset, Rect};
 use inset_foundation::{App, Handle, Listener, ValueKey};
 use inset_rendering::{RenderBox, RenderParagraph};
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Clone, Debug, Default)]

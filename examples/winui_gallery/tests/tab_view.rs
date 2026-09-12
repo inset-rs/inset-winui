@@ -1,8 +1,6 @@
 //! TabView collection changes exercise real layout, input, focus and retained pages.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
 use inset_foundation::{App, Handle, Listener};
 use inset_gestures::GestureBinding;
@@ -11,6 +9,7 @@ use inset_services::{
 };
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::time::Duration;
 use std::{cell::Cell, rc::Rc};
 

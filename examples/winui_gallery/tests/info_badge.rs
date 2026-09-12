@@ -1,6 +1,7 @@
 //! InfoBadge's display kinds, its square minimum and the stadium its height rounds it into.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::{Fixture, mount};
 use inset_embedder::{Color, Size, TextDirection};

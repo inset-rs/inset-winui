@@ -1,6 +1,7 @@
 //! Shared SplitButton input, ToggleSplitButton checked states and flyout independence.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use inset_embedder::{Offset, PointerChange};

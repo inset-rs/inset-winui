@@ -2,12 +2,10 @@
 #![feature(arbitrary_self_types)]
 #[path = "../../../crates/inset-winui/src/primitives/anchored_flyout.rs"]
 mod attachment;
-mod common;
 mod theme {
     pub use inset_winui::*;
 }
 use attachment::{AnchoredFlyout, AnchoredFlyoutPlacement};
-use common::Fixture;
 use inset_embedder::{Offset, PointerChange, TextDirection};
 use inset_foundation::{App, Handle, Listener};
 use inset_rendering::{CrossAxisAlignment, MainAxisSize};
@@ -16,6 +14,7 @@ use inset_services::{
 };
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Clone, Debug, Default)]

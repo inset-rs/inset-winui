@@ -1,12 +1,11 @@
 //! Per-side chrome and post-frame size reporting used by SplitView.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::{Fixture, mount};
 use inset_embedder::{Color, Size};
 use inset_foundation::App;
 use inset_widgets::*;
 use inset_winui::{Brush, ControlBorder, SizeObserver};
+use inset_winui_test_support::{Fixture, mount};
 use std::{cell::RefCell, rc::Rc};
 
 type Reports = Rc<RefCell<Vec<(Size, Size)>>>;

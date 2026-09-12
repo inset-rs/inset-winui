@@ -1,13 +1,12 @@
 //! Real scene sampling and foreground isolation for the source acrylic effect pass.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::{Canvas, Color, Paint, Rect, Size};
 use inset_foundation::App;
 use inset_rendering::CustomPainter;
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 
 #[derive(Clone, Debug)]
 struct Pattern;

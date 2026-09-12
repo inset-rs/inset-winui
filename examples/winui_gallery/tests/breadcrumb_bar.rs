@@ -1,6 +1,7 @@
 //! Source overflow order, native retained layout, input, and collection ownership.
 #![feature(arbitrary_self_types)]
 mod common;
+use common::GalleryFixtureExt;
 
 use common::Fixture;
 use inset_embedder::{Offset, PointerChange, TextDirection};

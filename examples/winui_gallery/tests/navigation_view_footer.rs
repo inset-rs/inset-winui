@@ -1,12 +1,11 @@
 //! Custom pane footers measure independently of settings and footer menu items.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::Offset;
 use inset_foundation::{App, Handle, Listener};
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{cell::Cell, rc::Rc};
 
 /// Gives the test access to the owning page and its custom footer container.

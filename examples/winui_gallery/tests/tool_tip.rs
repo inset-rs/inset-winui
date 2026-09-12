@@ -1,8 +1,6 @@
 //! ToolTipService through native input, timers, overlays, layout and GPU rendering.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_embedder::{Offset, PointerChange, Rect};
 use inset_foundation::{App, Handle, Listener};
 use inset_rendering::RenderParagraph;
@@ -11,6 +9,7 @@ use inset_services::{
 };
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,

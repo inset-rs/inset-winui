@@ -1,13 +1,12 @@
 //! Flyout content survives its opener; focus and inherited settings follow the active target.
 #![feature(arbitrary_self_types)]
-mod common;
 
-use common::Fixture;
 use inset_foundation::{App, Handle, Listener};
 use inset_painting::Alignment;
 use inset_rendering::MainAxisSize;
 use inset_widgets::*;
 use inset_winui::*;
+use inset_winui_test_support::Fixture;
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
