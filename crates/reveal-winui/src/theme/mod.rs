@@ -192,6 +192,11 @@ impl ThemeResources {
         DropDownButtonResources::for_theme(self.theme, &self.accent)
     }
 
+    /// Resolves MenuBar and MenuBarItem template resources.
+    pub fn menu_bar(&self) -> MenuBarResources {
+        MenuBarResources::for_theme(self.theme, &self.accent)
+    }
+
     /// The split button resources for this theme.
     pub fn split_button(&self) -> SplitButtonResources {
         SplitButtonResources::for_theme(self.theme, &self.accent)

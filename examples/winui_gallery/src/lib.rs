@@ -206,6 +206,7 @@ impl GalleryState {
             Feature::SplitButton | Feature::ToggleSplitButton | Feature::MenuFlyout => {
                 sections::command_buttons::page(feature, resources)
             }
+            Feature::MenuBar => sections::menu_bar::page(resources),
             Feature::Flyout => sections::flyout::flyout(resources),
             Feature::DropDownButton => sections::flyout::drop_down_button(resources),
             Feature::TextBox => sections::text_input::text_box(resources),

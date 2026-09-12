@@ -7,6 +7,8 @@ use super::{
     template::{self, MenuTemplateSettings, MenuVisualState},
 };
 use crate::*;
+// Reveal exports a `FocusState` of its own; the XAML one is meant here.
+use crate::FocusState;
 use reveal_embedder::{Offset, PointerDeviceKind, Rect};
 use reveal_foundation::{App, Handle, Listener, Timer};
 use reveal_rendering::HitTestBehavior;
@@ -62,6 +64,9 @@ pub(super) struct MenuItemState {
     /// Native focus-highlight visibility.
     focused: bool,
 
+    /// Source real focus state: what a kit focus request passed, or the last input device's coercion when focus arrives from elsewhere.
+    focus_state: FocusState,
+
     /// Retained child collection, created only for SubItem.
     submenu: Option<Handle<MenuFlyout>>,
 
@@ -93,6 +98,7 @@ impl StatefulWidget for MenuItemWidget {
             gamepad_down: false,
             should_perform_actions: false,
             focused: false,
+            focus_state: FocusState::Pointer,
             submenu: None,
             open_timer: None,
             close_timer: None,
@@ -102,9 +108,24 @@ impl StatefulWidget for MenuItemWidget {
 }
 
 impl MenuItemState {
+    /// Clearing a closed presenter's items cancels submenu timers and pointer/key state.
+    pub(super) fn prepare_close(self: Handle<Self>, app: &mut App) {
+        self.cancel_open(app);
+        self.cancel_close(app);
+        self.clear_press(app);
+        self.set_state(app, |state| state.hovered = false);
+    }
+
     /// The focus identity used by MenuFlyoutPresenter::CycleFocus.
     pub(super) fn focus_node(self: Handle<Self>, app: &App) -> AnyFocusNode {
         app.get(self).focus.unwrap()
+    }
+
+    /// `Focus(FocusState)` on this item as MenuFlyoutPresenter::CycleFocus calls it: the requested state is recorded even when the item already holds focus, then focus moves and the item scrolls into view.
+    pub(super) fn request_focus(self: Handle<Self>, app: &mut App, state: FocusState) {
+        self.set_state(app, |data| data.focus_state = state);
+        let node = self.focus_node(app);
+        default_traversal_request_focus_callback(app, node, None, None, None, None);
     }
 
     /// Disabled entries and separators do not participate in focus cycling.
@@ -338,7 +359,7 @@ impl MenuItemState {
             } else {
                 CommonState::Normal
             },
-            focused: state.focused,
+            focused: state.focused && state.focus_state.shows_focus_visual(),
             submenu_open: state.close_timer.is_none()
                 && state.submenu.is_some_and(|menu| menu.is_open(app)),
         };
@@ -466,7 +487,10 @@ impl State for MenuItemState {
                 self.set_state(app, |state| state.focused = value)
             })
             .on_focus_change(move |app, focused| {
-                if !focused {
+                if focused {
+                    let focus_state = FocusState::coerce_programmatic(app);
+                    self.set_state(app, |state| state.focus_state = focus_state);
+                } else {
                     self.clear_press(app);
                 }
             });

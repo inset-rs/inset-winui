@@ -82,3 +82,6 @@ pub use split_button::*;
 
 mod toggle_split_button;
 pub use toggle_split_button::*;
+
+mod menu_bar;
+pub use menu_bar::*;

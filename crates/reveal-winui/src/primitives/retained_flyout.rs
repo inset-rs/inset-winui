@@ -44,6 +44,9 @@ pub struct RetainedFlyoutHost {
     /// Focus to restore when the flyout closes.
     previous_focus: Option<AnyFocusNode>,
 
+    /// An explicitly focused menu header takes precedence over earlier queued focus.
+    pub(crate) return_focus: Option<AnyFocusNode>,
+
     /// Prevents queued work from using a disposed host.
     disposed: bool,
 
@@ -92,6 +95,7 @@ impl RetainedFlyoutHost {
             open: false,
             take_focus: true,
             previous_focus: None,
+            return_focus: None,
             disposed: false,
             epoch: 0,
             rebuild_pending: false,
@@ -181,7 +185,7 @@ impl RetainedFlyoutHost {
                 .hosts
                 .retain(|host| *host != self);
         }
-        let previous_focus = primary_focus(app);
+        let previous_focus = app.get(self).return_focus.or_else(|| primary_focus(app));
         let already_owns_focus = app
             .get(self)
             .state
@@ -239,9 +243,7 @@ impl RetainedFlyoutHost {
         host.previous_focus = None;
         host.epoch += 1;
         let epoch = host.epoch;
-        if let Some(state) = host.state {
-            state.set_state(app, |_| {});
-        }
+        self.rebuild(app);
         SchedulerBinding::add_post_frame_callback(
             app,
             FrameCallback::new(move |app, _| {

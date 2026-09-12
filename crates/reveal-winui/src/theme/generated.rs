@@ -7961,3 +7961,94 @@ pub const ICON_INFO_BADGE_FONT_ICON_MARGIN: [f64; 4] = [4.0, 0.0, 4.0, 2.0];
 pub const VALUE_INFO_BADGE_TEXT_MARGIN: [f64; 4] = [4.0, 0.0, 4.0, 2.0];
 /// Left, top, right, bottom.
 pub const ICON_INFO_BADGE_ICON_MARGIN: [f64; 4] = [4.0, 4.0, 4.0, 4.0];
+/// Theme-dependent resources of `MenuBar_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct MenuBarResources {
+    /// The resolved `MenuBarBackground` resource.
+    pub menu_bar_background: Color,
+    /// The resolved `MenuBarItemForeground` resource.
+    pub menu_bar_item_foreground: Color,
+    /// The resolved `MenuBarItemBackground` resource.
+    pub menu_bar_item_background: Color,
+    /// The resolved `MenuBarItemBackgroundPointerOver` resource.
+    pub menu_bar_item_background_pointer_over: Color,
+    /// The resolved `MenuBarItemBackgroundPressed` resource.
+    pub menu_bar_item_background_pressed: Color,
+    /// The resolved `MenuBarItemBackgroundSelected` resource.
+    pub menu_bar_item_background_selected: Color,
+    /// The resolved `MenuBarItemBorderBrush` resource.
+    pub menu_bar_item_border_brush: Color,
+    /// The resolved `MenuBarItemBorderBrushPointerOver` resource.
+    pub menu_bar_item_border_brush_pointer_over: Color,
+    /// The resolved `MenuBarItemBorderBrushPressed` resource.
+    pub menu_bar_item_border_brush_pressed: Color,
+    /// The resolved `MenuBarItemBorderBrushSelected` resource.
+    pub menu_bar_item_border_brush_selected: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `SystemControlBackgroundListLowBrush` resource.
+    pub system_control_background_list_low_brush: Color,
+    /// The resolved `SystemControlBackgroundListMediumBrush` resource.
+    pub system_control_background_list_medium_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumLowBrush` resource.
+    pub system_control_foreground_base_medium_low_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumBrush` resource.
+    pub system_control_highlight_base_medium_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumLowBrush` resource.
+    pub system_control_highlight_base_medium_low_brush: Color,
+}
+
+impl MenuBarResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                menu_bar_background: Color::from_argb(0, 255, 255, 255),
+                menu_bar_item_foreground: Color::from_argb(228, 0, 0, 0),
+                menu_bar_item_background: Color::from_argb(0, 255, 255, 255),
+                menu_bar_item_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                menu_bar_item_background_pressed: Color::from_argb(6, 0, 0, 0),
+                menu_bar_item_background_selected: Color::from_argb(6, 0, 0, 0),
+                menu_bar_item_border_brush: Color::from_argb(15, 0, 0, 0),
+                menu_bar_item_border_brush_pointer_over: Color::from_argb(15, 0, 0, 0),
+                menu_bar_item_border_brush_pressed: Color::from_argb(15, 0, 0, 0),
+                menu_bar_item_border_brush_selected: Color::from_argb(15, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_background_list_low_brush: Color::from_argb(25, 0, 0, 0),
+                system_control_background_list_medium_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_foreground_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_highlight_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                menu_bar_background: Color::from_argb(0, 255, 255, 255),
+                menu_bar_item_foreground: Color::from_argb(255, 255, 255, 255),
+                menu_bar_item_background: Color::from_argb(0, 255, 255, 255),
+                menu_bar_item_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                menu_bar_item_background_pressed: Color::from_argb(10, 255, 255, 255),
+                menu_bar_item_background_selected: Color::from_argb(10, 255, 255, 255),
+                menu_bar_item_border_brush: Color::from_argb(11, 255, 255, 255),
+                menu_bar_item_border_brush_pointer_over: Color::from_argb(18, 255, 255, 255),
+                menu_bar_item_border_brush_pressed: Color::from_argb(18, 255, 255, 255),
+                menu_bar_item_border_brush_selected: Color::from_argb(18, 255, 255, 255),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_background_list_low_brush: Color::from_argb(25, 255, 255, 255),
+                system_control_background_list_medium_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_foreground_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_highlight_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+            },
+        }
+    }
+}
+pub const MENU_BAR_HEIGHT: f64 = 40.0;
+/// Left, top, right, bottom.
+pub const MENU_BAR_ITEM_BUTTON_PADDING: [f64; 4] = [10.0, 4.0, 10.0, 4.0];
+/// Left, top, right, bottom.
+pub const MENU_BAR_ITEM_MARGIN: [f64; 4] = [4.0, 4.0, 4.0, 4.0];
+/// Left, top, right, bottom.
+pub const MENU_BAR_ITEM_BORDER_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];

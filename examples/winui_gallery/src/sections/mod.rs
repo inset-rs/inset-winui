@@ -30,3 +30,5 @@ pub mod progress_ring;
 pub mod flyout;
 
 pub mod command_buttons;
+
+pub mod menu_bar;

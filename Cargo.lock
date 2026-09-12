@@ -2441,7 +2441,7 @@ checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
 
 [[package]]
 name = "valo"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "objc2 0.6.4",
  "objc2-metal 0.3.2",
@@ -2455,9 +2455,9 @@ dependencies = [
 
 [[package]]
 name = "valo-codec"
-version = "0.4.3"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef05060a5516eb1791f8e0ce9309f0c5d70f51c2381edaf6597ec79fcb146e1f"
+checksum = "9905acd1258f5837cb93e8f84ad4699a18fb89677227407eaf7bdf9ec9712ab6"
 dependencies = [
  "valo",
  "wgpu",
@@ -2499,7 +2499,7 @@ dependencies = [
 
 [[package]]
 name = "valo-dl"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "valo-geometry",
  "valo-text",
@@ -2508,7 +2508,7 @@ dependencies = [
 
 [[package]]
 name = "valo-fontmgr"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "core-foundation 0.10.1",
  "core-foundation-sys",
@@ -2520,14 +2520,14 @@ dependencies = [
 
 [[package]]
 name = "valo-geometry"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "glam",
 ]
 
 [[package]]
 name = "valo-harness"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "png 0.17.16",
  "pollster",
@@ -2538,7 +2538,7 @@ dependencies = [
 
 [[package]]
 name = "valo-renderer"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "bytemuck",
  "etagere",
@@ -2553,7 +2553,7 @@ dependencies = [
 
 [[package]]
 name = "valo-system-fonts"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "valo-fontmgr",
  "valo-text",
@@ -2561,7 +2561,7 @@ dependencies = [
 
 [[package]]
 name = "valo-text"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "harfrust",
  "skrifa 0.35.0",

@@ -1,7 +1,7 @@
 //! Native child layout for the source flyout placement calculation.
 
 use super::placement::{
-    FlyoutPlacementMode, calculate_placement, calculate_point_placement,
+    FlyoutPlacementMode, PointPlacementKind, calculate_placement, calculate_point_placement,
     calculate_submenu_placement,
 };
 use reveal_embedder::{Offset, Rect, Size, TextDirection};
@@ -23,6 +23,9 @@ pub(super) struct FlyoutLayoutSettings {
 
     /// Cascading submenus use their source overlap and edge-fitting calculation.
     pub submenu: bool,
+
+    /// Menu point placement starts at the point rather than centering around it.
+    pub point_kind: PointPlacementKind,
 
     /// Requested placement mode.
     pub placement: FlyoutPlacementMode,
@@ -165,6 +168,7 @@ impl RenderObject for RenderFlyoutLayout {
                     child.size(app),
                     settings.exclusion,
                     settings.container,
+                    settings.point_kind,
                 )
             } else {
                 calculate_placement(

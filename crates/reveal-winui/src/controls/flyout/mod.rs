@@ -162,6 +162,15 @@ pub struct Flyout {
     /// Submenu popups share their root menu's dismissing layer.
     pub(crate) is_sub_menu: bool,
 
+    /// A menu bar and its popups share a native TapRegion group.
+    pub(crate) tap_region_group: Option<HandleId>,
+
+    /// Point-positioned menu policy, set from its opening device.
+    point_kind: placement::PointPlacementKind,
+
+    /// Derived-control cleanup before the public Closed event.
+    pub(crate) on_closed: Option<Listener>,
+
     /// Native retained content owner, initialized with this object's presenter builder.
     host: Option<Handle<RetainedFlyoutHost>>,
 
@@ -239,6 +248,9 @@ impl Flyout {
             closed: None,
             host: None,
             is_sub_menu: false,
+            tap_region_group: None,
+            point_kind: placement::PointPlacementKind::Flyout,
+            on_closed: None,
             notifier: ChangeNotifierData::new(),
             phase: Phase::Closed,
             scope: None,
@@ -274,6 +286,21 @@ impl Flyout {
         }));
         app.get_mut(this).host = Some(host);
         this
+    }
+
+    /// MenuFlyout's point-positioning policy depends on the input that opened it.
+    pub(crate) fn menu_point_placement(self: Handle<Self>, app: &mut App, touch: bool) {
+        app.get_mut(self).point_kind = if touch {
+            placement::PointPlacementKind::TouchMenu
+        } else {
+            placement::PointPlacementKind::Menu
+        };
+    }
+
+    /// Supplies the menu header that receives focus after its popup closes.
+    pub(crate) fn return_focus_to(self: Handle<Self>, app: &mut App, node: AnyFocusNode) {
+        let host = app.get(self).host.unwrap();
+        app.get_mut(host).return_focus = Some(node);
     }
 
     /// Sets Content and updates the retained presenter.
@@ -559,6 +586,9 @@ impl Flyout {
         app.get_mut(self).phase = Phase::Closed;
         app.get_mut(self).placement_override = None;
         app.get_mut(self).position = None;
+        if let Some(closed) = app.get(self).on_closed.clone() {
+            closed.call(app);
+        }
         if let Some(closed) = app.get(self).closed.clone() {
             closed.call(app);
         }
@@ -647,6 +677,7 @@ impl Flyout {
                 let flyout = app.get(self);
                 let target = flyout.last_target_bounds;
                 let submenu = flyout.is_sub_menu;
+                let point_kind = flyout.point_kind;
                 let position = flyout.position;
                 let exclusion = flyout.exclusion;
                 let placement = flyout.placement_override.unwrap_or(flyout.placement);
@@ -658,6 +689,8 @@ impl Flyout {
                 let open = self.is_open(app);
                 let padding = flyout.padding;
                 let root = self.root(app);
+                let group = app.get(root).tap_region_group;
+                let grouped = group.is_some();
                 let topmost = self.topmost(app);
                 let standard = app.get(topmost).show_mode == FlyoutShowMode::Standard;
                 let presenter = if let Some(style) = style {
@@ -698,14 +731,17 @@ impl Flyout {
                         }))
                         .child(
                             TapRegion::new(presenter)
-                                .group_id(root.id())
+                                .group_id(group.unwrap_or(root.id()))
+                                .consume_outside_taps(open && grouped)
                                 .enabled(open)
                                 .on_tap_outside(Rc::new(move |app, _| {
                                     if self != root || !self.is_open(app) {
                                         return;
                                     }
                                     let topmost = self.topmost(app);
-                                    if app.get(topmost).show_mode != FlyoutShowMode::Standard {
+                                    if grouped
+                                        || app.get(topmost).show_mode != FlyoutShowMode::Standard
+                                    {
                                         let metadata = app.singleton::<FlyoutMetadata>();
                                         if let Some(scope) = app.get(self).scope {
                                             app.get_mut(metadata).staged.remove(&scope);
@@ -729,6 +765,7 @@ impl Flyout {
                         position,
                         exclusion,
                         submenu,
+                        point_kind,
                         placement,
                         direction: Directionality::of(app, context),
                         minimum,
@@ -741,7 +778,7 @@ impl Flyout {
                 .into_widget();
                 Stack::new()
                     .children([
-                        if open && standard && self == topmost {
+                        if open && standard && !grouped && self == topmost {
                             ModalBarrier::new()
                                 .on_dismiss(Listener::new(move |app| {
                                     self.hide(app);

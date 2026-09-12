@@ -110,6 +110,12 @@ Ported against: aa3207e6
   Reason: framework — a Flutter widget reports inherited changes and disposal through its lifecycle, and updating the separate overlay must wait until the current build finishes.
   Affect: Applications wrap opening widgets in FlyoutTarget; removing that widget can take another frame to close the flyout and does not dispose the retained child State.
 
+## input_device.rs → `CInputManager` last input device and `CFocusManager::CoerceFocusState`
+
+- Change: `FocusState::coerce_programmatic` counts every key event as hardware keyboard input and has no gamepad category.
+  Reason: os — the desktop host delivers keyboard and pointer events only, while Windows also records `GamepadOrRemote` and asks `LastInputWasNonFocusNavigationKeyFromSIP` whether a key came from the touch keyboard.
+  Affect: A gamepad reaches the kit only through keys the host maps for it, which count as keyboard input, and a key typed on an on-screen keyboard counts as keyboard input and draws a ring.
+
 ## Deferred
 
 - `BitmapIcon` and `ImageIcon` remain deferred. Trigger: Image loading is integrated with the kit's supported hosts, including foreground-color tinting for monochrome `BitmapIcon` images.

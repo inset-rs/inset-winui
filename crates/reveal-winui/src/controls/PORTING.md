@@ -318,9 +318,9 @@ Ported against: aa3207e6
   Reason: framework — Flutter preserves child State through mounted widgets and draws overlays inside the existing window, while WinUI retains detached content and can create separate popup windows.
   Affect: Reopening the same Flyout from another button preserves its child State, but the flyout cannot extend beyond the application window.
 
-- Change: `Flyout` uses Flutter’s ModalBarrier to block input outside its content when ShowMode is Standard.
+- Change: `Flyout` uses Flutter’s ModalBarrier to handle outside input in `FlyoutShowMode::Standard`, except when a `MenuBar` groups its headers with the popup.
   Reason: framework — WinUI's host distinguishes pointer buttons during popup hit testing, while Flutter's native barrier blocks input behind it and recognizes a completed tap from any button.
-  Affect: Outside dismissal occurs on release rather than press, and an outside right-click is consumed rather than reaching the control behind the flyout.
+  Affect: Standalone flyouts dismiss on release rather than press, and consume an outside right-click rather than passing it to the control behind the flyout.
 
 - Change: `Flyout` opens and closes without a visual transition.
   Reason: os — WinUI obtains popup motion and timing from Windows rather than declaring them in the template.
@@ -364,7 +364,25 @@ Ported against: aa3207e6
   Reason: framework — Reveal builds menu descriptions from application state, while WinUI stores checked values on its item objects and coordinates radio items by group name.
   Affect: Applications use the callbacks passed to `MenuFlyoutItem::toggle` and `MenuFlyoutItem::radio` to replace the menu's items with updated checked values and keep radio choices mutually exclusive.
 
+## menu_bar.rs → `MenuBar` and `MenuBarItem`
+
+- Change: `MenuBar` receives header descriptions with application-owned ids instead of live child controls.
+  Reason: framework — WinUI retains control objects in its collection, while Reveal rebuilds widgets from data and uses keys to preserve their State.
+  Affect: Applications keep header ids unique and stable when changing titles, commands or display order; replacing an id creates a new header and menu.
+
+- Change: `MenuBar` groups its headers and menus using Flutter's TapRegion mechanism.
+  Reason: framework — WinUI selects which elements receive input through its popup layer, while Flutter groups widgets and consumes gestures outside that group.
+  Affect: Outside taps dismiss the menu without activating ordinary tap callbacks behind it, but raw pointer listeners behind the menu can still observe those pointer events.
+
+## flyout/placement.rs → `MenuFlyout` point placement
+
+- Change: `MenuFlyout` starts pen-triggered menus at the requested point, aligning the left edge in left-to-right layouts and the right edge in right-to-left layouts.
+  Reason: os — WinUI adjusts pen menus using the Windows handedness preference, which Reveal's host does not expose.
+  Affect: Pen-triggered menus adjust to fit the window but do not switch sides to avoid the user's hand.
+
 ## Deferred
+
+- `MenuBar` activation by pressing Alt followed by a letter, and the temporary labels showing those letters, remain deferred. Trigger: The kit provides shared access-key mode and label display.
 
 - `ProgressRing` starts its arc at twelve o'clock, but that starting point remains unverified against Windows. Trigger: A Windows capture establishes where the original ellipse starts drawing its arc.
 

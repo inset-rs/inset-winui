@@ -7,6 +7,8 @@ use super::{
     template::MenuTemplateSettings,
 };
 use crate::*;
+// Reveal exports a `FocusState` of its own; the XAML one is meant here.
+use crate::FocusState;
 use reveal_foundation::{App, Handle};
 use reveal_painting::{PaintingBinding, TextPainter, TextSpan};
 use reveal_rendering::{BoxConstraints, CrossAxisAlignment, MainAxisSize};
@@ -56,27 +58,37 @@ impl MenuFlyoutPresenterState {
         self.set_state(app, |_| {});
     }
 
-    /// MenuFlyoutPresenter::CycleFocus, excluding separators and disabled items.
+    /// Source OnClosed clears the item containers; retained widgets reset transient input instead.
+    pub(super) fn prepare_close(self: Handle<Self>, app: &mut App) {
+        let items: Vec<_> = app.get(self).containers.values().copied().collect();
+        for item in items {
+            item.prepare_close(app);
+        }
+        app.get_mut(self).sub_item = None;
+    }
+
+    /// MenuFlyoutPresenter::CycleFocus with `FocusState_Keyboard`, excluding separators and disabled items.
     pub(super) fn cycle_focus(self: Handle<Self>, app: &mut App, down: bool) {
-        let nodes: Vec<_> = app
+        let items: Vec<_> = app
             .get(self)
             .containers
             .values()
             .copied()
             .filter(|item| app.contains(*item) && item.mounted(app) && item.is_focusable(app))
-            .map(|item| item.focus_node(app))
             .collect();
-        if nodes.is_empty() {
+        if items.is_empty() {
             return;
         }
-        let focused = nodes.iter().position(|node| node.has_primary_focus(app));
+        let focused = items
+            .iter()
+            .position(|item| item.focus_node(app).has_primary_focus(app));
         let next = match focused {
-            Some(index) if down => (index + 1) % nodes.len(),
-            Some(index) => (index + nodes.len() - 1) % nodes.len(),
+            Some(index) if down => (index + 1) % items.len(),
+            Some(index) => (index + items.len() - 1) % items.len(),
             None if down => 0,
-            None => nodes.len() - 1,
+            None => items.len() - 1,
         };
-        default_traversal_request_focus_callback(app, nodes[next], None, None, None, None);
+        items[next].request_focus(app, FocusState::Keyboard);
     }
 
     /// An item hover starts the current child menu's source close delay.
@@ -100,7 +112,7 @@ impl MenuFlyoutPresenterState {
         if !matches!(event, KeyEvent::Down(_) | KeyEvent::Repeat(_)) {
             return KeyEventResult::Ignored;
         }
-        match event.logical_key() {
+        let result = match event.logical_key() {
             LogicalKeyboardKey::ARROW_UP => {
                 self.cycle_focus(app, false);
                 KeyEventResult::Handled
@@ -120,6 +132,11 @@ impl MenuFlyoutPresenterState {
                 }
             }
             _ => KeyEventResult::Ignored,
+        };
+        if result == KeyEventResult::Ignored {
+            self.widget(app).menu.owner_key(app, event)
+        } else {
+            result
         }
     }
 }
@@ -188,7 +205,7 @@ impl State for MenuFlyoutPresenterState {
         let theme = ThemeResources::of(app, context);
         let resources = theme.menu_flyout();
         let settings = template_settings(app, context, &items, input.is_narrow());
-        let min_width = if input == super::input::InputDevice::Touch {
+        let min_width = if input == crate::InputDevice::Touch {
             FLYOUT_THEME_TOUCH_MIN_WIDTH
         } else {
             FLYOUT_THEME_MIN_WIDTH

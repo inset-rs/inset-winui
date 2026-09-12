@@ -445,6 +445,55 @@ mod tests {
         );
         assert_eq!(result, Rect::from_ltwh(25.0, 94.0, 450.0, 310.0));
     }
+
+    #[test]
+    fn menu_points_exclude_the_opener_in_both_directions() {
+        let available = Rect::from_ltwh(0.0, 0.0, 600.0, 400.0);
+        let size = Size::new(200.0, 80.0);
+        for direction in [TextDirection::Ltr, TextDirection::Rtl] {
+            let x = if direction == TextDirection::Ltr {
+                400.0
+            } else {
+                460.0
+            };
+            for (top, kind, expected_top) in [
+                (180.0, PointPlacementKind::Menu, 212.0),
+                (180.0, PointPlacementKind::TouchMenu, 100.0),
+                (4.0, PointPlacementKind::TouchMenu, 36.0),
+            ] {
+                let result = calculate_point_placement(
+                    FlyoutPlacementMode::Bottom,
+                    direction,
+                    Offset::new(x, top + 32.0),
+                    size,
+                    Rect::from_ltwh(400.0, top, 60.0, 32.0),
+                    available,
+                    kind,
+                );
+                assert_eq!(result.top, expected_top);
+                assert_eq!(
+                    result.left,
+                    if direction == TextDirection::Ltr {
+                        x
+                    } else {
+                        x - 200.0
+                    }
+                );
+            }
+        }
+    }
+}
+
+/// Point placement differs for ordinary flyouts and menus opened by touch.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub(super) enum PointPlacementKind {
+    /// Ordinary flyouts align their chosen side around the point.
+    #[default]
+    Flyout,
+    /// Menus start at the point without the ordinary flyout alignment offset.
+    Menu,
+    /// Touch menus prefer above the point, then fall back below when necessary.
+    TouchMenu,
 }
 
 /// UpdateTargetPosition for a point-positioned Flyout within the application window.
@@ -455,39 +504,51 @@ pub(super) fn calculate_point_placement(
     size: Size,
     exclusion: Rect,
     available: Rect,
+    kind: PointPlacementKind,
 ) -> Rect {
     use FlyoutPlacementMode::*;
     let width = size.width();
     let height = size.height();
     let mut x = point.dx().clamp(available.left, available.right);
     let mut y = point.dy().clamp(available.top, available.bottom);
-    match placement {
-        Top => {
-            x -= width / 2.0;
-            y -= height;
+    if kind == PointPlacementKind::Flyout {
+        match placement {
+            Top => {
+                x -= width / 2.0;
+                y -= height;
+            }
+            Bottom => x -= width / 2.0,
+            Left => {
+                x -= width;
+                y -= height / 2.0;
+            }
+            Right => y -= height / 2.0,
+            TopEdgeAlignedLeft | RightEdgeAlignedBottom => y -= height,
+            TopEdgeAlignedRight | LeftEdgeAlignedBottom => {
+                x -= width;
+                y -= height;
+            }
+            BottomEdgeAlignedLeft | RightEdgeAlignedTop | Full => {}
+            BottomEdgeAlignedRight | LeftEdgeAlignedTop => x -= width,
         }
-        Bottom => x -= width / 2.0,
-        Left => {
-            x -= width;
-            y -= height / 2.0;
-        }
-        Right => y -= height / 2.0,
-        TopEdgeAlignedLeft | RightEdgeAlignedBottom => y -= height,
-        TopEdgeAlignedRight | LeftEdgeAlignedBottom => {
-            x -= width;
-            y -= height;
-        }
-        BottomEdgeAlignedLeft | RightEdgeAlignedTop | Full => {}
-        BottomEdgeAlignedRight | LeftEdgeAlignedTop => x -= width,
+    }
+    let prefer_top = kind == PointPlacementKind::TouchMenu;
+    if prefer_top {
+        y -= height;
     }
     let rtl = direction == TextDirection::Rtl;
-    let mut side = placement.major(direction);
+    let mut side = if prefer_top {
+        MajorPlacementMode::Top
+    } else {
+        placement.major(direction)
+    };
     let original_side = side;
     let account_for_exclusion = |side, x: &mut f64, y: &mut f64| {
-        let disjoint = exclusion.right <= *x
-            || exclusion.left >= *x + width
-            || exclusion.bottom <= *y
-            || exclusion.top >= *y + height;
+        // RectUtil::AreDisjoint counts touching edges as an intersection.
+        let disjoint = exclusion.right < *x
+            || exclusion.left > *x + width
+            || exclusion.bottom < *y
+            || exclusion.top > *y + height;
         if !exclusion.is_empty() && !disjoint {
             match side {
                 MajorPlacementMode::Top => *y = exclusion.top - height,
@@ -502,7 +563,7 @@ pub(super) fn calculate_point_placement(
         }
     };
     account_for_exclusion(side, &mut x, &mut y);
-    let target = Offset::new(x, y);
+    let mut target = Offset::new(x, y);
     if !rtl && target.dx() + width > available.right {
         x -= width.min(x);
         if side == MajorPlacementMode::Right {
@@ -512,6 +573,13 @@ pub(super) fn calculate_point_placement(
         x += width.min(available.right - x);
         if side == MajorPlacementMode::Left {
             side = MajorPlacementMode::Right;
+        }
+    }
+    if prefer_top && target.dy() < available.top {
+        y += height;
+        target = target + Offset::new(0.0, height);
+        if side == MajorPlacementMode::Top {
+            side = MajorPlacementMode::Bottom;
         }
     }
     if target.dy() + height > available.bottom {
