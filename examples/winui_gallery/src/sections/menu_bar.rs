@@ -1,10 +1,10 @@
 //! MenuBar examples for navigation, nested commands and live collection changes.
 
 use crate::{column, example, row, section};
-use reveal_embedder::TextDirection;
-use reveal_foundation::{App, Handle, Listener};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::TextDirection;
+use inset_foundation::{App, Handle, Listener};
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Builds the menu-bar feature page.
 pub fn page(resources: &ThemeResources) -> Vec<WidgetRef> {
@@ -53,7 +53,7 @@ impl StatefulWidget for MenuBarDemo {
 
 impl State for MenuBarDemoState {
     type Widget = MenuBarDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);

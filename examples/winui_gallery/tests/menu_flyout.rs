@@ -3,13 +3,13 @@
 mod common;
 
 use common::Fixture;
-use reveal_foundation::{Handle, Listener};
-use reveal_painting::Alignment;
-use reveal_services::{
+use inset_foundation::{Handle, Listener};
+use inset_painting::Alignment;
+use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey, PhysicalKeyboardKey,
 };
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Default)]
@@ -135,7 +135,7 @@ fn focused(f: &Fixture, text: &str) -> bool {
     for element in f.elements() {
         let mut app = f.cell.borrow_mut();
         if let Some(object) = element.render_object(&app)
-            && let Some(paragraph) = object.downcast::<reveal_rendering::RenderParagraph>(&app)
+            && let Some(paragraph) = object.downcast::<inset_rendering::RenderParagraph>(&app)
             && paragraph.text(&app).to_plain_text(true, true) == text
         {
             return Focus::of(&mut app, element, false, false).has_primary_focus(&app);

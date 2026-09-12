@@ -2,12 +2,12 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
-use reveal_embedder::{Color, PointerChange};
-use reveal_foundation::{App, Handle};
-use reveal_painting::EdgeInsetsGeometry;
-use reveal_scheduler::SchedulerBinding;
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::{Color, PointerChange};
+use inset_foundation::{App, Handle};
+use inset_painting::EdgeInsetsGeometry;
+use inset_scheduler::SchedulerBinding;
+use inset_widgets::*;
+use inset_winui::*;
 use std::time::Duration;
 
 /// Taps `text` and then runs only `frames` 20 ms frames, to catch an animation in flight.
@@ -78,7 +78,7 @@ impl StatefulWidget for Lone {
 }
 impl State for LoneState {
     type Widget = Lone;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
     fn build(self: Handle<Self>, app: &mut App, _context: BuildContext) -> WidgetRef {
         let is_checked = app.get(self).is_checked;
         let page = ColoredBox::new(Color::from_argb(255, 255, 255, 255)).child(

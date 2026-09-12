@@ -1,9 +1,9 @@
 //! Retained content, placement and outside-input examples for Flyout and DropDownButton.
 
 use crate::{column, example, row, section};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_widgets::*;
+use inset_winui::*;
 use std::rc::Rc;
 
 /// Builds the Flyout feature page.
@@ -69,7 +69,7 @@ impl StatefulWidget for FlyoutDemo {
 
 impl State for FlyoutDemoState {
     type Widget = FlyoutDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
         let flyout = Flyout::new(app, RetainedCounter);
@@ -193,7 +193,7 @@ impl StatefulWidget for RetainedCounter {
 
 impl State for RetainedCounterState {
     type Widget = RetainedCounter;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         column(

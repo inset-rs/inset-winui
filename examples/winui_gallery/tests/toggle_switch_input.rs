@@ -1,7 +1,7 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
-use reveal_services::{
+use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyRepeatEvent, KeyUpEvent, LogicalKeyboardKey,
     PhysicalKeyboardKey,
 };

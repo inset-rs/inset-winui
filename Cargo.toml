@@ -12,18 +12,18 @@ unsafe_code = "forbid"
 
 # The framework is the sibling reveal-rs checkout; the kit adds nothing to it.
 [workspace.dependencies]
-reveal-winui = { path = "crates/reveal-winui" }
-reveal-animation = { path = "../reveal-rs/crates/reveal-animation" }
-reveal-embedder = { path = "../reveal-rs/crates/reveal-embedder" }
-reveal-embedder-winit = { path = "../reveal-rs/crates/reveal-embedder-winit" }
-reveal-foundation = { path = "../reveal-rs/crates/reveal-foundation" }
-reveal-gestures = { path = "../reveal-rs/crates/reveal-gestures" }
-reveal-painting = { path = "../reveal-rs/crates/reveal-painting" }
-reveal-rendering = { path = "../reveal-rs/crates/reveal-rendering" }
-reveal-scheduler = { path = "../reveal-rs/crates/reveal-scheduler" }
-reveal-services = { path = "../reveal-rs/crates/reveal-services" }
-reveal-shell = { path = "../reveal-rs/crates/reveal-shell" }
-reveal-widgets = { path = "../reveal-rs/crates/reveal-widgets" }
+inset-winui = { path = "crates/inset-winui" }
+inset-animation = { path = "../reveal-rs/crates/inset-animation" }
+inset-embedder = { path = "../reveal-rs/crates/inset-embedder" }
+inset-embedder-winit = { path = "../reveal-rs/crates/inset-embedder-winit" }
+inset-foundation = { path = "../reveal-rs/crates/inset-foundation" }
+inset-gestures = { path = "../reveal-rs/crates/inset-gestures" }
+inset-painting = { path = "../reveal-rs/crates/inset-painting" }
+inset-rendering = { path = "../reveal-rs/crates/inset-rendering" }
+inset-scheduler = { path = "../reveal-rs/crates/inset-scheduler" }
+inset-services = { path = "../reveal-rs/crates/inset-services" }
+inset-shell = { path = "../reveal-rs/crates/inset-shell" }
+inset-widgets = { path = "../reveal-rs/crates/inset-widgets" }
 valo-harness = { path = "../valo/crates/valo-harness" }
 
 # reveal-rs's runtime-filter support is in the sibling valo checkout until its next release;

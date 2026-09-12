@@ -4,11 +4,11 @@
 mod common;
 
 use common::{Fixture, mount};
-use reveal_embedder::{Color, TextDirection};
-use reveal_painting::AlignmentGeometry;
-use reveal_scheduler::SchedulerBinding;
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::{Color, TextDirection};
+use inset_painting::AlignmentGeometry;
+use inset_scheduler::SchedulerBinding;
+use inset_widgets::*;
+use inset_winui::*;
 use std::time::Duration;
 
 const VIEW: [u32; 2] = [64, 64];
@@ -277,8 +277,8 @@ fn reactivating_a_determinate_ring_shows_its_requested_value() {
 
 #[test]
 fn the_ring_does_not_intercept_pointer_input() {
-    use reveal_embedder::{Offset, PointerChange};
-    use reveal_foundation::Listener;
+    use inset_embedder::{Offset, PointerChange};
+    use inset_foundation::Listener;
     use std::{cell::Cell, rc::Rc};
 
     let clicks = Rc::new(Cell::new(0));
@@ -293,7 +293,7 @@ fn the_ring_does_not_intercept_pointer_input() {
                     Stack::new().children([
                         Positioned::fill(
                             GestureDetector::new()
-                                .behavior(reveal_rendering::HitTestBehavior::Opaque)
+                                .behavior(inset_rendering::HitTestBehavior::Opaque)
                                 .on_tap(Listener::new(move |_| shared.set(shared.get() + 1)))
                                 .child(SizedBox::expand()),
                         )

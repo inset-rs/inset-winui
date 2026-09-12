@@ -3,14 +3,14 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{Offset, PointerChange, TextAffinity, TextRange, TextSelection};
-use reveal_foundation::Handle;
-use reveal_services::{
+use inset_embedder::{Offset, PointerChange, TextAffinity, TextRange, TextSelection};
+use inset_foundation::Handle;
+use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey as Key,
     PhysicalKeyboardKey as Physical, TextEditingValue, TextInput,
 };
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Finds a public control's native controller by its placeholder.
 fn controller(f: &Fixture, placeholder: &str) -> Handle<TextEditingController> {
@@ -274,7 +274,7 @@ fn text_commands_copy_paste_undo_and_password_copy_policy() {
     assert!(!widgets.into_iter().any(|element| {
         element
             .render_object(&app)
-            .and_then(|render| render.downcast::<reveal_rendering::RenderParagraph>(&app))
+            .and_then(|render| render.downcast::<inset_rendering::RenderParagraph>(&app))
             .is_some_and(|paragraph| paragraph.text(&app).to_plain_text(true, true) == "Copy")
     }));
 }

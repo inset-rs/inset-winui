@@ -3,8 +3,8 @@
 mod common;
 
 use common::Fixture;
-use reveal_widgets::downcast_widget;
-use reveal_winui::{InfoBar, ProgressBar};
+use inset_widgets::downcast_widget;
+use inset_winui::{InfoBar, ProgressBar};
 use winui_gallery::Feature;
 
 #[test]
@@ -106,12 +106,12 @@ fn info_bar_narrow_layout_renders() {
     fixture.find("Resume requested");
 }
 
-use reveal_foundation::{App, Handle, Listener};
-use reveal_painting::Alignment;
-use reveal_rendering::MainAxisSize;
-use reveal_scheduler::SchedulerBinding;
-use reveal_widgets::*;
-use reveal_winui::{AccentPalette, ExpandDirection, Expander};
+use inset_foundation::{App, Handle, Listener};
+use inset_painting::Alignment;
+use inset_rendering::MainAxisSize;
+use inset_scheduler::SchedulerBinding;
+use inset_widgets::*;
+use inset_winui::{AccentPalette, ExpandDirection, Expander};
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
@@ -157,7 +157,7 @@ impl StatefulWidget for LifecyclePage {
 
 impl State for LifecycleState {
     type Widget = LifecyclePage;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         self.widget(app).probe.set(Some(self));
@@ -336,10 +336,10 @@ fn determinate_progress_clamps_to_the_range_and_handles_a_zero_span() {
                                         .maximum(maximum)
                                         .value(value)
                                         .corner_radius(0.0)
-                                        .foreground(reveal_embedder::Color::from_argb(
+                                        .foreground(inset_embedder::Color::from_argb(
                                             255, 255, 0, 0,
                                         ))
-                                        .background(reveal_embedder::Color::from_argb(
+                                        .background(inset_embedder::Color::from_argb(
                                             255, 0, 0, 255,
                                         )),
                                 ),
@@ -380,15 +380,15 @@ fn info_bar_status_glyphs_keep_their_natural_line_height() {
         let Some(object) = element.render_object(&app) else {
             continue;
         };
-        let Some(paragraph) = object.downcast::<reveal_rendering::RenderParagraph>(&app) else {
+        let Some(paragraph) = object.downcast::<inset_rendering::RenderParagraph>(&app) else {
             continue;
         };
         let text = paragraph.text(&app).to_plain_text(true, true);
         if ![
-            reveal_winui::FluentSymbol::Info,
-            reveal_winui::FluentSymbol::CheckmarkCircle,
-            reveal_winui::FluentSymbol::ErrorCircle,
-            reveal_winui::FluentSymbol::DismissCircle,
+            inset_winui::FluentSymbol::Info,
+            inset_winui::FluentSymbol::CheckmarkCircle,
+            inset_winui::FluentSymbol::ErrorCircle,
+            inset_winui::FluentSymbol::DismissCircle,
         ]
         .iter()
         .any(|symbol| text == symbol.glyph().to_string())
@@ -399,7 +399,7 @@ fn info_bar_status_glyphs_keep_their_natural_line_height() {
         let actual = render_box.size(&app);
         let natural = render_box.get_dry_layout(
             &mut app,
-            reveal_rendering::BoxConstraints::new().max_width(actual.width()),
+            inset_rendering::BoxConstraints::new().max_width(actual.width()),
         );
         assert!(
             actual.height() >= natural.height(),

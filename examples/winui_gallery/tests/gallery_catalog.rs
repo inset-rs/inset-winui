@@ -3,8 +3,8 @@
 mod common;
 
 use common::Fixture;
-use reveal_widgets::downcast_widget;
-use reveal_winui::NavigationView;
+use inset_widgets::downcast_widget;
+use inset_winui::NavigationView;
 use std::collections::HashSet;
 use winui_gallery::Feature;
 

@@ -1,9 +1,9 @@
 //! SplitView's four display modes, pane placement, dimming and cancelable dismissal.
 use crate::{column, example, example_row, label, section};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_painting::EdgeInsetsGeometry;
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_painting::EdgeInsetsGeometry;
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Builds the configurable pane layout example.
 pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
@@ -73,7 +73,7 @@ impl StatefulWidget for SplitViewDemo {
 
 impl State for SplitViewDemoState {
     type Widget = SplitViewDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);

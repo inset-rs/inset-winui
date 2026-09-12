@@ -3,10 +3,10 @@
 mod common;
 
 use common::{Fixture, mount};
-use reveal_embedder::{Color, Size};
-use reveal_foundation::App;
-use reveal_widgets::*;
-use reveal_winui::{Brush, ControlBorder, SizeObserver};
+use inset_embedder::{Color, Size};
+use inset_foundation::App;
+use inset_widgets::*;
+use inset_winui::{Brush, ControlBorder, SizeObserver};
 use std::{cell::RefCell, rc::Rc};
 
 type Reports = Rc<RefCell<Vec<(Size, Size)>>>;

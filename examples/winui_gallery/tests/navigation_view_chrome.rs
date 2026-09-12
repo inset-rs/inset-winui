@@ -3,11 +3,11 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{Offset, Rect};
-use reveal_foundation::{App, Handle, Listener, ValueKey};
-use reveal_rendering::{RenderBox, RenderParagraph};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::{Offset, Rect};
+use inset_foundation::{App, Handle, Listener, ValueKey};
+use inset_rendering::{RenderBox, RenderParagraph};
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Clone, Debug, Default)]
@@ -42,7 +42,7 @@ impl StatefulWidget for Page {
 
 impl State for PageState {
     type Widget = Page;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         self.widget(app).0.0.set(Some(self));
@@ -160,8 +160,8 @@ fn tap_key(f: &mut Fixture, key: &'static str) {
     let point = key_bounds(f, key)
         .unwrap_or_else(|| panic!("missing onstage keyed control {key}"))
         .center();
-    f.send(reveal_embedder::PointerChange::Down, point);
-    f.send(reveal_embedder::PointerChange::Up, point);
+    f.send(inset_embedder::PointerChange::Down, point);
+    f.send(inset_embedder::PointerChange::Up, point);
     f.pump();
 }
 

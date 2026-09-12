@@ -3,10 +3,10 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::Offset;
-use reveal_foundation::{App, Handle, Listener};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::Offset;
+use inset_foundation::{App, Handle, Listener};
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::Cell, rc::Rc};
 
 /// Gives the test access to the owning page and its custom footer container.
@@ -41,7 +41,7 @@ impl StatefulWidget for Page {
 
 impl State for PageState {
     type Widget = Page;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         let probe = self.widget(app).0.clone();

@@ -1,9 +1,9 @@
 //! `Button` styles, icon content, custom content and disabled states.
 
 use crate::{GalleryState, column, example, example_row, row, section};
-use reveal_foundation::{Handle, Listener};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{Handle, Listener};
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Builds the button style and content examples.
 pub fn build(state: Handle<GalleryState>, resources: &ThemeResources) -> Vec<WidgetRef> {

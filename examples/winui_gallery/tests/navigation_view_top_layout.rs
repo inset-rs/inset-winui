@@ -2,10 +2,10 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
-use reveal_foundation::{App, Handle};
-use reveal_rendering::{RenderBox, RenderParagraph};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle};
+use inset_rendering::{RenderBox, RenderParagraph};
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Debug)]
@@ -31,7 +31,7 @@ impl StatefulWidget for Page {
 }
 impl State for PageState {
     type Widget = Page;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         self.widget(app).0.set(Some(self));
         let s = app.get(self);
@@ -62,7 +62,7 @@ impl State for PageState {
         ThemeScope::new(
             Theme::Light,
             Align::new()
-                .alignment(reveal_painting::Alignment::TOP_LEFT.into())
+                .alignment(inset_painting::Alignment::TOP_LEFT.into())
                 .child(SizedBox::new().width(s.width).height(200.0).child(nav)),
         )
         .into_widget()

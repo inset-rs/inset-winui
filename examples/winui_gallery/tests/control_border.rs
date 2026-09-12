@@ -3,12 +3,12 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{Color, Offset, PointerChange};
-use reveal_foundation::Listener;
-use reveal_painting::Alignment;
-use reveal_rendering::HitTestBehavior;
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::{Color, Offset, PointerChange};
+use inset_foundation::Listener;
+use inset_painting::Alignment;
+use inset_rendering::HitTestBehavior;
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::Cell, rc::Rc};
 
 fn fixture(background: Option<Brush>, rounded_child: bool) -> (Fixture, Rc<Cell<usize>>) {

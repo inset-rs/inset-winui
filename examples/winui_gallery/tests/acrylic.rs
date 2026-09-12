@@ -3,11 +3,11 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{Canvas, Color, Paint, Rect, Size};
-use reveal_foundation::App;
-use reveal_rendering::CustomPainter;
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::{Canvas, Color, Paint, Rect, Size};
+use inset_foundation::App;
+use inset_rendering::CustomPainter;
+use inset_widgets::*;
+use inset_winui::*;
 
 #[derive(Clone, Debug)]
 struct Pattern;
@@ -62,7 +62,7 @@ fn fixture_with_fallback_alpha(theme: Theme, acrylic: bool, transparent_fallback
         run_app(
             app,
             Directionality::new(
-                reveal_embedder::TextDirection::Ltr,
+                inset_embedder::TextDirection::Ltr,
                 Stack::new().children(vec![
                     Positioned::fill(CustomPaint::new().painter(Pattern)).into_widget(),
                     Positioned::new(

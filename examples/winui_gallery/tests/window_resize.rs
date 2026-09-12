@@ -1,17 +1,17 @@
 //! Actual platform metrics changes exercise OverlayPortal layout during adaptive resizing.
 #![feature(arbitrary_self_types)]
-use reveal_embedder::valo::{Color, Context};
-use reveal_embedder::{
+use inset_embedder::valo::{Color, Context};
+use inset_embedder::{
     FontSource, Picture, Platform, SystemFontSource, TargetPlatform, View, ViewConstraints, ViewId,
     ViewMetrics, ViewRef,
 };
-use reveal_embedder::{PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
-use reveal_foundation::{AppCell, Listener};
-use reveal_gestures::GestureBinding;
-use reveal_rendering::RendererBinding;
-use reveal_scheduler::SchedulerBinding;
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::{PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
+use inset_foundation::{AppCell, Listener};
+use inset_gestures::GestureBinding;
+use inset_rendering::RendererBinding;
+use inset_scheduler::SchedulerBinding;
+use inset_widgets::*;
+use inset_winui::*;
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,

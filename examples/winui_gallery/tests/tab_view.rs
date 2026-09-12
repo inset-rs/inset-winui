@@ -3,14 +3,14 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_gestures::GestureBinding;
-use reveal_services::{
+use inset_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
+use inset_foundation::{App, Handle, Listener};
+use inset_gestures::GestureBinding;
+use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey, PhysicalKeyboardKey,
 };
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_widgets::*;
+use inset_winui::*;
 use std::time::Duration;
 use std::{cell::Cell, rc::Rc};
 
@@ -65,7 +65,7 @@ impl StatefulWidget for Page {
 
 impl State for PageState {
     type Widget = Page;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         self.widget(app).0.0.set(Some(self));
@@ -128,7 +128,7 @@ impl State for PageState {
         }));
         if state.custom_feedback {
             tabs = tabs.tab_drag_feedback_builder(|_, _, _| {
-                ColoredBox::new(reveal_embedder::Color::from_argb(255, 255, 0, 255))
+                ColoredBox::new(inset_embedder::Color::from_argb(255, 255, 0, 255))
                     .child(Text::new("Independent preview"))
                     .into_widget()
             });
@@ -161,7 +161,7 @@ impl StatefulWidget for Counter {
 
 impl State for CounterState {
     type Widget = Counter;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         Button::text(
@@ -427,7 +427,7 @@ impl StatefulWidget for CrossPage {
 }
 impl State for CrossState {
     type Widget = CrossPage;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         self.widget(app).0.0.set(Some(self));
         let items = |ids: &[usize]| {
@@ -705,7 +705,7 @@ fn control_tab_moves_page_focus_and_close_recovers_adjacent_header_focus() {
 /// Collection reconciliation must finish before the first layout after removal.
 #[test]
 fn collection_replacement_is_visible_in_the_first_frame() {
-    use reveal_scheduler::SchedulerBinding;
+    use inset_scheduler::SchedulerBinding;
 
     for (initial_selection, removed, disabled, hidden, expected) in [
         (Some(3), 3, vec![], vec![], 2),

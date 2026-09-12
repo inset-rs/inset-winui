@@ -317,7 +317,7 @@ def main():
            '//! Colours are ARGB literals resolved through every StaticResource alias in the',
            '//! XAML theme dictionaries; the XAML "Default" dictionary is the dark theme.',
            '#![allow(clippy::excessive_precision, unused_variables)]',
-           'use super::{AccentPalette, AcrylicBrushResources, Theme};', 'use crate::BackgroundSizing;', 'use reveal_embedder::{Color, FontWeight};', 'use std::time::Duration;', '']
+           'use super::{AccentPalette, AcrylicBrushResources, Theme};', 'use crate::BackgroundSizing;', 'use inset_embedder::{Color, FontWeight};', 'use std::time::Duration;', '']
     # Brush keys alias a colour rather than stating one, so the alias kind belongs
     # in the shared struct as much as a literal colour does.
     common_keys = [k for k, v in base_themes['Light'].items() if v[0] in ('color', 'gradient', 'alias', 'opacity')]

@@ -1,8 +1,8 @@
 //! `ToggleSwitch` with a header, with on and off content, and disabled.
 use crate::{GalleryState, column, example, example_row, label, section};
-use reveal_foundation::{App, Handle};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle};
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Builds shared gallery switches alongside an independent property example.
 pub fn build(state: Handle<GalleryState>, app: &App, resources: &ThemeResources) -> Vec<WidgetRef> {
@@ -83,7 +83,7 @@ impl StatefulWidget for ToggleProperties {
 
 impl State for TogglePropertiesState {
     type Widget = ToggleProperties;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     /// Rebuilds the switch from the selected properties.
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {

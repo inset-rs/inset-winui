@@ -2,9 +2,9 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
-use reveal_foundation::{App, Handle, Listener};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::Cell, rc::Rc};
 
 #[derive(Clone, Debug, Default)]
@@ -43,7 +43,7 @@ impl StatefulWidget for Page {
 
 impl State for PageState {
     type Widget = Page;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         self.widget(app).0.0.set(Some(self));
@@ -73,7 +73,7 @@ impl State for PageState {
         ThemeScope::new(
             state.theme,
             Align::new()
-                .alignment(reveal_painting::Alignment::TOP_LEFT.into())
+                .alignment(inset_painting::Alignment::TOP_LEFT.into())
                 .child(SizedBox::new().width(state.width).height(440.0).child(nav)),
         )
         .into_widget()
@@ -149,12 +149,12 @@ fn adaptive_thresholds_and_force_closed_pane() {
     assert_eq!(split(&f), (SplitViewDisplayMode::CompactInline, true));
     f.capture("navigation_expanded_dark");
     f.send(
-        reveal_embedder::PointerChange::Down,
-        reveal_embedder::Offset::new(24.0, 24.0),
+        inset_embedder::PointerChange::Down,
+        inset_embedder::Offset::new(24.0, 24.0),
     );
     f.send(
-        reveal_embedder::PointerChange::Up,
-        reveal_embedder::Offset::new(24.0, 24.0),
+        inset_embedder::PointerChange::Up,
+        inset_embedder::Offset::new(24.0, 24.0),
     );
     f.pump();
     assert!(!split(&f).1);
@@ -184,8 +184,8 @@ fn top_overflow_selection_promotes_and_resize_recovers() {
                 }
                 let b = e.find_render_object(&app)?.as_box()?;
                 Some(
-                    b.local_to_global(&app, reveal_embedder::Offset::ZERO, None)
-                        + reveal_embedder::Offset::new(
+                    b.local_to_global(&app, inset_embedder::Offset::ZERO, None)
+                        + inset_embedder::Offset::new(
                             b.size(&app).width() / 2.0,
                             b.size(&app).height() / 2.0,
                         ),
@@ -193,8 +193,8 @@ fn top_overflow_selection_promotes_and_resize_recovers() {
             })
             .unwrap()
     };
-    f.send(reveal_embedder::PointerChange::Down, point);
-    f.send(reveal_embedder::PointerChange::Up, point);
+    f.send(inset_embedder::PointerChange::Down, point);
+    f.send(inset_embedder::PointerChange::Up, point);
     f.pump();
     f.tap("Destination 7");
     f.pump();
@@ -232,11 +232,11 @@ impl StatefulWidget for Content {
 
 impl State for ContentState {
     type Widget = Content;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         Column::new()
-            .main_axis_size(reveal_rendering::MainAxisSize::Min)
+            .main_axis_size(inset_rendering::MainAxisSize::Min)
             .children([
                 Text::new(self.widget(app).0.clone()).into_widget(),
                 Button::text(
@@ -269,20 +269,20 @@ fn pane_closing_is_cancelable_only_for_light_dismiss_and_raised_once() {
         s.mode = NavigationViewPaneDisplayMode::LeftCompact;
         s.cancel_close = true;
     });
-    let toggle = reveal_embedder::Offset::new(24.0, 24.0);
+    let toggle = inset_embedder::Offset::new(24.0, 24.0);
     for change in [
-        reveal_embedder::PointerChange::Down,
-        reveal_embedder::PointerChange::Up,
+        inset_embedder::PointerChange::Down,
+        inset_embedder::PointerChange::Up,
     ] {
         f.send(change, toggle);
     }
     f.pump();
     assert!(split(&f).1);
     let before = f.cell.borrow().get(p.0.get().unwrap()).closing_count;
-    let outside = reveal_embedder::Offset::new(600.0, 200.0);
+    let outside = inset_embedder::Offset::new(600.0, 200.0);
     for change in [
-        reveal_embedder::PointerChange::Down,
-        reveal_embedder::PointerChange::Up,
+        inset_embedder::PointerChange::Down,
+        inset_embedder::PointerChange::Up,
     ] {
         f.send(change, outside);
     }
@@ -294,8 +294,8 @@ fn pane_closing_is_cancelable_only_for_light_dismiss_and_raised_once() {
     );
     update(&mut f, &p, |s| s.cancel_close = false);
     for change in [
-        reveal_embedder::PointerChange::Down,
-        reveal_embedder::PointerChange::Up,
+        inset_embedder::PointerChange::Down,
+        inset_embedder::PointerChange::Up,
     ] {
         f.send(change, outside);
     }

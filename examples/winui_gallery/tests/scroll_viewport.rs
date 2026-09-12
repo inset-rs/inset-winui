@@ -3,17 +3,17 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{
+use inset_embedder::{
     Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind, PointerSignalKind,
 };
-use reveal_foundation::{Handle, Listenable, Listener};
-use reveal_gestures::GestureBinding;
-use reveal_painting::{Axis, EdgeInsetsGeometry};
-use reveal_services::{
+use inset_foundation::{Handle, Listenable, Listener};
+use inset_gestures::GestureBinding;
+use inset_painting::{Axis, EdgeInsetsGeometry};
+use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey, PhysicalKeyboardKey,
 };
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_widgets::*;
+use inset_winui::*;
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,

@@ -3,11 +3,11 @@
 mod common;
 
 use common::Fixture;
-use reveal_foundation::{App, Handle, Listener};
-use reveal_painting::Alignment;
-use reveal_rendering::MainAxisSize;
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_painting::Alignment;
+use inset_rendering::MainAxisSize;
+use inset_widgets::*;
+use inset_winui::*;
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
@@ -52,7 +52,7 @@ impl StatefulWidget for Page {
 
 impl State for PageState {
     type Widget = Page;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
         let probe = self.widget(app).probe.clone();
@@ -94,7 +94,7 @@ impl State for PageState {
                 .focus_node(opener)
                 .into_widget()
             }))
-            .key(Rc::new(reveal_foundation::ValueKey::new(name)))
+            .key(Rc::new(inset_foundation::ValueKey::new(name)))
             .into_widget()
         };
         ThemeScope::new(
@@ -156,7 +156,7 @@ impl StatefulWidget for Content {
 
 impl State for ContentState {
     type Widget = Content;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
         app.get_mut(self).focus = Some(FocusNode::new(app).as_node());

@@ -3,9 +3,9 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{Offset, Size};
-use reveal_widgets::*;
-use reveal_winui::{Grid, GridCell, GridLength, RowDefinition};
+use inset_embedder::{Offset, Size};
+use inset_widgets::*;
+use inset_winui::{Grid, GridCell, GridLength, RowDefinition};
 use std::{cell::RefCell, rc::Rc};
 
 /// WinUI MeasureCell calls child.Measure; a native LayoutBuilder needs actual layout.

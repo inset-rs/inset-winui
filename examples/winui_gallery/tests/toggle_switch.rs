@@ -2,10 +2,10 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
-use reveal_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
-use reveal_gestures::GestureBinding;
-use reveal_rendering::RenderParagraph;
-use reveal_winui::{
+use inset_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
+use inset_gestures::GestureBinding;
+use inset_rendering::RenderParagraph;
+use inset_winui::{
     CONTENT_GAP, KNOB_AREA, KNOB_TRANSLATION_RANGE, TOGGLE_SWITCH_PRE_CONTENT_MARGIN,
     TOGGLE_SWITCH_TOP_HEADER_MARGIN, TRACK_HEIGHT, TRACK_WIDTH,
 };

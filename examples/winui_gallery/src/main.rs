@@ -1,5 +1,5 @@
-use reveal_embedder_winit::{ImplicitViewConfig, WinitEmbedder};
-use reveal_shell::Shell;
+use inset_embedder_winit::{ImplicitViewConfig, WinitEmbedder};
+use inset_shell::Shell;
 fn main() {
     WinitEmbedder {
         implicit_view: Some(ImplicitViewConfig {

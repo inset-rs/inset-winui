@@ -1,10 +1,10 @@
 //! `Slider`: horizontal with a header and a value label, stepped with tick marks, disabled, and vertical.
 use crate::{column, example, example_row, label, row, section};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_widgets::*;
-// `Orientation` is also a `reveal_widgets` name (the media query's); the slider's is XAML's.
-use reveal_winui::Orientation;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_widgets::*;
+// `Orientation` is also a `inset_widgets` name (the media query's); the slider's is XAML's.
+use inset_winui::Orientation;
+use inset_winui::*;
 
 /// The track height for the vertical orientation example.
 const VERTICAL_DEMO_HEIGHT: f64 = 184.0;
@@ -73,7 +73,7 @@ impl StatefulWidget for SliderDemo {
 
 impl State for SliderDemoState {
     type Widget = SliderDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     /// Builds the examples from their current property choices.
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {

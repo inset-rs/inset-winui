@@ -1,16 +1,16 @@
 //! A GPU-backed host for kit tests: mounts a widget tree in a real `App` on a headless valo device, pumps frames, finds labels, sends pointer events and can export what it rendered.
 #![allow(dead_code)]
-use reveal_embedder::valo::{Color, Context};
-use reveal_embedder::{
+use inset_embedder::valo::{Color, Context};
+use inset_embedder::{
     FontSource, Offset, Picture, Platform, PointerChange, PointerData, PointerDataPacket,
     PointerDeviceKind, SystemFontSource, TargetPlatform, View, ViewConstraints, ViewId,
     ViewMetrics, ViewRef,
 };
-use reveal_foundation::{App, AppCell};
-use reveal_gestures::GestureBinding;
-use reveal_rendering::RenderParagraph;
-use reveal_scheduler::SchedulerBinding;
-use reveal_widgets::{AnyElement, WidgetRef, WidgetsBinding};
+use inset_foundation::{App, AppCell};
+use inset_gestures::GestureBinding;
+use inset_rendering::RenderParagraph;
+use inset_scheduler::SchedulerBinding;
+use inset_widgets::{AnyElement, WidgetRef, WidgetsBinding};
 use std::{cell::RefCell, rc::Rc, time::Duration};
 
 pub struct CaptureView {
@@ -122,7 +122,7 @@ impl Fixture {
         }));
         {
             let mut app = cell.borrow_mut();
-            reveal_painting::PaintingBinding::instance(&mut app).install_fonts(&mut app, |fonts| {
+            inset_painting::PaintingBinding::instance(&mut app).install_fonts(&mut app, |fonts| {
                 fonts.add_source(SystemFontSource::platform());
             });
             run(&mut app);
@@ -171,7 +171,7 @@ impl Fixture {
         let mut index = 0;
         while index < elements.len() {
             let element = elements[index];
-            let offstage = reveal_widgets::downcast_widget::<reveal_widgets::Offstage>(
+            let offstage = inset_widgets::downcast_widget::<inset_widgets::Offstage>(
                 element.widget(&app).as_ref(),
             )
             .is_some_and(|widget| widget.offstage);
@@ -215,13 +215,13 @@ impl Fixture {
                     .is_some_and(|paragraph| paragraph.text(&app).to_plain_text(true, true) == text)
             })
             .unwrap_or_else(|| panic!("missing label {text}"));
-        drop(reveal_widgets::Scrollable::ensure_visible(
+        drop(inset_widgets::Scrollable::ensure_visible(
             &mut app,
             context,
             0.5,
             Duration::ZERO,
-            reveal_animation::Curves::linear(),
-            reveal_widgets::ScrollPositionAlignmentPolicy::Explicit,
+            inset_animation::Curves::linear(),
+            inset_widgets::ScrollPositionAlignmentPolicy::Explicit,
         ));
         drop(app);
         self.cell.checkpoint();
@@ -275,7 +275,7 @@ impl Fixture {
 
     /// Traverses with Tab presses until the named control owns keyboard focus.
     pub fn focus(&mut self, text: &str) {
-        use reveal_services::{
+        use inset_services::{
             HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey,
             PhysicalKeyboardKey,
         };
@@ -290,10 +290,10 @@ impl Fixture {
                     .is_some_and(|paragraph| paragraph.text(&app).to_plain_text(true, true) == text)
             })
             .unwrap_or_else(|| panic!("missing label {text}"));
-        let target = reveal_widgets::Focus::of(&mut app, context, false, false);
+        let target = inset_widgets::Focus::of(&mut app, context, false, false);
         drop(app);
         for _ in 0..100 {
-            if reveal_widgets::primary_focus(&mut self.cell.borrow_mut()) == Some(target) {
+            if inset_widgets::primary_focus(&mut self.cell.borrow_mut()) == Some(target) {
                 return;
             }
             for event in [
@@ -340,10 +340,10 @@ impl Fixture {
     }
 }
 
-/// `reveal_widgets::run_app` for a widget built once the app exists.
+/// `inset_widgets::run_app` for a widget built once the app exists.
 pub fn mount(root: impl FnOnce(&mut App) -> WidgetRef + 'static) -> impl FnOnce(&mut App) {
     move |app| {
         let widget = root(app);
-        reveal_widgets::run_app(app, widget);
+        inset_widgets::run_app(app, widget);
     }
 }

@@ -3,11 +3,11 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::PointerChange;
-use reveal_foundation::{App, Handle};
-use reveal_scheduler::SchedulerBinding;
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::PointerChange;
+use inset_foundation::{App, Handle};
+use inset_scheduler::SchedulerBinding;
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::Cell, rc::Rc, time::Duration};
 
 #[derive(Debug)]
@@ -42,7 +42,7 @@ impl StatefulWidget for Page {
 
 impl State for PageState {
     type Widget = Page;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         self.widget(app).probe.set(Some(self));
@@ -323,7 +323,7 @@ fn collapse_and_expand_transfer_selection_between_actual_ancestor_and_child() {
     }
     let child = indicator_pixels(&f);
     assert_ne!(ancestor, child);
-    let chevron = reveal_embedder::Offset::new(292.0, f.find("First").dy());
+    let chevron = inset_embedder::Offset::new(292.0, f.find("First").dy());
     f.send(PointerChange::Down, chevron);
     f.send(PointerChange::Up, chevron);
     for _ in 0..20 {

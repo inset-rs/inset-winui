@@ -3,14 +3,14 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{Offset, PointerChange, TextDirection};
-use reveal_foundation::Listener;
-use reveal_rendering::CrossAxisAlignment;
-use reveal_services::{
+use inset_embedder::{Offset, PointerChange, TextDirection};
+use inset_foundation::Listener;
+use inset_rendering::CrossAxisAlignment;
+use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey, PhysicalKeyboardKey,
 };
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_widgets::*;
+use inset_winui::*;
 use std::rc::Rc;
 
 /// A menu bar whose header takes focus when its menu opens, above a plain button.
@@ -31,12 +31,18 @@ fn fixture() -> Fixture {
                                     MenuBarItem::new(
                                         "file",
                                         "File",
-                                        vec![MenuFlyoutItem::new("New document", Listener::new(|_| {}))],
+                                        vec![MenuFlyoutItem::new(
+                                            "New document",
+                                            Listener::new(|_| {}),
+                                        )],
                                     ),
                                     MenuBarItem::new(
                                         "edit",
                                         "Edit",
-                                        vec![MenuFlyoutItem::new("Copy item", Listener::new(|_| {}))],
+                                        vec![MenuFlyoutItem::new(
+                                            "Copy item",
+                                            Listener::new(|_| {}),
+                                        )],
                                     ),
                                 ])
                                 .into_widget(),
@@ -126,7 +132,11 @@ fn mouse_opened_menu_focuses_without_focus_visuals() {
         focus_contains(&f, file) || focus_contains(&f, item),
         "opening the flyout moves focus into the header or its menu"
     );
-    assert_eq!(visible_rings(&f), 0, "pointer-caused programmatic focus draws no ring");
+    assert_eq!(
+        visible_rings(&f),
+        0,
+        "pointer-caused programmatic focus draws no ring"
+    );
     f.send_mouse(PointerChange::Hover, item, 0);
     f.pump();
     assert_eq!(visible_rings(&f), 0);
@@ -139,9 +149,16 @@ fn keyboard_opened_menu_shows_focus_visuals_on_header_and_first_item() {
     let file = f.find("File");
     assert!(focus_contains(&f, file));
     assert_eq!(visible_rings(&f), 1, "keyboard focus draws the header ring");
-    key(&mut f, PhysicalKeyboardKey::ARROW_DOWN, LogicalKeyboardKey::ARROW_DOWN);
+    key(
+        &mut f,
+        PhysicalKeyboardKey::ARROW_DOWN,
+        LogicalKeyboardKey::ARROW_DOWN,
+    );
     let item = f.find("New document");
-    assert!(focus_contains(&f, item), "a keyboard-opened menu focuses its first item");
+    assert!(
+        focus_contains(&f, item),
+        "a keyboard-opened menu focuses its first item"
+    );
     assert_eq!(visible_rings(&f), 1, "the ring moves to the focused item");
 }
 
@@ -156,8 +173,15 @@ fn keyboard_focus_ring_survives_later_pointer_input() {
     f.send_mouse(PointerChange::Up, Offset::new(500.0, 350.0), 0);
     f.pump();
     let file = f.find("File");
-    assert!(focus_contains(&f, file), "a click on empty space leaves focus where it was");
-    assert_eq!(visible_rings(&f), 1, "the focus state is latched when focus arrives, not re-read later");
+    assert!(
+        focus_contains(&f, file),
+        "a click on empty space leaves focus where it was"
+    );
+    assert_eq!(
+        visible_rings(&f),
+        1,
+        "the focus state is latched when focus arrives, not re-read later"
+    );
 }
 
 #[test]
@@ -168,7 +192,18 @@ fn arrow_key_on_the_only_item_shows_its_ring() {
     let item = f.find("New document");
     assert!(focus_contains(&f, item));
     assert_eq!(visible_rings(&f), 0);
-    key(&mut f, PhysicalKeyboardKey::ARROW_DOWN, LogicalKeyboardKey::ARROW_DOWN);
-    assert!(focus_contains(&f, item), "a one-item menu cycles back to the same item");
-    assert_eq!(visible_rings(&f), 1, "CycleFocus re-focuses with FocusState_Keyboard even on the same item");
+    key(
+        &mut f,
+        PhysicalKeyboardKey::ARROW_DOWN,
+        LogicalKeyboardKey::ARROW_DOWN,
+    );
+    assert!(
+        focus_contains(&f, item),
+        "a one-item menu cycles back to the same item"
+    );
+    assert_eq!(
+        visible_rings(&f),
+        1,
+        "CycleFocus re-focuses with FocusState_Keyboard even on the same item"
+    );
 }

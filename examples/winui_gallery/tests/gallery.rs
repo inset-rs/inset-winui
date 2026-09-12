@@ -67,12 +67,12 @@ fn every_feature_has_a_destination_and_small_windows_use_the_pane_toggle() {
     narrow.tap("Standard");
     narrow.find("Clicked 1 times · wifi true · airplane false");
     narrow.send(
-        reveal_embedder::PointerChange::Down,
-        reveal_embedder::Offset::new(24.0, 24.0),
+        inset_embedder::PointerChange::Down,
+        inset_embedder::Offset::new(24.0, 24.0),
     );
     narrow.send(
-        reveal_embedder::PointerChange::Up,
-        reveal_embedder::Offset::new(24.0, 24.0),
+        inset_embedder::PointerChange::Up,
+        inset_embedder::Offset::new(24.0, 24.0),
     );
     narrow.pump();
     narrow.navigate(Feature::Slider);
@@ -82,11 +82,11 @@ fn every_feature_has_a_destination_and_small_windows_use_the_pane_toggle() {
 
 #[test]
 fn navigation_demo_minimal_header_clears_back_and_toggle_buttons() {
-    use reveal_embedder::Offset;
-    use reveal_foundation::ValueKey;
-    use reveal_rendering::{RenderBox, RenderParagraph};
-    use reveal_widgets::{Offstage, downcast_widget};
-    use reveal_winui::{NavigationView, NavigationViewPaneDisplayMode};
+    use inset_embedder::Offset;
+    use inset_foundation::ValueKey;
+    use inset_rendering::{RenderBox, RenderParagraph};
+    use inset_widgets::{Offstage, downcast_widget};
+    use inset_winui::{NavigationView, NavigationViewPaneDisplayMode};
 
     let mut f = Fixture::for_feature([1080, 900], Feature::NavigationView);
     f.tap("Mode: Left");
@@ -147,9 +147,9 @@ fn navigation_demo_minimal_header_clears_back_and_toggle_buttons() {
 
 #[test]
 fn theme_footer_remains_usable_when_the_pane_is_collapsed() {
-    use reveal_embedder::{Offset, PointerChange};
-    use reveal_widgets::downcast_widget;
-    use reveal_winui::{FluentSymbol, NavigationView};
+    use inset_embedder::{Offset, PointerChange};
+    use inset_widgets::downcast_widget;
+    use inset_winui::{FluentSymbol, NavigationView};
 
     let mut fixture = Fixture::new([1080, 780]);
     fixture.tap("Standard");
@@ -168,10 +168,9 @@ fn theme_footer_remains_usable_when_the_pane_is_collapsed() {
         let element = elements
             .iter()
             .find(|element| {
-                downcast_widget::<reveal_winui::FontIcon>(element.widget(&app).as_ref())
-                    .is_some_and(|icon| {
-                        icon.glyph == FluentSymbol::WeatherSunny.glyph().to_string()
-                    })
+                downcast_widget::<inset_winui::FontIcon>(element.widget(&app).as_ref()).is_some_and(
+                    |icon| icon.glyph == FluentSymbol::WeatherSunny.glyph().to_string(),
+                )
             })
             .unwrap();
         let render = element.find_render_object(&app).unwrap().as_box().unwrap();

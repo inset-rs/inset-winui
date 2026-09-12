@@ -3,10 +3,10 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_gestures::GestureBinding;
-use reveal_widgets::*;
+use inset_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
+use inset_foundation::{App, Handle, Listener};
+use inset_gestures::GestureBinding;
+use inset_widgets::*;
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
@@ -39,7 +39,7 @@ impl StatefulWidget for Page {
 
 impl State for PageState {
     type Widget = Page;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         let probe = self.widget(app).0.clone();
@@ -121,7 +121,7 @@ fn fixture_with_delayed(delayed: bool) -> (Fixture, Probe) {
         );
         run_app(
             app,
-            WidgetsApp::new(reveal_embedder::Color::new(0xff000000))
+            WidgetsApp::new(inset_embedder::Color::new(0xff000000))
                 .debug_show_checked_mode_banner(false)
                 .builder(move |_, _, _| Overlay::new().initial_entries([entry]).into_widget())
                 .into_widget(),

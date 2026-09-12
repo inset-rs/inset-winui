@@ -3,11 +3,11 @@
 mod common;
 
 use common::{Fixture, mount};
-use reveal_embedder::{Color, Size, TextDirection};
-use reveal_foundation::App;
-use reveal_painting::AlignmentGeometry;
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::{Color, Size, TextDirection};
+use inset_foundation::App;
+use inset_painting::AlignmentGeometry;
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::RefCell, rc::Rc};
 
 /// Mounts one badge at the view's top-left corner and reports the size it took.
@@ -55,7 +55,7 @@ fn a_value_wins_over_an_icon_and_a_glyph_icon_takes_the_font_icon_state() {
     let glyph = InfoBadge::new().icon_source(FontIcon::symbol(FluentSymbol::Checkmark));
     assert_eq!(glyph.display_kind(), InfoBadgeDisplayKind::FontIcon);
     let drawn =
-        InfoBadge::new().icon_source(PathIcon::new(reveal_embedder::PathBuilder::new().build()));
+        InfoBadge::new().icon_source(PathIcon::new(inset_embedder::PathBuilder::new().build()));
     assert_eq!(drawn.display_kind(), InfoBadgeDisplayKind::Icon);
 }
 
@@ -63,8 +63,8 @@ fn a_value_wins_over_an_icon_and_a_glyph_icon_takes_the_font_icon_state() {
 fn a_badge_narrower_than_it_is_tall_is_squared_up() {
     // InfoBadge::MeasureOverride returns {height, height} when the template measures narrower
     // than it is tall. A 1x6 geometry inside IconInfoBadgeIconMargin measures 9 by 14.
-    let mut geometry = reveal_embedder::PathBuilder::new();
-    geometry.rect(reveal_embedder::valo::Rect::new(0.0, 0.0, 1.0, 6.0));
+    let mut geometry = inset_embedder::PathBuilder::new();
+    geometry.rect(inset_embedder::valo::Rect::new(0.0, 0.0, 1.0, 6.0));
     let (_, size) = badge_at_top_left(
         [120, 60],
         InfoBadge::new().icon_source(PathIcon::new(geometry.build())),
@@ -169,8 +169,8 @@ fn the_gallery_page_shows_every_display_kind_and_severity() {
 #[test]
 fn icon_foreground_inherits_the_badge_unless_explicitly_overridden() {
     for explicit in [None, Some(Color::from_argb(255, 0, 255, 0))] {
-        let mut path = reveal_embedder::PathBuilder::new();
-        path.rect(reveal_embedder::valo::Rect::new(0.0, 0.0, 8.0, 8.0));
+        let mut path = inset_embedder::PathBuilder::new();
+        path.rect(inset_embedder::valo::Rect::new(0.0, 0.0, 8.0, 8.0));
         let mut icon = PathIcon::new(path.build());
         icon.foreground = explicit;
         let (f, _) = badge_at_top_left(

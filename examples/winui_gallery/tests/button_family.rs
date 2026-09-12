@@ -2,7 +2,7 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
-use reveal_embedder::{Offset, PointerChange};
+use inset_embedder::{Offset, PointerChange};
 use std::time::Duration;
 
 /// Lets `duration` pass on the App clock in 20 ms steps (the timers fire from `AppCell::elapse`, not from frames), pumping frames between steps so what the timers changed is built and painted.

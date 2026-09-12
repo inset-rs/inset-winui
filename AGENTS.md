@@ -1,6 +1,6 @@
-# reveal-winui
+# inset-winui
 
-WinUI 3 (Fluent 2) on the reveal framework, ported from Microsoft's open source. The spec is the repository at `/Users/mac/code/microsoft-ui-xaml`; values and behaviour are read from it, not remembered or measured from screenshots, so that later controls do not drift from the source. Desktop first: WinUI adapts by window size, not by device, so there is no mobile idiom.
+WinUI 3 (Fluent 2) on the Inset framework, ported from Microsoft's open source. The spec is the repository at `/Users/mac/code/microsoft-ui-xaml`; values and behaviour are read from it, not remembered or measured from screenshots, so that later controls do not drift from the source. Desktop first: WinUI adapts by window size, not by device, so there is no mobile idiom.
 
 ## The spec
 
@@ -12,7 +12,7 @@ WinUI 3 (Fluent 2) on the reveal framework, ported from Microsoft's open source.
 ## How the code is shaped
 
 - `theme/generated.rs` holds every colour, brush, size, duration and spline of the XAML theme dictionaries, produced by `tools/gen_resources.py`; `{ThemeResource X}` in a template is the field `x`. It is generated rather than typed so a value cannot be mistyped or invented; a control whose resources are missing is added to the generator's arguments.
-- A control file is a transcription of its `ControlTemplate`: the elements in order with their `x:Name`s in comments, each visual state group as an enum, the storyboards as the animations they declare. Its behaviour follows the C++ as closely as reveal allows.
+- A control file is a transcription of its `ControlTemplate`: the elements in order with their `x:Name`s in comments, each visual state group as an enum, the storyboards as the animations they declare. Its behaviour follows the C++ as closely as Inset allows.
 - What the repository leaves to Windows (accent shades, system colours, theme-animation timings, Segoe UI) has a substitute and a `PORTING.md` entry saying so. Text is Selawik, Microsoft's metric-compatible open substitute for Segoe UI, bundled with the gallery.
 - Widget construction follows `docs/widget-syntax.md`.
 
@@ -28,7 +28,7 @@ Bottom up: a panel or primitive a template needs is ported before the control th
 
 ## Porting guidance
 
-Faithful WinUI behavior remains the aim, especially where later controls depend on it, to avoid drift over time. For small interaction differences, prefer reveal's native mechanisms when reproducing the WinUI mechanism would add substantial complexity for little user benefit. One example is Button tap recognition: it uses reveal's native tap recognizer, not WinUI's pointer capture.
+Faithful WinUI behavior remains the aim, especially where later controls depend on it, to avoid drift over time. For small interaction differences, prefer Inset’s native mechanisms when reproducing the WinUI mechanism would add substantial complexity for little user benefit. One example is Button tap recognition: it uses Inset’s native tap recognizer, not WinUI's pointer capture.
 
 ## Rules
 
@@ -41,7 +41,7 @@ Faithful WinUI behavior remains the aim, especially where later controls depend 
 Each source folder keeps its own `PORTING.md` (`src/theme`, `src/primitives`, `src/controls`), with a section per file: `## toggle_switch.rs → ToggleSwitch`. An entry is Change / Reason / Affect, for a reader who knows Flutter and Rust but not WinUI internals; no visible Affect means identical, so no entry. An entry is three sentences: Change starts with its subject and says the idea, Reason names the kind and one fact, Affect says what a reader of the control would notice. Deferred items go under `## Deferred`, each with a trigger. The Reason is one of three, because each has its own way back:
 
 - `os` — Windows supplies it and this host does not: a value not in the repository, or a facility of the OS. Name the substitute; the trigger is a measurement or table from a Windows machine, or a host that provides it.
-- `framework` — reveal has no equivalent of the XAML mechanism. The trigger is the framework feature.
+- `framework` — Inset has no equivalent of the XAML mechanism. The trigger is the framework feature.
 - `language` — Rust has no counterpart of the XAML or C++ shape. The Affect says what a caller writes differently.
 
 Start Change with the concrete type, constant or variant being described, then explain the behavior in ordinary language. Keep source symbol names as references, not as substitutes for an explanation. Avoid unnamed subjects such as “dragging a switch” and session-specific shorthand. Reason explains the underlying cause, rather than merely saying an API is missing; Affect describes what the user sees or what application code must do.

@@ -2,13 +2,13 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
-use reveal_foundation::{App, Handle};
-use reveal_rendering::RenderParagraph;
-use reveal_services::{
+use inset_foundation::{App, Handle};
+use inset_rendering::RenderParagraph;
+use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey, PhysicalKeyboardKey,
 };
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::Cell, rc::Rc};
 #[derive(Debug)]
 struct Page(Rc<Cell<Option<Handle<PageState>>>>);
@@ -31,7 +31,7 @@ impl StatefulWidget for Page {
 }
 impl State for PageState {
     type Widget = Page;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         self.widget(app).0.set(Some(self));
         let mut slider = Slider::new(app.get(self).value, move |app, value| {

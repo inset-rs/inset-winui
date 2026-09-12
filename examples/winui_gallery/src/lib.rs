@@ -4,12 +4,12 @@ mod catalog;
 mod sections;
 pub use catalog::Feature;
 
-use reveal_embedder::Color;
-use reveal_foundation::{App, Handle, ValueKey};
-use reveal_painting::{Axis, EdgeInsetsGeometry, PaintingBinding};
-use reveal_rendering::{CrossAxisAlignment, MainAxisSize, StackFit};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::Color;
+use inset_foundation::{App, Handle, ValueKey};
+use inset_painting::{Axis, EdgeInsetsGeometry, PaintingBinding};
+use inset_rendering::{CrossAxisAlignment, MainAxisSize, StackFit};
+use inset_widgets::*;
+use inset_winui::*;
 use std::rc::Rc;
 
 /// The gallery switches directly between expanded and minimal navigation.
@@ -266,7 +266,7 @@ impl GalleryState {
 
 impl State for GalleryState {
     type Widget = Gallery;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         // Minimal HeaderContent follows the visible toggle column and its negative margin.

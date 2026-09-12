@@ -4,12 +4,12 @@
 use crate::{column, example, example_row, label, section};
 use std::sync::Arc;
 
-use reveal_embedder::valo::{Point, Rect as ValoRect};
-use reveal_embedder::{FillRule, Path, PathBuilder, TextDirection};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_rendering::{CrossAxisAlignment, MainAxisSize};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_embedder::valo::{Point, Rect as ValoRect};
+use inset_embedder::{FillRule, Path, PathBuilder, TextDirection};
+use inset_foundation::{App, Handle, Listener};
+use inset_rendering::{CrossAxisAlignment, MainAxisSize};
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Named symbols available to controls and gallery navigation.
 const SYMBOLS: [(FluentSymbol, &str); 28] = [
@@ -90,7 +90,7 @@ impl StatefulWidget for IconDemo {
 
 impl State for IconDemoState {
     type Widget = IconDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let r = ThemeResources::of(app, context);

@@ -2,14 +2,14 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::CaptureView;
-use reveal_embedder::valo::Context;
-use reveal_embedder::{
+use inset_embedder::valo::Context;
+use inset_embedder::{
     EmbedderClient, FontSource, Frame, Offset, Platform, PointerChange, PointerData,
     PointerDataPacket, PointerDeviceKind, SystemFontSource, TargetPlatform, ViewId, ViewRef,
 };
-use reveal_rendering::RenderParagraph;
-use reveal_shell::Shell;
-use reveal_widgets::WidgetsBinding;
+use inset_rendering::RenderParagraph;
+use inset_shell::Shell;
+use inset_widgets::WidgetsBinding;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::time::{Duration, Instant};

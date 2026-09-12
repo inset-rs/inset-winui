@@ -1,9 +1,9 @@
 //! Expander direction, retained content and disabled examples.
 
 use crate::{column, example, section};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Builds the expander examples.
 pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
@@ -44,7 +44,7 @@ impl StatefulWidget for ExpanderDemo {
 
 impl State for ExpanderDemoState {
     type Widget = ExpanderDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);
@@ -132,7 +132,7 @@ impl StatefulWidget for RetainedCounter {
 
 impl State for RetainedCounterState {
     type Widget = RetainedCounter;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, _: BuildContext) -> WidgetRef {
         let count = app.get(self).count;

@@ -1,10 +1,10 @@
 //! Determinate and indeterminate ProgressRing examples.
 
 use crate::{column, example, example_row, label, row, section};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_rendering::{CrossAxisAlignment, MainAxisSize};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_rendering::{CrossAxisAlignment, MainAxisSize};
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Builds the ring feature page.
 pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
@@ -56,7 +56,7 @@ fn captioned(ring: WidgetRef, name: &str, resources: &ThemeResources) -> WidgetR
 
 impl State for RingDemoState {
     type Widget = RingDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let r = ThemeResources::of(app, context);

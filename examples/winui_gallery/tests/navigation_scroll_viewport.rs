@@ -1,16 +1,16 @@
 //! Source scrollbar presentation backed by native scrolling and drag recognizers.
 #![feature(arbitrary_self_types)]
 mod common;
-#[path = "../../../crates/reveal-winui/src/controls/scroll_bar_viewport.rs"]
+#[path = "../../../crates/inset-winui/src/controls/scroll_bar_viewport.rs"]
 mod presentation;
 use common::Fixture;
+use inset_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
+use inset_foundation::{Handle, Listener};
+use inset_gestures::GestureBinding;
+use inset_rendering::{CrossAxisAlignment, MainAxisSize};
+use inset_widgets::*;
+use inset_winui::*;
 use presentation::ScrollBarViewport;
-use reveal_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
-use reveal_foundation::{Handle, Listener};
-use reveal_gestures::GestureBinding;
-use reveal_rendering::{CrossAxisAlignment, MainAxisSize};
-use reveal_widgets::*;
-use reveal_winui::*;
 use std::{cell::Cell, rc::Rc, time::Duration};
 fn fixture(theme: Theme) -> (Fixture, Handle<ScrollViewportController>) {
     let slot = Rc::new(Cell::new(None));

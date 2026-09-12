@@ -3,16 +3,16 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{PointerChange, ViewFocusDirection, ViewFocusEvent, ViewFocusState};
-use reveal_rendering::RenderParagraph;
-use reveal_services::{
+use inset_embedder::{PointerChange, ViewFocusDirection, ViewFocusEvent, ViewFocusState};
+use inset_rendering::RenderParagraph;
+use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey as Key,
     PhysicalKeyboardKey as Physical,
 };
-use reveal_widgets::{
+use inset_widgets::{
     AnyFocusNode, FocusableActionDetector, WidgetsBinding, downcast_widget, primary_focus,
 };
-use reveal_winui::FocusVisual;
+use inset_winui::FocusVisual;
 
 /// Sends a complete hardware key press through the native shortcut handlers.
 fn key(f: &mut Fixture, logical: Key, physical: Physical) {
@@ -90,7 +90,7 @@ fn mouse_leaves_focus_alone_and_tab_works_before_any_click() {
         WidgetsBinding::instance(&mut app).handle_view_focus_changed(
             &mut app,
             ViewFocusEvent {
-                view_id: reveal_embedder::ViewId(0),
+                view_id: inset_embedder::ViewId(0),
                 state,
                 direction: ViewFocusDirection::Undefined,
             },
@@ -144,13 +144,13 @@ fn pointer_interaction_does_not_focus_sliders_switches_or_repeat_buttons() {
                     let widget = element.widget(&app);
                     match feature {
                         winui_gallery::Feature::Slider => {
-                            downcast_widget::<reveal_winui::Slider>(widget.as_ref()).is_some()
+                            downcast_widget::<inset_winui::Slider>(widget.as_ref()).is_some()
                         }
                         winui_gallery::Feature::ToggleSwitch => {
-                            downcast_widget::<reveal_winui::ToggleSwitch>(widget.as_ref()).is_some()
+                            downcast_widget::<inset_winui::ToggleSwitch>(widget.as_ref()).is_some()
                         }
                         winui_gallery::Feature::RepeatButton => {
-                            downcast_widget::<reveal_winui::RepeatButton>(widget.as_ref()).is_some()
+                            downcast_widget::<inset_winui::RepeatButton>(widget.as_ref()).is_some()
                         }
                         _ => unreachable!(),
                     }
@@ -160,7 +160,7 @@ fn pointer_interaction_does_not_focus_sliders_switches_or_repeat_buttons() {
             let size = render.size(&app);
             render.local_to_global(
                 &app,
-                reveal_embedder::Offset::new(size.width() / 2.0, size.height() / 2.0),
+                inset_embedder::Offset::new(size.width() / 2.0, size.height() / 2.0),
                 None,
             )
         };

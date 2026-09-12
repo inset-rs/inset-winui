@@ -1,9 +1,9 @@
 //! Determinate and indeterminate ProgressBar examples.
 
 use crate::{column, example, example_row, section};
-use reveal_foundation::{App, Handle};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle};
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Builds the progress examples.
 pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
@@ -44,7 +44,7 @@ impl StatefulWidget for ProgressDemo {
 
 impl State for ProgressDemoState {
     type Widget = ProgressDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);

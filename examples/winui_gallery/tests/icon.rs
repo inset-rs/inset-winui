@@ -4,12 +4,12 @@
 mod common;
 
 use common::{Fixture, mount};
-use reveal_embedder::valo::{Point, Rect as ValoRect};
-use reveal_embedder::{Color, FillRule, Path, PathBuilder, Size, TextDirection};
-use reveal_foundation::App;
-use reveal_painting::{AlignmentGeometry, TextStyle};
-use reveal_widgets::*;
-use reveal_winui::{FluentSymbol, FontIcon, PathIcon, SizeObserver, install_icon_font};
+use inset_embedder::valo::{Point, Rect as ValoRect};
+use inset_embedder::{Color, FillRule, Path, PathBuilder, Size, TextDirection};
+use inset_foundation::App;
+use inset_painting::{AlignmentGeometry, TextStyle};
+use inset_widgets::*;
+use inset_winui::{FluentSymbol, FontIcon, PathIcon, SizeObserver, install_icon_font};
 use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 const GREEN: Color = Color::from_argb(255, 0, 160, 0);

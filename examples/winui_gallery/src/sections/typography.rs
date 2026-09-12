@@ -1,9 +1,9 @@
 //! Text styles, foreground hierarchy and a configurable reading sample.
 
 use crate::{column, example, example_row, label, section};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_widgets::*;
+use inset_winui::*;
 
 /// The complete type ramp currently exposed by the kit.
 const STYLES: [(&str, TextBlockStyle); 9] = [
@@ -51,7 +51,7 @@ impl StatefulWidget for TypographyDemo {
 
 impl State for TypographyDemoState {
     type Widget = TypographyDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let r = ThemeResources::of(app, context);

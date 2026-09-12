@@ -1,9 +1,9 @@
 //! `ToggleButton` states, `RepeatButton` timing and `HyperlinkButton` content.
 
 use crate::{column, example, example_row, label, row, section};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_widgets::*;
+use inset_winui::*;
 use std::time::Duration;
 
 /// Builds the ToggleButton examples and their retained state.
@@ -98,7 +98,7 @@ impl StatefulWidget for ToggleButtonDemo {
 impl State for ToggleButtonDemoState {
     type Widget = ToggleButtonDemo;
 
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let (two_state, three_state) = (app.get(self).two_state, app.get(self).three_state);
@@ -166,7 +166,7 @@ impl StatefulWidget for RepeatButtonDemo {
 impl State for RepeatButtonDemoState {
     type Widget = RepeatButtonDemo;
 
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let clicks = app.get(self).clicks;
@@ -220,7 +220,7 @@ impl StatefulWidget for HyperlinkButtonDemo {
 impl State for HyperlinkButtonDemoState {
     type Widget = HyperlinkButtonDemo;
 
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let clicks = app.get(self).clicks;

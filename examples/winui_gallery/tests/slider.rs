@@ -2,9 +2,9 @@
 #![feature(arbitrary_self_types)]
 mod common;
 use common::Fixture;
-use reveal_embedder::{Offset, PointerChange, Rect};
-use reveal_rendering::RenderParagraph;
-use reveal_winui::*;
+use inset_embedder::{Offset, PointerChange, Rect};
+use inset_rendering::RenderParagraph;
+use inset_winui::*;
 use std::time::Duration;
 
 /// The bounds of the paragraph showing `text`. A slider's header fills the root grid's width, so its box is as wide as the slider and its bottom edge is where the `SliderTopHeaderMargin` starts.
@@ -96,7 +96,7 @@ fn slider_presses_drags_snaps_and_switches_theme() {
 #[test]
 fn mouse_drag_updates_the_thumb_without_acquiring_focus() {
     let mut fixture = Fixture::for_feature([900, 2600], winui_gallery::Feature::Slider);
-    let focus = reveal_widgets::primary_focus(&mut fixture.cell.borrow_mut());
+    let focus = inset_widgets::primary_focus(&mut fixture.cell.borrow_mut());
     fixture.find("Slider: 42 · stepped 50 · vertical 30");
     let volume = label_bounds(&fixture, "Volume");
     let thumb = track_point(volume, 0.42);
@@ -126,7 +126,7 @@ fn mouse_drag_updates_the_thumb_without_acquiring_focus() {
     fixture.pump();
     fixture.find("Slider: 62 · stepped 50 · vertical 30");
     assert_eq!(
-        reveal_widgets::primary_focus(&mut fixture.cell.borrow_mut()),
+        inset_widgets::primary_focus(&mut fixture.cell.borrow_mut()),
         focus,
     );
 }

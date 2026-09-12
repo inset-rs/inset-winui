@@ -1,9 +1,9 @@
 //! Split-button and menu examples with independent actions and retained menu settings.
 
 use crate::{Feature, column, example, row, section};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_foundation::{App, Handle, Listener};
+use inset_widgets::*;
+use inset_winui::*;
 
 /// Builds one feature page while giving it its own menu and application state.
 pub fn page(feature: Feature, resources: &ThemeResources) -> Vec<WidgetRef> {
@@ -113,7 +113,7 @@ impl CommandDemoState {
 
 impl State for CommandDemoState {
     type Widget = CommandDemo;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
         let items = self.items(app);

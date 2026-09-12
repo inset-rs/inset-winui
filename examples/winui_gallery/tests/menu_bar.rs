@@ -3,14 +3,14 @@
 mod common;
 
 use common::Fixture;
-use reveal_embedder::{Offset, PointerChange, TextDirection};
-use reveal_foundation::{App, Handle, Listener};
-use reveal_rendering::{CrossAxisAlignment, RenderParagraph};
-use reveal_services::{
+use inset_embedder::{Offset, PointerChange, TextDirection};
+use inset_foundation::{App, Handle, Listener};
+use inset_rendering::{CrossAxisAlignment, RenderParagraph};
+use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey, PhysicalKeyboardKey,
 };
-use reveal_widgets::*;
-use reveal_winui::*;
+use inset_widgets::*;
+use inset_winui::*;
 use std::{cell::Cell, rc::Rc, time::Duration};
 
 #[derive(Default, Debug)]
@@ -56,7 +56,7 @@ impl StatefulWidget for Owner {
 
 impl State for OwnerState {
     type Widget = Owner;
-    reveal_widgets::state_accessors!();
+    inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
         self.widget(app).probe.state.set(Some(self));
@@ -116,7 +116,7 @@ impl State for OwnerState {
                             .is_enabled(app.get(self).enabled)
                             .into_widget(),
                         SizedBox::new().height(80.0).into_widget(),
-                        reveal_widgets::Listener::new()
+                        inset_widgets::Listener::new()
                             .on_pointer_down(Rc::new(move |_, _| {
                                 raw_outside
                                     .raw_outside
