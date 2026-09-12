@@ -172,6 +172,26 @@ impl ThemeResources {
         FlyoutPresenterResources::for_theme(self.theme, &self.accent)
     }
 
+    /// The menu presenter and menu item resources for this theme.
+    pub fn menu_flyout(&self) -> MenuFlyoutResources {
+        MenuFlyoutResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The dropdown chevron resources for this theme.
+    pub fn drop_down_button(&self) -> DropDownButtonResources {
+        DropDownButtonResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The split button resources for this theme.
+    pub fn split_button(&self) -> SplitButtonResources {
+        SplitButtonResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The radio menu item resources for this theme.
+    pub fn radio_menu_flyout_item(&self) -> RadioMenuFlyoutItemResources {
+        RadioMenuFlyoutItemResources::for_theme(self.theme, &self.accent)
+    }
+
     /// The navigation back and close button resources for this theme.
     pub fn navigation_back_button(&self) -> NavigationBackButtonResources {
         NavigationBackButtonResources::for_theme(self.theme, &self.accent)

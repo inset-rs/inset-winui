@@ -1415,7 +1415,7 @@ impl NavigationViewState {
                 .children([
                     SizedBox::new()
                         .height(main_space)
-                        .child(NavigationScrollViewport::new(scrolls[0], main.clone()))
+                        .child(ScrollBarViewport::new(scrolls[0], main.clone()))
                         .into_widget(),
                     SizedBox::new()
                         .height(line_height)
@@ -1434,7 +1434,7 @@ impl NavigationViewState {
                         .into_widget(),
                     SizedBox::new()
                         .height(footer_space)
-                        .child(NavigationScrollViewport::new(scrolls[1], footer.clone()))
+                        .child(ScrollBarViewport::new(scrolls[1], footer.clone()))
                         .into_widget(),
                 ])
                 .into_widget()

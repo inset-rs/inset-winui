@@ -325,4 +325,34 @@ Ported against: aa3207e6
 - TabView insertion, removal and reorder animations remain deferred. Trigger: Windows timing is verified or a host animation service is available.
 - Navigation integration with title-bar space, window borders, system sounds and page-change animations remains deferred. Trigger: The host exposes the corresponding window or animation support.
 - Navigation by gamepad shoulder buttons, directional focus movement, accessibility and high-contrast colors remain deferred. Trigger: The corresponding input, accessibility and theme support is available.
-- Standalone Flyout, ScrollViewer and ScrollBar APIs remain deferred. Trigger: A consumer needs those public controls beyond NavigationView’s internal adapters.
+- Standalone ScrollViewer and ScrollBar APIs remain deferred. Trigger: A consumer needs those public controls beyond NavigationView’s internal adapters.
+
+## flyout/mod.rs → `Flyout` and `FlyoutBase`
+
+- Change: `Flyout` keeps its content mounted while hidden and displays it inside the application’s root Overlay.
+  Reason: framework — Flutter preserves child State through mounted widgets and draws overlays inside the existing window, while WinUI retains detached content and can create separate popup windows.
+  Affect: Reopening the same Flyout from another button preserves its child State, but the flyout cannot extend beyond the application window.
+
+- Change: `Flyout` uses Flutter’s ModalBarrier to block input outside its content when ShowMode is Standard.
+  Reason: framework — WinUI's host distinguishes pointer buttons during popup hit testing, while Flutter's native barrier blocks input behind it and recognizes a completed tap from any button.
+  Affect: Outside dismissal occurs on release rather than press, and an outside right-click is consumed rather than reaching the control behind the flyout.
+
+- Change: `Flyout` opens and closes without a visual transition.
+  Reason: os — WinUI obtains popup motion and timing from Windows rather than declaring them in the template.
+  Affect: The flyout’s visible container appears and disappears immediately.
+
+- Change: `Flyout` accepts a widget builder to customize the visible container around its content.
+  Reason: language — Rust supplies widget construction through callbacks rather than runtime XAML template resources.
+  Affect: Applications provide `flyout_presenter_style` when replacing the default border, scrolling or content layout.
+
+## flyout/shadow.rs → `Flyout` and `MenuFlyout` shadows
+
+- Change: `Flyout` and `MenuFlyout` paint their shadows using Reveal's native BoxShadow blur with WinUI's default shadow colors, offsets and increases in elevation for each nested submenu.
+  Reason: os — Windows Composition performs WinUI's blur, and its blur-radius conversion is not specified, so the port interprets the radii from WinUI's `DropShadowRecipe.h` using Flutter's native conversion.
+  Affect: Popups have a soft shadow that becomes stronger in dark theme and at deeper submenu levels, but its softness can differ from Windows; the shadow is clipped at the application window's edges.
+
+## drop_down_button.rs → `DropDownButton`
+
+- Change: `DropDownButton` uses a static Fluent chevron for the source animated icon.
+  Reason: os — the Windows animated-chevron asset has no matching animation in the bundled Fluent font.
+  Affect: The chevron changes color on hover and press but does not animate its shape.

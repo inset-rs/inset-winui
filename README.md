@@ -8,7 +8,7 @@ Sibling checkouts this workspace expects: `../reveal-rs` (the framework, path de
 cargo run -p winui_gallery
 cargo test
 WINUI_CAPTURE_DIR=$PWD/output cargo test -p winui_gallery   # export what the tests rendered
-python3 tools/gen_resources.py ../microsoft-ui-xaml crates/reveal-winui/src/theme/generated.rs Button ToggleSwitch CheckBox RadioButton ToggleButton HyperlinkButton RepeatButton Slider ToolTip TextBlock CornerRadius SplitView TabView ScrollBar NavigationView FlyoutPresenter NavigationBackButton TextBox PasswordBox CommandBarFlyout AppBarButton AcrylicBrush ProgressBar Expander InfoBar
+python3 tools/gen_resources.py ../microsoft-ui-xaml crates/reveal-winui/src/theme/generated.rs Button ToggleSwitch CheckBox RadioButton ToggleButton HyperlinkButton RepeatButton Slider ToolTip TextBlock CornerRadius SplitView TabView ScrollBar NavigationView FlyoutPresenter NavigationBackButton TextBox PasswordBox CommandBarFlyout AppBarButton AcrylicBrush ProgressBar Expander InfoBar MenuFlyout DropDownButton SplitButton RadioMenuFlyoutItem
 ```
 
 The gallery uses NavigationView with 21 destinations and an icon for each feature. Each page groups examples into cards with settings for exploring control behavior, including navigation modes, tab options, slider ranges, and selection states. Typography and Icons pages demonstrate the type ramp and bundled Fluent symbols; the Acrylic page compares the material with its opaque fallback. Visited examples retain their state, and a theme switch stays in the pane footer.

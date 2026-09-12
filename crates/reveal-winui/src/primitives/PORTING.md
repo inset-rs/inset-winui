@@ -88,6 +88,16 @@ Ported against: aa3207e6
   Reason: framework — WinUI reads this setting from the parent, but Flutter layout constraints describe the space available to a child, not the settings used to size its parent.
   Affect: When using the panel directly, pass the container’s minimum height minus the panel’s top and bottom margins as `parent_min_height`; the full notification control does this automatically.
 
+## retained_flyout.rs → `FlyoutBase` content lifetime
+
+- Change: `RetainedFlyoutHost` keeps closed flyout content mounted in a root OverlayEntry, independently of its opening button.
+  Reason: framework — WinUI keeps its content object alive after removing its visuals, while Flutter requires the child to stay mounted to preserve its State.
+  Affect: Child State survives closing and reopening from another opening button, but hidden children can still be laid out; Offstage hides them and TickerMode mutes their animation ticks.
+
+- Change: `FlyoutTarget` updates the flyout’s theme or requests closing after the opening widget is removed, waiting until the frame ends.
+  Reason: framework — a Flutter widget reports inherited changes and disposal through its lifecycle, and updating the separate overlay must wait until the current build finishes.
+  Affect: Applications wrap opening widgets in FlyoutTarget; removing that widget can take another frame to close the flyout and does not dispose the retained child State.
+
 ## Deferred
 
 - Navigation flyout opening and closing animations remain deferred. Trigger: A Windows timing measurement or equivalent host transition is available.

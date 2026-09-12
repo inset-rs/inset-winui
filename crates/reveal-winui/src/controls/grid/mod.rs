@@ -11,7 +11,6 @@ pub use layout::CellPlacement;
 pub use render_grid::*;
 
 use crate::{BackgroundSizing, Brush, ControlBorder};
-use reveal_embedder::Color;
 use reveal_foundation::App;
 use reveal_rendering::{AnyRenderObject, RenderBox, RenderHandle};
 use reveal_widgets::*;
@@ -137,19 +136,13 @@ impl Grid {
         self.children = children.into_iter().collect();
         self
     }
-
-    fn has_chrome(&self) -> bool {
-        self.background.is_some()
-            || self.border_brush.is_some()
-            || self
-                .border_thickness
-                .iter()
-                .any(|thickness| *thickness > 0.0)
-            || self.padding != [0.0; 4]
-    }
 }
 
 impl StatelessWidget for Grid {
+    fn key(&self) -> Option<&KeyRef> {
+        self.key.as_ref()
+    }
+
     fn build(&self, _app: &mut App, _context: BuildContext) -> WidgetRef {
         let panel = GridPanel {
             key: self.key.clone(),
@@ -159,20 +152,13 @@ impl StatelessWidget for Grid {
             column_spacing: self.column_spacing,
             children: self.children.clone(),
         };
-        if !self.has_chrome() {
-            return panel.into_widget();
-        }
-        let none = Brush::Solid(Color::from_argb(0, 0, 0, 0));
-        ControlBorder::new(
-            self.background.unwrap_or(none),
-            self.border_brush.unwrap_or(none),
-        )
-        .border_thickness_ltrb(self.border_thickness)
-        .corner_radius_corners(self.corner_radius)
-        .background_sizing(self.background_sizing)
-        .padding(self.padding)
-        .child(panel)
-        .into_widget()
+        ControlBorder::new_optional(self.background, self.border_brush)
+            .border_thickness_ltrb(self.border_thickness)
+            .corner_radius_corners(self.corner_radius)
+            .background_sizing(self.background_sizing)
+            .padding(self.padding)
+            .child(panel)
+            .into_widget()
     }
 }
 

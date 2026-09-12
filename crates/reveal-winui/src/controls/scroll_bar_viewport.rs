@@ -1,22 +1,24 @@
-//! NavigationView's vertical scrolling presenter with source ScrollBar chrome over native input.
+//! Source ScrollBar chrome around a native viewport, shared by navigation and flyouts.
 
 use crate::*;
-use reveal_embedder::{Color, Radius};
+use reveal_embedder::{Color, Radius, TextDirection};
 use reveal_foundation::{App, Handle, Listener, Timer};
 use reveal_painting::{Axis, EdgeInsetsGeometry, TextStyle};
 use reveal_widgets::*;
 use std::{rc::Rc, time::Duration};
 
-/// Native vertical viewport used by NavigationView's main and footer item areas.
+/// Native single-axis viewport with the source horizontal or vertical scrollbar template.
 #[derive(Clone, Debug)]
-pub(crate) struct NavigationScrollViewport {
+pub(crate) struct ScrollBarViewport {
     /// Caller-owned scroll state, also used by the native scrollbar drag recognizer.
     controller: Handle<ScrollViewportController>,
-    /// Intrinsically sized vertical content.
+    /// Content measured by the native single-child scrolling viewport.
     child: WidgetRef,
+    /// Scroll direction; navigation uses vertical and flyouts may use either axis.
+    axis: Axis,
 }
 
-impl NavigationScrollViewport {
+impl ScrollBarViewport {
     /// Wraps content without changing controller ownership or native focus scrolling.
     pub(crate) fn new<K>(
         controller: Handle<ScrollViewportController>,
@@ -25,14 +27,21 @@ impl NavigationScrollViewport {
         Self {
             controller,
             child: child.into_widget(),
+            axis: Axis::Vertical,
         }
+    }
+
+    /// Selects the scrollbar's source horizontal or vertical template.
+    pub(crate) fn axis(mut self, axis: Axis) -> Self {
+        self.axis = axis;
+        self
     }
 }
 
 /// Native hover lifetime and delayed source expansion state.
-pub(crate) struct NavigationScrollViewportState {
+pub(crate) struct ScrollBarViewportState {
     /// Widget attachment.
-    state: StateData<NavigationScrollViewport>,
+    state: StateData<ScrollBarViewport>,
     /// The pointer is inside the scrolling area.
     hovered: bool,
     /// The source Expanded visual state.
@@ -41,10 +50,10 @@ pub(crate) struct NavigationScrollViewportState {
     timer: Option<Timer>,
 }
 
-impl StatefulWidget for NavigationScrollViewport {
-    type State = NavigationScrollViewportState;
+impl StatefulWidget for ScrollBarViewport {
+    type State = ScrollBarViewportState;
     fn create_state(&self) -> Self::State {
-        NavigationScrollViewportState {
+        ScrollBarViewportState {
             state: StateData::new(),
             hovered: false,
             expanded: false,
@@ -53,7 +62,7 @@ impl StatefulWidget for NavigationScrollViewport {
     }
 }
 
-impl NavigationScrollViewportState {
+impl ScrollBarViewportState {
     /// Applies the source delayed bar-hover state, leaving scrolling to native widgets.
     fn hover_bar(self: Handle<Self>, app: &mut App, enter: bool) {
         if let Some(timer) = app.get_mut(self).timer.take() {
@@ -82,12 +91,13 @@ impl NavigationScrollViewportState {
     fn template(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let r = ThemeResources::of(app, context).scroll_bar();
+        let vertical = widget.axis == Axis::Vertical;
+        let rtl = Directionality::of(app, context) == TextDirection::Rtl;
         let metrics = widget.controller.metrics(app);
         let overflow = metrics.scrollable_length > 0.0;
         let expanded = app.get(self).expanded && overflow;
-        let mut parts = vec![
-            ScrollViewport::new(Axis::Vertical, widget.controller, widget.child).into_widget(),
-        ];
+        let mut parts =
+            vec![ScrollViewport::new(widget.axis, widget.controller, widget.child).into_widget()];
         if overflow {
             let mut chrome = Vec::new();
             if expanded {
@@ -104,10 +114,16 @@ impl NavigationScrollViewportState {
                 for increase in [false, true] {
                     let controller = widget.controller;
                     let button = RepeatButton::new(
-                        FluentIcon::new(if increase {
-                            FluentSymbol::ChevronDown
+                        FluentIcon::new(if vertical {
+                            if increase {
+                                FluentSymbol::ChevronDown
+                            } else {
+                                FluentSymbol::ChevronUp
+                            }
+                        } else if increase != rtl {
+                            FluentSymbol::ChevronRight
                         } else {
-                            FluentSymbol::ChevronUp
+                            FluentSymbol::ChevronLeft
                         })
                         .font_size(SCROLL_BAR_BUTTON_ARROW_ICON_FONT_SIZE),
                         Listener::new(move |app| {
@@ -123,34 +139,40 @@ impl NavigationScrollViewportState {
                     })
                     .interval(Duration::from_millis(50))
                     .template(move |app, context, states, content| {
-                        arrow_template(app, context, states, content, increase)
+                        arrow_template(app, context, states, content, increase, vertical)
                     });
-                    let button = Positioned::new(button)
-                        .left(0.0)
-                        .right(0.0)
-                        .height(SCROLL_BAR_SIZE);
-                    chrome.push(
+                    let button = Positioned::new(button);
+                    let button = if vertical {
+                        let button = button.left(0.0).right(0.0).height(SCROLL_BAR_SIZE);
                         if increase {
                             button.bottom(0.0)
                         } else {
                             button.top(0.0)
                         }
-                        .into_widget(),
-                    );
+                    } else {
+                        let button = button.top(0.0).bottom(0.0).width(SCROLL_BAR_SIZE);
+                        if increase != rtl {
+                            button.right(0.0)
+                        } else {
+                            button.left(0.0)
+                        }
+                    };
+                    chrome.push(button.into_widget());
                 }
             }
+            let bar = Positioned::new(
+                MouseRegion::new()
+                    .opaque(false)
+                    .on_enter(Rc::new(move |app, _| self.hover_bar(app, true)))
+                    .on_exit(Rc::new(move |app, _| self.hover_bar(app, false)))
+                    .child(Stack::new().children(chrome)),
+            );
             parts.push(
-                Positioned::new(
-                    MouseRegion::new()
-                        .opaque(false)
-                        .on_enter(Rc::new(move |app, _| self.hover_bar(app, true)))
-                        .on_exit(Rc::new(move |app, _| self.hover_bar(app, false)))
-                        .child(Stack::new().children(chrome)),
-                )
-                .right(0.0)
-                .top(0.0)
-                .bottom(0.0)
-                .width(SCROLL_BAR_SIZE)
+                if vertical {
+                    bar.right(0.0).top(0.0).bottom(0.0).width(SCROLL_BAR_SIZE)
+                } else {
+                    bar.left(0.0).right(0.0).bottom(0.0).height(SCROLL_BAR_SIZE)
+                }
                 .into_widget(),
             );
         }
@@ -158,7 +180,11 @@ impl NavigationScrollViewportState {
         let thickness = if expanded {
             SCROLL_BAR_SIZE
         } else {
-            SCROLL_BAR_VERTICAL_THUMB_MIN_WIDTH
+            if vertical {
+                SCROLL_BAR_VERTICAL_THUMB_MIN_WIDTH
+            } else {
+                SCROLL_BAR_HORIZONTAL_THUMB_MIN_HEIGHT
+            }
         } - SCROLL_BAR_THUMB_STROKE_THICKNESS;
         RawScrollbar::new(Stack::new().children(parts))
             .controller(widget.controller.native_controller(app))
@@ -168,20 +194,28 @@ impl NavigationScrollViewportState {
             .thickness(thickness)
             .radius(Radius::circular(SCROLL_BAR_CORNER_RADIUS[0]))
             .min_thumb_length(
-                SCROLL_BAR_VERTICAL_THUMB_MIN_HEIGHT - SCROLL_BAR_THUMB_STROKE_THICKNESS,
+                (if vertical {
+                    SCROLL_BAR_VERTICAL_THUMB_MIN_HEIGHT
+                } else {
+                    SCROLL_BAR_HORIZONTAL_THUMB_MIN_WIDTH
+                }) - SCROLL_BAR_THUMB_STROKE_THICKNESS,
             )
             .main_axis_margin(SCROLL_BAR_SIZE + SCROLL_BAR_THUMB_STROKE_THICKNESS / 2.0)
             .cross_axis_margin((SCROLL_BAR_SIZE - thickness) / 2.0)
             .padding(EdgeInsetsGeometry::ZERO)
-            .scrollbar_orientation(ScrollbarOrientation::Right)
+            .scrollbar_orientation(if vertical {
+                ScrollbarOrientation::Right
+            } else {
+                ScrollbarOrientation::Bottom
+            })
             .fade_duration(SCROLL_BAR_OPACITY_CHANGE_DURATION)
             .time_to_fade(SCROLL_BAR_CONTRACT_DELAY)
             .into_widget()
     }
 }
 
-impl State for NavigationScrollViewportState {
-    type Widget = NavigationScrollViewport;
+impl State for ScrollBarViewportState {
+    type Widget = ScrollBarViewport;
     reveal_widgets::state_accessors!();
     fn dispose(self: Handle<Self>, app: &mut App) {
         if let Some(timer) = app.get_mut(self).timer.take() {
@@ -213,6 +247,7 @@ fn arrow_template(
     states: ControlStates,
     content: WidgetRef,
     increase: bool,
+    vertical: bool,
 ) -> WidgetRef {
     let r = ThemeResources::of(app, context).scroll_bar();
     let (background, foreground) = match states.common {
@@ -235,10 +270,18 @@ fn arrow_template(
     };
     ControlBorder::new(Brush::Solid(background), Brush::Solid(Color::new(0)))
         .border_thickness(0.0)
-        .padding(if increase {
-            SCROLL_BAR_VERTICAL_INCREASE_MARGIN
+        .padding(if vertical {
+            if increase {
+                SCROLL_BAR_VERTICAL_INCREASE_MARGIN
+            } else {
+                SCROLL_BAR_VERTICAL_DECREASE_MARGIN
+            }
         } else {
-            SCROLL_BAR_VERTICAL_DECREASE_MARGIN
+            if increase {
+                SCROLL_BAR_HORIZONTAL_INCREASE_MARGIN
+            } else {
+                SCROLL_BAR_HORIZONTAL_DECREASE_MARGIN
+            }
         })
         .child(Center::new().child(DefaultTextStyle::new(
             TextStyle::new().color(foreground),

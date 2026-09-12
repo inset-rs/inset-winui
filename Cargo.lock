@@ -1817,6 +1817,7 @@ dependencies = [
  "valo",
  "valo-geometry",
  "valo-system-fonts",
+ "web-time",
 ]
 
 [[package]]
@@ -1852,6 +1853,7 @@ dependencies = [
  "reveal-embedder",
  "reveal-foundation",
  "reveal-scheduler",
+ "web-time",
 ]
 
 [[package]]

@@ -6332,3 +6332,970 @@ pub const INFO_BAR_ACTION_HORIZONTAL_ORIENTATION_MARGIN: [f64; 4] = [16.0, 8.0, 
 pub const INFO_BAR_ACTION_VERTICAL_ORIENTATION_MARGIN: [f64; 4] = [0.0, 12.0, 0.0, 0.0];
 /// Left, top, right, bottom.
 pub const INFO_BAR_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Theme-dependent resources of `MenuFlyout_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct MenuFlyoutResources {
+    /// The resolved `MenuFlyoutSeparatorBackground` resource.
+    pub menu_flyout_separator_background: Color,
+    /// The resolved `MenuFlyoutItemBackground` resource.
+    pub menu_flyout_item_background: Color,
+    /// The resolved `MenuFlyoutItemBackgroundPointerOver` resource.
+    pub menu_flyout_item_background_pointer_over: Color,
+    /// The resolved `MenuFlyoutItemBackgroundPressed` resource.
+    pub menu_flyout_item_background_pressed: Color,
+    /// The resolved `MenuFlyoutItemBackgroundDisabled` resource.
+    pub menu_flyout_item_background_disabled: Color,
+    /// The resolved `MenuFlyoutItemBackgroundBrush` resource.
+    pub menu_flyout_item_background_brush: Color,
+    /// The resolved `MenuFlyoutItemForeground` resource.
+    pub menu_flyout_item_foreground: Color,
+    /// The resolved `MenuFlyoutItemForegroundPointerOver` resource.
+    pub menu_flyout_item_foreground_pointer_over: Color,
+    /// The resolved `MenuFlyoutItemForegroundPressed` resource.
+    pub menu_flyout_item_foreground_pressed: Color,
+    /// The resolved `MenuFlyoutItemForegroundDisabled` resource.
+    pub menu_flyout_item_foreground_disabled: Color,
+    /// The resolved `MenuFlyoutSubItemBackground` resource.
+    pub menu_flyout_sub_item_background: Color,
+    /// The resolved `MenuFlyoutSubItemBackgroundPointerOver` resource.
+    pub menu_flyout_sub_item_background_pointer_over: Color,
+    /// The resolved `MenuFlyoutSubItemBackgroundPressed` resource.
+    pub menu_flyout_sub_item_background_pressed: Color,
+    /// The resolved `MenuFlyoutSubItemBackgroundSubMenuOpened` resource.
+    pub menu_flyout_sub_item_background_sub_menu_opened: Color,
+    /// The resolved `MenuFlyoutSubItemBackgroundDisabled` resource.
+    pub menu_flyout_sub_item_background_disabled: Color,
+    /// The resolved `MenuFlyoutSubItemBackgroundBrush` resource.
+    pub menu_flyout_sub_item_background_brush: Color,
+    /// The resolved `MenuFlyoutSubItemForeground` resource.
+    pub menu_flyout_sub_item_foreground: Color,
+    /// The resolved `MenuFlyoutSubItemForegroundPointerOver` resource.
+    pub menu_flyout_sub_item_foreground_pointer_over: Color,
+    /// The resolved `MenuFlyoutSubItemForegroundPressed` resource.
+    pub menu_flyout_sub_item_foreground_pressed: Color,
+    /// The resolved `MenuFlyoutSubItemForegroundSubMenuOpened` resource.
+    pub menu_flyout_sub_item_foreground_sub_menu_opened: Color,
+    /// The resolved `MenuFlyoutSubItemForegroundDisabled` resource.
+    pub menu_flyout_sub_item_foreground_disabled: Color,
+    /// The resolved `MenuFlyoutSubItemChevron` resource.
+    pub menu_flyout_sub_item_chevron: Color,
+    /// The resolved `MenuFlyoutSubItemChevronPointerOver` resource.
+    pub menu_flyout_sub_item_chevron_pointer_over: Color,
+    /// The resolved `MenuFlyoutSubItemChevronPressed` resource.
+    pub menu_flyout_sub_item_chevron_pressed: Color,
+    /// The resolved `MenuFlyoutSubItemChevronSubMenuOpened` resource.
+    pub menu_flyout_sub_item_chevron_sub_menu_opened: Color,
+    /// The resolved `MenuFlyoutSubItemChevronDisabled` resource.
+    pub menu_flyout_sub_item_chevron_disabled: Color,
+    /// The resolved `MenuFlyoutItemKeyboardAcceleratorTextForeground` resource.
+    pub menu_flyout_item_keyboard_accelerator_text_foreground: Color,
+    /// The resolved `MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver` resource.
+    pub menu_flyout_item_keyboard_accelerator_text_foreground_pointer_over: Color,
+    /// The resolved `MenuFlyoutItemKeyboardAcceleratorTextForegroundPressed` resource.
+    pub menu_flyout_item_keyboard_accelerator_text_foreground_pressed: Color,
+    /// The resolved `MenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled` resource.
+    pub menu_flyout_item_keyboard_accelerator_text_foreground_disabled: Color,
+    /// The resolved `SplitMenuFlyoutItemButtonDividerBrush` resource.
+    pub split_menu_flyout_item_button_divider_brush: Color,
+    /// The resolved `MenuFlyoutPresenterBackground` resource.
+    pub menu_flyout_presenter_background: Color,
+    /// The resolved `MenuFlyoutPresenterBorderBrush` resource.
+    pub menu_flyout_presenter_border_brush: Color,
+    /// The resolved `ToggleMenuFlyoutItemKeyboardAcceleratorTextForeground` resource.
+    pub toggle_menu_flyout_item_keyboard_accelerator_text_foreground: Color,
+    /// The resolved `ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver` resource.
+    pub toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pointer_over: Color,
+    /// The resolved `ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundPressed` resource.
+    pub toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pressed: Color,
+    /// The resolved `ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled` resource.
+    pub toggle_menu_flyout_item_keyboard_accelerator_text_foreground_disabled: Color,
+    /// The resolved `MenuFlyoutItemFocusedBackgroundThemeBrush` resource.
+    pub menu_flyout_item_focused_background_theme_brush: Color,
+    /// The resolved `MenuFlyoutItemFocusedForegroundThemeBrush` resource.
+    pub menu_flyout_item_focused_foreground_theme_brush: Color,
+    /// The resolved `MenuFlyoutItemDisabledForegroundThemeBrush` resource.
+    pub menu_flyout_item_disabled_foreground_theme_brush: Color,
+    /// The resolved `MenuFlyoutItemPointerOverBackgroundThemeBrush` resource.
+    pub menu_flyout_item_pointer_over_background_theme_brush: Color,
+    /// The resolved `MenuFlyoutItemPointerOverForegroundThemeBrush` resource.
+    pub menu_flyout_item_pointer_over_foreground_theme_brush: Color,
+    /// The resolved `MenuFlyoutItemPressedBackgroundThemeBrush` resource.
+    pub menu_flyout_item_pressed_background_theme_brush: Color,
+    /// The resolved `MenuFlyoutItemPressedForegroundThemeBrush` resource.
+    pub menu_flyout_item_pressed_foreground_theme_brush: Color,
+    /// The resolved `MenuFlyoutSeparatorThemeBrush` resource.
+    pub menu_flyout_separator_theme_brush: Color,
+    /// The resolved `MenuFlyoutLightDismissOverlayBackground` resource.
+    pub menu_flyout_light_dismiss_overlay_background: Color,
+    /// The resolved `MenuFlyoutItemRevealBackground` resource.
+    pub menu_flyout_item_reveal_background: Color,
+    /// The resolved `MenuFlyoutItemRevealBackgroundPointerOver` resource.
+    pub menu_flyout_item_reveal_background_pointer_over: Color,
+    /// The resolved `MenuFlyoutItemRevealBackgroundPressed` resource.
+    pub menu_flyout_item_reveal_background_pressed: Color,
+    /// The resolved `MenuFlyoutItemRevealBackgroundDisabled` resource.
+    pub menu_flyout_item_reveal_background_disabled: Color,
+    /// The resolved `MenuFlyoutItemRevealBorderBrush` resource.
+    pub menu_flyout_item_reveal_border_brush: Color,
+    /// The resolved `MenuFlyoutItemRevealBorderBrushPressed` resource.
+    pub menu_flyout_item_reveal_border_brush_pressed: Color,
+    /// The resolved `MenuFlyoutItemRevealBorderBrushPointerOver` resource.
+    pub menu_flyout_item_reveal_border_brush_pointer_over: Color,
+    /// The resolved `MenuFlyoutItemRevealBorderBrushDisabled` resource.
+    pub menu_flyout_item_reveal_border_brush_disabled: Color,
+    /// The resolved `ToggleMenuFlyoutItemRevealBackground` resource.
+    pub toggle_menu_flyout_item_reveal_background: Color,
+    /// The resolved `ToggleMenuFlyoutItemRevealBackgroundPointerOver` resource.
+    pub toggle_menu_flyout_item_reveal_background_pointer_over: Color,
+    /// The resolved `ToggleMenuFlyoutItemRevealBackgroundPressed` resource.
+    pub toggle_menu_flyout_item_reveal_background_pressed: Color,
+    /// The resolved `ToggleMenuFlyoutItemRevealBackgroundDisabled` resource.
+    pub toggle_menu_flyout_item_reveal_background_disabled: Color,
+    /// The resolved `ToggleMenuFlyoutItemRevealBorderBrush` resource.
+    pub toggle_menu_flyout_item_reveal_border_brush: Color,
+    /// The resolved `ToggleMenuFlyoutItemRevealBorderBrushPressed` resource.
+    pub toggle_menu_flyout_item_reveal_border_brush_pressed: Color,
+    /// The resolved `ToggleMenuFlyoutItemRevealBorderBrushPointerOver` resource.
+    pub toggle_menu_flyout_item_reveal_border_brush_pointer_over: Color,
+    /// The resolved `ToggleMenuFlyoutItemRevealBorderBrushDisabled` resource.
+    pub toggle_menu_flyout_item_reveal_border_brush_disabled: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBackground` resource.
+    pub menu_flyout_sub_item_reveal_background: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBackgroundPointerOver` resource.
+    pub menu_flyout_sub_item_reveal_background_pointer_over: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBackgroundPressed` resource.
+    pub menu_flyout_sub_item_reveal_background_pressed: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBackgroundSubMenuOpened` resource.
+    pub menu_flyout_sub_item_reveal_background_sub_menu_opened: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBackgroundDisabled` resource.
+    pub menu_flyout_sub_item_reveal_background_disabled: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBorderBrush` resource.
+    pub menu_flyout_sub_item_reveal_border_brush: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBorderBrushPressed` resource.
+    pub menu_flyout_sub_item_reveal_border_brush_pressed: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBorderBrushPointerOver` resource.
+    pub menu_flyout_sub_item_reveal_border_brush_pointer_over: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBorderBrushSubMenuOpened` resource.
+    pub menu_flyout_sub_item_reveal_border_brush_sub_menu_opened: Color,
+    /// The resolved `MenuFlyoutSubItemRevealBorderBrushDisabled` resource.
+    pub menu_flyout_sub_item_reveal_border_brush_disabled: Color,
+    /// The resolved `DesktopAcrylicTransparentBrush` resource.
+    pub desktop_acrylic_transparent_brush: Color,
+    /// The resolved `SystemControlPageBackgroundMediumAltMediumBrush` resource.
+    pub system_control_page_background_medium_alt_medium_brush: Color,
+    /// The resolved `SystemControlTransparentRevealBackgroundBrush` resource.
+    pub system_control_transparent_reveal_background_brush: Color,
+    /// The resolved `SystemControlHighlightListLowRevealBackgroundBrush` resource.
+    pub system_control_highlight_list_low_reveal_background_brush: Color,
+    /// The resolved `SystemControlHighlightListMediumRevealBackgroundBrush` resource.
+    pub system_control_highlight_list_medium_reveal_background_brush: Color,
+    /// The resolved `SystemControlTransparentRevealBorderBrush` resource.
+    pub system_control_transparent_reveal_border_brush: Color,
+    /// The resolved `SystemControlHighlightAccentRevealBackgroundBrush` resource.
+    pub system_control_highlight_accent_reveal_background_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `ToggleMenuFlyoutItemForeground` resource.
+    pub toggle_menu_flyout_item_foreground: Color,
+    /// The resolved `ToggleMenuFlyoutItemForegroundPointerOver` resource.
+    pub toggle_menu_flyout_item_foreground_pointer_over: Color,
+    /// The resolved `ToggleMenuFlyoutItemCheckGlyphForegroundPointerOver` resource.
+    pub toggle_menu_flyout_item_check_glyph_foreground_pointer_over: Color,
+    /// The resolved `ToggleMenuFlyoutItemForegroundPressed` resource.
+    pub toggle_menu_flyout_item_foreground_pressed: Color,
+    /// The resolved `ToggleMenuFlyoutItemCheckGlyphForegroundPressed` resource.
+    pub toggle_menu_flyout_item_check_glyph_foreground_pressed: Color,
+    /// The resolved `ToggleMenuFlyoutItemForegroundDisabled` resource.
+    pub toggle_menu_flyout_item_foreground_disabled: Color,
+    /// The resolved `ToggleMenuFlyoutItemCheckGlyphForegroundDisabled` resource.
+    pub toggle_menu_flyout_item_check_glyph_foreground_disabled: Color,
+    /// The resolved `ToggleMenuFlyoutItemCheckGlyphForeground` resource.
+    pub toggle_menu_flyout_item_check_glyph_foreground: Color,
+}
+
+impl MenuFlyoutResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                menu_flyout_separator_background: Color::from_argb(15, 0, 0, 0),
+                menu_flyout_item_background: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                menu_flyout_item_background_pressed: Color::from_argb(6, 0, 0, 0),
+                menu_flyout_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_background_brush: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_foreground: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_item_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_item_foreground_pressed: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_item_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                menu_flyout_sub_item_background: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                menu_flyout_sub_item_background_pressed: Color::from_argb(6, 0, 0, 0),
+                menu_flyout_sub_item_background_sub_menu_opened: Color::from_argb(9, 0, 0, 0),
+                menu_flyout_sub_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_background_brush: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_foreground: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_sub_item_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_sub_item_foreground_pressed: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_sub_item_foreground_sub_menu_opened: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_sub_item_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                menu_flyout_sub_item_chevron: Color::from_argb(158, 0, 0, 0),
+                menu_flyout_sub_item_chevron_pointer_over: Color::from_argb(158, 0, 0, 0),
+                menu_flyout_sub_item_chevron_pressed: Color::from_argb(114, 0, 0, 0),
+                menu_flyout_sub_item_chevron_sub_menu_opened: Color::from_argb(158, 0, 0, 0),
+                menu_flyout_sub_item_chevron_disabled: Color::from_argb(92, 0, 0, 0),
+                menu_flyout_item_keyboard_accelerator_text_foreground: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                menu_flyout_item_keyboard_accelerator_text_foreground_pointer_over:
+                    Color::from_argb(158, 0, 0, 0),
+                menu_flyout_item_keyboard_accelerator_text_foreground_pressed: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                menu_flyout_item_keyboard_accelerator_text_foreground_disabled: Color::from_argb(
+                    92, 0, 0, 0,
+                ),
+                split_menu_flyout_item_button_divider_brush: Color::from_argb(15, 0, 0, 0),
+                menu_flyout_presenter_background: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_presenter_border_brush: Color::from_argb(15, 0, 0, 0),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pointer_over:
+                    Color::from_argb(158, 0, 0, 0),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pressed:
+                    Color::from_argb(158, 0, 0, 0),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_disabled:
+                    Color::from_argb(92, 0, 0, 0),
+                menu_flyout_item_focused_background_theme_brush: Color::from_argb(
+                    255, 229, 229, 229,
+                ),
+                menu_flyout_item_focused_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                menu_flyout_item_disabled_foreground_theme_brush: Color::from_argb(102, 0, 0, 0),
+                menu_flyout_item_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 229, 229, 229,
+                ),
+                menu_flyout_item_pointer_over_foreground_theme_brush: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                menu_flyout_item_pressed_background_theme_brush: Color::from_argb(255, 0, 0, 0),
+                menu_flyout_item_pressed_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                menu_flyout_separator_theme_brush: Color::from_argb(255, 122, 122, 122),
+                menu_flyout_light_dismiss_overlay_background: Color::from_argb(153, 255, 255, 255),
+                menu_flyout_item_reveal_background: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_item_reveal_background_pointer_over: Color::from_argb(25, 0, 0, 0),
+                menu_flyout_item_reveal_background_pressed: Color::from_argb(51, 0, 0, 0),
+                menu_flyout_item_reveal_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_reveal_border_brush: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_reveal_border_brush_pressed: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_item_reveal_border_brush_pointer_over: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_item_reveal_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                toggle_menu_flyout_item_reveal_background: Color::from_argb(0, 0, 0, 0),
+                toggle_menu_flyout_item_reveal_background_pointer_over: Color::from_argb(
+                    25, 0, 0, 0,
+                ),
+                toggle_menu_flyout_item_reveal_background_pressed: Color::from_argb(51, 0, 0, 0),
+                toggle_menu_flyout_item_reveal_background_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                toggle_menu_flyout_item_reveal_border_brush: Color::from_argb(0, 255, 255, 255),
+                toggle_menu_flyout_item_reveal_border_brush_pressed: Color::from_argb(0, 0, 0, 0),
+                toggle_menu_flyout_item_reveal_border_brush_pointer_over: Color::from_argb(
+                    0, 0, 0, 0,
+                ),
+                toggle_menu_flyout_item_reveal_border_brush_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                menu_flyout_sub_item_reveal_background: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_sub_item_reveal_background_pointer_over: Color::from_argb(25, 0, 0, 0),
+                menu_flyout_sub_item_reveal_background_pressed: accent.base,
+                menu_flyout_sub_item_reveal_background_sub_menu_opened: Color::from_argb(
+                    25, 0, 0, 0,
+                ),
+                menu_flyout_sub_item_reveal_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_reveal_border_brush: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_reveal_border_brush_pressed: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_sub_item_reveal_border_brush_pointer_over: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_sub_item_reveal_border_brush_sub_menu_opened: Color::from_argb(
+                    0, 0, 0, 0,
+                ),
+                menu_flyout_sub_item_reveal_border_brush_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                desktop_acrylic_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_page_background_medium_alt_medium_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                system_control_transparent_reveal_background_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_list_low_reveal_background_brush: Color::from_argb(
+                    25, 0, 0, 0,
+                ),
+                system_control_highlight_list_medium_reveal_background_brush: Color::from_argb(
+                    51, 0, 0, 0,
+                ),
+                system_control_transparent_reveal_border_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_accent_reveal_background_brush: accent.base,
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                toggle_menu_flyout_item_foreground: Color::from_argb(255, 0, 0, 0),
+                toggle_menu_flyout_item_foreground_pointer_over: Color::from_argb(255, 0, 0, 0),
+                toggle_menu_flyout_item_check_glyph_foreground_pointer_over: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                toggle_menu_flyout_item_foreground_pressed: Color::from_argb(255, 0, 0, 0),
+                toggle_menu_flyout_item_check_glyph_foreground_pressed: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+                toggle_menu_flyout_item_foreground_disabled: Color::from_argb(102, 0, 0, 0),
+                toggle_menu_flyout_item_check_glyph_foreground_disabled: Color::from_argb(
+                    102, 0, 0, 0,
+                ),
+                toggle_menu_flyout_item_check_glyph_foreground: Color::from_argb(204, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                menu_flyout_separator_background: Color::from_argb(21, 255, 255, 255),
+                menu_flyout_item_background: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                menu_flyout_item_background_pressed: Color::from_argb(10, 255, 255, 255),
+                menu_flyout_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_background_brush: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_foreground: Color::from_argb(255, 255, 255, 255),
+                menu_flyout_item_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                menu_flyout_item_foreground_pressed: Color::from_argb(255, 255, 255, 255),
+                menu_flyout_item_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                menu_flyout_sub_item_background: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                menu_flyout_sub_item_background_pressed: Color::from_argb(10, 255, 255, 255),
+                menu_flyout_sub_item_background_sub_menu_opened: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                menu_flyout_sub_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_background_brush: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_foreground: Color::from_argb(255, 255, 255, 255),
+                menu_flyout_sub_item_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                menu_flyout_sub_item_foreground_pressed: Color::from_argb(255, 255, 255, 255),
+                menu_flyout_sub_item_foreground_sub_menu_opened: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                menu_flyout_sub_item_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                menu_flyout_sub_item_chevron: Color::from_argb(197, 255, 255, 255),
+                menu_flyout_sub_item_chevron_pointer_over: Color::from_argb(197, 255, 255, 255),
+                menu_flyout_sub_item_chevron_pressed: Color::from_argb(135, 255, 255, 255),
+                menu_flyout_sub_item_chevron_sub_menu_opened: Color::from_argb(197, 255, 255, 255),
+                menu_flyout_sub_item_chevron_disabled: Color::from_argb(93, 255, 255, 255),
+                menu_flyout_item_keyboard_accelerator_text_foreground: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                menu_flyout_item_keyboard_accelerator_text_foreground_pointer_over:
+                    Color::from_argb(197, 255, 255, 255),
+                menu_flyout_item_keyboard_accelerator_text_foreground_pressed: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                menu_flyout_item_keyboard_accelerator_text_foreground_disabled: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                split_menu_flyout_item_button_divider_brush: Color::from_argb(21, 255, 255, 255),
+                menu_flyout_presenter_background: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_presenter_border_brush: Color::from_argb(51, 0, 0, 0),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pointer_over:
+                    Color::from_argb(197, 255, 255, 255),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pressed:
+                    Color::from_argb(197, 255, 255, 255),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_disabled:
+                    Color::from_argb(93, 255, 255, 255),
+                menu_flyout_item_focused_background_theme_brush: Color::from_argb(255, 33, 33, 33),
+                menu_flyout_item_focused_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                menu_flyout_item_disabled_foreground_theme_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                menu_flyout_item_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 33, 33, 33,
+                ),
+                menu_flyout_item_pointer_over_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                menu_flyout_item_pressed_background_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                menu_flyout_item_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                menu_flyout_separator_theme_brush: Color::from_argb(255, 122, 122, 122),
+                menu_flyout_light_dismiss_overlay_background: Color::from_argb(153, 0, 0, 0),
+                menu_flyout_item_reveal_background: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_item_reveal_background_pointer_over: Color::from_argb(
+                    25, 255, 255, 255,
+                ),
+                menu_flyout_item_reveal_background_pressed: Color::from_argb(51, 255, 255, 255),
+                menu_flyout_item_reveal_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_reveal_border_brush: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_reveal_border_brush_pressed: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_item_reveal_border_brush_pointer_over: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_item_reveal_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                toggle_menu_flyout_item_reveal_background: Color::from_argb(0, 0, 0, 0),
+                toggle_menu_flyout_item_reveal_background_pointer_over: Color::from_argb(
+                    25, 255, 255, 255,
+                ),
+                toggle_menu_flyout_item_reveal_background_pressed: Color::from_argb(
+                    51, 255, 255, 255,
+                ),
+                toggle_menu_flyout_item_reveal_background_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                toggle_menu_flyout_item_reveal_border_brush: Color::from_argb(0, 255, 255, 255),
+                toggle_menu_flyout_item_reveal_border_brush_pressed: Color::from_argb(0, 0, 0, 0),
+                toggle_menu_flyout_item_reveal_border_brush_pointer_over: Color::from_argb(
+                    0, 0, 0, 0,
+                ),
+                toggle_menu_flyout_item_reveal_border_brush_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                menu_flyout_sub_item_reveal_background: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_sub_item_reveal_background_pointer_over: Color::from_argb(
+                    25, 255, 255, 255,
+                ),
+                menu_flyout_sub_item_reveal_background_pressed: accent.base,
+                menu_flyout_sub_item_reveal_background_sub_menu_opened: Color::from_argb(
+                    25, 255, 255, 255,
+                ),
+                menu_flyout_sub_item_reveal_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_reveal_border_brush: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_reveal_border_brush_pressed: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_sub_item_reveal_border_brush_pointer_over: Color::from_argb(0, 0, 0, 0),
+                menu_flyout_sub_item_reveal_border_brush_sub_menu_opened: Color::from_argb(
+                    0, 0, 0, 0,
+                ),
+                menu_flyout_sub_item_reveal_border_brush_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                desktop_acrylic_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_page_background_medium_alt_medium_brush: Color::from_argb(
+                    153, 0, 0, 0,
+                ),
+                system_control_transparent_reveal_background_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_list_low_reveal_background_brush: Color::from_argb(
+                    25, 255, 255, 255,
+                ),
+                system_control_highlight_list_medium_reveal_background_brush: Color::from_argb(
+                    51, 255, 255, 255,
+                ),
+                system_control_transparent_reveal_border_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_accent_reveal_background_brush: accent.base,
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                toggle_menu_flyout_item_foreground: Color::from_argb(255, 255, 255, 255),
+                toggle_menu_flyout_item_foreground_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                toggle_menu_flyout_item_check_glyph_foreground_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                toggle_menu_flyout_item_foreground_pressed: Color::from_argb(255, 255, 255, 255),
+                toggle_menu_flyout_item_check_glyph_foreground_pressed: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                toggle_menu_flyout_item_foreground_disabled: Color::from_argb(102, 255, 255, 255),
+                toggle_menu_flyout_item_check_glyph_foreground_disabled: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                toggle_menu_flyout_item_check_glyph_foreground: Color::from_argb(
+                    204, 255, 255, 255,
+                ),
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_SCROLLER_MARGIN: [f64; 4] = [0.0, 4.0, 0.0, 4.0];
+pub const FLYOUT_THEME_TOUCH_MIN_WIDTH: f64 = 240.0;
+pub const MENU_FLYOUT_SEPARATOR_HEIGHT: f64 = 1.0;
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_PRESENTER_THEME_PADDING: [f64; 4] = [0.0, 2.0, 0.0, 2.0];
+pub const MENU_FLYOUT_THEME_MIN_HEIGHT: f64 = 32.0;
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_ITEM_CHEVRON_MARGIN: [f64; 4] = [24.0, 0.0, 0.0, -1.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_SEPARATOR_THEME_PADDING: [f64; 4] = [-4.0, 1.0, -4.0, 1.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_ITEM_MARGIN: [f64; 4] = [4.0, 2.0, 4.0, 2.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_ITEM_THEME_PADDING: [f64; 4] = [11.0, 8.0, 11.0, 9.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_ITEM_THEME_PADDING_NARROW: [f64; 4] = [11.0, 4.0, 11.0, 5.0];
+pub const SPLIT_MENU_FLYOUT_ITEM_SEPARATOR_HEIGHT: f64 = 18.0;
+pub const SPLIT_MENU_FLYOUT_ITEM_CHEVRON_BUTTON_WIDTH: f64 = 38.0;
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_PRESENTER_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_ITEM_BORDER_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_SUB_ITEM_BORDER_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_ITEM_PLACEHOLDER_THEME_THICKNESS: [f64; 4] = [28.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_ITEM_DOUBLE_PLACEHOLDER_THEME_THICKNESS: [f64; 4] = [56.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_ITEM_REVEAL_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const TOGGLE_MENU_FLYOUT_ITEM_REVEAL_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const MENU_FLYOUT_SUB_ITEM_REVEAL_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Theme-dependent resources of `DropDownButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct DropDownButtonResources {
+    /// The resolved `DropDownButtonForegroundSecondary` resource.
+    pub drop_down_button_foreground_secondary: Color,
+    /// The resolved `DropDownButtonForegroundSecondaryPointerOver` resource.
+    pub drop_down_button_foreground_secondary_pointer_over: Color,
+    /// The resolved `DropDownButtonForegroundSecondaryPressed` resource.
+    pub drop_down_button_foreground_secondary_pressed: Color,
+    /// The resolved `ButtonBackground` resource.
+    pub button_background: Color,
+    /// The resolved `ButtonForeground` resource.
+    pub button_foreground: Color,
+    /// The resolved `ButtonBorderBrush` resource.
+    pub button_border_brush: [(f64, Color); 2],
+    /// The resolved `ButtonBackgroundPointerOver` resource.
+    pub button_background_pointer_over: Color,
+    /// The resolved `ButtonBorderBrushPointerOver` resource.
+    pub button_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `ButtonForegroundPointerOver` resource.
+    pub button_foreground_pointer_over: Color,
+    /// The resolved `ButtonBackgroundPressed` resource.
+    pub button_background_pressed: Color,
+    /// The resolved `ButtonBorderBrushPressed` resource.
+    pub button_border_brush_pressed: Color,
+    /// The resolved `ButtonForegroundPressed` resource.
+    pub button_foreground_pressed: Color,
+    /// The resolved `ButtonBackgroundDisabled` resource.
+    pub button_background_disabled: Color,
+    /// The resolved `ButtonBorderBrushDisabled` resource.
+    pub button_border_brush_disabled: Color,
+    /// The resolved `ButtonForegroundDisabled` resource.
+    pub button_foreground_disabled: Color,
+}
+
+impl DropDownButtonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                drop_down_button_foreground_secondary: Color::from_argb(158, 0, 0, 0),
+                drop_down_button_foreground_secondary_pointer_over: Color::from_argb(114, 0, 0, 0),
+                drop_down_button_foreground_secondary_pressed: Color::from_argb(114, 0, 0, 0),
+                button_background: Color::from_argb(179, 255, 255, 255),
+                button_foreground: Color::from_argb(228, 0, 0, 0),
+                button_border_brush: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                button_background_pointer_over: Color::from_argb(128, 249, 249, 249),
+                button_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                button_background_pressed: Color::from_argb(77, 249, 249, 249),
+                button_border_brush_pressed: Color::from_argb(15, 0, 0, 0),
+                button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                button_background_disabled: Color::from_argb(77, 249, 249, 249),
+                button_border_brush_disabled: Color::from_argb(15, 0, 0, 0),
+                button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                drop_down_button_foreground_secondary: Color::from_argb(197, 255, 255, 255),
+                drop_down_button_foreground_secondary_pointer_over: Color::from_argb(
+                    135, 255, 255, 255,
+                ),
+                drop_down_button_foreground_secondary_pressed: Color::from_argb(135, 255, 255, 255),
+                button_background: Color::from_argb(15, 255, 255, 255),
+                button_foreground: Color::from_argb(255, 255, 255, 255),
+                button_border_brush: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                button_background_pointer_over: Color::from_argb(21, 255, 255, 255),
+                button_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                button_background_pressed: Color::from_argb(8, 255, 255, 255),
+                button_border_brush_pressed: Color::from_argb(18, 255, 255, 255),
+                button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                button_background_disabled: Color::from_argb(11, 255, 255, 255),
+                button_border_brush_disabled: Color::from_argb(18, 255, 255, 255),
+                button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+            },
+        }
+    }
+}
+/// Theme-dependent resources of `SplitButton_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SplitButtonResources {
+    /// The resolved `SplitButtonBackground` resource.
+    pub split_button_background: Color,
+    /// The resolved `SplitButtonBackgroundPointerOver` resource.
+    pub split_button_background_pointer_over: Color,
+    /// The resolved `SplitButtonBackgroundPressed` resource.
+    pub split_button_background_pressed: Color,
+    /// The resolved `SplitButtonBackgroundDisabled` resource.
+    pub split_button_background_disabled: Color,
+    /// The resolved `SplitButtonBackgroundChecked` resource.
+    pub split_button_background_checked: Color,
+    /// The resolved `SplitButtonBackgroundCheckedPointerOver` resource.
+    pub split_button_background_checked_pointer_over: Color,
+    /// The resolved `SplitButtonBackgroundCheckedPressed` resource.
+    pub split_button_background_checked_pressed: Color,
+    /// The resolved `SplitButtonBackgroundCheckedDisabled` resource.
+    pub split_button_background_checked_disabled: Color,
+    /// The resolved `SplitButtonForeground` resource.
+    pub split_button_foreground: Color,
+    /// The resolved `SplitButtonForegroundPointerOver` resource.
+    pub split_button_foreground_pointer_over: Color,
+    /// The resolved `SplitButtonForegroundPressed` resource.
+    pub split_button_foreground_pressed: Color,
+    /// The resolved `SplitButtonForegroundDisabled` resource.
+    pub split_button_foreground_disabled: Color,
+    /// The resolved `SplitButtonForegroundChecked` resource.
+    pub split_button_foreground_checked: Color,
+    /// The resolved `SplitButtonForegroundCheckedPointerOver` resource.
+    pub split_button_foreground_checked_pointer_over: Color,
+    /// The resolved `SplitButtonForegroundCheckedPressed` resource.
+    pub split_button_foreground_checked_pressed: Color,
+    /// The resolved `SplitButtonForegroundCheckedDisabled` resource.
+    pub split_button_foreground_checked_disabled: Color,
+    /// The resolved `SplitButtonForegroundSecondary` resource.
+    pub split_button_foreground_secondary: Color,
+    /// The resolved `SplitButtonForegroundSecondaryPressed` resource.
+    pub split_button_foreground_secondary_pressed: Color,
+    /// The resolved `SplitButtonBorderBrush` resource.
+    pub split_button_border_brush: [(f64, Color); 2],
+    /// The resolved `SplitButtonBorderBrushPointerOver` resource.
+    pub split_button_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `SplitButtonBorderBrushPressed` resource.
+    pub split_button_border_brush_pressed: Color,
+    /// The resolved `SplitButtonBorderBrushDisabled` resource.
+    pub split_button_border_brush_disabled: Color,
+    /// The resolved `SplitButtonBorderBrushDivider` resource.
+    pub split_button_border_brush_divider: Color,
+    /// The resolved `SplitButtonBorderBrushChecked` resource.
+    pub split_button_border_brush_checked: [(f64, Color); 2],
+    /// The resolved `SplitButtonBorderBrushCheckedPointerOver` resource.
+    pub split_button_border_brush_checked_pointer_over: [(f64, Color); 2],
+    /// The resolved `SplitButtonBorderBrushCheckedPressed` resource.
+    pub split_button_border_brush_checked_pressed: Color,
+    /// The resolved `SplitButtonBorderBrushCheckedDisabled` resource.
+    pub split_button_border_brush_checked_disabled: Color,
+    /// The resolved `SplitButtonBorderBrushCheckedDivider` resource.
+    pub split_button_border_brush_checked_divider: Color,
+    /// The resolved `SplitButtonInAppBarUnfocusedPointerOver` resource.
+    pub split_button_in_app_bar_unfocused_pointer_over: Color,
+    /// The resolved `SystemControlForegroundTransparentBrush` resource.
+    pub system_control_foreground_transparent_brush: Color,
+    /// The resolved `SystemControlDisabledTransparentBrush` resource.
+    pub system_control_disabled_transparent_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `AppBarButtonBackground` resource.
+    pub app_bar_button_background: Color,
+    /// The resolved `AppBarButtonForeground` resource.
+    pub app_bar_button_foreground: Color,
+    /// The resolved `AppBarButtonBorderBrush` resource.
+    pub app_bar_button_border_brush: Color,
+    /// The resolved `AppBarButtonForegroundDisabled` resource.
+    pub app_bar_button_foreground_disabled: Color,
+    /// The resolved `AppBarButtonBackgroundDisabled` resource.
+    pub app_bar_button_background_disabled: Color,
+    /// The resolved `AppBarButtonBorderBrushDisabled` resource.
+    pub app_bar_button_border_brush_disabled: Color,
+    /// The resolved `AppBarButtonBackgroundPressed` resource.
+    pub app_bar_button_background_pressed: Color,
+    /// The resolved `AppBarButtonBorderBrushPressed` resource.
+    pub app_bar_button_border_brush_pressed: Color,
+    /// The resolved `AppBarButtonForegroundPressed` resource.
+    pub app_bar_button_foreground_pressed: Color,
+    /// The resolved `AppBarButtonBackgroundPointerOver` resource.
+    pub app_bar_button_background_pointer_over: Color,
+    /// The resolved `AppBarButtonForegroundPointerOver` resource.
+    pub app_bar_button_foreground_pointer_over: Color,
+    /// The resolved `AppBarToggleButtonBackgroundChecked` resource.
+    pub app_bar_toggle_button_background_checked: Color,
+    /// The resolved `AppBarToggleButtonBorderBrushChecked` resource.
+    pub app_bar_toggle_button_border_brush_checked: Color,
+    /// The resolved `AppBarToggleButtonForegroundChecked` resource.
+    pub app_bar_toggle_button_foreground_checked: Color,
+    /// The resolved `AppBarToggleButtonBackgroundCheckedPressed` resource.
+    pub app_bar_toggle_button_background_checked_pressed: Color,
+    /// The resolved `AppBarToggleButtonBorderBrushCheckedPressed` resource.
+    pub app_bar_toggle_button_border_brush_checked_pressed: Color,
+    /// The resolved `AppBarToggleButtonForegroundCheckedPressed` resource.
+    pub app_bar_toggle_button_foreground_checked_pressed: Color,
+    /// The resolved `AppBarToggleButtonBackgroundCheckedPointerOver` resource.
+    pub app_bar_toggle_button_background_checked_pointer_over: Color,
+    /// The resolved `AppBarToggleButtonForegroundCheckedPointerOver` resource.
+    pub app_bar_toggle_button_foreground_checked_pointer_over: Color,
+}
+
+impl SplitButtonResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                split_button_background: Color::from_argb(179, 255, 255, 255),
+                split_button_background_pointer_over: Color::from_argb(128, 249, 249, 249),
+                split_button_background_pressed: Color::from_argb(77, 249, 249, 249),
+                split_button_background_disabled: Color::from_argb(77, 249, 249, 249),
+                split_button_background_checked: accent.dark1,
+                split_button_background_checked_pointer_over: accent.dark1,
+                split_button_background_checked_pressed: accent.dark1,
+                split_button_background_checked_disabled: Color::from_argb(55, 0, 0, 0),
+                split_button_foreground: Color::from_argb(228, 0, 0, 0),
+                split_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                split_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                split_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                split_button_foreground_checked: Color::from_argb(255, 255, 255, 255),
+                split_button_foreground_checked_pointer_over: Color::from_argb(255, 255, 255, 255),
+                split_button_foreground_checked_pressed: Color::from_argb(179, 255, 255, 255),
+                split_button_foreground_checked_disabled: Color::from_argb(92, 0, 0, 0),
+                split_button_foreground_secondary: Color::from_argb(158, 0, 0, 0),
+                split_button_foreground_secondary_pressed: Color::from_argb(114, 0, 0, 0),
+                split_button_border_brush: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                split_button_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                split_button_border_brush_pressed: Color::from_argb(15, 0, 0, 0),
+                split_button_border_brush_disabled: Color::from_argb(15, 0, 0, 0),
+                split_button_border_brush_divider: Color::from_argb(15, 0, 0, 0),
+                split_button_border_brush_checked: [
+                    (0.33, Color::from_argb(102, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                split_button_border_brush_checked_pointer_over: [
+                    (0.33, Color::from_argb(102, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                split_button_border_brush_checked_pressed: Color::from_argb(0, 255, 255, 255),
+                split_button_border_brush_checked_disabled: Color::from_argb(0, 255, 255, 255),
+                split_button_border_brush_checked_divider: Color::from_argb(55, 0, 0, 0),
+                split_button_in_app_bar_unfocused_pointer_over: Color::from_argb(6, 0, 0, 0),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                app_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground: Color::from_argb(228, 0, 0, 0),
+                app_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                app_bar_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                app_bar_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                app_bar_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                app_bar_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                app_bar_toggle_button_background_checked: accent.base,
+                app_bar_toggle_button_border_brush_checked: Color::from_argb(0, 0, 0, 0),
+                app_bar_toggle_button_foreground_checked: Color::from_argb(255, 0, 0, 0),
+                app_bar_toggle_button_background_checked_pressed: accent.base,
+                app_bar_toggle_button_border_brush_checked_pressed: Color::from_argb(0, 0, 0, 0),
+                app_bar_toggle_button_foreground_checked_pressed: Color::from_argb(255, 0, 0, 0),
+                app_bar_toggle_button_background_checked_pointer_over: accent.base,
+                app_bar_toggle_button_foreground_checked_pointer_over: Color::from_argb(
+                    255, 0, 0, 0,
+                ),
+            },
+            Theme::Dark => Self {
+                split_button_background: Color::from_argb(15, 255, 255, 255),
+                split_button_background_pointer_over: Color::from_argb(21, 255, 255, 255),
+                split_button_background_pressed: Color::from_argb(8, 255, 255, 255),
+                split_button_background_disabled: Color::from_argb(11, 255, 255, 255),
+                split_button_background_checked: accent.light2,
+                split_button_background_checked_pointer_over: accent.light2,
+                split_button_background_checked_pressed: accent.light2,
+                split_button_background_checked_disabled: Color::from_argb(40, 255, 255, 255),
+                split_button_foreground: Color::from_argb(255, 255, 255, 255),
+                split_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                split_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                split_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                split_button_foreground_checked: Color::from_argb(255, 0, 0, 0),
+                split_button_foreground_checked_pointer_over: Color::from_argb(255, 0, 0, 0),
+                split_button_foreground_checked_pressed: Color::from_argb(128, 0, 0, 0),
+                split_button_foreground_checked_disabled: Color::from_argb(93, 255, 255, 255),
+                split_button_foreground_secondary: Color::from_argb(197, 255, 255, 255),
+                split_button_foreground_secondary_pressed: Color::from_argb(135, 255, 255, 255),
+                split_button_border_brush: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                split_button_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                split_button_border_brush_pressed: Color::from_argb(18, 255, 255, 255),
+                split_button_border_brush_disabled: Color::from_argb(18, 255, 255, 255),
+                split_button_border_brush_divider: Color::from_argb(18, 255, 255, 255),
+                split_button_border_brush_checked: [
+                    (0.33, Color::from_argb(35, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                split_button_border_brush_checked_pointer_over: [
+                    (0.33, Color::from_argb(35, 0, 0, 0)),
+                    (1.0, Color::from_argb(20, 255, 255, 255)),
+                ],
+                split_button_border_brush_checked_pressed: Color::from_argb(0, 255, 255, 255),
+                split_button_border_brush_checked_disabled: Color::from_argb(0, 255, 255, 255),
+                split_button_border_brush_checked_divider: Color::from_argb(55, 0, 0, 0),
+                split_button_in_app_bar_unfocused_pointer_over: Color::from_argb(10, 255, 255, 255),
+                system_control_foreground_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                app_bar_button_background: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground: Color::from_argb(255, 255, 255, 255),
+                app_bar_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                app_bar_button_background_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                app_bar_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                app_bar_button_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                app_bar_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                app_bar_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                app_bar_toggle_button_background_checked: accent.base,
+                app_bar_toggle_button_border_brush_checked: Color::from_argb(0, 0, 0, 0),
+                app_bar_toggle_button_foreground_checked: Color::from_argb(255, 255, 255, 255),
+                app_bar_toggle_button_background_checked_pressed: accent.base,
+                app_bar_toggle_button_border_brush_checked_pressed: Color::from_argb(0, 0, 0, 0),
+                app_bar_toggle_button_foreground_checked_pressed: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                app_bar_toggle_button_background_checked_pointer_over: accent.base,
+                app_bar_toggle_button_foreground_checked_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+            },
+        }
+    }
+}
+pub const SPLIT_BUTTON_PRIMARY_BUTTON_SIZE: f64 = 35.0;
+pub const SPLIT_BUTTON_SECONDARY_BUTTON_SIZE: f64 = 35.0;
+/// Left, top, right, bottom.
+pub const SPLIT_BUTTON_PADDING: [f64; 4] = [11.0, 6.0, 11.0, 7.0];
+/// Left, top, right, bottom.
+pub const SPLIT_BUTTON_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Theme-dependent resources of `RadioMenuFlyoutItem_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct RadioMenuFlyoutItemResources {
+    /// The resolved `MenuFlyoutItemBackground` resource.
+    pub menu_flyout_item_background: Color,
+    /// The resolved `MenuFlyoutItemForeground` resource.
+    pub menu_flyout_item_foreground: Color,
+    /// The resolved `MenuFlyoutSubItemBackgroundPointerOver` resource.
+    pub menu_flyout_sub_item_background_pointer_over: Color,
+    /// The resolved `MenuFlyoutItemForegroundPointerOver` resource.
+    pub menu_flyout_item_foreground_pointer_over: Color,
+    /// The resolved `ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver` resource.
+    pub toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pointer_over: Color,
+    /// The resolved `MenuFlyoutSubItemBackgroundPressed` resource.
+    pub menu_flyout_sub_item_background_pressed: Color,
+    /// The resolved `MenuFlyoutSubItemForegroundPressed` resource.
+    pub menu_flyout_sub_item_foreground_pressed: Color,
+    /// The resolved `ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundPressed` resource.
+    pub toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pressed: Color,
+    /// The resolved `MenuFlyoutSubItemForegroundDisabled` resource.
+    pub menu_flyout_sub_item_foreground_disabled: Color,
+    /// The resolved `ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled` resource.
+    pub toggle_menu_flyout_item_keyboard_accelerator_text_foreground_disabled: Color,
+    /// The resolved `MenuFlyoutSubItemChevron` resource.
+    pub menu_flyout_sub_item_chevron: Color,
+    /// The resolved `ToggleMenuFlyoutItemKeyboardAcceleratorTextForeground` resource.
+    pub toggle_menu_flyout_item_keyboard_accelerator_text_foreground: Color,
+    /// The resolved `MenuFlyoutSubItemForegroundPointerOver` resource.
+    pub menu_flyout_sub_item_foreground_pointer_over: Color,
+    /// The resolved `MenuFlyoutSubItemChevronPointerOver` resource.
+    pub menu_flyout_sub_item_chevron_pointer_over: Color,
+    /// The resolved `MenuFlyoutSubItemChevronPressed` resource.
+    pub menu_flyout_sub_item_chevron_pressed: Color,
+    /// The resolved `MenuFlyoutSubItemBackgroundSubMenuOpened` resource.
+    pub menu_flyout_sub_item_background_sub_menu_opened: Color,
+    /// The resolved `MenuFlyoutSubItemForegroundSubMenuOpened` resource.
+    pub menu_flyout_sub_item_foreground_sub_menu_opened: Color,
+    /// The resolved `MenuFlyoutSubItemChevronSubMenuOpened` resource.
+    pub menu_flyout_sub_item_chevron_sub_menu_opened: Color,
+    /// The resolved `MenuFlyoutSubItemBackgroundDisabled` resource.
+    pub menu_flyout_sub_item_background_disabled: Color,
+    /// The resolved `MenuFlyoutSubItemChevronDisabled` resource.
+    pub menu_flyout_sub_item_chevron_disabled: Color,
+}
+
+impl RadioMenuFlyoutItemResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                menu_flyout_item_background: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_foreground: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_sub_item_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                menu_flyout_item_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pointer_over:
+                    Color::from_argb(158, 0, 0, 0),
+                menu_flyout_sub_item_background_pressed: Color::from_argb(6, 0, 0, 0),
+                menu_flyout_sub_item_foreground_pressed: Color::from_argb(228, 0, 0, 0),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pressed:
+                    Color::from_argb(158, 0, 0, 0),
+                menu_flyout_sub_item_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_disabled:
+                    Color::from_argb(92, 0, 0, 0),
+                menu_flyout_sub_item_chevron: Color::from_argb(158, 0, 0, 0),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground: Color::from_argb(
+                    158, 0, 0, 0,
+                ),
+                menu_flyout_sub_item_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_sub_item_chevron_pointer_over: Color::from_argb(158, 0, 0, 0),
+                menu_flyout_sub_item_chevron_pressed: Color::from_argb(114, 0, 0, 0),
+                menu_flyout_sub_item_background_sub_menu_opened: Color::from_argb(9, 0, 0, 0),
+                menu_flyout_sub_item_foreground_sub_menu_opened: Color::from_argb(228, 0, 0, 0),
+                menu_flyout_sub_item_chevron_sub_menu_opened: Color::from_argb(158, 0, 0, 0),
+                menu_flyout_sub_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_chevron_disabled: Color::from_argb(92, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                menu_flyout_item_background: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_item_foreground: Color::from_argb(255, 255, 255, 255),
+                menu_flyout_sub_item_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                menu_flyout_item_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pointer_over:
+                    Color::from_argb(197, 255, 255, 255),
+                menu_flyout_sub_item_background_pressed: Color::from_argb(10, 255, 255, 255),
+                menu_flyout_sub_item_foreground_pressed: Color::from_argb(255, 255, 255, 255),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_pressed:
+                    Color::from_argb(197, 255, 255, 255),
+                menu_flyout_sub_item_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground_disabled:
+                    Color::from_argb(93, 255, 255, 255),
+                menu_flyout_sub_item_chevron: Color::from_argb(197, 255, 255, 255),
+                toggle_menu_flyout_item_keyboard_accelerator_text_foreground: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                menu_flyout_sub_item_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                menu_flyout_sub_item_chevron_pointer_over: Color::from_argb(197, 255, 255, 255),
+                menu_flyout_sub_item_chevron_pressed: Color::from_argb(135, 255, 255, 255),
+                menu_flyout_sub_item_background_sub_menu_opened: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                menu_flyout_sub_item_foreground_sub_menu_opened: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                menu_flyout_sub_item_chevron_sub_menu_opened: Color::from_argb(197, 255, 255, 255),
+                menu_flyout_sub_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                menu_flyout_sub_item_chevron_disabled: Color::from_argb(93, 255, 255, 255),
+            },
+        }
+    }
+}

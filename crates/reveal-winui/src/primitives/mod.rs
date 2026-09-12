@@ -26,3 +26,6 @@ pub use margin::*;
 
 mod info_bar_panel;
 pub use info_bar_panel::*;
+
+mod retained_flyout;
+pub use retained_flyout::{FlyoutTarget, FlyoutTargetState, RetainedFlyoutHost};

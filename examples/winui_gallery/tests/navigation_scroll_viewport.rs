@@ -1,10 +1,10 @@
 //! Source scrollbar presentation backed by native scrolling and drag recognizers.
 #![feature(arbitrary_self_types)]
 mod common;
-#[path = "../../../crates/reveal-winui/src/controls/navigation_scroll_viewport.rs"]
+#[path = "../../../crates/reveal-winui/src/controls/scroll_bar_viewport.rs"]
 mod presentation;
 use common::Fixture;
-use presentation::NavigationScrollViewport;
+use presentation::ScrollBarViewport;
 use reveal_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
 use reveal_foundation::{Handle, Listener};
 use reveal_gestures::GestureBinding;
@@ -39,7 +39,7 @@ fn fixture(theme: Theme) -> (Fixture, Handle<ScrollViewportController>) {
                                 .common
                                 .solid_background_fill_color_base,
                         )
-                        .child(NavigationScrollViewport::new(
+                        .child(ScrollBarViewport::new(
                             controller,
                             Column::new()
                                 .main_axis_size(MainAxisSize::Min)

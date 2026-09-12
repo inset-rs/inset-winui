@@ -21,6 +21,9 @@ NS = {
     'x': 'http://schemas.microsoft.com/winfx/2006/xaml',
     '': 'http://schemas.microsoft.com/winfx/2006/xaml/presentation',
 }
+# MenuFlyoutPresenter::UpdateTemplateSettings looks up this key in C++, not XAML.
+RUNTIME_RESOURCE_REFERENCES = {'MenuFlyout': ['FlyoutThemeTouchMinWidth']}
+
 X_KEY = '{%s}Key' % NS['x']
 P = '{%s}' % NS['']
 
@@ -319,6 +322,7 @@ def main():
         if companion.is_file():
             templates.append(ET.parse(companion).getroot())
         references = [key for template in templates for key in resource_references(template)]
+        references.extend(RUNTIME_RESOURCE_REFERENCES.get(control, []))
         legacy_themes, legacy_shared = read_dictionaries(root / 'dxaml/xcp/dxaml/themes/generic.xaml', references)
         shared = {**{key: value for key, value in legacy_shared.items() if key not in declared}, **shared}
         shared = {key: value for key, value in shared.items() if key not in emitted}

@@ -5,6 +5,10 @@ use reveal_winui::FluentSymbol;
 /// A gallery destination with its own retained examples and scroll position.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Feature {
+    /// Reusable anchored content and dismissal policies.
+    Flyout,
+    /// Buttons that open an associated flyout.
+    DropDownButton,
     /// Determinate and animated progress states.
     ProgressBar,
     /// Expandable content in either direction.
@@ -51,8 +55,10 @@ pub enum Feature {
 
 impl Feature {
     /// Display order in the navigation pane.
-    pub const ALL: [Self; 21] = [
+    pub const ALL: [Self; 23] = [
         Self::Button,
+        Self::DropDownButton,
+        Self::Flyout,
         Self::TextBox,
         Self::PasswordBox,
         Self::ToggleSwitch,
@@ -78,6 +84,8 @@ impl Feature {
     /// The navigation label and stable destination identity.
     pub fn title(self) -> &'static str {
         match self {
+            Self::Flyout => "Flyout",
+            Self::DropDownButton => "DropDownButton",
             Self::Button => "Button",
             Self::TextBox => "TextBox",
             Self::PasswordBox => "PasswordBox",
@@ -105,6 +113,8 @@ impl Feature {
     /// A distinct bundled Fluent symbol keeps each destination recognizable in compact mode.
     pub fn symbol(self) -> FluentSymbol {
         match self {
+            Self::Flyout => FluentSymbol::ChevronRight,
+            Self::DropDownButton => FluentSymbol::ChevronDown,
             Self::Button => FluentSymbol::CursorClick,
             Self::TextBox => FluentSymbol::TextField,
             Self::PasswordBox => FluentSymbol::LockClosed,
@@ -132,6 +142,8 @@ impl Feature {
     /// Brief guidance above the examples.
     pub fn description(self) -> &'static str {
         match self {
+            Self::Flyout => "Show reusable content beside its opening control.",
+            Self::DropDownButton => "Open a flyout from a button with a dropdown chevron.",
             Self::Button => "Activate an action using the pointer or keyboard.",
             Self::TextBox => "Enter and edit text, select words, and explore multiline input.",
             Self::PasswordBox => {
