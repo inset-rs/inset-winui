@@ -508,8 +508,14 @@ impl CommonResources {
                 control_on_image_fill_color_disabled_brush: Color::from_argb(0, 255, 255, 255),
                 accent_fill_color_selected_text_background_brush: accent.base,
                 accent_fill_color_default_brush: accent.dark1,
-                accent_fill_color_secondary_brush: accent.dark1,
-                accent_fill_color_tertiary_brush: accent.dark1,
+                accent_fill_color_secondary_brush: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                accent_fill_color_tertiary_brush: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 accent_fill_color_disabled_brush: Color::from_argb(55, 0, 0, 0),
                 control_stroke_color_default_brush: Color::from_argb(15, 0, 0, 0),
                 control_stroke_color_secondary_brush: Color::from_argb(41, 0, 0, 0),
@@ -715,8 +721,14 @@ impl CommonResources {
                 control_on_image_fill_color_disabled_brush: Color::from_argb(255, 30, 30, 30),
                 accent_fill_color_selected_text_background_brush: accent.base,
                 accent_fill_color_default_brush: accent.light2,
-                accent_fill_color_secondary_brush: accent.light2,
-                accent_fill_color_tertiary_brush: accent.light2,
+                accent_fill_color_secondary_brush: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                accent_fill_color_tertiary_brush: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 accent_fill_color_disabled_brush: Color::from_argb(40, 255, 255, 255),
                 control_stroke_color_default_brush: Color::from_argb(18, 255, 255, 255),
                 control_stroke_color_secondary_brush: Color::from_argb(24, 255, 255, 255),
@@ -942,8 +954,14 @@ impl ButtonResources {
         match theme {
             Theme::Light => Self {
                 accent_button_background: accent.dark1,
-                accent_button_background_pointer_over: accent.dark1,
-                accent_button_background_pressed: accent.dark1,
+                accent_button_background_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                accent_button_background_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 accent_button_background_disabled: Color::from_argb(55, 0, 0, 0),
                 accent_button_foreground: Color::from_argb(255, 255, 255, 255),
                 accent_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
@@ -1014,8 +1032,14 @@ impl ButtonResources {
             },
             Theme::Dark => Self {
                 accent_button_background: accent.light2,
-                accent_button_background_pointer_over: accent.light2,
-                accent_button_background_pressed: accent.light2,
+                accent_button_background_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                accent_button_background_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 accent_button_background_disabled: Color::from_argb(40, 255, 255, 255),
                 accent_button_foreground: Color::from_argb(255, 0, 0, 0),
                 accent_button_foreground_pointer_over: Color::from_argb(255, 0, 0, 0),
@@ -1237,12 +1261,24 @@ impl ToggleSwitchResources {
                 toggle_switch_stroke_off_pressed: Color::from_argb(114, 0, 0, 0),
                 toggle_switch_stroke_off_disabled: Color::from_argb(55, 0, 0, 0),
                 toggle_switch_fill_on: accent.dark1,
-                toggle_switch_fill_on_pointer_over: accent.dark1,
-                toggle_switch_fill_on_pressed: accent.dark1,
+                toggle_switch_fill_on_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                toggle_switch_fill_on_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 toggle_switch_fill_on_disabled: Color::from_argb(55, 0, 0, 0),
                 toggle_switch_stroke_on: accent.dark1,
-                toggle_switch_stroke_on_pointer_over: accent.dark1,
-                toggle_switch_stroke_on_pressed: accent.dark1,
+                toggle_switch_stroke_on_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                toggle_switch_stroke_on_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 toggle_switch_stroke_on_disabled: Color::from_argb(55, 0, 0, 0),
                 toggle_switch_knob_fill_off: Color::from_argb(158, 0, 0, 0),
                 toggle_switch_knob_fill_off_pointer_over: Color::from_argb(158, 0, 0, 0),
@@ -1315,12 +1351,24 @@ impl ToggleSwitchResources {
                 toggle_switch_stroke_off_pressed: Color::from_argb(139, 255, 255, 255),
                 toggle_switch_stroke_off_disabled: Color::from_argb(40, 255, 255, 255),
                 toggle_switch_fill_on: accent.light2,
-                toggle_switch_fill_on_pointer_over: accent.light2,
-                toggle_switch_fill_on_pressed: accent.light2,
+                toggle_switch_fill_on_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                toggle_switch_fill_on_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 toggle_switch_fill_on_disabled: Color::from_argb(40, 255, 255, 255),
                 toggle_switch_stroke_on: accent.light2,
-                toggle_switch_stroke_on_pointer_over: accent.light2,
-                toggle_switch_stroke_on_pressed: accent.light2,
+                toggle_switch_stroke_on_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                toggle_switch_stroke_on_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 toggle_switch_stroke_on_disabled: Color::from_argb(40, 255, 255, 255),
                 toggle_switch_knob_fill_off: Color::from_argb(197, 255, 255, 255),
                 toggle_switch_knob_fill_off_pointer_over: Color::from_argb(197, 255, 255, 255),
@@ -1622,12 +1670,24 @@ impl CheckBoxResources {
                 check_box_check_background_stroke_unchecked_pressed: Color::from_argb(55, 0, 0, 0),
                 check_box_check_background_stroke_unchecked_disabled: Color::from_argb(55, 0, 0, 0),
                 check_box_check_background_stroke_checked: accent.dark1,
-                check_box_check_background_stroke_checked_pointer_over: accent.dark1,
-                check_box_check_background_stroke_checked_pressed: accent.dark1,
+                check_box_check_background_stroke_checked_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                check_box_check_background_stroke_checked_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 check_box_check_background_stroke_checked_disabled: Color::from_argb(55, 0, 0, 0),
                 check_box_check_background_stroke_indeterminate: accent.dark1,
-                check_box_check_background_stroke_indeterminate_pointer_over: accent.dark1,
-                check_box_check_background_stroke_indeterminate_pressed: accent.dark1,
+                check_box_check_background_stroke_indeterminate_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                check_box_check_background_stroke_indeterminate_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 check_box_check_background_stroke_indeterminate_disabled: Color::from_argb(
                     55, 0, 0, 0,
                 ),
@@ -1640,12 +1700,24 @@ impl CheckBoxResources {
                     0, 255, 255, 255,
                 ),
                 check_box_check_background_fill_checked: accent.dark1,
-                check_box_check_background_fill_checked_pointer_over: accent.dark1,
-                check_box_check_background_fill_checked_pressed: accent.dark1,
+                check_box_check_background_fill_checked_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                check_box_check_background_fill_checked_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 check_box_check_background_fill_checked_disabled: Color::from_argb(55, 0, 0, 0),
                 check_box_check_background_fill_indeterminate: accent.dark1,
-                check_box_check_background_fill_indeterminate_pointer_over: accent.dark1,
-                check_box_check_background_fill_indeterminate_pressed: accent.dark1,
+                check_box_check_background_fill_indeterminate_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                check_box_check_background_fill_indeterminate_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 check_box_check_background_fill_indeterminate_disabled: Color::from_argb(
                     55, 0, 0, 0,
                 ),
@@ -1748,14 +1820,26 @@ impl CheckBoxResources {
                     40, 255, 255, 255,
                 ),
                 check_box_check_background_stroke_checked: accent.light2,
-                check_box_check_background_stroke_checked_pointer_over: accent.light2,
-                check_box_check_background_stroke_checked_pressed: accent.light2,
+                check_box_check_background_stroke_checked_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                check_box_check_background_stroke_checked_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 check_box_check_background_stroke_checked_disabled: Color::from_argb(
                     40, 255, 255, 255,
                 ),
                 check_box_check_background_stroke_indeterminate: accent.light2,
-                check_box_check_background_stroke_indeterminate_pointer_over: accent.light2,
-                check_box_check_background_stroke_indeterminate_pressed: accent.light2,
+                check_box_check_background_stroke_indeterminate_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                check_box_check_background_stroke_indeterminate_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 check_box_check_background_stroke_indeterminate_disabled: Color::from_argb(
                     40, 255, 255, 255,
                 ),
@@ -1770,14 +1854,26 @@ impl CheckBoxResources {
                     0, 255, 255, 255,
                 ),
                 check_box_check_background_fill_checked: accent.light2,
-                check_box_check_background_fill_checked_pointer_over: accent.light2,
-                check_box_check_background_fill_checked_pressed: accent.light2,
+                check_box_check_background_fill_checked_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                check_box_check_background_fill_checked_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 check_box_check_background_fill_checked_disabled: Color::from_argb(
                     40, 255, 255, 255,
                 ),
                 check_box_check_background_fill_indeterminate: accent.light2,
-                check_box_check_background_fill_indeterminate_pointer_over: accent.light2,
-                check_box_check_background_fill_indeterminate_pressed: accent.light2,
+                check_box_check_background_fill_indeterminate_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                check_box_check_background_fill_indeterminate_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 check_box_check_background_fill_indeterminate_disabled: Color::from_argb(
                     40, 255, 255, 255,
                 ),
@@ -1977,12 +2073,24 @@ impl RadioButtonResources {
                 radio_button_outer_ellipse_fill_pressed: Color::from_argb(24, 0, 0, 0),
                 radio_button_outer_ellipse_fill_disabled: Color::from_argb(0, 255, 255, 255),
                 radio_button_outer_ellipse_checked_stroke: accent.dark1,
-                radio_button_outer_ellipse_checked_stroke_pointer_over: accent.dark1,
-                radio_button_outer_ellipse_checked_stroke_pressed: accent.dark1,
+                radio_button_outer_ellipse_checked_stroke_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                radio_button_outer_ellipse_checked_stroke_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 radio_button_outer_ellipse_checked_stroke_disabled: Color::from_argb(55, 0, 0, 0),
                 radio_button_outer_ellipse_checked_fill: accent.dark1,
-                radio_button_outer_ellipse_checked_fill_pointer_over: accent.dark1,
-                radio_button_outer_ellipse_checked_fill_pressed: accent.dark1,
+                radio_button_outer_ellipse_checked_fill_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                radio_button_outer_ellipse_checked_fill_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 radio_button_outer_ellipse_checked_fill_disabled: Color::from_argb(55, 0, 0, 0),
                 radio_button_check_glyph_fill: Color::from_argb(255, 255, 255, 255),
                 radio_button_check_glyph_fill_pointer_over: Color::from_argb(255, 255, 255, 255),
@@ -2064,14 +2172,26 @@ impl RadioButtonResources {
                 radio_button_outer_ellipse_fill_pressed: Color::from_argb(18, 255, 255, 255),
                 radio_button_outer_ellipse_fill_disabled: Color::from_argb(0, 255, 255, 255),
                 radio_button_outer_ellipse_checked_stroke: accent.light2,
-                radio_button_outer_ellipse_checked_stroke_pointer_over: accent.light2,
-                radio_button_outer_ellipse_checked_stroke_pressed: accent.light2,
+                radio_button_outer_ellipse_checked_stroke_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                radio_button_outer_ellipse_checked_stroke_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 radio_button_outer_ellipse_checked_stroke_disabled: Color::from_argb(
                     40, 255, 255, 255,
                 ),
                 radio_button_outer_ellipse_checked_fill: accent.light2,
-                radio_button_outer_ellipse_checked_fill_pointer_over: accent.light2,
-                radio_button_outer_ellipse_checked_fill_pressed: accent.light2,
+                radio_button_outer_ellipse_checked_fill_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                radio_button_outer_ellipse_checked_fill_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 radio_button_outer_ellipse_checked_fill_disabled: Color::from_argb(
                     40, 255, 255, 255,
                 ),
@@ -2285,8 +2405,14 @@ impl ToggleButtonResources {
                 toggle_button_background_pressed: Color::from_argb(77, 249, 249, 249),
                 toggle_button_background_disabled: Color::from_argb(77, 249, 249, 249),
                 toggle_button_background_checked: accent.dark1,
-                toggle_button_background_checked_pointer_over: accent.dark1,
-                toggle_button_background_checked_pressed: accent.dark1,
+                toggle_button_background_checked_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                toggle_button_background_checked_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 toggle_button_background_checked_disabled: Color::from_argb(55, 0, 0, 0),
                 toggle_button_background_indeterminate: Color::from_argb(179, 255, 255, 255),
                 toggle_button_background_indeterminate_pointer_over: Color::from_argb(
@@ -2387,8 +2513,14 @@ impl ToggleButtonResources {
                 toggle_button_background_pressed: Color::from_argb(8, 255, 255, 255),
                 toggle_button_background_disabled: Color::from_argb(11, 255, 255, 255),
                 toggle_button_background_checked: accent.light2,
-                toggle_button_background_checked_pointer_over: accent.light2,
-                toggle_button_background_checked_pressed: accent.light2,
+                toggle_button_background_checked_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                toggle_button_background_checked_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 toggle_button_background_checked_disabled: Color::from_argb(40, 255, 255, 255),
                 toggle_button_background_indeterminate: Color::from_argb(15, 255, 255, 255),
                 toggle_button_background_indeterminate_pointer_over: Color::from_argb(
@@ -2883,8 +3015,14 @@ impl SliderResources {
                 slider_container_background_pressed: Color::from_argb(0, 255, 255, 255),
                 slider_container_background_disabled: Color::from_argb(0, 255, 255, 255),
                 slider_thumb_background: accent.dark1,
-                slider_thumb_background_pointer_over: accent.dark1,
-                slider_thumb_background_pressed: accent.dark1,
+                slider_thumb_background_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                slider_thumb_background_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 slider_thumb_background_disabled: Color::from_argb(55, 0, 0, 0),
                 slider_thumb_border_brush: [
                     (0.33, Color::from_argb(41, 0, 0, 0)),
@@ -2896,8 +3034,14 @@ impl SliderResources {
                 slider_track_fill_pressed: Color::from_argb(114, 0, 0, 0),
                 slider_track_fill_disabled: Color::from_argb(81, 0, 0, 0),
                 slider_track_value_fill: accent.dark1,
-                slider_track_value_fill_pointer_over: accent.dark1,
-                slider_track_value_fill_pressed: accent.dark1,
+                slider_track_value_fill_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                slider_track_value_fill_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 slider_track_value_fill_disabled: Color::from_argb(55, 0, 0, 0),
                 slider_header_foreground: Color::from_argb(228, 0, 0, 0),
                 slider_header_foreground_disabled: Color::from_argb(92, 0, 0, 0),
@@ -2960,8 +3104,14 @@ impl SliderResources {
                 slider_container_background_pressed: Color::from_argb(0, 255, 255, 255),
                 slider_container_background_disabled: Color::from_argb(0, 255, 255, 255),
                 slider_thumb_background: accent.light2,
-                slider_thumb_background_pointer_over: accent.light2,
-                slider_thumb_background_pressed: accent.light2,
+                slider_thumb_background_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                slider_thumb_background_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 slider_thumb_background_disabled: Color::from_argb(40, 255, 255, 255),
                 slider_thumb_border_brush: [
                     (0.33, Color::from_argb(24, 255, 255, 255)),
@@ -2973,8 +3123,14 @@ impl SliderResources {
                 slider_track_fill_pressed: Color::from_argb(139, 255, 255, 255),
                 slider_track_fill_disabled: Color::from_argb(63, 255, 255, 255),
                 slider_track_value_fill: accent.light2,
-                slider_track_value_fill_pointer_over: accent.light2,
-                slider_track_value_fill_pressed: accent.light2,
+                slider_track_value_fill_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                slider_track_value_fill_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 slider_track_value_fill_disabled: Color::from_argb(40, 255, 255, 255),
                 slider_header_foreground: Color::from_argb(255, 255, 255, 255),
                 slider_header_foreground_disabled: Color::from_argb(93, 255, 255, 255),
@@ -5307,8 +5463,14 @@ impl CommandBarFlyoutResources {
                 command_bar_flyout_app_bar_button_sub_item_chevron_disabled_foreground:
                     Color::from_argb(92, 0, 0, 0),
                 command_bar_flyout_app_bar_button_background_checked: accent.dark1,
-                command_bar_flyout_app_bar_button_background_checked_pointer_over: accent.dark1,
-                command_bar_flyout_app_bar_button_background_checked_pressed: accent.dark1,
+                command_bar_flyout_app_bar_button_background_checked_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                command_bar_flyout_app_bar_button_background_checked_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 command_bar_flyout_app_bar_button_background_checked_disabled: Color::from_argb(
                     55, 0, 0, 0,
                 ),
@@ -5385,8 +5547,14 @@ impl CommandBarFlyoutResources {
                 command_bar_flyout_app_bar_button_sub_item_chevron_disabled_foreground:
                     Color::from_argb(93, 255, 255, 255),
                 command_bar_flyout_app_bar_button_background_checked: accent.light2,
-                command_bar_flyout_app_bar_button_background_checked_pointer_over: accent.light2,
-                command_bar_flyout_app_bar_button_background_checked_pressed: accent.light2,
+                command_bar_flyout_app_bar_button_background_checked_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                command_bar_flyout_app_bar_button_background_checked_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 command_bar_flyout_app_bar_button_background_checked_disabled: Color::from_argb(
                     40, 255, 255, 255,
                 ),
@@ -5570,7 +5738,10 @@ impl AppBarButtonResources {
                 system_control_disabled_transparent_brush: Color::from_argb(0, 0, 0, 0),
                 system_control_foreground_base_medium_brush: Color::from_argb(153, 0, 0, 0),
                 system_control_highlight_alt_base_medium_brush: Color::from_argb(153, 0, 0, 0),
-                system_control_highlight_list_accent_low_brush: accent.base,
+                system_control_highlight_list_accent_low_brush: {
+                    let color = accent.base;
+                    color.with_values(Some(color.a * 0.4), None, None, None, None)
+                },
                 system_control_foreground_base_medium_high_brush: Color::from_argb(204, 0, 0, 0),
             },
             Theme::Dark => Self {
@@ -5629,7 +5800,10 @@ impl AppBarButtonResources {
                 system_control_highlight_alt_base_medium_brush: Color::from_argb(
                     153, 255, 255, 255,
                 ),
-                system_control_highlight_list_accent_low_brush: accent.base,
+                system_control_highlight_list_accent_low_brush: {
+                    let color = accent.base;
+                    color.with_values(Some(color.a * 0.6), None, None, None, None)
+                },
                 system_control_foreground_base_medium_high_brush: Color::from_argb(
                     204, 255, 255, 255,
                 ),
@@ -6015,7 +6189,10 @@ impl AcrylicThemeResources {
                     tint_luminosity_opacity: None,
                     fallback_color: Color::from_argb(255, 255, 255, 255),
                 },
-                system_control_transient_border_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_transient_border_brush: {
+                    let color = Color::from_argb(255, 0, 0, 0);
+                    color.with_values(Some(color.a * 0.14), None, None, None, None)
+                },
                 acrylic_background_fill_color_default_brush: AcrylicBrushResources {
                     tint_color: Color::from_argb(255, 252, 252, 252),
                     tint_opacity: 0.0,
@@ -6305,7 +6482,10 @@ impl AcrylicThemeResources {
                     tint_luminosity_opacity: None,
                     fallback_color: Color::from_argb(255, 0, 0, 0),
                 },
-                system_control_transient_border_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_transient_border_brush: {
+                    let color = Color::from_argb(255, 0, 0, 0);
+                    color.with_values(Some(color.a * 0.36), None, None, None, None)
+                },
                 acrylic_background_fill_color_default_brush: AcrylicBrushResources {
                     tint_color: Color::from_argb(255, 44, 44, 44),
                     tint_opacity: 0.15,
@@ -6425,39 +6605,6 @@ pub const PROGRESS_BAR_CORNER_RADIUS: [f64; 4] = [1.5, 1.5, 1.5, 1.5];
 pub const PROGRESS_BAR_TRACK_CORNER_RADIUS: [f64; 4] = [0.5, 0.5, 0.5, 0.5];
 /// Left, top, right, bottom.
 pub const PROGRESS_BAR_BORDER_THEME_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
-/// Theme-dependent resources of `ProgressRing_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
-#[derive(Clone, Debug, PartialEq)]
-pub struct ProgressRingResources {
-    /// The resolved `ProgressRingForegroundThemeBrush` resource.
-    pub progress_ring_foreground_theme_brush: Color,
-    /// The resolved `ProgressRingBackgroundThemeBrush` resource.
-    pub progress_ring_background_theme_brush: Color,
-    /// The resolved `SystemControlHighlightAccentBrush` resource.
-    pub system_control_highlight_accent_brush: Color,
-    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
-    pub system_control_background_base_low_brush: Color,
-}
-
-impl ProgressRingResources {
-    /// Resolves the source dictionary for the requested theme and accent palette.
-    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
-        match theme {
-            Theme::Light => Self {
-                progress_ring_foreground_theme_brush: accent.dark1,
-                progress_ring_background_theme_brush: Color::from_argb(0, 255, 255, 255),
-                system_control_highlight_accent_brush: accent.base,
-                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
-            },
-            Theme::Dark => Self {
-                progress_ring_foreground_theme_brush: accent.light2,
-                progress_ring_background_theme_brush: Color::from_argb(0, 255, 255, 255),
-                system_control_highlight_accent_brush: accent.base,
-                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
-            },
-        }
-    }
-}
-pub const PROGRESS_RING_STROKE_THICKNESS: f64 = 4.0;
 /// Theme-dependent resources of `Expander_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ExpanderResources {
@@ -6663,7 +6810,10 @@ impl InfoBarResources {
                 info_bar_message_foreground: Color::from_argb(228, 0, 0, 0),
                 info_bar_hyperlink_button_foreground: accent.dark2,
                 info_bar_border_brush: Color::from_argb(15, 0, 0, 0),
-                system_control_transient_border_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_transient_border_brush: {
+                    let color = Color::from_argb(255, 0, 0, 0);
+                    color.with_values(Some(color.a * 0.14), None, None, None, None)
+                },
                 app_bar_button_background: Color::from_argb(0, 255, 255, 255),
                 app_bar_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
                 app_bar_button_background_pressed: Color::from_argb(6, 0, 0, 0),
@@ -6696,7 +6846,10 @@ impl InfoBarResources {
                 info_bar_message_foreground: Color::from_argb(255, 255, 255, 255),
                 info_bar_hyperlink_button_foreground: accent.light3,
                 info_bar_border_brush: Color::from_argb(25, 0, 0, 0),
-                system_control_transient_border_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_transient_border_brush: {
+                    let color = Color::from_argb(255, 0, 0, 0);
+                    color.with_values(Some(color.a * 0.36), None, None, None, None)
+                },
                 app_bar_button_background: Color::from_argb(0, 255, 255, 255),
                 app_bar_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
                 app_bar_button_background_pressed: Color::from_argb(10, 255, 255, 255),
@@ -7465,8 +7618,14 @@ impl SplitButtonResources {
                 split_button_background_pressed: Color::from_argb(77, 249, 249, 249),
                 split_button_background_disabled: Color::from_argb(77, 249, 249, 249),
                 split_button_background_checked: accent.dark1,
-                split_button_background_checked_pointer_over: accent.dark1,
-                split_button_background_checked_pressed: accent.dark1,
+                split_button_background_checked_pointer_over: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                split_button_background_checked_pressed: {
+                    let color = accent.dark1;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 split_button_background_checked_disabled: Color::from_argb(55, 0, 0, 0),
                 split_button_foreground: Color::from_argb(228, 0, 0, 0),
                 split_button_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
@@ -7532,8 +7691,14 @@ impl SplitButtonResources {
                 split_button_background_pressed: Color::from_argb(8, 255, 255, 255),
                 split_button_background_disabled: Color::from_argb(11, 255, 255, 255),
                 split_button_background_checked: accent.light2,
-                split_button_background_checked_pointer_over: accent.light2,
-                split_button_background_checked_pressed: accent.light2,
+                split_button_background_checked_pointer_over: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                split_button_background_checked_pressed: {
+                    let color = accent.light2;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
                 split_button_background_checked_disabled: Color::from_argb(40, 255, 255, 255),
                 split_button_foreground: Color::from_argb(255, 255, 255, 255),
                 split_button_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
@@ -7714,6 +7879,39 @@ impl RadioMenuFlyoutItemResources {
         }
     }
 }
+/// Theme-dependent resources of `ProgressRing_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ProgressRingResources {
+    /// The resolved `ProgressRingForegroundThemeBrush` resource.
+    pub progress_ring_foreground_theme_brush: Color,
+    /// The resolved `ProgressRingBackgroundThemeBrush` resource.
+    pub progress_ring_background_theme_brush: Color,
+    /// The resolved `SystemControlHighlightAccentBrush` resource.
+    pub system_control_highlight_accent_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
+    pub system_control_background_base_low_brush: Color,
+}
+
+impl ProgressRingResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                progress_ring_foreground_theme_brush: accent.dark1,
+                progress_ring_background_theme_brush: Color::from_argb(0, 255, 255, 255),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                progress_ring_foreground_theme_brush: accent.light2,
+                progress_ring_background_theme_brush: Color::from_argb(0, 255, 255, 255),
+                system_control_highlight_accent_brush: accent.base,
+                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
+            },
+        }
+    }
+}
+pub const PROGRESS_RING_STROKE_THICKNESS: f64 = 4.0;
 /// Theme-dependent resources of `InfoBadge_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct InfoBadgeResources {

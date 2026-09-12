@@ -64,6 +64,9 @@ pub struct RetainedFlyoutHost {
 
     /// Optional owner close request when the active target is removed.
     pub(crate) target_removed: Option<Listener>,
+
+    /// Popup key handling also applies when the scope itself has focus.
+    pub(crate) on_key_event: Option<FocusOnKeyEventCallback>,
 }
 
 impl fmt::Debug for RetainedFlyoutHost {
@@ -96,6 +99,7 @@ impl RetainedFlyoutHost {
             closed: None,
             target_removed: None,
             on_dispose: None,
+            on_key_event: None,
         })
     }
 
@@ -497,6 +501,7 @@ impl State for RetainedFlyoutState {
             .expect("a shown flyout has a target theme");
         let direction = data.direction;
         let builder = data.builder.clone();
+        let on_key_event = data.on_key_event.clone();
         let mut themed_content = ThemeScope::new(
             resources.theme,
             Directionality::new(
@@ -505,14 +510,15 @@ impl State for RetainedFlyoutState {
             ),
         );
         themed_content.resources = resources;
+        let mut scope = FocusScope::new(themed_content).node(app.get(self).focus.unwrap());
+        if let Some(handler) = on_key_event {
+            scope = scope.on_key_event(handler);
+        }
         Offstage::new()
             .offstage(!open)
             .child(TickerMode::new(
                 open,
-                ExcludeFocus::new(
-                    FocusScope::new(themed_content).node(app.get(self).focus.unwrap()),
-                )
-                .excluding(!open),
+                ExcludeFocus::new(scope).excluding(!open),
             ))
             .into_widget()
     }

@@ -16,3 +16,5 @@ The gallery uses NavigationView with 25 destinations and an icon for each featur
 The gallery includes TextBox and PasswordBox (native editing, selection, clipboard commands, multiline input and password reveal), TabView (selection, closing, sizing, scrolling and in-window drag/reorder) and NavigationView (adaptive left panes, hierarchy and top overflow), alongside the earlier button, slider and SplitView ports. Native framework and host differences are recorded in the source folders’ `PORTING.md` files.
 
 `AGENTS.md` has the porting rules; `crates/reveal-winui/README.md` the shape of the code.
+
+The gallery includes dedicated `SplitButton`, `ToggleSplitButton` and `MenuFlyout` pages with independent primary actions, checked choices and nested menus.

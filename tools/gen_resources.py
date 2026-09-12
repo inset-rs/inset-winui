@@ -98,7 +98,9 @@ def read_dictionaries(path, keys=None):
             elif kind == 'SolidColorBrush':
                 color = element.get('Color', '')
                 match = re.match(r'\{(?:StaticResource|ThemeResource) (\w+)\}', color)
-                entries[name] = ('alias', match.group(1)) if match else ('color', parse_color(color))
+                entry = ('alias', match.group(1)) if match else ('color', parse_color(color))
+                opacity = float(element.get('Opacity', '1'))
+                entries[name] = ('opacity', (entry, opacity)) if opacity != 1 else entry
             elif kind == 'Color':
                 entries[name] = ('color', parse_color(element.text))
             elif kind == 'AcrylicBrush':
@@ -178,6 +180,13 @@ def resolve(entries, base, name, seen=()):
         if value in seen:
             return None
         return resolve(entries, base, value, seen + (value,))
+    if kind == 'opacity':
+        color, opacity = value
+        if color[0] == 'alias':
+            if color[1] in seen:
+                return None
+            color = resolve(entries, base, color[1], seen + (color[1],))
+        return ('opacity', (color, opacity)) if color is not None else None
     if kind == 'gradient':
         return ('gradient', [(offset, key if isinstance(key, tuple) else resolve(entries, base, key)) for offset, key in value])
     if kind == 'acrylic':
@@ -210,6 +219,10 @@ def accent_field(name):
 
 def value_literal(entry):
     kind, value = entry
+    if kind == 'opacity':
+        color, opacity = value
+        return ('{ let color = ' + value_literal(color) + '; '
+                f'color.with_values(Some(color.a * {opacity}), None, None, None, None) }}')
     return accent_field(value) if kind == 'accent' else color_literal(value)
 
 
@@ -234,7 +247,7 @@ def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
             print(f'warning: {source}: unresolved resource {key} ({missing}); not emitted', file=sys.stderr)
             continue
         kinds = {light[0], dark[0]}
-        if kinds <= {'color', 'accent'}:
+        if kinds <= {'color', 'accent', 'opacity'}:
             fields.append((snake(key), 'Color'))
             values['Light'].append(value_literal(light))
             values['Default'].append(value_literal(dark))
@@ -307,7 +320,7 @@ def main():
            'use super::{AccentPalette, AcrylicBrushResources, Theme};', 'use crate::BackgroundSizing;', 'use reveal_embedder::{Color, FontWeight};', 'use std::time::Duration;', '']
     # Brush keys alias a colour rather than stating one, so the alias kind belongs
     # in the shared struct as much as a literal colour does.
-    common_keys = [k for k, v in base_themes['Light'].items() if v[0] in ('color', 'gradient', 'alias')]
+    common_keys = [k for k, v in base_themes['Light'].items() if v[0] in ('color', 'gradient', 'alias', 'opacity')]
     emit_struct(out, 'CommonResources', common_keys, base_themes, {}, base_shared, 'Common_themeresources_any.xaml')
     sources = [(control, control_source(root, control)) for control in controls]
     # Control dictionaries share named resources in WinUI's merged theme dictionary.

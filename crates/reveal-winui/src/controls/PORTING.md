@@ -342,6 +342,28 @@ Ported against: aa3207e6
   Reason: os — the Windows animated-chevron asset has no matching animation in the bundled Fluent font.
   Affect: The chevron changes color on hover and press but does not animate its shape.
 
+## toggle_split_button.rs → `ToggleSplitButton`
+
+- Change: `ToggleSplitButton` receives its checked value from the application and reports the next value through a callback.
+  Reason: framework — Reveal rebuilds widgets from application state, while WinUI changes the control's own checked property before raising its change event.
+  Affect: Applications store the requested value in `is_checked_changed` for the next rebuild, then `click` runs with that updated application state; assigning a checked value directly does not invoke the change callback.
+
+## split_button.rs → `SplitButton` and `ToggleSplitButton`
+
+- Change: `SplitButton` and `ToggleSplitButton` use an action callback instead of a command object.
+  Reason: framework — WinUI commands can report whether they are available, while the kit's callbacks only perform the action.
+  Affect: Applications capture action arguments in the callback and set `is_enabled` themselves when the action becomes unavailable.
+
+- Change: `SplitButton` and `ToggleSplitButton` use a static Fluent chevron for the menu button.
+  Reason: os — the Windows animated-chevron asset is unavailable in the bundled icon font.
+  Affect: The arrow changes color with the button's state but does not animate its shape.
+
+## menu_flyout/mod.rs → `MenuFlyout`
+
+- Change: `MenuFlyout` receives toggle and radio-item checked values from the application.
+  Reason: framework — Reveal builds menu descriptions from application state, while WinUI stores checked values on its item objects and coordinates radio items by group name.
+  Affect: Applications use the callbacks passed to `MenuFlyoutItem::toggle` and `MenuFlyoutItem::radio` to replace the menu's items with updated checked values and keep radio choices mutually exclusive.
+
 ## Deferred
 
 - `ProgressRing` starts its arc at twelve o'clock, but that starting point remains unverified against Windows. Trigger: A Windows capture establishes where the original ellipse starts drawing its arc.

@@ -5,6 +5,12 @@ use reveal_winui::FluentSymbol;
 /// A gallery destination with its own retained examples and scroll position.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Feature {
+    /// Independent primary and flyout actions.
+    SplitButton,
+    /// A checked primary action beside a flyout button.
+    ToggleSplitButton,
+    /// Commands, checks, radio choices and nested menus.
+    MenuFlyout,
     /// Reusable anchored content and dismissal policies.
     Flyout,
     /// Buttons that open an associated flyout.
@@ -59,9 +65,12 @@ pub enum Feature {
 
 impl Feature {
     /// Display order in the navigation pane.
-    pub const ALL: [Self; 25] = [
+    pub const ALL: [Self; 28] = [
         Self::Button,
         Self::DropDownButton,
+        Self::SplitButton,
+        Self::ToggleSplitButton,
+        Self::MenuFlyout,
         Self::Flyout,
         Self::TextBox,
         Self::PasswordBox,
@@ -90,6 +99,9 @@ impl Feature {
     /// The navigation label and stable destination identity.
     pub fn title(self) -> &'static str {
         match self {
+            Self::SplitButton => "SplitButton",
+            Self::ToggleSplitButton => "ToggleSplitButton",
+            Self::MenuFlyout => "MenuFlyout",
             Self::Flyout => "Flyout",
             Self::DropDownButton => "DropDownButton",
             Self::Button => "Button",
@@ -121,6 +133,9 @@ impl Feature {
     /// A distinct bundled Fluent symbol keeps each destination recognizable in compact mode.
     pub fn symbol(self) -> FluentSymbol {
         match self {
+            Self::SplitButton => FluentSymbol::Add,
+            Self::ToggleSplitButton => FluentSymbol::Checkmark,
+            Self::MenuFlyout => FluentSymbol::More,
             Self::Flyout => FluentSymbol::ChevronRight,
             Self::DropDownButton => FluentSymbol::ChevronDown,
             Self::Button => FluentSymbol::CursorClick,
@@ -152,6 +167,9 @@ impl Feature {
     /// Brief guidance above the examples.
     pub fn description(self) -> &'static str {
         match self {
+            Self::SplitButton => "Combine a primary action with a menu of related choices.",
+            Self::ToggleSplitButton => "Toggle an action while keeping its menu independent.",
+            Self::MenuFlyout => "Choose commands and settings from a hierarchical menu.",
             Self::Flyout => "Show reusable content beside its opening control.",
             Self::DropDownButton => "Open a flyout from a button with a dropdown chevron.",
             Self::Button => "Activate an action using the pointer or keyboard.",

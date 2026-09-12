@@ -256,6 +256,16 @@ impl Flyout {
             app,
             Rc::new(move |app, context| this.build_presenter(app, context)),
         );
+        app.get_mut(host).on_key_event = Some(Rc::new(move |app, _, event| {
+            if matches!(event, KeyEvent::Down(_))
+                && event.logical_key() == LogicalKeyboardKey::ESCAPE
+            {
+                this.hide(app);
+                KeyEventResult::Handled
+            } else {
+                KeyEventResult::Ignored
+            }
+        }));
         app.get_mut(host).on_dispose = Some(Listener::new(move |app| this.dispose(app)));
         app.get_mut(host).opened = Some(Listener::new(move |app| this.on_opened(app)));
         app.get_mut(host).closed = Some(Listener::new(move |app| this.on_closed(app)));
@@ -705,17 +715,7 @@ impl Flyout {
                                 })),
                         ),
                 )
-                .can_request_focus(false)
-                .on_key_event(Rc::new(move |app, _, event| {
-                    if matches!(event, KeyEvent::Down(_))
-                        && event.logical_key() == LogicalKeyboardKey::ESCAPE
-                    {
-                        self.hide(app);
-                        KeyEventResult::Handled
-                    } else {
-                        KeyEventResult::Ignored
-                    }
-                }));
+                .can_request_focus(false);
                 let insets = MediaQuery::view_insets_of(app, context);
                 let area = Rect::from_ltwh(
                     0.0,

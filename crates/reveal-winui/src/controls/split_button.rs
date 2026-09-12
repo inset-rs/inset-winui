@@ -93,7 +93,7 @@ impl SplitButton {
     }
 }
 
-/// The unchecked SplitButton CommonStates; checked states belong to ToggleSplitButton.
+/// CommonStates shared by SplitButton and ToggleSplitButton.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum SplitButtonVisualState {
     Normal,
@@ -107,9 +107,9 @@ enum SplitButtonVisualState {
 }
 
 /// Pointer and keyboard state shared by the two source buttons.
-pub struct SplitButtonState {
+pub(crate) struct SplitButtonState {
     /// Native state identity.
-    state: StateData<SplitButton>,
+    state: StateData<SplitButtonPresenter>,
 
     /// Focus identity for the whole control, while internal buttons are not tab stops.
     focus: Option<AnyFocusNode>,
@@ -142,12 +142,40 @@ pub struct SplitButtonState {
     target: Option<BuildContext>,
 }
 
-impl StatefulWidget for SplitButton {
-    type State = SplitButtonState;
-
+impl StatelessWidget for SplitButton {
     fn key(&self) -> Option<&KeyRef> {
         self.key.as_ref()
     }
+
+    fn build(&self, _app: &mut App, _context: BuildContext) -> WidgetRef {
+        SplitButtonPresenter {
+            button: self.clone(),
+            is_checked: false,
+        }
+        .into_widget()
+    }
+}
+
+/// Both source classes use the same template and input state, with a checked-state override.
+#[derive(Clone, Debug)]
+pub(crate) struct SplitButtonPresenter {
+    /// Shared content, activation and focus configuration.
+    pub(crate) button: SplitButton,
+
+    /// ToggleSplitButton::InternalIsChecked; false for an ordinary SplitButton.
+    pub(crate) is_checked: bool,
+}
+
+impl std::ops::Deref for SplitButtonPresenter {
+    type Target = SplitButton;
+
+    fn deref(&self) -> &Self::Target {
+        &self.button
+    }
+}
+
+impl StatefulWidget for SplitButtonPresenter {
+    type State = SplitButtonState;
 
     fn create_state(&self) -> Self::State {
         SplitButtonState {
@@ -167,7 +195,7 @@ impl StatefulWidget for SplitButton {
 }
 
 impl SplitButtonState {
-    /// SplitButton::UpdateVisualStates for the non-toggle control.
+    /// SplitButton::UpdateVisualStates chooses interaction state before checked colors.
     fn visual_state(self: Handle<Self>, app: &App) -> SplitButtonVisualState {
         use SplitButtonVisualState::*;
         let widget = self.widget(app);
@@ -440,6 +468,44 @@ impl SplitButtonState {
             }
             Normal => {}
         }
+        let mut divider = r.split_button_border_brush_divider;
+        if self.widget(app).is_checked && state != Disabled {
+            primary_fill = r.split_button_background_checked;
+            secondary_fill = primary_fill;
+            primary_foreground = r.split_button_foreground_checked;
+            secondary_foreground = primary_foreground;
+            primary_border = Brush::ControlElevation(r.split_button_border_brush_checked);
+            secondary_border = primary_border;
+            divider = r.split_button_border_brush_checked_divider;
+
+            match state {
+                FlyoutOpen | TouchPressed => {
+                    primary_fill = r.split_button_background_checked_pressed;
+                    secondary_fill = primary_fill;
+                    primary_foreground = r.split_button_foreground_checked_pressed;
+                    secondary_foreground = primary_foreground;
+                    primary_border = Brush::Solid(r.split_button_border_brush_checked_pressed);
+                    secondary_border = primary_border;
+                }
+                PrimaryPointerOver => {
+                    primary_fill = r.split_button_background_checked_pointer_over;
+                    primary_foreground = r.split_button_foreground_checked_pointer_over;
+                }
+                PrimaryPressed => {
+                    primary_fill = r.split_button_background_checked_pressed;
+                    primary_foreground = r.split_button_foreground_checked_pressed;
+                }
+                SecondaryPointerOver => {
+                    secondary_fill = r.split_button_background_checked_pointer_over;
+                    secondary_foreground = r.split_button_foreground_checked_pointer_over;
+                }
+                SecondaryPressed => {
+                    secondary_fill = r.split_button_background_checked_pressed;
+                    secondary_foreground = r.split_button_foreground_checked_pressed;
+                }
+                Normal | Disabled => {}
+            }
+        }
         let primary = self.button(
             app,
             true,
@@ -465,11 +531,9 @@ impl SplitButtonState {
                 GridCell::new(Grid::new().background(Brush::Solid(primary_fill)))
                     .column_span(2)
                     .into_widget(),
-                GridCell::new(
-                    Grid::new().background(Brush::Solid(r.split_button_border_brush_divider)),
-                )
-                .column(1)
-                .into_widget(),
+                GridCell::new(Grid::new().background(Brush::Solid(divider)))
+                    .column(1)
+                    .into_widget(),
                 GridCell::new(Grid::new().background(Brush::Solid(secondary_fill)))
                     .column(2)
                     .into_widget(),
@@ -503,14 +567,14 @@ impl SplitButtonState {
 }
 
 impl State for SplitButtonState {
-    type Widget = SplitButton;
+    type Widget = SplitButtonPresenter;
     reveal_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
         self.attach_focus(app);
     }
 
-    fn did_update_widget(self: Handle<Self>, app: &mut App, old: &SplitButton) {
+    fn did_update_widget(self: Handle<Self>, app: &mut App, old: &SplitButtonPresenter) {
         if !self.widget(app).is_enabled {
             app.get_mut(self).primary_pressed = false;
             app.get_mut(self).secondary_pressed = false;
