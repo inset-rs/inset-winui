@@ -8052,3 +8052,180 @@ pub const MENU_BAR_ITEM_BUTTON_PADDING: [f64; 4] = [10.0, 4.0, 10.0, 4.0];
 pub const MENU_BAR_ITEM_MARGIN: [f64; 4] = [4.0, 4.0, 4.0, 4.0];
 /// Left, top, right, bottom.
 pub const MENU_BAR_ITEM_BORDER_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Theme-dependent resources of `BreadcrumbBar_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct BreadcrumbBarResources {
+    /// The resolved `BreadcrumbBarNormalForegroundBrush` resource.
+    pub breadcrumb_bar_normal_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarHoverForegroundBrush` resource.
+    pub breadcrumb_bar_hover_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarPressedForegroundBrush` resource.
+    pub breadcrumb_bar_pressed_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarDisabledForegroundBrush` resource.
+    pub breadcrumb_bar_disabled_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarFocusForegroundBrush` resource.
+    pub breadcrumb_bar_focus_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarCurrentNormalForegroundBrush` resource.
+    pub breadcrumb_bar_current_normal_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarCurrentHoverForegroundBrush` resource.
+    pub breadcrumb_bar_current_hover_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarCurrentPressedForegroundBrush` resource.
+    pub breadcrumb_bar_current_pressed_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarCurrentDisabledForegroundBrush` resource.
+    pub breadcrumb_bar_current_disabled_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarCurrentFocusForegroundBrush` resource.
+    pub breadcrumb_bar_current_focus_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarEllipsisDropDownItemBackground` resource.
+    pub breadcrumb_bar_ellipsis_drop_down_item_background: Color,
+    /// The resolved `BreadcrumbBarEllipsisDropDownItemBackgroundPointerOver` resource.
+    pub breadcrumb_bar_ellipsis_drop_down_item_background_pointer_over: Color,
+    /// The resolved `BreadcrumbBarEllipsisDropDownItemBackgroundPressed` resource.
+    pub breadcrumb_bar_ellipsis_drop_down_item_background_pressed: Color,
+    /// The resolved `BreadcrumbBarEllipsisDropDownItemBackgroundDisabled` resource.
+    pub breadcrumb_bar_ellipsis_drop_down_item_background_disabled: Color,
+    /// The resolved `BreadcrumbBarEllipsisDropDownItemForegroundPointerOver` resource.
+    pub breadcrumb_bar_ellipsis_drop_down_item_foreground_pointer_over: Color,
+    /// The resolved `BreadcrumbBarEllipsisDropDownItemForegroundPressed` resource.
+    pub breadcrumb_bar_ellipsis_drop_down_item_foreground_pressed: Color,
+    /// The resolved `BreadcrumbBarEllipsisDropDownItemForegroundDisabled` resource.
+    pub breadcrumb_bar_ellipsis_drop_down_item_foreground_disabled: Color,
+    /// The resolved `BreadcrumbBarForegroundBrush` resource.
+    pub breadcrumb_bar_foreground_brush: Color,
+    /// The resolved `BreadcrumbBarBackgroundBrush` resource.
+    pub breadcrumb_bar_background_brush: Color,
+    /// The resolved `BreadcrumbBarBorderBrush` resource.
+    pub breadcrumb_bar_border_brush: Color,
+    /// The resolved `BreadcrumbBarEllipsisFlyoutPresenterBackground` resource.
+    pub breadcrumb_bar_ellipsis_flyout_presenter_background: AcrylicBrushResources,
+    /// The resolved `BreadcrumbBarEllipsisFlyoutPresenterBorderBrush` resource.
+    pub breadcrumb_bar_ellipsis_flyout_presenter_border_brush: Color,
+    /// The resolved `AcrylicBackgroundFillColorDefaultBrush` resource.
+    pub acrylic_background_fill_color_default_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+}
+
+impl BreadcrumbBarResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => {
+                Self {
+                    breadcrumb_bar_normal_foreground_brush: Color::from_argb(228, 0, 0, 0),
+                    breadcrumb_bar_hover_foreground_brush: Color::from_argb(158, 0, 0, 0),
+                    breadcrumb_bar_pressed_foreground_brush: Color::from_argb(114, 0, 0, 0),
+                    breadcrumb_bar_disabled_foreground_brush: Color::from_argb(92, 0, 0, 0),
+                    breadcrumb_bar_focus_foreground_brush: Color::from_argb(228, 0, 0, 0),
+                    breadcrumb_bar_current_normal_foreground_brush: Color::from_argb(228, 0, 0, 0),
+                    breadcrumb_bar_current_hover_foreground_brush: Color::from_argb(158, 0, 0, 0),
+                    breadcrumb_bar_current_pressed_foreground_brush: Color::from_argb(114, 0, 0, 0),
+                    breadcrumb_bar_current_disabled_foreground_brush: Color::from_argb(92, 0, 0, 0),
+                    breadcrumb_bar_current_focus_foreground_brush: Color::from_argb(228, 0, 0, 0),
+                    breadcrumb_bar_ellipsis_drop_down_item_background: Color::from_argb(
+                        0, 255, 255, 255,
+                    ),
+                    breadcrumb_bar_ellipsis_drop_down_item_background_pointer_over:
+                        Color::from_argb(9, 0, 0, 0),
+                    breadcrumb_bar_ellipsis_drop_down_item_background_pressed: Color::from_argb(
+                        6, 0, 0, 0,
+                    ),
+                    breadcrumb_bar_ellipsis_drop_down_item_background_disabled: Color::from_argb(
+                        0, 255, 255, 255,
+                    ),
+                    breadcrumb_bar_ellipsis_drop_down_item_foreground_pointer_over:
+                        Color::from_argb(228, 0, 0, 0),
+                    breadcrumb_bar_ellipsis_drop_down_item_foreground_pressed: Color::from_argb(
+                        228, 0, 0, 0,
+                    ),
+                    breadcrumb_bar_ellipsis_drop_down_item_foreground_disabled: Color::from_argb(
+                        92, 0, 0, 0,
+                    ),
+                    breadcrumb_bar_foreground_brush: Color::from_argb(228, 0, 0, 0),
+                    breadcrumb_bar_background_brush: Color::from_argb(0, 0, 0, 0),
+                    breadcrumb_bar_border_brush: Color::from_argb(0, 0, 0, 0),
+                    breadcrumb_bar_ellipsis_flyout_presenter_background: AcrylicBrushResources {
+                        tint_color: Color::from_argb(255, 252, 252, 252),
+                        tint_opacity: 0.0,
+                        tint_luminosity_opacity: Some(0.85),
+                        fallback_color: Color::from_argb(255, 249, 249, 249),
+                    },
+                    breadcrumb_bar_ellipsis_flyout_presenter_border_brush: Color::from_argb(
+                        15, 0, 0, 0,
+                    ),
+                    acrylic_background_fill_color_default_brush: AcrylicBrushResources {
+                        tint_color: Color::from_argb(255, 252, 252, 252),
+                        tint_opacity: 0.0,
+                        tint_luminosity_opacity: Some(0.85),
+                        fallback_color: Color::from_argb(255, 249, 249, 249),
+                    },
+                    system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                }
+            }
+            Theme::Dark => Self {
+                breadcrumb_bar_normal_foreground_brush: Color::from_argb(255, 255, 255, 255),
+                breadcrumb_bar_hover_foreground_brush: Color::from_argb(197, 255, 255, 255),
+                breadcrumb_bar_pressed_foreground_brush: Color::from_argb(135, 255, 255, 255),
+                breadcrumb_bar_disabled_foreground_brush: Color::from_argb(93, 255, 255, 255),
+                breadcrumb_bar_focus_foreground_brush: Color::from_argb(255, 255, 255, 255),
+                breadcrumb_bar_current_normal_foreground_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                breadcrumb_bar_current_hover_foreground_brush: Color::from_argb(197, 255, 255, 255),
+                breadcrumb_bar_current_pressed_foreground_brush: Color::from_argb(
+                    135, 255, 255, 255,
+                ),
+                breadcrumb_bar_current_disabled_foreground_brush: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                breadcrumb_bar_current_focus_foreground_brush: Color::from_argb(255, 255, 255, 255),
+                breadcrumb_bar_ellipsis_drop_down_item_background: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                breadcrumb_bar_ellipsis_drop_down_item_background_pointer_over: Color::from_argb(
+                    15, 255, 255, 255,
+                ),
+                breadcrumb_bar_ellipsis_drop_down_item_background_pressed: Color::from_argb(
+                    10, 255, 255, 255,
+                ),
+                breadcrumb_bar_ellipsis_drop_down_item_background_disabled: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                breadcrumb_bar_ellipsis_drop_down_item_foreground_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                breadcrumb_bar_ellipsis_drop_down_item_foreground_pressed: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                breadcrumb_bar_ellipsis_drop_down_item_foreground_disabled: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                breadcrumb_bar_foreground_brush: Color::from_argb(255, 255, 255, 255),
+                breadcrumb_bar_background_brush: Color::from_argb(0, 0, 0, 0),
+                breadcrumb_bar_border_brush: Color::from_argb(0, 0, 0, 0),
+                breadcrumb_bar_ellipsis_flyout_presenter_background: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                breadcrumb_bar_ellipsis_flyout_presenter_border_brush: Color::from_argb(
+                    51, 0, 0, 0,
+                ),
+                acrylic_background_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const BREADCRUMB_BAR_CHEVRON_PADDING: [f64; 4] = [2.0, 0.0, 2.0, 0.0];
+pub const BREADCRUMB_BAR_ITEM_FONT_WEIGHT: FontWeight = FontWeight::NORMAL;
+/// Left, top, right, bottom.
+pub const BREADCRUMB_BAR_ELLIPSIS_FLYOUT_PRESENTER_BORDER_THEME_THICKNESS: [f64; 4] =
+    [1.0, 1.0, 1.0, 1.0];
+pub const BREADCRUMB_BAR_CHEVRON_FONT_SIZE: f64 = 12.0;

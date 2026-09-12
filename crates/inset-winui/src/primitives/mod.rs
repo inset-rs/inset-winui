@@ -32,3 +32,6 @@ pub use info_bar_panel::*;
 
 mod retained_flyout;
 pub use retained_flyout::{FlyoutTarget, FlyoutTargetState, RetainedFlyoutHost};
+
+mod breadcrumb_layout;
+pub(crate) use breadcrumb_layout::*;

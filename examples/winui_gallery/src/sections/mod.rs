@@ -32,3 +32,5 @@ pub mod flyout;
 pub mod command_buttons;
 
 pub mod menu_bar;
+
+pub mod breadcrumb_bar;

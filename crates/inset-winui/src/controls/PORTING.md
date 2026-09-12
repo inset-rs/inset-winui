@@ -380,6 +380,16 @@ Ported against: aa3207e6
   Reason: os — WinUI adjusts pen menus using the Windows handedness preference, which Inset's host does not expose.
   Affect: Pen-triggered menus adjust to fit the window but do not switch sides to avoid the user's hand.
 
+## breadcrumb_bar.rs → `BreadcrumbBar` and `BreadcrumbBarItem`
+
+- Change: `BreadcrumbBar` receives item descriptions with stable ids and widget content instead of a XAML item collection and data template.
+  Reason: framework — Inset rebuilds widgets from application data, while WinUI retains item objects and asks its element factory to create their controls.
+  Affect: Applications preserve item ids across collection changes; inline and overflow content have separate widget State, and `item_clicked` reports the item and its index in the current collection for inline clicks or the copied collection from when the overflow menu opened for dropdown clicks, without changing the path.
+
+- Change: `BreadcrumbBarItem` recognizes dropdown clicks with Inset’s native tap recognizer.
+  Reason: framework — WinUI tracks a pointer id and invokes the dropdown item on release, while Inset resolves taps alongside competing drag and scroll gestures.
+  Affect: Dragging the overflow list can cancel a pending item click using the same native behavior as the kit’s buttons.
+
 ## Deferred
 
 - `MenuBar` activation by pressing Alt followed by a letter, and the temporary labels showing those letters, remain deferred. Trigger: The kit provides shared access-key mode and label display.

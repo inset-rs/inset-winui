@@ -192,6 +192,11 @@ impl ThemeResources {
         DropDownButtonResources::for_theme(self.theme, &self.accent)
     }
 
+    /// Resolves BreadcrumbBar and BreadcrumbBarItem template resources.
+    pub fn breadcrumb_bar(&self) -> BreadcrumbBarResources {
+        BreadcrumbBarResources::for_theme(self.theme, &self.accent)
+    }
+
     /// Resolves MenuBar and MenuBarItem template resources.
     pub fn menu_bar(&self) -> MenuBarResources {
         MenuBarResources::for_theme(self.theme, &self.accent)

@@ -116,6 +116,12 @@ Ported against: aa3207e6
   Reason: os — the desktop host delivers keyboard and pointer events only, while Windows also records `GamepadOrRemote` and asks `LastInputWasNonFocusNavigationKeyFromSIP` whether a key came from the touch keyboard.
   Affect: A gamepad reaches the kit only through keys the host maps for it, which count as keyboard input, and a key typed on an on-screen keyboard counts as keyboard input and draws a ring.
 
+## breadcrumb_layout.rs → `BreadcrumbLayout`
+
+- Change: `BreadcrumbLayout` retains hidden item State and measures hidden content with the same available-width constraints as visible items, following Inset’s offstage behavior.
+  Reason: framework — WinUI measures every item and then arranges hidden items into zero-sized rectangles, while Inset uses one constraint-driven layout operation.
+  Affect: Hidden breadcrumbs do not paint or receive pointer input, but their content is still laid out at its measured size and retains its State when the bar narrows or widens.
+
 ## Deferred
 
 - `BitmapIcon` and `ImageIcon` remain deferred. Trigger: Image loading is integrated with the kit's supported hosts, including foreground-color tinting for monochrome `BitmapIcon` images.

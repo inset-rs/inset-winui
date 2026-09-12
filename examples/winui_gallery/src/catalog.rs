@@ -7,6 +7,7 @@ use inset_winui::FluentSymbol;
 pub enum Feature {
     /// Application menu headers and keyboard navigation.
     MenuBar,
+    BreadcrumbBar,
     /// Independent primary and flyout actions.
     SplitButton,
     /// A checked primary action beside a flyout button.
@@ -67,13 +68,14 @@ pub enum Feature {
 
 impl Feature {
     /// Display order in the navigation pane.
-    pub const ALL: [Self; 29] = [
+    pub const ALL: [Self; 30] = [
         Self::Button,
         Self::DropDownButton,
         Self::SplitButton,
         Self::ToggleSplitButton,
         Self::MenuFlyout,
         Self::MenuBar,
+        Self::BreadcrumbBar,
         Self::Flyout,
         Self::TextBox,
         Self::PasswordBox,
@@ -106,6 +108,7 @@ impl Feature {
             Self::ToggleSplitButton => "ToggleSplitButton",
             Self::MenuFlyout => "MenuFlyout",
             Self::MenuBar => "MenuBar",
+            Self::BreadcrumbBar => "BreadcrumbBar",
             Self::Flyout => "Flyout",
             Self::DropDownButton => "DropDownButton",
             Self::Button => "Button",
@@ -141,6 +144,7 @@ impl Feature {
             Self::ToggleSplitButton => FluentSymbol::Checkmark,
             Self::MenuFlyout => FluentSymbol::More,
             Self::MenuBar => FluentSymbol::MenuList,
+            Self::BreadcrumbBar => FluentSymbol::ChevronLeft,
             Self::Flyout => FluentSymbol::ChevronRight,
             Self::DropDownButton => FluentSymbol::ChevronDown,
             Self::Button => FluentSymbol::CursorClick,
@@ -175,6 +179,9 @@ impl Feature {
             Self::SplitButton => "Combine a primary action with a menu of related choices.",
             Self::ToggleSplitButton => "Toggle an action while keeping its menu independent.",
             Self::MenuFlyout => "Choose commands and settings from a hierarchical menu.",
+            Self::BreadcrumbBar => {
+                "Navigate a path and keep earlier destinations in the overflow menu."
+            }
             Self::MenuBar => {
                 "Organize application commands into menus with pointer and keyboard navigation."
             }
