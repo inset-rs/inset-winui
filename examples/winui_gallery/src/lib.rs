@@ -12,6 +12,12 @@ use inset_widgets::*;
 use inset_winui::*;
 use std::rc::Rc;
 
+/// Starts the gallery with the native or web host selected by Inset.
+#[inset::main(title = "WinUI Gallery", size = [1080.0, 780.0])]
+fn main(app: &mut App) {
+    run(app);
+}
+
 /// The gallery switches directly between expanded and minimal navigation.
 const GALLERY_NAVIGATION_BREAKPOINT: f64 = 800.0;
 

@@ -2,7 +2,7 @@
 
 use inset_animation::{AnimationBehavior, AnimationController, ColorTween, Curves};
 use inset_embedder::Color;
-use inset_foundation::{App, Handle, Listenable, Listener};
+use inset_foundation::{App, Handle, Listener};
 use inset_scheduler::{Ticker, TickerCallback, TickerProviderObject};
 use inset_widgets::*;
 use std::{fmt, rc::Rc, time::Duration};

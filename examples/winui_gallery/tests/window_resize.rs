@@ -17,6 +17,7 @@ use inset_winui::*;
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
+    sync::Arc,
     time::Duration,
 };
 
@@ -40,11 +41,12 @@ impl View for CaptureView {
             ..Default::default()
         }
     }
-    fn present(&self, picture: &Picture) {
-        *self.pixels.borrow_mut() =
-            self.renderer
-                .borrow_mut()
-                .render_to_rgba(picture, self.size.get(), Some(Color::WHITE));
+    fn present(&self, picture: Arc<Picture>) {
+        *self.pixels.borrow_mut() = self.renderer.borrow_mut().render_to_rgba(
+            &picture,
+            self.size.get(),
+            Some(Color::WHITE),
+        );
     }
 }
 struct Host {

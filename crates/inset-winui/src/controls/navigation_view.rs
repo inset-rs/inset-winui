@@ -9,7 +9,7 @@ use super::top_navigation_view_data_provider::TopNavigationViewDataProvider;
 use crate::*;
 use inset_animation::{AnimationBehavior, AnimationController, Curves};
 use inset_embedder::{Color, FontWeight, Offset, Rect, TextDirection};
-use inset_foundation::{App, Handle, Listenable, Listener};
+use inset_foundation::{App, Handle, Listener};
 use inset_painting::{Alignment, EdgeInsetsGeometry};
 use inset_rendering::{BoxConstraints, CrossAxisAlignment, MainAxisSize, StackFit};
 use inset_scheduler::{

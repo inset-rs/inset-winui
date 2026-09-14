@@ -7,7 +7,7 @@ use inset_scheduler::SchedulerBinding;
 use inset_services::*;
 use inset_widgets::*;
 use inset_winui::{CommonState, CommonStates, ControlStates};
-use std::{cell::Cell, rc::Rc, time::Duration};
+use std::{cell::Cell, rc::Rc, sync::Arc, time::Duration};
 
 struct TestView;
 impl inset_embedder::View for TestView {
@@ -22,7 +22,7 @@ impl inset_embedder::View for TestView {
             ..Default::default()
         }
     }
-    fn present(&self, _: &Picture) {}
+    fn present(&self, _: Arc<Picture>) {}
 }
 struct Host;
 impl Platform for Host {

@@ -2,7 +2,7 @@
 
 use inset_embedder::valo::{Color, Context};
 use inset_embedder::{Picture, View, ViewConstraints, ViewId, ViewMetrics};
-use std::cell::RefCell;
+use std::{cell::RefCell, sync::Arc};
 
 /// A headless view that retains the last rendered RGBA frame.
 pub struct CaptureView {
@@ -25,10 +25,10 @@ impl View for CaptureView {
             ..Default::default()
         }
     }
-    fn present(&self, picture: &Picture) {
+    fn present(&self, picture: Arc<Picture>) {
         *self.pixels.borrow_mut() =
             self.renderer
                 .borrow_mut()
-                .render_to_rgba(picture, self.size, Some(Color::WHITE));
+                .render_to_rgba(&picture, self.size, Some(Color::WHITE));
     }
 }

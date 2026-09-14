@@ -236,7 +236,13 @@ fn text_commands_copy_paste_undo_and_password_copy_policy() {
     let copy = f.find("Copy");
     click(&mut f, copy);
     assert_eq!(
-        f.cell.borrow().platform().clipboard_get_data().as_deref(),
+        f.cell
+            .borrow()
+            .platform()
+            .clipboard()
+            .unwrap()
+            .text()
+            .as_deref(),
         Some("copy")
     );
     assert!(focus.has_focus(&mut f.cell.borrow_mut()));
@@ -337,7 +343,15 @@ fn native_keyboard_selection_deletion_and_password_copy_policy() {
         key(&mut f, true, logical, physical);
         key(&mut f, false, logical, physical);
         key(&mut f, false, Key::META_LEFT, Physical::META_LEFT);
-        assert!(f.cell.borrow().platform().clipboard_get_data().is_none());
+        assert!(
+            f.cell
+                .borrow()
+                .platform()
+                .clipboard()
+                .unwrap()
+                .text()
+                .is_none()
+        );
         assert_eq!(c.text_value(&f.cell.borrow()), "sample");
     }
 }

@@ -3,8 +3,8 @@
 use crate::{CaptureView, gpu};
 use inset_embedder::valo::Context;
 use inset_embedder::{
-    FontSource, Offset, Platform, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind,
-    SystemFontSource, TargetPlatform, ViewId, ViewRef,
+    Clipboard, FontSource, Offset, Platform, PointerChange, PointerData, PointerDataPacket,
+    PointerDeviceKind, SystemFontSource, TargetPlatform, ViewId, ViewRef,
 };
 use inset_foundation::{App, AppCell};
 use inset_gestures::GestureBinding;
@@ -18,20 +18,26 @@ struct Host {
     /// In-memory platform clipboard for headless editing tests.
     clipboard: RefCell<Option<String>>,
 }
-impl Platform for Host {
-    fn clipboard_set_data(&self, text: &str) {
+impl Clipboard for Host {
+    fn set_text(&self, text: &str) {
         *self.clipboard.borrow_mut() = Some(text.to_owned());
     }
 
-    fn clipboard_get_data(&self) -> Option<String> {
+    fn text(&self) -> Option<String> {
         self.clipboard.borrow().clone()
     }
 
-    fn clipboard_has_strings(&self) -> bool {
+    fn has_strings(&self) -> bool {
         self.clipboard
             .borrow()
             .as_ref()
             .is_some_and(|text| !text.is_empty())
+    }
+}
+
+impl Platform for Host {
+    fn clipboard(&self) -> Option<&dyn Clipboard> {
+        Some(self)
     }
 
     fn target_platform(&self) -> TargetPlatform {
