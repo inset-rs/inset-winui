@@ -19,7 +19,7 @@ Run the gallery from this repository. Dependencies come from crates.io.
 
 ```toml
 [dependencies]
-inset-winui = "0.1.0"
+inset-winui = "0.2.0"
 ```
 
 Use controls inside an Inset `WidgetsApp`, with `ThemeScope` selecting the light or dark theme. Call `install_icon_font` once during application setup. Controls that show popups need an `Overlay` ancestor.

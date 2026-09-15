@@ -15,7 +15,7 @@ unsafe_code = "forbid"
 # Use published Inset crates; the gallery uses the local kit under development.
 [workspace.dependencies]
 inset = "0.3.0"
-inset-winui = { version = "0.1.0", path = "crates/inset-winui" }
+inset-winui = { version = "0.2.0", path = "crates/inset-winui" }
 inset-animation = "0.3.0"
 inset-embedder = "0.3.0"
 inset-foundation = "0.3.0"
