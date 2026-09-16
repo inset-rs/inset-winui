@@ -35,9 +35,17 @@ fn ring_at_top_left(ring: ProgressRing) -> Fixture {
 }
 
 /// Hands the mounted ring new property values, as an owner rebuild does.
+///
+/// Attaches the tree in place. `run_app` would schedule a warm-up frame that resets the
+/// scheduler epoch, which would move an already-running visual independently of the
+/// properties being replaced.
 fn replace(fixture: &mut Fixture, ring: ProgressRing) {
-    run_app(&mut fixture.cell.borrow_mut(), tree(ring));
-    fixture.cell.elapse(Duration::ZERO);
+    {
+        let mut app = fixture.cell.borrow_mut();
+        let binding = WidgetsBinding::instance(&mut app);
+        let wrapped = binding.wrap_with_default_view(&mut app, tree(ring));
+        binding.attach_root_widget(&mut app, wrapped);
+    }
     advance(fixture, Duration::from_millis(20));
 }
 

@@ -1,9 +1,10 @@
-//! The gallery under a driver that behaves like the winit embedder: frames only when requested, timers only when the platform's `wake_at` deadline is reached, the app clock advanced only by frames and wakes.
+//! The gallery under a driver that behaves like the winit embedder: frames only when requested, timers only when the dispatcher's `wake_at` deadline is reached, the app clock advanced only by frames and wakes.
 #![feature(arbitrary_self_types)]
 use inset_embedder::valo::Context;
 use inset_embedder::{
-    EmbedderClient, FontSource, Frame, Offset, Platform, PointerChange, PointerData,
-    PointerDataPacket, PointerDeviceKind, SystemFontSource, TargetPlatform, ViewId, ViewRef,
+    Dispatcher, EmbedderClient, FontSource, Frame, Instant, Offset, Platform, PointerChange,
+    PointerData, PointerDataPacket, PointerDeviceKind, SystemFontSource, TargetPlatform, ViewId,
+    ViewRef,
 };
 use inset_rendering::RenderParagraph;
 use inset_shell::Shell;
@@ -11,14 +12,59 @@ use inset_widgets::WidgetsBinding;
 use inset_winui_test_support::CaptureView;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
-use std::time::{Duration, Instant};
+use std::sync::{Arc, Mutex};
+use std::time::Duration;
+
+/// Records the next turn the framework asks for, so the driver can fire it when that time comes.
+struct LoopDispatcher {
+    deadline: Mutex<Option<Instant>>,
+}
+
+impl LoopDispatcher {
+    fn new() -> Arc<LoopDispatcher> {
+        Arc::new(LoopDispatcher {
+            deadline: Mutex::new(None),
+        })
+    }
+
+    fn due(&self, now: Instant) -> Option<Instant> {
+        let mut deadline = self
+            .deadline
+            .lock()
+            .expect("the deadline is never poisoned");
+        match *deadline {
+            Some(at) if at <= now => deadline.take(),
+            _ => None,
+        }
+    }
+
+    fn next(&self) -> Option<Instant> {
+        *self
+            .deadline
+            .lock()
+            .expect("the deadline is never poisoned")
+    }
+}
+
+impl Dispatcher for LoopDispatcher {
+    fn wake_at(&self, deadline: Instant) {
+        *self
+            .deadline
+            .lock()
+            .expect("the deadline is never poisoned") = Some(deadline);
+    }
+
+    fn dispatch(&self, work: Box<dyn FnOnce() + Send>) {
+        work();
+    }
+}
 
 struct LoopPlatform {
     view: Rc<CaptureView>,
     origin: Instant,
     clock: Cell<Duration>,
     frame_requested: Cell<bool>,
-    deadline: Cell<Option<Instant>>,
+    dispatcher: Arc<LoopDispatcher>,
 }
 impl Platform for LoopPlatform {
     fn target_platform(&self) -> TargetPlatform {
@@ -30,8 +76,8 @@ impl Platform for LoopPlatform {
     fn now(&self) -> Instant {
         self.origin + self.clock.get()
     }
-    fn wake_at(&self, deadline: Instant) {
-        self.deadline.set(Some(deadline));
+    fn dispatcher(&self) -> Arc<dyn Dispatcher> {
+        Arc::clone(&self.dispatcher) as Arc<dyn Dispatcher>
     }
     fn views(&self) -> Vec<ViewRef> {
         vec![self.view.clone()]
@@ -68,7 +114,7 @@ impl Driver {
             // Real time has passed by the time the embedder's first event arrives.
             clock: Cell::new(Duration::from_millis(1)),
             frame_requested: Cell::new(false),
-            deadline: Cell::new(None),
+            dispatcher: LoopDispatcher::new(),
         });
         let shell = Shell::new(platform.clone(), |app| {
             winui_gallery::run_feature(app, winui_gallery::Feature::RepeatButton)
@@ -92,17 +138,14 @@ impl Driver {
                 self.shell.frame(Frame { elapsed: now });
                 // The display's next vsync.
                 self.platform.clock.set(now + Duration::from_millis(16));
-            } else if let Some(deadline) = self.platform.deadline.get()
-                && deadline <= self.platform.now()
-            {
-                self.platform.deadline.set(None);
+            } else if self.platform.dispatcher.due(self.platform.now()).is_some() {
                 self.log.push(format!("{now:?} wake"));
                 self.shell.wake(now);
             } else {
                 let next = self
                     .platform
-                    .deadline
-                    .get()
+                    .dispatcher
+                    .next()
                     .map(|d| d.saturating_duration_since(self.platform.origin))
                     .filter(|d| *d > now)
                     .unwrap_or(end)

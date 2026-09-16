@@ -5,44 +5,16 @@ use inset_foundation::{AppCell, Listener};
 use inset_gestures::GestureBinding;
 use inset_scheduler::SchedulerBinding;
 use inset_services::*;
+use inset_test::{TestPlatform, TestView};
 use inset_widgets::*;
 use inset_winui::{CommonState, CommonStates, ControlStates};
-use std::{cell::Cell, rc::Rc, sync::Arc, time::Duration};
+use std::{cell::Cell, rc::Rc, time::Duration};
 
-struct TestView;
-impl inset_embedder::View for TestView {
-    fn id(&self) -> ViewId {
-        ViewId(0)
-    }
-    fn metrics(&self) -> ViewMetrics {
-        ViewMetrics {
-            physical_size: [800.0, 600.0],
-            physical_constraints: ViewConstraints::tight(800.0, 600.0),
-            device_pixel_ratio: 1.0,
-            ..Default::default()
-        }
-    }
-    fn present(&self, _: Arc<Picture>) {}
-}
-struct Host;
-impl Platform for Host {
-    fn target_platform(&self) -> TargetPlatform {
-        TargetPlatform::MacOS
-    }
-    fn request_frame(&self) {}
-    fn now(&self) -> std::time::Instant {
-        std::time::Instant::now()
-    }
-    fn wake_at(&self, _: std::time::Instant) {}
-    fn views(&self) -> Vec<ViewRef> {
-        vec![Rc::new(TestView)]
-    }
-    fn view(&self, id: ViewId) -> Option<ViewRef> {
-        (id == ViewId(0)).then(|| Rc::new(TestView) as ViewRef)
-    }
-    fn implicit_view(&self) -> Option<ViewRef> {
-        self.view(ViewId(0))
-    }
+/// An 800x600 view on a macOS host.
+fn host() -> TestPlatform {
+    TestPlatform::new()
+        .on(TargetPlatform::MacOS)
+        .with_view(Rc::new(TestView::new(800.0, 600.0)))
 }
 
 struct Fixture {
@@ -55,7 +27,7 @@ struct Fixture {
 impl Fixture {
     fn new(accepts_return: bool) -> Self {
         let mut fixture = Self {
-            cell: AppCell::with_platform(Rc::new(Host)),
+            cell: AppCell::with_platform(Rc::new(host())),
             clicks: Rc::new(Cell::new(0)),
             states: Rc::new(Cell::new(ControlStates::default())),
             accepts_return,

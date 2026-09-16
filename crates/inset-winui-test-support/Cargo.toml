@@ -14,6 +14,7 @@ inset-painting.workspace = true
 inset-rendering.workspace = true
 inset-scheduler.workspace = true
 inset-services.workspace = true
+inset-test.workspace = true
 inset-widgets.workspace = true
 wgpu.workspace = true
 pollster.workspace = true

@@ -4,14 +4,14 @@ use inset_winui_test_support::gpu;
 
 use inset_embedder::valo::{Color, Context};
 use inset_embedder::{
-    FontSource, Picture, Platform, SystemFontSource, TargetPlatform, View, ViewConstraints, ViewId,
-    ViewMetrics, ViewRef,
+    Picture, SystemFontSource, TargetPlatform, View, ViewConstraints, ViewId, ViewMetrics,
 };
 use inset_embedder::{PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
 use inset_foundation::{AppCell, Listener};
 use inset_gestures::GestureBinding;
 use inset_rendering::RendererBinding;
 use inset_scheduler::SchedulerBinding;
+use inset_test::TestPlatform;
 use inset_widgets::*;
 use inset_winui::*;
 use std::{
@@ -49,30 +49,12 @@ impl View for CaptureView {
         );
     }
 }
-struct Host {
-    view: Rc<CaptureView>,
-}
-impl Platform for Host {
-    fn target_platform(&self) -> TargetPlatform {
-        TargetPlatform::MacOS
-    }
-    fn request_frame(&self) {}
-    fn now(&self) -> std::time::Instant {
-        std::time::Instant::now()
-    }
-    fn wake_at(&self, _deadline: std::time::Instant) {}
-    fn views(&self) -> Vec<ViewRef> {
-        vec![self.view.clone()]
-    }
-    fn view(&self, id: ViewId) -> Option<ViewRef> {
-        (id == ViewId(0)).then(|| self.view.clone() as ViewRef)
-    }
-    fn implicit_view(&self) -> Option<ViewRef> {
-        Some(self.view.clone())
-    }
-    fn font_source(&self) -> Option<Box<dyn FontSource>> {
-        Some(Box::new(SystemFontSource::platform()))
-    }
+/// A macOS host showing `view`, with the system fonts.
+fn host(view: &Rc<CaptureView>) -> TestPlatform {
+    TestPlatform::new()
+        .on(TargetPlatform::MacOS)
+        .with_view(view.clone())
+        .with_font_source(|| Box::new(SystemFontSource::platform()))
 }
 
 #[test]
@@ -83,7 +65,7 @@ fn real_window_resize_relayouts_navigation_overlay() {
         renderer: RefCell::new(Context::new(device, queue)),
         pixels: RefCell::new(Vec::new()),
     });
-    let cell = AppCell::with_platform(Rc::new(Host { view: view.clone() }));
+    let cell = AppCell::with_platform(Rc::new(host(&view)));
     let tooltip_opened = Rc::new(Cell::new(false));
     {
         let mut app = cell.borrow_mut();
@@ -186,7 +168,7 @@ fn real_gallery_window_resize_keeps_overlay_parent_data() {
         renderer: RefCell::new(Context::new(device, queue)),
         pixels: RefCell::new(Vec::new()),
     });
-    let cell = AppCell::with_platform(Rc::new(Host { view: view.clone() }));
+    let cell = AppCell::with_platform(Rc::new(host(&view)));
     {
         let mut app = cell.borrow_mut();
         winui_gallery::install_fonts(&mut app);
