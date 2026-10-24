@@ -408,6 +408,7 @@ impl ToolTipServiceState {
                     callback.call(app);
                 }
             }),
+            View::maybe_id_of(app, self.context(app)),
         );
     }
 
@@ -573,6 +574,7 @@ impl State for ToolTipServiceState {
                         self.show(app);
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
     }
@@ -593,6 +595,7 @@ impl State for ToolTipServiceState {
                         self.close(app);
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
     }
@@ -609,6 +612,7 @@ impl State for ToolTipServiceState {
                         self.close(app);
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
     }

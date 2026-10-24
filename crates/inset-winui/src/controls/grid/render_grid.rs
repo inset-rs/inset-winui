@@ -217,16 +217,28 @@ impl RenderObject for RenderGrid {
         let mut layout = std::mem::take(&mut self.get_mut(app).layout);
 
         // Measure: every child's desired size against what its cell offers.
+        let mut offered = vec![Size::ZERO; children.len()];
         let desired = layout.measure(&placements, constraints.biggest(), |index, available| {
             let child = children[index];
+            offered[index] = available;
             child.layout(app, BoxConstraints::loose(available), true);
             child.size(app)
         });
         let size = constraints.constrain(desired);
 
-        // Arrange: every child fills its cell (XAML's `Stretch`).
-        for (child, rect) in children.iter().zip(layout.arrange(&placements, size)) {
-            child.layout(app, BoxConstraints::tight(rect.size()), true);
+        // Arrange: every child fills its cell (XAML's `Stretch`), offered at least the cell and
+        // at most what its measure offered rather than exactly the cell. A child last given an
+        // exact size stops telling its parent when it needs layout, so the measure would not
+        // run again when a child an Auto track follows changes its desired size.
+        let rects = layout.arrange(&placements, size);
+        for ((child, rect), offered) in children.iter().zip(rects).zip(offered) {
+            let cell = rect.size();
+            let constraints = BoxConstraints::new()
+                .min_width(cell.width())
+                .max_width(cell.width().max(offered.width()))
+                .min_height(cell.height())
+                .max_height(cell.height().max(offered.height()));
+            child.layout(app, constraints, true);
             child
                 .parent_data_of_mut::<GridParentData>(app)
                 .set_offset(rect.top_left());

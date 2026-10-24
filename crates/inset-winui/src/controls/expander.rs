@@ -330,8 +330,13 @@ impl State for ExpanderState {
                         event.call(app);
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
+    }
+
+    fn activate(self: Handle<Self>, app: &mut App) {
+        SingleTickerProviderStateMixin::activate(self, app);
     }
 
     /// Releases the storyboard clock before disposing its ticker provider.

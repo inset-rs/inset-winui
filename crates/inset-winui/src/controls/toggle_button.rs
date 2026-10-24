@@ -11,6 +11,7 @@ use crate::{
 };
 use inset_embedder::{Color, FontWeight};
 use inset_foundation::{App, Listener};
+use inset_painting::AlignmentGeometry;
 use inset_widgets::*;
 use std::{fmt, rc::Rc};
 
@@ -270,14 +271,49 @@ fn template(
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
     let brushes = toggle_button_brushes(&resources.toggle_button(), is_checked, states.common);
+    let content = content.unwrap_or_else(|| SizedBox::shrink().into_widget());
+    toggle_button_presenter(
+        &resources,
+        brushes,
+        ToggleButtonSetters::DEFAULT,
+        content,
+        states,
+    )
+}
+
+/// The properties a style sets that `DefaultToggleButtonStyle`'s template binds.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) struct ToggleButtonSetters {
+    /// `Padding`: left, top, right, bottom.
+    pub(crate) padding: [f64; 4],
+    /// `HorizontalContentAlignment`, where the content sits across the button.
+    pub(crate) horizontal_content_alignment: AlignmentGeometry,
+}
+
+impl ToggleButtonSetters {
+    /// `DefaultToggleButtonStyle`'s own.
+    pub(crate) const DEFAULT: ToggleButtonSetters = ToggleButtonSetters {
+        padding: BUTTON_PADDING,
+        horizontal_content_alignment: AlignmentGeometry::CENTER,
+    };
+}
+
+/// `DefaultToggleButtonStyle`'s template in one state's `brushes`, with a style's `setters`.
+pub(crate) fn toggle_button_presenter(
+    resources: &ThemeResources,
+    brushes: ToggleButtonBrushes,
+    setters: ToggleButtonSetters,
+    content: WidgetRef,
+    states: ControlStates,
+) -> WidgetRef {
     let text = control_text_style(
         CONTROL_CONTENT_FONT_SIZE,
         FontWeight::W400,
         brushes.foreground,
     );
-    let content = content.unwrap_or_else(|| SizedBox::shrink().into_widget());
-    // `ContentPresenter`: `HorizontalContentAlignment` and `VerticalContentAlignment` are Center.
-    let label = Center::new()
+    // `ContentPresenter`: `VerticalContentAlignment` is Center.
+    let label = Align::new()
+        .alignment(setters.horizontal_content_alignment)
         .width_factor(1.0)
         .height_factor(1.0)
         .child(DefaultTextStyle::new(text, content))
@@ -290,7 +326,7 @@ fn template(
                 .border_thickness(TOGGLE_BUTTON_BORDER_THICKNESS)
                 .corner_radius(CONTROL_CORNER_RADIUS[0])
                 .background_sizing(brushes.background_sizing)
-                .padding(BUTTON_PADDING)
+                .padding(setters.padding)
                 .child(label.clone())
                 .into_widget()
         },

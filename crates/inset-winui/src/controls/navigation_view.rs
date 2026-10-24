@@ -535,6 +535,7 @@ impl NavigationViewState {
                     entry.focus.dispose(app);
                     app.destroy(entry.focus.id());
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
         for id in ids {
@@ -570,15 +571,15 @@ impl NavigationViewState {
 
     /// Raises a callback after the current build/layout phase.
     fn after_frame(self: Handle<Self>, app: &mut App, callback: impl Fn(&mut App) + 'static) {
-        SchedulerBinding::add_post_frame_callback(
+        after_next_frame(
             app,
+            View::maybe_id_of(app, self.context(app)),
             FrameCallback::new(move |app, _| {
                 if app.contains(self) && self.mounted(app) {
                     callback(app);
                 }
             }),
         );
-        SchedulerBinding::ensure_visual_update(app);
     }
 
     /// OpenPane/ClosePane requests, with explicit closure remembered for adaptive resizing.
@@ -2272,6 +2273,10 @@ impl State for NavigationViewState {
         }
     }
 
+    fn activate(self: Handle<Self>, app: &mut App) {
+        SingleTickerProviderStateMixin::activate(self, app);
+    }
+
     fn dispose(self: Handle<Self>, app: &mut App) {
         let controller = app.get_mut(self).indicator_controller.take().unwrap();
         controller.dispose(app);
@@ -2281,6 +2286,8 @@ impl State for NavigationViewState {
             FrameCallback::new(move |app, _| {
                 app.destroy(controller);
             }),
+            // Disposed, the state is in no view any more.
+            None,
         );
 
         if let Some(scope) = app.get_mut(self).search_focus.take() {

@@ -5,7 +5,7 @@ use inset_foundation::{AppCell, Listener};
 use inset_gestures::GestureBinding;
 use inset_scheduler::SchedulerBinding;
 use inset_services::*;
-use inset_test::{TestPlatform, TestView};
+use inset_test::{IMPLICIT_VIEW_ID, TestPlatform, TestView};
 use inset_widgets::*;
 use inset_winui::{CommonState, CommonStates, ControlStates};
 use std::{cell::Cell, rc::Rc, time::Duration};
@@ -66,9 +66,10 @@ impl Fixture {
     fn pump(&mut self) {
         self.time += Duration::from_millis(20);
         let mut app = self.cell.borrow_mut();
-        SchedulerBinding::handle_begin_frame(&mut app, Some(self.time));
+        let views = [IMPLICIT_VIEW_ID];
+        SchedulerBinding::handle_begin_frame(&mut app, &views, Some(self.time));
         app.drain_microtasks();
-        SchedulerBinding::handle_draw_frame(&mut app);
+        SchedulerBinding::handle_draw_frame(&mut app, &views);
         app.drain_microtasks();
     }
     fn node(&self) -> AnyFocusNode {

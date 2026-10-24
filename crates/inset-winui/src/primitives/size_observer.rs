@@ -133,6 +133,8 @@ impl RenderSizeObserver {
                 let callback = self.get(app).on_changed.clone();
                 callback(app, old, new);
             }),
+            // Queued during layout, which every view of a frame shares: this frame's end runs it.
+            None,
         );
     }
 }

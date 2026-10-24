@@ -122,6 +122,12 @@ Ported against: aa3207e6
   Reason: framework — WinUI measures every item and then arranges hidden items into zero-sized rectangles, while Inset uses one constraint-driven layout operation.
   Affect: Hidden breadcrumbs do not paint or receive pointer input, but their content is still laid out at its measured size and retains its State when the bar narrows or widens.
 
+## color_display_name.rs → `ColorHelper::ToDisplayName`
+
+- Change: `color_display_name` names a colour by the regions `ColorIntegrationTests::CanRetrieveColorNames` lays out in HSL: black and white by luminosity, greys by low saturation, and every other colour by a saturation band, a hue range in it and a dark, mid or light luminosity, with the 42 names of `Microsoft.UI.Xaml.Common.rc`.
+  Reason: os — WinUI classifies the colour with `ColorHelper_ToDisplayNameId`, which is part of Windows and not in the repository, and the test states the regions only at points inside them.
+  Affect: A colour well inside a region gets Windows' name, and ColorPicker's keys reach the colours `ColorPickerTests` expects, but a colour near a region's edge may get the neighbouring name, which also moves where Ctrl and an arrow key stop.
+
 ## Deferred
 
 - `BitmapIcon` and `ImageIcon` remain deferred. Trigger: Image loading is integrated with the kit's supported hosts, including foreground-color tinting for monochrome `BitmapIcon` images.
@@ -130,3 +136,4 @@ Ported against: aa3207e6
 - The blurred background’s repeating noise image remains deferred. Trigger: Inset can upload that image to the renderer.
 - Automatic acrylic fallback policy remains deferred. Trigger: A host reports battery and advanced-effects policy changes.
 - Animated tint changes remain deferred. Trigger: The background implementation stores the old and new colors and an animation between them.
+- The exact edges between `color_display_name`'s regions remain deferred. Trigger: A name table measured on Windows.

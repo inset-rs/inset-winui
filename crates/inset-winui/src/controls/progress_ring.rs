@@ -387,6 +387,10 @@ impl State for ProgressRingState {
         }
     }
 
+    fn activate(self: Handle<Self>, app: &mut App) {
+        SingleTickerProviderStateMixin::activate(self, app);
+    }
+
     fn dispose(self: Handle<Self>, app: &mut App) {
         app.get(self).ticker.unwrap().dispose(app);
         SingleTickerProviderStateMixin::dispose(self, app);

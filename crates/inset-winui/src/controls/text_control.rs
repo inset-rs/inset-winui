@@ -1,5 +1,7 @@
 //! TextBoxBase integration shared by the source TextBox and PasswordBox templates.
 
+use super::combo_box::ComboBoxTextBoxStyle;
+use super::number_box::NumberBoxTextBoxStyle;
 use super::{PasswordRevealMode, TextBox, TextWrapping};
 use crate::*;
 use inset_embedder::FontWeight;
@@ -21,12 +23,35 @@ pub(super) struct TextControl {
 
     /// Password specialization, absent for a plain TextBox.
     password: Option<(PasswordRevealMode, char)>,
+
+    /// NumberBox's `NumberBoxTextBoxStyle`, absent for the default TextBox template.
+    number_box: Option<NumberBoxTextBoxStyle>,
+
+    /// ComboBox's `ComboBoxTextBoxStyle`, absent for the default TextBox template.
+    combo_box: Option<ComboBoxTextBoxStyle>,
 }
 
 impl TextControl {
     /// Creates the shared editor while keeping each public control's specialization explicit.
     pub(super) fn new(config: TextBox, password: Option<(PasswordRevealMode, char)>) -> Self {
-        Self { config, password }
+        Self {
+            config,
+            password,
+            number_box: None,
+            combo_box: None,
+        }
+    }
+
+    /// Draws NumberBox's `InputBox` template instead of the default one.
+    pub(super) fn number_box_style(mut self, style: NumberBoxTextBoxStyle) -> Self {
+        self.number_box = Some(style);
+        self
+    }
+
+    /// Draws ComboBox's `EditableText` template instead of the default one.
+    pub(super) fn combo_box_style(mut self, style: ComboBoxTextBoxStyle) -> Self {
+        self.combo_box = Some(style);
+        self
     }
 }
 
@@ -135,7 +160,12 @@ impl TextControlState {
     fn button_visible(self: Handle<Self>, app: &App) -> bool {
         let widget = self.widget(app);
         let s = app.get(self);
-        if !widget.config.is_enabled || !s.focused || !s.has_space_for_button {
+        // `ComboBoxTextBoxStyle` has no `DeleteButton`.
+        if !widget.config.is_enabled
+            || !s.focused
+            || !s.has_space_for_button
+            || widget.combo_box.is_some()
+        {
             return false;
         }
 
@@ -287,6 +317,10 @@ impl TextControlState {
     fn helper(self: Handle<Self>, app: &App) -> WidgetRef {
         let password = self.widget(app).password.is_some();
         let width = app.get(self).helper_width;
+        let width = self
+            .widget(app)
+            .number_box
+            .map_or(width, |style| style.delete_button_width(width));
         let corner = self.widget(app).config.corner_radius;
         CommonStates::new(
             Listener::new(move |app| self.clear(app)),
@@ -466,6 +500,7 @@ impl State for TextControlState {
         };
 
         let password = widget.password;
+        let number_box = widget.number_box;
         let obscured = password.is_some_and(|(mode, _)| {
             mode != PasswordRevealMode::Visible && !app.get(self).password_revealed
         });
@@ -519,6 +554,10 @@ impl State for TextControlState {
         .autocorrect(password.is_none())
         .enable_suggestions(password.is_none())
         .key(Rc::new(app.get(self).editable_key.clone()));
+        // A WinUI text box keeps the focus on Enter: the platform's done action ends the
+        // composition without the unfocusing Flutter defaults to.
+        let controller = config.controller;
+        editable = editable.on_editing_complete(move |app| controller.clear_composing(app));
         if password.is_some() {
             editable = editable.toolbar_options(ToolbarOptions {
                 copy: false,
@@ -628,13 +667,19 @@ impl State for TextControlState {
         let border = SizeObserver::new(
             ConstrainedBox::new(
                 BoxConstraints::new()
-                    .min_width(TEXT_CONTROL_THEME_MIN_WIDTH)
+                    .min_width(
+                        number_box.map_or(TEXT_CONTROL_THEME_MIN_WIDTH, |style| style.min_width),
+                    )
                     .min_height(TEXT_CONTROL_THEME_MIN_HEIGHT),
             )
             .child(
                 ControlBorder::new(background, border)
                     .border_thickness_ltrb(border_thickness)
-                    .corner_radius(config.corner_radius),
+                    .corner_radius_corners(
+                        widget
+                            .combo_box
+                            .map_or([config.corner_radius; 4], |style| style.corner_radius),
+                    ),
             ),
             Rc::new(move |app, _, size| {
                 if !app.contains(self) || !self.mounted(app) {
@@ -654,7 +699,13 @@ impl State for TextControlState {
                 }
             }),
         );
-        cells.push(GridCell::new(border).row(1).column_span(2).into_widget());
+        let columns = if number_box.is_some() { 3 } else { 2 };
+        cells.push(
+            GridCell::new(border)
+                .row(1)
+                .column_span(columns)
+                .into_widget(),
+        );
         cells.push(
             GridCell::new(Padding::new(insets(TEXT_CONTROL_BORDER_THEME_THICKNESS)).child(content))
                 .row(1)
@@ -667,6 +718,10 @@ impl State for TextControlState {
                     .column(1)
                     .into_widget(),
             );
+        }
+        if let Some(indicator) = number_box.and_then(|style| style.popup_indicator(&theme)) {
+            // NumberBox's PopupIndicator.
+            cells.push(GridCell::new(indicator).row(1).column(2).into_widget());
         }
 
         if let Some(description) = config.description {
@@ -692,10 +747,14 @@ impl State for TextControlState {
                 RowDefinition::new(GridLength::star(1.0)),
                 RowDefinition::new(GridLength::AUTO),
             ])
-            .column_definitions([
-                ColumnDefinition::new(GridLength::star(1.0)),
-                ColumnDefinition::new(GridLength::AUTO),
-            ])
+            .column_definitions(
+                [
+                    ColumnDefinition::new(GridLength::star(1.0)),
+                    ColumnDefinition::new(GridLength::AUTO),
+                ]
+                .into_iter()
+                .chain(number_box.map(NumberBoxTextBoxStyle::spin_buttons_column)),
+            )
             .children(cells);
         TextFieldTapRegion::new(
             ExcludeFocus::new(

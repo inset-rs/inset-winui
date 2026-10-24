@@ -130,3 +130,57 @@ fn native_thumb_drag_and_track_press_change_the_same_controller() {
         "native page track failed"
     );
 }
+/// A lazy list of 30 items that scrolls itself, with the scrollbar put on it.
+fn lazy_list_fixture() -> (Fixture, Handle<ScrollViewportController>) {
+    let slot = Rc::new(Cell::new(None));
+    let q = slot.clone();
+    let f = Fixture::with_root([260, 240], move |app| {
+        winui_gallery::install_fonts(app);
+        let controller = ScrollViewportController::new(app);
+        q.set(Some(controller));
+        let list = ListView::builder(|_, _, index| {
+            Some(
+                SizedBox::new()
+                    .height(40.0)
+                    .child(Text::new(format!("Item {index}")))
+                    .into_widget(),
+            )
+        })
+        .item_count(30)
+        .build()
+        .controller(controller.native_controller(app));
+        run_app(
+            app,
+            WidgetsApp::new(AccentPalette::default().base)
+                .debug_show_checked_mode_banner(false)
+                .builder(move |_, _, _| {
+                    ThemeScope::new(
+                        Theme::Light,
+                        ScrollBarViewport::scroller(controller, list.clone()),
+                    )
+                    .into_widget()
+                })
+                .into_widget(),
+        );
+    });
+    (f, slot.get().unwrap())
+}
+#[test]
+fn the_scrollbar_pages_a_lazy_list_it_is_put_on() {
+    let (mut f, c) = lazy_list_fixture();
+    settle(&mut f);
+    assert_eq!(
+        c.metrics(&f.cell.borrow()).scrollable_length,
+        30.0 * 40.0 - 240.0
+    );
+    f.send_mouse(PointerChange::Hover, Offset::new(254.0, 24.0), 0);
+    wait(&mut f, 650);
+    f.send_mouse(PointerChange::Down, Offset::new(254.0, 180.0), 1);
+    f.send_mouse(PointerChange::Up, Offset::new(254.0, 180.0), 0);
+    wait(&mut f, 300);
+    assert!(
+        c.metrics(&f.cell.borrow()).offset > 100.0,
+        "the track press did not scroll the list: {:?}",
+        c.metrics(&f.cell.borrow())
+    );
+}

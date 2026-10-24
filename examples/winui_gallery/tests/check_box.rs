@@ -6,7 +6,6 @@ use common::GalleryFixtureExt;
 use inset_embedder::{Color, PointerChange};
 use inset_foundation::{App, Handle};
 use inset_painting::EdgeInsetsGeometry;
-use inset_scheduler::SchedulerBinding;
 use inset_widgets::*;
 use inset_winui::*;
 use std::time::Duration;
@@ -18,11 +17,7 @@ fn tap_and_pump(fixture: &mut Fixture, text: &str, frames: u32) {
     fixture.at += Duration::from_millis(20);
     fixture.send(PointerChange::Up, p);
     for _ in 0..frames {
-        fixture.at += Duration::from_millis(20);
-        SchedulerBinding::handle_begin_frame(&mut fixture.cell.borrow_mut(), Some(fixture.at));
-        fixture.cell.checkpoint();
-        SchedulerBinding::handle_draw_frame(&mut fixture.cell.borrow_mut());
-        fixture.cell.checkpoint();
+        fixture.frame_after(Duration::from_millis(20));
     }
 }
 

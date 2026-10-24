@@ -490,33 +490,65 @@ fn template(
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
     let brushes = repeat_button_brushes(&resources.repeat_button(), states.common);
-    let text = control_text_style(
-        CONTROL_CONTENT_FONT_SIZE,
-        FontWeight::W400,
-        brushes.foreground,
-    );
+    let presenter = repeat_button_presenter(brushes, RepeatButtonSetters::DEFAULT, content);
+    FocusVisual::new(presenter, resources.theme)
+        .visible(states.focused)
+        .margin(REPEAT_BUTTON_FOCUS_VISUAL_MARGIN)
+        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .into_widget()
+}
+
+/// The values the template of `DefaultRepeatButtonStyle` takes from the style's setters, which
+/// a style based on it can change.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) struct RepeatButtonSetters {
+    /// `BorderThickness`: left, top, right, bottom.
+    pub(crate) border_thickness: [f64; 4],
+    /// `CornerRadius`.
+    pub(crate) corner_radius: f64,
+    /// `Padding`: left, top, right, bottom.
+    pub(crate) padding: [f64; 4],
+    /// `FontSize` of the content's text.
+    pub(crate) font_size: f64,
+}
+
+impl RepeatButtonSetters {
+    /// `DefaultRepeatButtonStyle`'s own.
+    pub(crate) const DEFAULT: RepeatButtonSetters = RepeatButtonSetters {
+        border_thickness: [REPEAT_BUTTON_BORDER_THICKNESS; 4],
+        corner_radius: CONTROL_CORNER_RADIUS[0],
+        padding: BUTTON_PADDING,
+        font_size: CONTROL_CONTENT_FONT_SIZE,
+    };
+}
+
+/// `ContentPresenter`, the template of `DefaultRepeatButtonStyle`: `content` centered in a
+/// border drawn with `brushes` and `setters`, its background fading between states over 83 ms
+/// (`BrushTransition`).
+pub(crate) fn repeat_button_presenter(
+    brushes: RepeatButtonBrushes,
+    setters: RepeatButtonSetters,
+    content: WidgetRef,
+) -> WidgetRef {
+    let text = control_text_style(setters.font_size, FontWeight::W400, brushes.foreground);
     // `ContentPresenter`: `HorizontalContentAlignment` and `VerticalContentAlignment` are Center.
     let label = Center::new()
         .width_factor(1.0)
         .height_factor(1.0)
         .child(DefaultTextStyle::new(text, content))
         .into_widget();
-    let presenter = ColorTransition::new(
+    ColorTransition::new(
         brushes.background,
         CONTROL_FASTER_ANIMATION_DURATION,
         move |_app, background| {
             ControlBorder::new(Brush::Solid(background), brushes.border)
-                .border_thickness(REPEAT_BUTTON_BORDER_THICKNESS)
-                .corner_radius(CONTROL_CORNER_RADIUS[0])
+                .border_thickness_ltrb(setters.border_thickness)
+                .corner_radius(setters.corner_radius)
                 .background_sizing(BackgroundSizing::InnerBorderEdge)
-                .padding(BUTTON_PADDING)
+                .padding(setters.padding)
                 .child(label.clone())
                 .into_widget()
         },
-    );
-    FocusVisual::new(presenter, resources.theme)
-        .visible(states.focused)
-        .margin(REPEAT_BUTTON_FOCUS_VISUAL_MARGIN)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
-        .into_widget()
+    )
+    .into_widget()
 }

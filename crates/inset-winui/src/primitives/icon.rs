@@ -102,6 +102,8 @@ pub enum FluentSymbol {
     ChevronDown,
     /// Upward disclosure or scroll affordance.
     ChevronUp,
+    /// A value that steps up or down, as NumberBox's popup indicator.
+    ChevronUpDown,
     /// Toggle the navigation pane.
     Navigation,
     /// Opens the navigation search presenter.
@@ -120,6 +122,10 @@ pub enum FluentSymbol {
     LockClosed,
     /// A status dot or badge.
     Circle,
+    /// Colour choice: a palette.
+    Color,
+    /// A hierarchy of items.
+    TextBulletListTree,
     /// Work whose completion is shown as a ring.
     SpinnerIos,
 }
@@ -160,6 +166,7 @@ impl FluentSymbol {
             Self::ChevronRight => 62127,
             Self::ChevronDown => 62114,
             Self::ChevronUp => 62134,
+            Self::ChevronUpDown => 58158,
             Self::Search => 63119,
             Self::Navigation => 62816,
             Self::Back => 61787,
@@ -169,6 +176,8 @@ impl FluentSymbol {
             Self::TextField => 63455,
             Self::LockClosed => 59279,
             Self::Circle => 62140,
+            Self::Color => 62197,
+            Self::TextBulletListTree => 63406,
             Self::SpinnerIos => 63241,
         })
         .unwrap()

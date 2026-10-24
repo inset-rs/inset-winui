@@ -3,8 +3,9 @@
 use crate::{CaptureView, gpu};
 use inset_embedder::valo::Context;
 use inset_embedder::{
-    Clipboard, Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind,
-    SystemFontSource, TargetPlatform,
+    Clipboard, ClipboardHasStringsFuture, ClipboardSetTextFuture, ClipboardTextFuture, Offset,
+    PointerChange, PointerData, PointerDataPacket, PointerDeviceKind, SystemFontSource,
+    TargetPlatform, View,
 };
 use inset_foundation::{App, AppCell};
 use inset_gestures::GestureBinding;
@@ -12,26 +13,33 @@ use inset_rendering::RenderParagraph;
 use inset_scheduler::SchedulerBinding;
 use inset_test::TestPlatform;
 use inset_widgets::{AnyElement, WidgetRef, WidgetsBinding};
+use std::future::{Future, ready};
+use std::pin::pin;
+use std::task::{Context as TaskContext, Poll, Waker};
 use std::{cell::RefCell, rc::Rc, time::Duration};
 
 /// In-memory platform clipboard for headless editing tests.
 #[derive(Default)]
 struct MemoryClipboard(RefCell<Option<String>>);
 
+/// Every answer is ready at once: the text is in memory.
 impl Clipboard for MemoryClipboard {
-    fn set_text(&self, text: &str) {
+    fn set_text(&self, text: &str) -> ClipboardSetTextFuture {
         *self.0.borrow_mut() = Some(text.to_owned());
+        Box::pin(ready(()))
     }
 
-    fn text(&self) -> Option<String> {
-        self.0.borrow().clone()
+    fn text(&self) -> ClipboardTextFuture {
+        Box::pin(ready(self.0.borrow().clone()))
     }
 
-    fn has_strings(&self) -> bool {
-        self.0
+    fn has_strings(&self) -> ClipboardHasStringsFuture {
+        let has_strings = self
+            .0
             .borrow()
             .as_ref()
-            .is_some_and(|text| !text.is_empty())
+            .is_some_and(|text| !text.is_empty());
+        Box::pin(ready(has_strings))
     }
 }
 /// Mounts an arbitrary application with simulated time and pointer input.
@@ -58,11 +66,17 @@ impl Fixture {
             renderer: RefCell::new(Context::new(device, queue)),
             pixels: RefCell::new(Vec::new()),
         });
+        // Images made from pixels go to the capture view's renderer, which draws them.
+        let renderer = view.clone();
         let platform = TestPlatform::new()
             .on(TargetPlatform::MacOS)
             .with_view(view.clone())
             .with_clipboard(Rc::new(MemoryClipboard::default()))
-            .with_font_source(|| Box::new(SystemFontSource::platform()));
+            .with_font_source(|| Box::new(SystemFontSource::platform()))
+            .with_pixel_import(move |pixels| {
+                let renderer = renderer.renderer.borrow();
+                renderer.image_context().upload_pixels(pixels, false).ok()
+            });
         let cell = AppCell::with_platform(Rc::new(platform));
         {
             let mut app = cell.borrow_mut();
@@ -83,16 +97,33 @@ impl Fixture {
         result.pump();
         result
     }
-    /// Runs ten 20 ms frames, processing microtasks between frame phases.
+    /// Runs ten 20 ms refreshes of the view.
     pub fn pump(&mut self) {
         for _ in 0..10 {
-            self.at += Duration::from_millis(20);
-            SchedulerBinding::handle_begin_frame(&mut self.cell.borrow_mut(), Some(self.at));
-            self.cell.checkpoint();
-            SchedulerBinding::handle_draw_frame(&mut self.cell.borrow_mut());
-            self.cell.checkpoint();
+            self.frame_after(Duration::from_millis(20));
         }
     }
+
+    /// Runs one refresh of the view, `elapsed` after the last, processing microtasks between its
+    /// phases.
+    pub fn frame_after(&mut self, elapsed: Duration) {
+        self.at += elapsed;
+        let views = [self.view.id()];
+        SchedulerBinding::handle_begin_frame(&mut self.cell.borrow_mut(), &views, Some(self.at));
+        self.cell.checkpoint();
+        SchedulerBinding::handle_draw_frame(&mut self.cell.borrow_mut(), &views);
+        self.cell.checkpoint();
+    }
+    /// The text on the platform's clipboard: the in-memory one, which answers at once.
+    pub fn clipboard_text(&self) -> Option<String> {
+        let platform = self.cell.borrow().platform();
+        let text = platform.clipboard()?.text();
+        match pin!(text).poll(&mut TaskContext::from_waker(Waker::noop())) {
+            Poll::Ready(text) => text,
+            Poll::Pending => unreachable!("the in-memory clipboard answers at once"),
+        }
+    }
+
     /// Enumerates all mounted elements, including retained offstage subtrees.
     pub fn elements(&self) -> Vec<AnyElement> {
         let mut app = self.cell.borrow_mut();

@@ -5,7 +5,7 @@ use crate::{
     Brush, ColorTransition, ColumnDefinition, Grid, GridCell, GridLength,
     SPLIT_VIEW_COMPACT_PANE_THEME_LENGTH, SPLIT_VIEW_LEFT_BORDER_THEME_THICKNESS,
     SPLIT_VIEW_OPEN_PANE_THEME_LENGTH, SPLIT_VIEW_PANE_ROOT_CORNER_RADIUS, SizeObserver,
-    ThemeResources,
+    ThemeResources, after_next_frame,
 };
 use inset_embedder::{Color, Offset, Path, PathBuilder, Rect, Size};
 use inset_foundation::{App, Handle, Listener};
@@ -471,9 +471,9 @@ impl SplitViewState {
         }
         let changed = self.widget(app).is_pane_open_changed.clone();
         changed(app, false);
-        SchedulerBinding::ensure_visual_update(app);
-        SchedulerBinding::add_post_frame_callback(
+        after_next_frame(
             app,
+            View::maybe_id_of(app, self.context(app)),
             FrameCallback::new(move |app, _| {
                 if app.contains(self) && self.mounted(app) && self.widget(app).is_pane_open {
                     app.get_mut(self).closing_by_dismiss = false;
@@ -555,6 +555,7 @@ impl SplitViewState {
                         self.complete(app, epoch);
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
     }
@@ -578,6 +579,7 @@ impl SplitViewState {
                     }
                 }
             }),
+            View::maybe_id_of(app, self.context(app)),
         );
     }
 }
@@ -608,6 +610,7 @@ impl State for SplitViewState {
                     self.focus_pane(app);
                 }
             }),
+            View::maybe_id_of(app, self.context(app)),
         );
     }
 
@@ -681,6 +684,7 @@ impl State for SplitViewState {
                         callback(app, &mut SplitViewPaneClosingEventArgs::default());
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
         if duration.is_zero() {
@@ -691,6 +695,7 @@ impl State for SplitViewState {
                         self.complete(app, epoch);
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         } else {
             ticker.start(app);
@@ -710,8 +715,13 @@ impl State for SplitViewState {
                         self.dismiss(app);
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
+    }
+
+    fn activate(self: Handle<Self>, app: &mut App) {
+        SingleTickerProviderStateMixin::activate(self, app);
     }
 
     fn dispose(self: Handle<Self>, app: &mut App) {

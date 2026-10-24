@@ -2,7 +2,7 @@
 
 mod layout;
 mod placement;
-mod shadow;
+pub(crate) mod shadow;
 pub use placement::FlyoutPlacementMode;
 
 use crate::*;
@@ -708,10 +708,10 @@ impl Flyout {
                     ancestor = parent;
                 }
                 let presenter = CustomPaint::new()
-                    .painter(shadow::PopupShadow {
-                        theme: ThemeResources::of(app, context).theme,
+                    .painter(shadow::PopupShadow::for_flyout(
+                        ThemeResources::of(app, context).theme,
                         depth,
-                    })
+                    ))
                     .child(presenter);
                 let foreground = ThemeResources::of(app, context)
                     .common

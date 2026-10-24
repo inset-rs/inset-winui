@@ -169,12 +169,14 @@ impl AnchoredFlyoutState {
                                 .find(|n| n.can_request_focus(app));
                             first.unwrap_or(scope).request_focus(app, None);
                         }),
+                        View::maybe_id_of(app, self.context(app)),
                     );
                 } else {
                     self.restore(app);
                     portal.hide(app);
                 }
             }),
+            View::maybe_id_of(app, self.context(app)),
         );
     }
 }

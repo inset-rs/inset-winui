@@ -419,6 +419,7 @@ impl TabViewState {
             SchedulerBinding::add_post_frame_callback(
                 app,
                 FrameCallback::new(move |app, _| container.clone().dispose(app)),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
         for id in ids {
@@ -512,6 +513,7 @@ impl TabViewState {
                         focus.request_focus(app, None);
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
     }
@@ -666,8 +668,9 @@ impl TabViewState {
         epoch: u64,
         attempt: usize,
     ) {
-        SchedulerBinding::add_post_frame_callback(
+        after_next_frame(
             app,
+            View::maybe_id_of(app, self.context(app)),
             FrameCallback::new(move |app, _| {
                 if !app.contains(self) || !self.mounted(app) || app.get(self).bring_epoch != epoch {
                     return;
@@ -720,7 +723,6 @@ impl TabViewState {
                 }
             }),
         );
-        SchedulerBinding::ensure_visual_update(app);
     }
 }
 
@@ -821,6 +823,7 @@ impl State for TabViewState {
                         callback(app, next);
                     }
                 }),
+                View::maybe_id_of(app, self.context(app)),
             );
         }
         if single_removal
@@ -854,6 +857,7 @@ impl State for TabViewState {
                             }
                         }
                     }),
+                    View::maybe_id_of(app, self.context(app)),
                 );
             }
         }

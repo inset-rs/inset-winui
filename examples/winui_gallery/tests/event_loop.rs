@@ -1,10 +1,10 @@
-//! The gallery under a driver that behaves like the winit embedder: frames only when requested, timers only when the dispatcher's `wake_at` deadline is reached, the app clock advanced only by frames and wakes.
+//! The gallery under a driver that behaves like the winit embedder: frames only when requested, timers only when the dispatcher's `wake_at` deadline is reached or a ready task asks with `wake_now`, the app clock advanced only by frames and wakes.
 #![feature(arbitrary_self_types)]
 use inset_embedder::valo::Context;
 use inset_embedder::{
     Dispatcher, EmbedderClient, FontSource, Frame, Instant, Offset, Platform, PointerChange,
-    PointerData, PointerDataPacket, PointerDeviceKind, SystemFontSource, TargetPlatform, ViewId,
-    ViewRef,
+    PointerData, PointerDataPacket, PointerDeviceKind, SystemFontSource, TargetPlatform, View,
+    ViewId, ViewRef,
 };
 use inset_rendering::RenderParagraph;
 use inset_shell::Shell;
@@ -12,19 +12,29 @@ use inset_widgets::WidgetsBinding;
 use inset_winui_test_support::CaptureView;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 /// Records the next turn the framework asks for, so the driver can fire it when that time comes.
 struct LoopDispatcher {
     deadline: Mutex<Option<Instant>>,
+    /// A ready task asked to be woken, which the next wake clears.
+    wake_now: AtomicBool,
 }
 
 impl LoopDispatcher {
     fn new() -> Arc<LoopDispatcher> {
         Arc::new(LoopDispatcher {
             deadline: Mutex::new(None),
+            wake_now: AtomicBool::new(false),
         })
+    }
+
+    /// Whether the framework is to be woken by `now`: a ready task asked, or its timer is due.
+    fn take_wake(&self, now: Instant) -> bool {
+        let asked = self.wake_now.swap(false, Ordering::SeqCst);
+        asked || self.due(now).is_some()
     }
 
     fn due(&self, now: Instant) -> Option<Instant> {
@@ -47,11 +57,15 @@ impl LoopDispatcher {
 }
 
 impl Dispatcher for LoopDispatcher {
-    fn wake_at(&self, deadline: Instant) {
+    fn wake_at(&self, timer_wakeup: Option<Instant>) {
         *self
             .deadline
             .lock()
-            .expect("the deadline is never poisoned") = Some(deadline);
+            .expect("the deadline is never poisoned") = timer_wakeup;
+    }
+
+    fn wake_now(&self) {
+        self.wake_now.store(true, Ordering::SeqCst);
     }
 
     fn dispatch(&self, work: Box<dyn FnOnce() + Send>) {
@@ -70,7 +84,8 @@ impl Platform for LoopPlatform {
     fn target_platform(&self) -> TargetPlatform {
         TargetPlatform::MacOS
     }
-    fn request_frame(&self) {
+    /// The one view's frame, at the driver's next tick.
+    fn request_frame(&self, _view: ViewId) {
         self.frame_requested.set(true);
     }
     fn now(&self) -> Instant {
@@ -84,9 +99,6 @@ impl Platform for LoopPlatform {
     }
     fn view(&self, id: ViewId) -> Option<ViewRef> {
         (id == ViewId(0)).then(|| self.view.clone() as ViewRef)
-    }
-    fn implicit_view(&self) -> Option<ViewRef> {
-        Some(self.view.clone())
     }
     fn font_source(&self) -> Option<Box<dyn FontSource>> {
         Some(Box::new(SystemFontSource::platform()))
@@ -135,10 +147,11 @@ impl Driver {
             let now = self.platform.clock.get();
             if self.platform.frame_requested.replace(false) {
                 self.log.push(format!("{now:?} frame"));
-                self.shell.frame(Frame { elapsed: now });
+                self.shell
+                    .frame(&[self.platform.view.id()], Frame { elapsed: now });
                 // The display's next vsync.
                 self.platform.clock.set(now + Duration::from_millis(16));
-            } else if self.platform.dispatcher.due(self.platform.now()).is_some() {
+            } else if self.platform.dispatcher.take_wake(self.platform.now()) {
                 self.log.push(format!("{now:?} wake"));
                 self.shell.wake(now);
             } else {

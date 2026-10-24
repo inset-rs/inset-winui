@@ -14,6 +14,7 @@ use inset_widgets::{
     AnyFocusNode, FocusableActionDetector, WidgetsBinding, downcast_widget, primary_focus,
 };
 use inset_winui::FocusVisual;
+use winui_gallery::Feature;
 
 /// Sends a complete hardware key press through the native shortcut handlers.
 fn key(f: &mut Fixture, logical: Key, physical: Physical) {
@@ -75,7 +76,8 @@ fn mouse_leaves_focus_alone_and_tab_works_before_any_click() {
     assert_eq!(primary_focus(&mut f.cell.borrow_mut()), keyboard_focus);
     f.find("Clicked 1 times · wifi true · airplane false");
     let target = control_focus(&f, "Standard");
-    for _ in 0..35 {
+    // Tab passes every feature's navigation item, and a few other stops, before the page.
+    for _ in 0..Feature::ALL.len() + 5 {
         if primary_focus(&mut f.cell.borrow_mut()) == Some(target) {
             break;
         }

@@ -128,6 +128,10 @@ Ported against: aa3207e6
   Reason: os — this host does not expose Windows handedness settings.
   Affect: `Slider` vertical tooltips prefer the left side of the thumb.
 
+- Change: `Slider` accepts a `SliderTemplate`, a function that builds its template around the `SliderContainer` it is given, and a `key_down` function that sees each key before the slider does.
+  Reason: language — Rust callbacks receive the slider's states and template parts in place of a XAML `ControlTemplate`, and a function in place of a derived class's `OnKeyDown` override.
+  Affect: A control built on `Slider`, as `ColorPickerSlider` is, supplies `.template(...)` and `.key_down(...)` and keeps the slider's input and value behavior.
+
 ## split_view.rs → `SplitView`
 
 - Change: `SplitView` dismisses an overlay pane when Inset recognizes a tap outside it.
@@ -330,11 +334,125 @@ Ported against: aa3207e6
   Reason: language — Rust supplies widget construction through callbacks rather than runtime XAML template resources.
   Affect: Applications provide `flyout_presenter_style` when replacing the default border, scrolling or content layout.
 
-## flyout/shadow.rs → `Flyout` and `MenuFlyout` shadows
+## flyout/shadow.rs → `Flyout`, `MenuFlyout`, `ContentDialog`, `NumberBox` and `ComboBox` popup shadows
 
-- Change: `Flyout` and `MenuFlyout` paint their shadows using Inset's native BoxShadow blur with WinUI's default shadow colors, offsets and increases in elevation for each nested submenu.
+- Change: `Flyout`, `MenuFlyout`, `ContentDialog`, the popup of `NumberBox` and the drop-down of `ComboBox` paint their shadows using Inset's native BoxShadow blur with WinUI's default shadow colors, offsets and elevations: a flyout's rises with each nested submenu, a dialog's is the highest the recipe allows, the number box popup's is lower than a flyout's, and the combo box drop-down's matches a flyout's.
   Reason: os — Windows Composition performs WinUI's blur, and its blur-radius conversion is not specified, so the port interprets the radii from WinUI's `DropShadowRecipe.h` using Flutter's native conversion.
   Affect: Popups have a soft shadow that becomes stronger in dark theme and at deeper submenu levels, but its softness can differ from Windows; the shadow is clipped at the application window's edges.
+
+## content_dialog.rs → `ContentDialog`
+
+- Change: `ContentDialog::show_async` pushes the dialog onto the root navigator as a dialog route whose modal barrier is the smoke layer, instead of opening one popup for the smoke layer and another for the dialog.
+  Reason: framework — Inset's navigator already has modal routes that block input to the page beneath and keep keyboard focus inside, while WinUI builds modality from two popups and its own focus cycling.
+  Affect: A dialog needs a `Navigator` above the context that shows it, as `WidgetsApp` provides, and returns keyboard focus to the page the way any popped route does.
+
+- Change: `ContentDialog` always shows over its whole window: there is no `ContentDialogPlacement` choosing `InPlace` or `UnconstrainedPopup`.
+  Reason: framework — a XAML control is at once the object `ShowAsync` is called on and an element that can sit in a page, while an Inset widget is a description its parent rebuilds, so the persistent dialog object has no element of its own to place in a page; and Inset draws overlays only inside the window.
+  Affect: A dialog cannot be confined to part of a page or extend beyond the application window.
+
+- Change: `ContentDialogButtonClickEventArgs` and `ContentDialogClosingEventArgs` reach their handlers as an `Rc`, with `cancel` and `set_cancel` in place of a `Cancel` property.
+  Reason: language — WinRT event arguments are shared objects a handler may keep after it returns, which in Rust is a reference-counted value whose fields change through `Cell`.
+  Affect: A handler that decides later clones the `Rc`, takes `get_deferral`, and calls `set_cancel` before it completes the deferral.
+
+- Change: The future `ContentDialog::show_async` returns cannot be canceled, and dropping it leaves the dialog open.
+  Reason: language — `ShowAsync` returns an `IAsyncOperation` whose `Cancel` closes the dialog without Closing, while an Inset future has no cancellation and runs to completion.
+  Affect: An application closes a shown dialog with `hide`, which raises Closing, or with `dispose`.
+
+- Change: `ContentDialog` keeps the theme and text direction of the context that showed it for as long as it is shown.
+  Reason: framework — the dialog's route lives in the root navigator's overlay, usually above the page's `ThemeScope`, so it inherits no theme and holds what the showing context had.
+  Affect: A theme change while a dialog is open reaches the dialog the next time it is shown.
+
+- Change: `ContentDialog` has click handlers for its buttons but no `PrimaryButtonCommand`, `CommandParameter` or button style properties.
+  Reason: language — XAML binds an `ICommand` object with its parameter and a `Style` resource per button, while a Rust closure captures both and the kit's buttons choose between its default and accent styles.
+  Affect: Applications put a command's work in `primary_button_click` and its siblings, and the command buttons always look like the kit's default buttons, the default button accented.
+
+- Change: `ContentDialog::dispose` releases the dialog object, closing a shown dialog first without its Closing and Closed events.
+  Reason: language — WinUI's dialog is released when nothing refers to it, while the kit's persistent objects, like `Flyout`, are released by their owner.
+  Affect: The owner of a dialog disposes it when the owner is disposed; a shown dialog then disappears and its `show_async` result is `None`.
+
+## number_box.rs → `NumberBox`
+
+- Change: `NumberBox` reports through `value_changed` only the values it asks for itself, from typing, keys, the wheel and its spin buttons, and shows its value as the application passes it back.
+  Reason: framework — WinUI's `Value` is a property of a persistent control, which the control sets itself and every change of which raises `ValueChanged`, while an Inset widget is rebuilt from the application's state.
+  Affect: An application stores `new_value` and rebuilds; a value it sets raises no `ValueChanged`, and a value it does not pass back is undone in the box at the box's next build.
+
+- Change: `NumberBox` raises the `ValueChanged` of a change it makes to what the application passes, coercing a `value` out of range or reading a new `text` or `validation_mode`, at the end of the frame.
+  Reason: framework — these changes are found while the box is rebuilt, and Inset forbids a callback that updates the application's state during a build.
+  Affect: The application hears of such a change one frame late, and a new `text` shows as given for that frame before the box shows its value.
+
+- Change: `NumberBox::text` is read as committed input whenever the application passes a new one, but the box does not report the text it shows.
+  Reason: framework — XAML can bind `Text` both ways, so the control's own updates reach the application, while an Inset widget only receives what the application passes.
+  Affect: An application that needs the shown text formats `value` itself, and passing the same `text` again is not read again.
+
+- Change: `NumberBox::number_formatter` takes any `NumberFormatter` with `PartialEq`, a trait of `format_double` and `parse_double`, and formats the text again only when a formatter of another type or value is passed.
+  Reason: language — WinUI takes a Windows.Globalization object that must implement two interfaces, checked when it is set, while a Rust trait states both methods; and a widget is described again on every build, where XAML sets the property once, so the box compares formatters by value.
+  Affect: Applications implement `NumberFormatter` and `PartialEq` for their own formatting and can build the formatter inline; an equal one leaves text being typed alone.
+
+- Change: `NumberBox` opens its compact spin buttons in the root Overlay of the application window.
+  Reason: framework — the template's `UpDownPopup` sets `ShouldConstrainToRootBounds` to false to open in a window of its own, while Inset draws popups only inside the application window.
+  Affect: Next to a window edge the popup is cut off by the edge instead of extending past it.
+
+## number_box/formatter.rs → `DecimalFormatter` and NumberBox's display rounding
+
+- Change: `DecimalFormatter` and `NumberBox`'s rounding stand in for the Windows `DecimalFormatter` and `SignificantDigitsNumberRounder` NumberBox creates: a value is rounded to 10 significant digits, a halfway value toward positive infinity, and written in its shortest decimal form with `.` and `-` and no grouping, and text is read as an optional `-`, digits and one `.`.
+  Reason: os — Windows.Globalization formats, rounds and parses numbers following the user's regional settings, which the repository does not contain and this host does not provide.
+  Affect: Numbers always follow the en-US conventions: text with grouping separators, exponents or another locale's decimal separator is not a number, and formatting can differ from Windows beyond those conventions.
+
+## combo_box.rs → `ComboBox` and `ComboBoxItem`
+
+- Change: `ComboBox` reports through `selection_changed` only the selections it asks for itself, from the pointer, keys, the wheel, typing and an editable box's text, and shows the selection the application passes back in `selected_index` and `custom_value`.
+  Reason: framework — WinUI's `SelectedIndex` and `SelectedItem` are properties of a persistent control, which the control sets itself and every change of which raises `SelectionChanged`, while an Inset widget is rebuilt from the application's state.
+  Affect: An application stores the selection the event asks for and rebuilds; a selection it sets raises no `SelectionChanged`, and one it does not pass back is undone in the box at the box's next build.
+
+- Change: `ComboBoxSelectionChangedEventArgs` carries `removed_item` and `added_item`, each an `Option<ComboBoxSelectedItem>` holding an item's index and id or a custom value's text, in place of the `RemovedItems` and `AddedItems` lists of objects.
+  Reason: language — XAML's lists hold whatever objects the items are, while a box with one selection removes and adds at most one, which Rust states as an `Option` of an enum.
+  Affect: A handler reads `selected_index()` or `custom_value()` of the arguments, or matches `added_item`, instead of casting the first element of `AddedItems`.
+
+- Change: `ComboBoxItem` is a unique `id`, a `content` widget, an optional `plain_text` and `is_enabled`, in place of the objects of `Items` or `ItemsSource` that the box shows through `ItemTemplate` or `DisplayMemberPath`.
+  Reason: language — the source turns an item object into the string it searches with `DisplayMemberPath` or the object's `ToString`, while a widget has no string form, so the text is given beside the content.
+  Affect: Type-ahead and an editable box find only items with `plain_text`, which `ComboBoxItem::text` sets; an item without it ends a search, as an item without a string does in WinUI.
+
+- Change: `ComboBox` opens and closes its drop-down itself unless the application passes `is_drop_down_open`, in which case it asks through the callback and shows the state the application passes.
+  Reason: framework — WinUI's `IsDropDownOpen` is a property that both the control and the application set, while an Inset widget is rebuilt from the application's state.
+  Affect: An application that owns the drop-down stores the state it is asked for; a state it declines is undone at the box's next build without asking again, and a state it passes takes effect, with `DropDownOpened` or `DropDownClosed`, at the end of that frame.
+
+- Change: `ComboBox` opens its drop-down in the root Overlay of the application window and places it within the window.
+  Reason: framework — the source sets the popup's `ShouldConstrainToRootBounds` to false, so that the drop-down opens in a window of its own placed within the monitor's work area, while Inset draws popups only inside the application window.
+  Affect: The drop-down never extends past the application window, so in a short window it shows fewer items and scrolls sooner than WinUI's.
+
+- Change: `ComboBox` places its drop-down using the item heights laid out in earlier frames, and one line of text for items not laid out yet, and makes it as wide as the widest item laid out since it opened.
+  Reason: framework — the source measures any item's container on demand while it arranges the popup, while Inset lays a widget out only in the frame's layout pass, and the lazy list lays out the items in its view and a margin beyond it.
+  Affect: Items taller than one line can move the drop-down a frame after it opens, and an item laid out just beyond the drop-down's view widens it before it is scrolled into view.
+
+- Change: `ComboBox` opens and closes its drop-down without the template's split animation, and raises `DropDownClosed` as soon as the drop-down closes.
+  Reason: os — the template's `SplitOpenThemeAnimation` and `SplitCloseThemeAnimation` take their motion and timing from Windows, and the source raises `DropDownClosed` when the close animation completes.
+  Affect: The drop-down appears and disappears at once, and `drop_down_closed` runs in the frame the drop-down closes.
+
+- Change: `ComboBox` uses a static Fluent chevron for the template's animated `DropDownGlyph`.
+  Reason: os — the Windows animated-chevron asset has no matching animation in the bundled Fluent font.
+  Affect: The chevron changes color with the box's state but does not animate its shape.
+
+- Change: A non-editable `ComboBox` takes the characters for type-ahead from the key presses that reach it.
+  Reason: framework — XAML raises `CharacterReceived` for every character the window receives, including those an input method commits, while Inset delivers an input method's text only to a focused text field and otherwise reports the character a key press produces.
+  Affect: Text composed with an input method, such as kana converted to kanji, does not select items in a non-editable box.
+
+- Change: An editable `ComboBox` searches its items for submitted text as soon as `text_submitted` returns unhandled, before the application can pass an item it added in the handler.
+  Reason: framework — a WinUI handler can add the text to an observable `ItemsSource`, which the box sees at once and then selects, while an Inset widget sees new items only when the application rebuilds it.
+  Affect: An application that adds submitted text as an item without setting `handled` receives the text as a custom value in `selection_changed`, and selects the new item by passing its index in `selected_index`.
+
+- Change: An editable `ComboBox` opens its drop-down directly below the box rather than below an input method's candidate window.
+  Reason: os — the source adds the height of the candidate window that Windows reports through the text box's `CandidateWindowBoundsChanged`, which this host does not report.
+  Affect: While text is being composed with an input method, its candidate window can cover the top of the drop-down.
+
+- Change: `ComboBox` takes pointer input only within its own bounds, not in the 4-pixel focus border (`HighlightBackground`) that the template draws around the box.
+  Reason: framework — XAML hit-tests an element where it is drawn, even outside its parent's layout bounds and at zero opacity, while Inset tests a child only where its parent's bounds contain the point.
+  Affect: A press or hover up to 4 pixels outside the box's edges reaches what lies beneath instead of the box.
+
+## combo_box/search.rs → ComboBox text search
+
+- Change: `ComboBox` matches typed text to an item's text ignoring case, the width of full-width Latin letters, digits and punctuation, and the difference between hiragana and katakana, but not diacritics, as a substitute for the Windows comparison.
+  Reason: os — the source compares with `FindNLSStringEx` under the user's locale, with flags that also ignore diacritics and apply the locale's casing, which Windows implements and this host does not provide.
+  Affect: Typing `e` does not find an item that starts with `é`, and case follows Unicode's default rules rather than the user's language, as Turkish dotted and dotless i show.
 
 ## drop_down_button.rs → `DropDownButton`
 
@@ -390,6 +508,100 @@ Ported against: aa3207e6
   Reason: framework — WinUI tracks a pointer id and invokes the dropdown item on release, while Inset resolves taps alongside competing drag and scroll gestures.
   Affect: Dragging the overflow list can cancel a pending item click using the same native behavior as the kit’s buttons.
 
+## color_spectrum.rs → `ColorSpectrum`
+
+- Change: `ColorSpectrum` reports through `color_changed` only the colours the user picks, with the `HsvColor` it asks for, and shows the `hsv_color` the application passes back.
+  Reason: framework — WinUI's `Color` and `HsvColor` are properties of a persistent control, which the control sets itself and every change of which raises `ColorChanged`, while an Inset widget is rebuilt from the application's state.
+  Affect: An application stores `args.hsv_color` and rebuilds; an `hsv_color` it sets raises no `ColorChanged`, and one it does not pass back is undone at the spectrum's next build.
+
+- Change: `ColorSpectrum` takes its colour only as `hsv_color`, whose `Color` is `HsvColor::to_color`, and an RGB colour becomes an `HsvColor` through `HsvColor::from_color`.
+  Reason: framework — WinUI keeps `Color` and `HsvColor` as two properties that set each other, while a widget the application rebuilds needs one value to compare with what it shows.
+  Affect: Where XAML sets `Color`, a caller writes `ColorSpectrum::new(HsvColor::from_color(color), …)`.
+
+- Change: `HsvColor` names its components `hue`, `saturation`, `value` and `alpha` where XAML's `Vector4` has `X`, `Y`, `Z` and `W`.
+  Reason: language — a Rust struct gives the four numbers their meanings as field names instead of reusing a general vector type.
+  Affect: Code reading `HsvColor.X` reads `hsv_color.hue`.
+
+- Change: `ColorSpectrum` computes its spectrum images on the UI thread, in the update that changes its size, `Shape`, `Components` or a component's range.
+  Reason: framework — WinUI computes the pixels on a thread-pool work item and hands them back through the dispatcher, which the kit's controls do not use; the largest spectrum ColorPicker shows, 336 square, takes 2 to 5 ms in an optimized build.
+  Affect: The spectrum appears in the frame after its size is known, without the empty frames WinUI can show while its work item runs, and that frame takes the time of the computation.
+
+## color_picker_slider.rs → `ColorPickerSlider`
+
+- Change: `ColorPickerSlider` is a widget of its own that builds a `Slider` with the template of `ColorPickerSliderStyle` and an `OnKeyDown` override, and it has the Slider properties that template shows.
+  Reason: language — the XAML control derives from `Slider` and inherits all of its properties, while a Rust widget composes another.
+  Affect: `ColorPickerSlider` has no tick, `SnapsTo`, `SmallChange` or thumb tooltip converter properties; an application needing them uses `Slider` with its own template.
+
+- Change: `ColorPickerSlider` opens its tooltip of the value and the colour's name when it takes the focus from the keyboard, not when it is pressed.
+  Reason: framework — the source opens the tooltip from `OnGotFocus`, and the kit's `Slider` does not take the focus on a press (see the shared conventions).
+  Affect: Pressing or dragging the thumb does not open the tooltip; once the value has changed, it opens as other tooltips do when the pointer rests on the thumb.
+
+## color_picker.rs → `ColorPicker`
+
+- Change: `ColorPicker` reports through `color_changed` only the colours it asks for itself, from its spectrum, sliders and text boxes, and shows the `color` the application passes back.
+  Reason: framework — WinUI's `Color` is a property of a persistent control, which the control sets itself and every change of which raises `ColorChanged`, while an Inset widget is rebuilt from the application's state.
+  Affect: An application stores `new_color` and rebuilds; a colour it sets raises no `ColorChanged`, a colour it does not pass back is undone in the picker at its next build, and the hue and saturation of a grey or black are kept only while the application passes back the colours the picker asks for.
+
+- Change: `ColorPicker` raises the `ColorChanged` of a change it makes to the colour the application passes, bringing it into a narrowed `MinHue` to `MaxValue` range, at the end of the frame.
+  Reason: framework — these changes are found while the picker is rebuilt, and Inset forbids a callback that updates the application's state during a build.
+  Affect: The application hears of such a change one frame late.
+
+## tree_view.rs → `TreeView`, `TreeViewItem` and `TreeViewList`
+
+- Change: `TreeView` receives its nodes, each node's `is_expanded` and the selected nodes from the application, and reports what it asks to change through `expanding`, `collapsed`, `selection_changed` and `move_requested`.
+  Reason: framework — WinUI's `TreeViewNode` objects and `SelectedNodes` belong to the control, which changes them itself, while an Inset widget is rebuilt from the application's state.
+  Affect: An application stores what each callback asks for and rebuilds; a change it does not store is undone at the tree's next build, and a change it makes itself raises no event.
+
+- Change: `TreeView` reports the moves a drop or Shift+Alt with an arrow makes as `TreeViewNodeMove`s, each a node with its new parent and its index counted after the node leaves its parent, and reports a parent the moves leave without children through `collapsed`.
+  Reason: framework — WinUI's drop and keyboard reorder handlers remove and insert `TreeViewNode`s in the control's own collections, which an application owning its tree has to do itself.
+  Affect: An application applies the moves in order and stores the collapse; `DragItemsCompleted`'s `new_parent_item` is the parent the moves give the first item.
+
+- Change: `TreeView` draws `selected_nodes` as the application passes them, without the rules `SelectedNodes` applies when a node is added to it.
+  Reason: framework — WinUI's `SelectedNodes` is a collection on the control whose `Append` also selects the node's descendants and completes its ancestors, while an Inset widget only reads what the application passes.
+  Affect: In Multiple mode, an application selecting a node itself also passes its descendants, and a parent whose children are all passed is drawn partly selected until it is passed too; the check boxes and Space apply WinUI's rules and report the full selection in `selected_nodes`.
+
+- Change: `TreeView` has no `Expand`, `Collapse`, `SelectAll`, `SelectedItem`, `NodeFromContainer` or `ContainerFromNode`, and no content mode with `ItemsSource`, `ItemTemplate`, `ItemTemplateSelector`, `ItemContainerStyle` or `ItemContainerStyleSelector`.
+  Reason: language — the methods act on the control's own nodes and containers, and the content mode turns application objects into rows through XAML templates, while in Rust the application passes `TreeViewNode`s with the widget each row shows.
+  Affect: An application sets `is_expanded` and `selected_nodes` itself, chooses each node's `content` widget where it would choose a template, and cannot set a property, such as `AllowDrop`, on a single row.
+
+- Change: `TreeView`'s event arguments name nodes by their `id`, `TreeViewSelectionChangedEventArgs` adds the new `selected_nodes`, and `TreeViewItemInvokedEventArgs` has no `Handled`.
+  Reason: language — WinUI passes the node objects, which a handler reads further from the control, while a Rust handler receives values; nothing in TreeView reads `Handled`.
+  Affect: Handlers look nodes up by id in the application's own tree.
+
+- Change: `TreeView` builds its rows in a lazy `ListView`, and Left and Right move the focus to a parent or first child whose row is not built yet, scrolling to it.
+  Reason: framework — Flutter's lazy list creates rows only near the view, and estimates the place of rows not laid out yet, where WinUI's ItemsStackPanel keeps a cache of containers and `HandleExpandCollapse` only focuses a container it has.
+  Affect: Paging and scrolling to rows far from the view can land a few pixels off and correct themselves once the rows are laid out, and Left from a deep row reaches a parent above the cached range, where WinUI's key does nothing.
+
+- Change: `TreeView` raises no `SelectionChanged` when a selected node the application passes while it is hidden becomes a row, and raises the one for a selected node the application's change hides at the end of the frame.
+  Reason: framework — WinUI's list selects the container it creates for a node the view model has selected and unselects one it removes, each with an event, while the tree draws the selection from `selected_nodes` and finds such changes while it is rebuilt, when Inset forbids a callback that updates the application's state.
+  Affect: Expanding the parent of a selected node raises no event, and the application hears of a selection its own collapse cleared one frame late.
+
+- Change: `TreeViewItem`'s chevron uses the bundled Fluent chevrons for the template's `\uE76C` and `\uE70D` glyphs of `SymbolThemeFontFamily`.
+  Reason: os — the Segoe Fluent Icons font ships with Windows and is not bundled with the kit.
+  Affect: The chevrons can differ slightly in shape and weight from Windows'.
+
+- Change: `TreeView` adds, removes and moves rows at once, and fades a dragged row out at once, without the template's `ContentThemeTransition`, `ReorderThemeTransition`, `EntranceThemeTransition` and `FadeOutThemeAnimation`.
+  Reason: os — these theme transitions and animations take their motion and timing from Windows.
+  Affect: Rows appear when a node expands, and the gap of a drag opens, without movement.
+
+## tree_view/drag.rs → TreeView drag and drop
+
+- Change: `TreeView` starts a drag with Inset's native drag recognition and shows the dragged row as a separate widget under the pointer, opaque and without the system's drop glyph or caption.
+  Reason: framework — Inset cannot capture the displayed row as an image for the system drag visual, and its drags stay in the window.
+  Affect: The drag starts after Inset's drag threshold, and the preview is the row in its pressed state, with the count of nodes for a drag of several, built from the node's `content` a second time, so content holding a `GlobalKey` cannot be dragged.
+
+- Change: `TreeView`'s drags carry no `DataPackage` and reach only the tree they started in: `TreeViewDragItemsStartingEventArgs` has no `Data`, and drags from outside are not taken.
+  Reason: framework — Inset's drag and drop passes widgets' data within a window, with no transfer of formats to other controls or applications.
+  Affect: Nodes cannot be dragged to another tree, control or application, or dropped in from them.
+
+- Change: `TreeView` goes over the pointer's place again when a gap opens, a hovered row expands, the list edge-scrolls and a drop happens.
+  Reason: framework — Windows keeps reporting a drag's position while the pointer is still, and Inset reports it only when the pointer moves.
+  Affect: What lies under a still pointer decides the drop as on Windows, though the row a still pointer points at shows only after one of these.
+
+- Change: `TreeView` moves nothing for a drag when `can_drag_items` is false and `can_reorder_items` true.
+  Reason: framework — without `DragItemsStarting` TreeViewList knows no dragged node, and WinUI's ListView then reorders the flattened rows of its view model, which in Inset is no collection a list owns.
+  Affect: The rows open a gap while dragged and the drop leaves the tree as it was, where WinUI moves a row without changing the tree.
+
 ## Deferred
 
 - `MenuBar` activation by pressing Alt followed by a letter, and the temporary labels showing those letters, remain deferred. Trigger: The kit provides shared access-key mode and label display.
@@ -412,7 +624,14 @@ Ported against: aa3207e6
 - Template and Slider-key right-to-left mirroring remain deferred. Trigger: A consumer needs right-to-left layout, prompting a source comparison of each affected template and keyboard direction.
 - CheckBox indeterminate sweep animation remains deferred. Trigger: A recording from Windows is available.
 - `RatingControl` remains deferred because the bundled icon font supplies outlined stars but no filled stars for selected ratings. Trigger: A matching filled-star glyph is bundled.
-- Additional TextBlock styles and dialogs remain deferred. Trigger: The next control port is selected.
+- Additional TextBlock styles remain deferred. Trigger: The next control port is selected.
+- `ContentDialog` placement inside part of a page (`InPlace`) remains deferred. Trigger: An application needs a dialog confined to part of a page.
+- `NumberBox`'s accessibility, the name it gives its text box from its header and range and the automation event of a value change, remains deferred. Trigger: The kit gains accessibility support.
+- `ComboBox`'s touch presentation remains deferred: the larger item padding of `TouchInputMode`, the drop-down's touch minimum width, the scrolling layout a touch-opened long list uses, and an editable box opening its drop-down when a touch focuses it and selecting its text at the next tap. Trigger: The kit distinguishes touch input in its controls.
+- `ComboBox`'s gamepad and remote-control input, its `GameControllerInputMode` item padding and the `LightDismissOverlayMode` overlay remain deferred. Trigger: A host supplies gamepad or remote-control input.
+- `ComboBox`'s accessibility, its automation peer and the automation events of opening, closing and selection, remains deferred. Trigger: The kit gains accessibility support.
+- `ComboBox`'s element sounds and its closing on system back remain deferred. Trigger: A host exposes those facilities.
+- `ComboBox::text`, an editable box's text as a property apart from its selection, remains deferred. Trigger: An application needs to set or read an editable box's text before it is committed.
 - Mica wallpaper backdrops remain deferred. Trigger: A host material path supplies the wallpaper processing absent from the source.
 - Text controls’ spell-check suggestion menus, touch command-bar presentation, input-scope-specific soft keyboards and OS credential/autofill integration remain deferred. Trigger: The corresponding native services or additional control ports are available.
 - TabView tear-out, caption regions, window movement and cross-window drag transport remain deferred. Trigger: A host provides window management and native drag transport.
@@ -421,3 +640,11 @@ Ported against: aa3207e6
 - Navigation integration with title-bar space, window borders, system sounds and page-change animations remains deferred. Trigger: The host exposes the corresponding window or animation support.
 - Navigation by gamepad shoulder buttons, directional focus movement, accessibility and high-contrast colors remain deferred. Trigger: The corresponding input, accessibility and theme support is available.
 - Standalone ScrollViewer and ScrollBar APIs remain deferred. Trigger: A consumer needs those public controls beyond NavigationView’s internal adapters.
+- `ColorSpectrum`, `ColorPickerSlider` and `ColorPicker` accessibility remains deferred: their automation peers, the names of their parts, and the value strings of the spectrum and the sliders. Trigger: The kit gains accessibility support.
+- `ColorSpectrum`'s mirrored spectrum and the reversed Left and Right keys of `ColorSpectrum` and `ColorPickerSlider` in right-to-left layout remain deferred. Trigger: A consumer needs right-to-left layout.
+- `ColorPicker`'s labels, tooltip texts and colour names in languages other than en-US remain deferred. Trigger: The kit gains localized resources.
+- Whether WinUI shows the tooltip of a vertical `ColorPickerSlider`, whose `ToolTip` belongs to the collapsed horizontal thumb, remains unverified; the kit shows none. Trigger: A Windows capture of a `Horizontal` ColorPicker's slider taking the keyboard focus.
+- `TreeView`'s touch input, dragging a row by pressing and holding it and the press feedback of a touch, remains deferred. Trigger: The kit distinguishes touch input in its controls.
+- `TreeView`'s gamepad input, Gamepad A cycling a node of Multiple mode between expanding and selecting, and directional focus movement, remains deferred. Trigger: A host supplies gamepad or remote-control input.
+- `TreeView`'s accessibility, its automation peers, the automation events of expanding, collapsing, selection and drops, and the drop-effect descriptions TreeViewList builds, remains deferred. Trigger: The kit gains accessibility support.
+- Cancelling a `TreeView` drag with Escape remains deferred. Trigger: Inset's drag and drop can be cancelled by a key.

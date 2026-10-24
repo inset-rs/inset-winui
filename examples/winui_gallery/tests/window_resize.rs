@@ -3,10 +3,10 @@
 use inset_winui_test_support::gpu;
 
 use inset_embedder::valo::{Color, Context};
-use inset_embedder::{
-    Picture, SystemFontSource, TargetPlatform, View, ViewConstraints, ViewId, ViewMetrics,
-};
 use inset_embedder::{PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
+use inset_embedder::{
+    Scene, SystemFontSource, TargetPlatform, View, ViewConstraints, ViewId, ViewMetrics,
+};
 use inset_foundation::{AppCell, Listener};
 use inset_gestures::GestureBinding;
 use inset_rendering::RendererBinding;
@@ -41,13 +41,22 @@ impl View for CaptureView {
             ..Default::default()
         }
     }
-    fn present(&self, picture: Arc<Picture>) {
+    fn present(&self, scene: Arc<Scene>) {
         *self.pixels.borrow_mut() = self.renderer.borrow_mut().render_to_rgba(
-            &picture,
+            &scene.picture,
             self.size.get(),
             Some(Color::WHITE),
         );
     }
+}
+
+/// One refresh of `view` at `time`, processing microtasks between its phases.
+fn refresh(cell: &AppCell, view: &CaptureView, time: Duration) {
+    let views = [view.id()];
+    SchedulerBinding::handle_begin_frame(&mut cell.borrow_mut(), &views, Some(time));
+    cell.checkpoint();
+    SchedulerBinding::handle_draw_frame(&mut cell.borrow_mut(), &views);
+    cell.checkpoint();
 }
 /// A macOS host showing `view`, with the system fonts.
 fn host(view: &Rc<CaptureView>) -> TestPlatform {
@@ -105,10 +114,7 @@ fn real_window_resize_relayouts_navigation_overlay() {
     }
     cell.elapse(Duration::ZERO);
     let mut time = Duration::ZERO;
-    SchedulerBinding::handle_begin_frame(&mut cell.borrow_mut(), Some(time));
-    cell.checkpoint();
-    SchedulerBinding::handle_draw_frame(&mut cell.borrow_mut());
-    cell.checkpoint();
+    refresh(&cell, &view, time);
     {
         let mut app = cell.borrow_mut();
         GestureBinding::instance(&mut app).handle_pointer_data_packet(
@@ -125,10 +131,7 @@ fn real_window_resize_relayouts_navigation_overlay() {
     cell.checkpoint();
     cell.elapse(Duration::from_millis(900));
     time += Duration::from_millis(900);
-    SchedulerBinding::handle_begin_frame(&mut cell.borrow_mut(), Some(time));
-    cell.checkpoint();
-    SchedulerBinding::handle_draw_frame(&mut cell.borrow_mut());
-    cell.checkpoint();
+    refresh(&cell, &view, time);
     assert!(
         tooltip_opened.get(),
         "hover timer opens tooltip before resizing"
@@ -151,10 +154,7 @@ fn real_window_resize_relayouts_navigation_overlay() {
         }
         {
             time += Duration::from_millis(16);
-            SchedulerBinding::handle_begin_frame(&mut cell.borrow_mut(), Some(time));
-            cell.checkpoint();
-            SchedulerBinding::handle_draw_frame(&mut cell.borrow_mut());
-            cell.checkpoint();
+            refresh(&cell, &view, time);
             assert_eq!(view.pixels.borrow().len(), (size[0] * size[1] * 4) as usize);
         }
     }
@@ -194,10 +194,7 @@ fn real_gallery_window_resize_keeps_overlay_parent_data() {
         }
         {
             time += Duration::from_millis(16);
-            SchedulerBinding::handle_begin_frame(&mut cell.borrow_mut(), Some(time));
-            cell.checkpoint();
-            SchedulerBinding::handle_draw_frame(&mut cell.borrow_mut());
-            cell.checkpoint();
+            refresh(&cell, &view, time);
             assert_eq!(view.pixels.borrow().len(), (size[0] * size[1] * 4) as usize);
         }
     }

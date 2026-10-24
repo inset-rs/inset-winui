@@ -110,7 +110,6 @@ fn info_bar_narrow_layout_renders() {
 use inset_foundation::{App, Handle, Listener};
 use inset_painting::Alignment;
 use inset_rendering::MainAxisSize;
-use inset_scheduler::SchedulerBinding;
 use inset_widgets::*;
 use inset_winui::{AccentPalette, ExpandDirection, Expander};
 use std::{
@@ -223,11 +222,7 @@ impl State for LifecycleState {
 
 /// Pumps one frame without concealing the intermediate animation state.
 fn frame(fixture: &mut Fixture, milliseconds: u64) {
-    fixture.at += Duration::from_millis(milliseconds);
-    SchedulerBinding::handle_begin_frame(&mut fixture.cell.borrow_mut(), Some(fixture.at));
-    fixture.cell.checkpoint();
-    SchedulerBinding::handle_draw_frame(&mut fixture.cell.borrow_mut());
-    fixture.cell.checkpoint();
+    fixture.frame_after(Duration::from_millis(milliseconds));
 }
 
 type LifecycleFixture = (Fixture, Handle<LifecycleState>, Rc<RefCell<Vec<String>>>);

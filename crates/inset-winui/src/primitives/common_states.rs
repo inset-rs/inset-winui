@@ -308,6 +308,7 @@ impl State for CommonStatesData {
                                 app.destroy(node.id());
                             }
                         }),
+                        View::maybe_id_of(app, self.context(app)),
                     );
                 } else {
                     node.set_on_key_event(app, None);

@@ -7,7 +7,6 @@ use common::GalleryFixtureExt;
 use common::{Fixture, mount};
 use inset_embedder::{Color, TextDirection};
 use inset_painting::AlignmentGeometry;
-use inset_scheduler::SchedulerBinding;
 use inset_widgets::*;
 use inset_winui::*;
 use std::time::Duration;
@@ -36,15 +35,16 @@ fn ring_at_top_left(ring: ProgressRing) -> Fixture {
 
 /// Hands the mounted ring new property values, as an owner rebuild does.
 ///
-/// Attaches the tree in place. `run_app` would schedule a warm-up frame that resets the
-/// scheduler epoch, which would move an already-running visual independently of the
-/// properties being replaced.
+/// Attaches the tree in place, in the `MultiViewApp` `run_app` builds the view with. `run_app`
+/// would schedule a warm-up frame that resets the scheduler epoch, which would move an
+/// already-running visual independently of the properties being replaced.
 fn replace(fixture: &mut Fixture, ring: ProgressRing) {
     {
         let mut app = fixture.cell.borrow_mut();
         let binding = WidgetsBinding::instance(&mut app);
-        let wrapped = binding.wrap_with_default_view(&mut app, tree(ring));
-        binding.attach_root_widget(&mut app, wrapped);
+        let tree = tree(ring);
+        let root = MultiViewApp::new(move |_, _| tree.clone()).into_widget();
+        binding.attach_root_widget(&mut app, root);
     }
     advance(fixture, Duration::from_millis(20));
 }
@@ -55,11 +55,7 @@ fn advance(fixture: &mut Fixture, duration: Duration) {
     let mut remaining = duration;
     while !remaining.is_zero() {
         let delta = step.min(remaining);
-        fixture.at += delta;
-        SchedulerBinding::handle_begin_frame(&mut fixture.cell.borrow_mut(), Some(fixture.at));
-        fixture.cell.checkpoint();
-        SchedulerBinding::handle_draw_frame(&mut fixture.cell.borrow_mut());
-        fixture.cell.checkpoint();
+        fixture.frame_after(delta);
         remaining -= delta;
     }
 }

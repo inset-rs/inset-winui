@@ -35,3 +35,16 @@ pub use retained_flyout::{FlyoutTarget, FlyoutTargetState, RetainedFlyoutHost};
 
 mod breadcrumb_layout;
 pub(crate) use breadcrumb_layout::*;
+
+mod after_frame;
+pub(crate) use after_frame::*;
+
+mod deferral;
+pub(crate) use deferral::DeferralManager;
+pub use deferral::{Deferral, DeferralCompleted};
+
+mod color_conversion;
+pub(crate) use color_conversion::*;
+
+mod color_display_name;
+pub use color_display_name::*;

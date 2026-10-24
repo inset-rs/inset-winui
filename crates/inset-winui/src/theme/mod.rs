@@ -221,6 +221,33 @@ impl ThemeResources {
     pub fn navigation_view(&self) -> NavigationViewResources {
         NavigationViewResources::for_theme(self.theme, &self.accent)
     }
+
+    /// The dialog's brushes, including its smoke layer.
+    pub fn content_dialog(&self) -> ContentDialogResources {
+        ContentDialogResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The number box's popup, its spin buttons and its text box brushes.
+    pub fn number_box(&self) -> NumberBoxResources {
+        NumberBoxResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The combo box's box, drop-down, items and editable text box brushes.
+    pub fn combo_box(&self) -> ComboBoxResources {
+        ComboBoxResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The color picker's slider thumbs, borders and checkered backgrounds, and its spectrum's
+    /// selection ellipse.
+    pub fn color_picker(&self) -> ColorPickerResources {
+        ColorPickerResources::for_theme(self.theme, &self.accent)
+    }
+
+    /// The tree view items' backgrounds, foregrounds and selection indicator, the drag count
+    /// badge, and what the items inherit from `DefaultListViewItemStyle`.
+    pub fn tree_view(&self) -> TreeViewResources {
+        TreeViewResources::for_theme(self.theme, &self.accent)
+    }
 }
 
 /// Sets the theme and accent for a subtree; XAML `FrameworkElement.RequestedTheme` plus the accent the OS would supply.

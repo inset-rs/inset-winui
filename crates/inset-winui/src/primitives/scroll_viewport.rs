@@ -7,9 +7,11 @@
 use inset_animation::Curves;
 use inset_foundation::{App, ChangeNotifier, ChangeNotifierData, Handle, Listenable, Listener};
 use inset_painting::{Axis, EdgeInsetsGeometry};
-use inset_scheduler::{FrameCallback, SchedulerBinding};
+use inset_scheduler::FrameCallback;
 use inset_widgets::*;
 use std::time::Duration;
+
+use super::after_next_frame;
 
 /// A snapshot of one native scrolling axis, in logical pixels.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -47,6 +49,17 @@ impl ScrollViewportController {
     /// Creates an unattached controller at offset zero.
     pub fn new(app: &mut App) -> Handle<Self> {
         let native = ScrollController::default(app);
+        Self::with_native(app, native)
+    }
+
+    /// Creates an unattached controller whose viewports start at `offset`.
+    pub fn with_initial_offset(app: &mut App, offset: f64) -> Handle<Self> {
+        let native = ScrollController::new(app, offset, false, None, None, None);
+        Self::with_native(app, native)
+    }
+
+    /// Wraps `native`, reporting its changes.
+    fn with_native(app: &mut App, native: Handle<ScrollController>) -> Handle<Self> {
         let controller = app.create(Self {
             notifier: ChangeNotifierData::new(),
             native,
@@ -166,8 +179,10 @@ impl ScrollViewportController {
             return;
         }
         app.get_mut(self).report_pending = true;
-        SchedulerBinding::add_post_frame_callback(
+        after_next_frame(
             app,
+            // A controller is in no view of its own.
+            None,
             FrameCallback::new(move |app, _| {
                 if !app.contains(self) || app.get(self).disposed {
                     return;
@@ -180,7 +195,6 @@ impl ScrollViewportController {
                 }
             }),
         );
-        SchedulerBinding::ensure_visual_update(app);
     }
 }
 

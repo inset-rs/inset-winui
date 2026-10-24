@@ -46,7 +46,10 @@ pub(super) fn build(
         commands.push((
             "Paste",
             "V",
-            Listener::new(move |app| editor.paste_text(app, SelectionChangedCause::Toolbar)),
+            Listener::new(move |app| {
+                // The paste finishes on its own once the clipboard answers.
+                drop(editor.paste_text(app, SelectionChangedCause::Toolbar));
+            }),
         ));
     }
     if !password && !read_only {

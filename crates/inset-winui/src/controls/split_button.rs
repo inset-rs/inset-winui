@@ -591,6 +591,7 @@ impl State for SplitButtonState {
                             app.destroy(node.id());
                         }
                     }),
+                    View::maybe_id_of(app, self.context(app)),
                 );
             }
             self.attach_focus(app);

@@ -2,7 +2,7 @@
 
 use crate::ThemeResources;
 use crate::ThemeScope;
-use inset_embedder::{Offset, Rect, TextDirection};
+use inset_embedder::{Offset, Rect, TextDirection, ViewId};
 use inset_foundation::{App, Handle, Listener};
 use inset_painting::transform_rect;
 use inset_scheduler::{FrameCallback, SchedulerBinding};
@@ -128,6 +128,12 @@ impl RetainedFlyoutHost {
         ))
     }
 
+    /// The view the content is shown in: its overlay's; none before the first opening.
+    fn view(self: Handle<Self>, app: &App) -> Option<ViewId> {
+        let overlay = app.get(self).overlay?;
+        View::maybe_id_of(app, overlay.context(app))
+    }
+
     /// Rebuilds retained content after a controller property changes.
     pub fn rebuild(self: Handle<Self>, app: &mut App) {
         if app.get(self).disposed {
@@ -148,6 +154,7 @@ impl RetainedFlyoutHost {
                         self.rebuild(app);
                     }
                 }),
+                self.view(app),
             );
         } else if let Some(state) = app.get(self).state {
             state.set_state(app, |_| {});
@@ -256,6 +263,7 @@ impl RetainedFlyoutHost {
                     closed.call(app);
                 }
             }),
+            self.view(app),
         );
     }
 
@@ -358,6 +366,7 @@ impl State for FlyoutTargetState {
                             state.set_state(app, |_| {});
                         }
                     }),
+                    View::maybe_id_of(app, self.context(app)),
                 );
             }
         }
@@ -382,6 +391,8 @@ impl State for FlyoutTargetState {
                             }
                         }
                     }),
+                    // Disposed, the target is in no view any more.
+                    None,
                 );
             }
         }
@@ -448,6 +459,7 @@ impl RetainedFlyoutState {
                     opened.call(app);
                 }
             }),
+            View::maybe_id_of(app, self.context(app)),
         );
     }
 

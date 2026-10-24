@@ -142,6 +142,10 @@ impl State for ColorTransitionState {
         controller.animate_to(app, 1.0, None, Curves::linear());
     }
 
+    fn activate(self: Handle<Self>, app: &mut App) {
+        SingleTickerProviderStateMixin::activate(self, app);
+    }
+
     fn dispose(self: Handle<Self>, app: &mut App) {
         let controller = self.controller(app);
         controller.dispose(app);

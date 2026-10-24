@@ -8229,3 +8229,1385 @@ pub const BREADCRUMB_BAR_ITEM_FONT_WEIGHT: FontWeight = FontWeight::NORMAL;
 pub const BREADCRUMB_BAR_ELLIPSIS_FLYOUT_PRESENTER_BORDER_THEME_THICKNESS: [f64; 4] =
     [1.0, 1.0, 1.0, 1.0];
 pub const BREADCRUMB_BAR_CHEVRON_FONT_SIZE: f64 = 12.0;
+/// Theme-dependent resources of `ContentDialog_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ContentDialogResources {
+    /// The resolved `ContentDialogForeground` resource.
+    pub content_dialog_foreground: Color,
+    /// The resolved `ContentDialogBackground` resource.
+    pub content_dialog_background: Color,
+    /// The resolved `ContentDialogSmokeFill` resource.
+    pub content_dialog_smoke_fill: Color,
+    /// The resolved `ContentDialogTopOverlay` resource.
+    pub content_dialog_top_overlay: Color,
+    /// The resolved `ContentDialogBorderBrush` resource.
+    pub content_dialog_border_brush: Color,
+    /// The resolved `ContentDialogSeparatorBorderBrush` resource.
+    pub content_dialog_separator_border_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `SystemControlForegroundAccentBrush` resource.
+    pub system_control_foreground_accent_brush: Color,
+}
+
+impl ContentDialogResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                content_dialog_foreground: Color::from_argb(228, 0, 0, 0),
+                content_dialog_background: Color::from_argb(255, 243, 243, 243),
+                content_dialog_smoke_fill: Color::from_argb(77, 0, 0, 0),
+                content_dialog_top_overlay: Color::from_argb(255, 255, 255, 255),
+                content_dialog_border_brush: Color::from_argb(102, 117, 117, 117),
+                content_dialog_separator_border_brush: Color::from_argb(15, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_accent_brush: accent.base,
+            },
+            Theme::Dark => Self {
+                content_dialog_foreground: Color::from_argb(255, 255, 255, 255),
+                content_dialog_background: Color::from_argb(255, 32, 32, 32),
+                content_dialog_smoke_fill: Color::from_argb(77, 0, 0, 0),
+                content_dialog_top_overlay: Color::from_argb(13, 255, 255, 255),
+                content_dialog_border_brush: Color::from_argb(102, 117, 117, 117),
+                content_dialog_separator_border_brush: Color::from_argb(25, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_foreground_accent_brush: accent.base,
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const CONTENT_DIALOG_BORDER_WIDTH: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+pub const CONTENT_DIALOG_MIN_WIDTH: f64 = 320.0;
+pub const CONTENT_DIALOG_MAX_WIDTH: f64 = 548.0;
+pub const CONTENT_DIALOG_MIN_HEIGHT: f64 = 184.0;
+pub const CONTENT_DIALOG_MAX_HEIGHT: f64 = 756.0;
+pub const CONTENT_DIALOG_BUTTON_SPACING: f64 = 8.0;
+/// Left, top, right, bottom.
+pub const CONTENT_DIALOG_TITLE_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 12.0];
+/// Left, top, right, bottom.
+pub const CONTENT_DIALOG_PADDING: [f64; 4] = [24.0, 24.0, 24.0, 24.0];
+/// Left, top, right, bottom.
+pub const CONTENT_DIALOG_SEPARATOR_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 1.0];
+/// Theme-dependent resources of `NumberBox_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct NumberBoxResources {
+    /// The resolved `NumberBoxPopupIndicatorForeground` resource.
+    pub number_box_popup_indicator_foreground: Color,
+    /// The resolved `NumberBoxPopupBackground` resource.
+    pub number_box_popup_background: AcrylicBrushResources,
+    /// The resolved `NumberBoxPopupBorderBrush` resource.
+    pub number_box_popup_border_brush: Color,
+    /// The resolved `NumberBoxPopupSpinButtonBackground` resource.
+    pub number_box_popup_spin_button_background: Color,
+    /// The resolved `AcrylicBackgroundFillColorDefaultBrush` resource.
+    pub acrylic_background_fill_color_default_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlForegroundBaseMediumBrush` resource.
+    pub system_control_foreground_base_medium_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseHighBrush` resource.
+    pub system_control_background_base_high_brush: Color,
+    /// The resolved `SystemControlTransientBorderBrush` resource.
+    pub system_control_transient_border_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `TextControlSelectionHighlightColor` resource.
+    pub text_control_selection_highlight_color: Color,
+    /// The resolved `TextControlBackground` resource.
+    pub text_control_background: Color,
+    /// The resolved `TextControlBorderBrush` resource.
+    pub text_control_border_brush: [(f64, Color); 2],
+    /// The resolved `TextControlForeground` resource.
+    pub text_control_foreground: Color,
+    /// The resolved `TextControlHeaderForegroundDisabled` resource.
+    pub text_control_header_foreground_disabled: Color,
+    /// The resolved `TextControlButtonBackground` resource.
+    pub text_control_button_background: Color,
+    /// The resolved `TextControlButtonBackgroundPointerOver` resource.
+    pub text_control_button_background_pointer_over: Color,
+    /// The resolved `TextControlButtonBackgroundPressed` resource.
+    pub text_control_button_background_pressed: Color,
+    /// The resolved `TextControlButtonForeground` resource.
+    pub text_control_button_foreground: Color,
+    /// The resolved `TextControlButtonForegroundPointerOver` resource.
+    pub text_control_button_foreground_pointer_over: Color,
+    /// The resolved `TextControlButtonForegroundPressed` resource.
+    pub text_control_button_foreground_pressed: Color,
+    /// The resolved `TextControlButtonBorderBrush` resource.
+    pub text_control_button_border_brush: Color,
+    /// The resolved `TextControlButtonBorderBrushPointerOver` resource.
+    pub text_control_button_border_brush_pointer_over: Color,
+    /// The resolved `TextControlButtonBorderBrushPressed` resource.
+    pub text_control_button_border_brush_pressed: Color,
+    /// The resolved `TextControlHeaderForeground` resource.
+    pub text_control_header_foreground: Color,
+    /// The resolved `SystemControlDescriptionTextForegroundBrush` resource.
+    pub system_control_description_text_foreground_brush: Color,
+    /// The resolved `TextControlBackgroundDisabled` resource.
+    pub text_control_background_disabled: Color,
+    /// The resolved `TextControlBorderBrushDisabled` resource.
+    pub text_control_border_brush_disabled: Color,
+    /// The resolved `TextControlForegroundDisabled` resource.
+    pub text_control_foreground_disabled: Color,
+    /// The resolved `TextControlPlaceholderForegroundDisabled` resource.
+    pub text_control_placeholder_foreground_disabled: Color,
+    /// The resolved `TextControlBorderBrushPointerOver` resource.
+    pub text_control_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `TextControlBackgroundPointerOver` resource.
+    pub text_control_background_pointer_over: Color,
+    /// The resolved `TextControlPlaceholderForegroundPointerOver` resource.
+    pub text_control_placeholder_foreground_pointer_over: Color,
+    /// The resolved `TextControlForegroundPointerOver` resource.
+    pub text_control_foreground_pointer_over: Color,
+    /// The resolved `TextControlPlaceholderForegroundFocused` resource.
+    pub text_control_placeholder_foreground_focused: Color,
+    /// The resolved `TextControlBackgroundFocused` resource.
+    pub text_control_background_focused: Color,
+    /// The resolved `TextControlBorderBrushFocused` resource.
+    pub text_control_border_brush_focused: [(f64, Color); 2],
+    /// The resolved `TextControlForegroundFocused` resource.
+    pub text_control_foreground_focused: Color,
+    /// The resolved `TextControlPlaceholderForeground` resource.
+    pub text_control_placeholder_foreground: Color,
+}
+
+impl NumberBoxResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                number_box_popup_indicator_foreground: Color::from_argb(158, 0, 0, 0),
+                number_box_popup_background: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                number_box_popup_border_brush: Color::from_argb(15, 0, 0, 0),
+                number_box_popup_spin_button_background: Color::from_argb(0, 255, 255, 255),
+                acrylic_background_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_background_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_transient_border_brush: {
+                    let color = Color::from_argb(255, 0, 0, 0);
+                    color.with_values(Some(color.a * 0.14), None, None, None, None)
+                },
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                text_control_selection_highlight_color: accent.base,
+                text_control_background: Color::from_argb(179, 255, 255, 255),
+                text_control_border_brush: [
+                    (0.5, Color::from_argb(114, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_foreground: Color::from_argb(228, 0, 0, 0),
+                text_control_header_foreground_disabled: Color::from_argb(102, 0, 0, 0),
+                text_control_button_background: Color::from_argb(0, 0, 0, 0),
+                text_control_button_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                text_control_button_background_pressed: Color::from_argb(6, 0, 0, 0),
+                text_control_button_foreground: Color::from_argb(158, 0, 0, 0),
+                text_control_button_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                text_control_button_foreground_pressed: Color::from_argb(114, 0, 0, 0),
+                text_control_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                text_control_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                text_control_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                text_control_header_foreground: Color::from_argb(255, 0, 0, 0),
+                system_control_description_text_foreground_brush: Color::from_argb(153, 0, 0, 0),
+                text_control_background_disabled: Color::from_argb(77, 249, 249, 249),
+                text_control_border_brush_disabled: Color::from_argb(15, 0, 0, 0),
+                text_control_foreground_disabled: Color::from_argb(92, 1, 1, 1),
+                text_control_placeholder_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                text_control_border_brush_pointer_over: [
+                    (0.5, Color::from_argb(114, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_background_pointer_over: Color::from_argb(128, 249, 249, 249),
+                text_control_placeholder_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                text_control_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                text_control_placeholder_foreground_focused: Color::from_argb(158, 0, 0, 0),
+                text_control_background_focused: Color::from_argb(255, 255, 255, 255),
+                text_control_border_brush_focused: [
+                    (1.0, accent.dark1),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_foreground_focused: Color::from_argb(228, 0, 0, 0),
+                text_control_placeholder_foreground: Color::from_argb(158, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                number_box_popup_indicator_foreground: Color::from_argb(197, 255, 255, 255),
+                number_box_popup_background: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                number_box_popup_border_brush: Color::from_argb(51, 0, 0, 0),
+                number_box_popup_spin_button_background: Color::from_argb(0, 255, 255, 255),
+                acrylic_background_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_background_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_transient_border_brush: {
+                    let color = Color::from_argb(255, 0, 0, 0);
+                    color.with_values(Some(color.a * 0.36), None, None, None, None)
+                },
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                text_control_selection_highlight_color: accent.base,
+                text_control_background: Color::from_argb(15, 255, 255, 255),
+                text_control_border_brush: [
+                    (0.5, Color::from_argb(139, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_foreground: Color::from_argb(255, 255, 255, 255),
+                text_control_header_foreground_disabled: Color::from_argb(102, 255, 255, 255),
+                text_control_button_background: Color::from_argb(0, 0, 0, 0),
+                text_control_button_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                text_control_button_background_pressed: Color::from_argb(10, 255, 255, 255),
+                text_control_button_foreground: Color::from_argb(197, 255, 255, 255),
+                text_control_button_foreground_pointer_over: Color::from_argb(197, 255, 255, 255),
+                text_control_button_foreground_pressed: Color::from_argb(135, 255, 255, 255),
+                text_control_button_border_brush: Color::from_argb(0, 255, 255, 255),
+                text_control_button_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                text_control_button_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                text_control_header_foreground: Color::from_argb(255, 255, 255, 255),
+                system_control_description_text_foreground_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                text_control_background_disabled: Color::from_argb(11, 255, 255, 255),
+                text_control_border_brush_disabled: Color::from_argb(18, 255, 255, 255),
+                text_control_foreground_disabled: Color::from_argb(93, 254, 254, 254),
+                text_control_placeholder_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                text_control_border_brush_pointer_over: [
+                    (0.5, Color::from_argb(139, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_background_pointer_over: Color::from_argb(21, 255, 255, 255),
+                text_control_placeholder_foreground_pointer_over: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                text_control_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                text_control_placeholder_foreground_focused: Color::from_argb(197, 255, 255, 255),
+                text_control_background_focused: Color::from_argb(179, 30, 30, 30),
+                text_control_border_brush_focused: [
+                    (1.0, accent.light2),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_foreground_focused: Color::from_argb(255, 255, 255, 255),
+                text_control_placeholder_foreground: Color::from_argb(197, 255, 255, 255),
+            },
+        }
+    }
+}
+/// Left, top, right, bottom.
+pub const NUMBER_BOX_SPIN_BUTTON_BORDER_THICKNESS: [f64; 4] = [0.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const NUMBER_BOX_ICON_MARGIN: [f64; 4] = [10.0, 0.0, 0.0, 0.0];
+pub const NUMBER_BOX_POPUP_HORIZONAL_OFFSET: f64 = -21.0;
+pub const NUMBER_BOX_POPUP_VERTICAL_OFFSET: f64 = -27.0;
+pub const NUMBER_BOX_POPUP_SHADOW_DEPTH: f64 = 16.0;
+pub const NUMBER_BOX_MIN_WIDTH: f64 = 120.0;
+/// Left, top, right, bottom.
+pub const NUMBER_BOX_POPUP_INDICATOR_MARGIN: [f64; 4] = [0.0, 0.0, 8.0, 0.0];
+/// Left, top, right, bottom.
+pub const NUMBER_BOX_POPUP_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const NUMBER_BOX_POPUP_SPIN_BUTTON_BORDER_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Theme-dependent resources of `ComboBox_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ComboBoxResources {
+    /// The resolved `ComboBoxItemForeground` resource.
+    pub combo_box_item_foreground: Color,
+    /// The resolved `ComboBoxItemForegroundPressed` resource.
+    pub combo_box_item_foreground_pressed: Color,
+    /// The resolved `ComboBoxItemForegroundPointerOver` resource.
+    pub combo_box_item_foreground_pointer_over: Color,
+    /// The resolved `ComboBoxItemForegroundDisabled` resource.
+    pub combo_box_item_foreground_disabled: Color,
+    /// The resolved `ComboBoxItemForegroundSelected` resource.
+    pub combo_box_item_foreground_selected: Color,
+    /// The resolved `ComboBoxItemForegroundSelectedUnfocused` resource.
+    pub combo_box_item_foreground_selected_unfocused: Color,
+    /// The resolved `ComboBoxItemForegroundSelectedPressed` resource.
+    pub combo_box_item_foreground_selected_pressed: Color,
+    /// The resolved `ComboBoxItemForegroundSelectedPointerOver` resource.
+    pub combo_box_item_foreground_selected_pointer_over: Color,
+    /// The resolved `ComboBoxItemForegroundSelectedDisabled` resource.
+    pub combo_box_item_foreground_selected_disabled: Color,
+    /// The resolved `ComboBoxItemBackground` resource.
+    pub combo_box_item_background: Color,
+    /// The resolved `ComboBoxItemBackgroundPressed` resource.
+    pub combo_box_item_background_pressed: Color,
+    /// The resolved `ComboBoxItemBackgroundPointerOver` resource.
+    pub combo_box_item_background_pointer_over: Color,
+    /// The resolved `ComboBoxItemBackgroundDisabled` resource.
+    pub combo_box_item_background_disabled: Color,
+    /// The resolved `ComboBoxItemBackgroundSelected` resource.
+    pub combo_box_item_background_selected: Color,
+    /// The resolved `ComboBoxItemBackgroundSelectedUnfocused` resource.
+    pub combo_box_item_background_selected_unfocused: Color,
+    /// The resolved `ComboBoxItemBackgroundSelectedPressed` resource.
+    pub combo_box_item_background_selected_pressed: Color,
+    /// The resolved `ComboBoxItemBackgroundSelectedPointerOver` resource.
+    pub combo_box_item_background_selected_pointer_over: Color,
+    /// The resolved `ComboBoxItemBackgroundSelectedDisabled` resource.
+    pub combo_box_item_background_selected_disabled: Color,
+    /// The resolved `ComboBoxItemBorderBrush` resource.
+    pub combo_box_item_border_brush: Color,
+    /// The resolved `ComboBoxItemBorderBrushPressed` resource.
+    pub combo_box_item_border_brush_pressed: Color,
+    /// The resolved `ComboBoxItemBorderBrushPointerOver` resource.
+    pub combo_box_item_border_brush_pointer_over: Color,
+    /// The resolved `ComboBoxItemBorderBrushDisabled` resource.
+    pub combo_box_item_border_brush_disabled: Color,
+    /// The resolved `ComboBoxItemBorderBrushSelected` resource.
+    pub combo_box_item_border_brush_selected: Color,
+    /// The resolved `ComboBoxItemBorderBrushSelectedUnfocused` resource.
+    pub combo_box_item_border_brush_selected_unfocused: Color,
+    /// The resolved `ComboBoxItemBorderBrushSelectedPressed` resource.
+    pub combo_box_item_border_brush_selected_pressed: Color,
+    /// The resolved `ComboBoxItemBorderBrushSelectedPointerOver` resource.
+    pub combo_box_item_border_brush_selected_pointer_over: Color,
+    /// The resolved `ComboBoxItemBorderBrushSelectedDisabled` resource.
+    pub combo_box_item_border_brush_selected_disabled: Color,
+    /// The resolved `ComboBoxBackground` resource.
+    pub combo_box_background: Color,
+    /// The resolved `ComboBoxBackgroundPointerOver` resource.
+    pub combo_box_background_pointer_over: Color,
+    /// The resolved `ComboBoxBackgroundPressed` resource.
+    pub combo_box_background_pressed: Color,
+    /// The resolved `ComboBoxBackgroundDisabled` resource.
+    pub combo_box_background_disabled: Color,
+    /// The resolved `ComboBoxBackgroundUnfocused` resource.
+    pub combo_box_background_unfocused: Color,
+    /// The resolved `ComboBoxBackgroundFocused` resource.
+    pub combo_box_background_focused: Color,
+    /// The resolved `ComboBoxBackgroundBorderBrushFocused` resource.
+    pub combo_box_background_border_brush_focused: Color,
+    /// The resolved `ComboBoxBackgroundBorderBrushUnfocused` resource.
+    pub combo_box_background_border_brush_unfocused: Color,
+    /// The resolved `ComboBoxForeground` resource.
+    pub combo_box_foreground: Color,
+    /// The resolved `ComboBoxForegroundPointerOver` resource.
+    pub combo_box_foreground_pointer_over: Color,
+    /// The resolved `ComboBoxForegroundPressed` resource.
+    pub combo_box_foreground_pressed: Color,
+    /// The resolved `ComboBoxForegroundDisabled` resource.
+    pub combo_box_foreground_disabled: Color,
+    /// The resolved `ComboBoxForegroundFocused` resource.
+    pub combo_box_foreground_focused: Color,
+    /// The resolved `ComboBoxForegroundFocusedPressed` resource.
+    pub combo_box_foreground_focused_pressed: Color,
+    /// The resolved `ComboBoxHeaderForeground` resource.
+    pub combo_box_header_foreground: Color,
+    /// The resolved `ComboBoxHeaderForegroundDisabled` resource.
+    pub combo_box_header_foreground_disabled: Color,
+    /// The resolved `ComboBoxPlaceHolderForeground` resource.
+    pub combo_box_place_holder_foreground: Color,
+    /// The resolved `ComboBoxPlaceHolderForegroundPointerOver` resource.
+    pub combo_box_place_holder_foreground_pointer_over: Color,
+    /// The resolved `ComboBoxPlaceHolderForegroundPressed` resource.
+    pub combo_box_place_holder_foreground_pressed: Color,
+    /// The resolved `ComboBoxPlaceHolderForegroundDisabled` resource.
+    pub combo_box_place_holder_foreground_disabled: Color,
+    /// The resolved `ComboBoxPlaceHolderForegroundFocused` resource.
+    pub combo_box_place_holder_foreground_focused: Color,
+    /// The resolved `ComboBoxPlaceHolderForegroundFocusedPressed` resource.
+    pub combo_box_place_holder_foreground_focused_pressed: Color,
+    /// The resolved `ComboBoxBorderBrush` resource.
+    pub combo_box_border_brush: [(f64, Color); 2],
+    /// The resolved `ComboBoxBorderBrushPointerOver` resource.
+    pub combo_box_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `ComboBoxBorderBrushPressed` resource.
+    pub combo_box_border_brush_pressed: Color,
+    /// The resolved `ComboBoxBorderBrushDisabled` resource.
+    pub combo_box_border_brush_disabled: Color,
+    /// The resolved `ComboBoxDropDownGlyphForeground` resource.
+    pub combo_box_drop_down_glyph_foreground: Color,
+    /// The resolved `ComboBoxDropDownGlyphForegroundDisabled` resource.
+    pub combo_box_drop_down_glyph_foreground_disabled: Color,
+    /// The resolved `ComboBoxDropDownGlyphForegroundFocused` resource.
+    pub combo_box_drop_down_glyph_foreground_focused: Color,
+    /// The resolved `ComboBoxDropDownGlyphForegroundFocusedPressed` resource.
+    pub combo_box_drop_down_glyph_foreground_focused_pressed: Color,
+    /// The resolved `ComboBoxDropDownForeground` resource.
+    pub combo_box_drop_down_foreground: Color,
+    /// The resolved `ComboBoxDropDownBackground` resource.
+    pub combo_box_drop_down_background: AcrylicBrushResources,
+    /// The resolved `ComboBoxDropDownBorderBrush` resource.
+    pub combo_box_drop_down_border_brush: Color,
+    /// The resolved `ComboBoxLightDismissOverlayBackground` resource.
+    pub combo_box_light_dismiss_overlay_background: Color,
+    /// The resolved `ComboBoxArrowDisabledForegroundThemeBrush` resource.
+    pub combo_box_arrow_disabled_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxArrowForegroundThemeBrush` resource.
+    pub combo_box_arrow_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxArrowPressedForegroundThemeBrush` resource.
+    pub combo_box_arrow_pressed_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxBackgroundThemeBrush` resource.
+    pub combo_box_background_theme_brush: Color,
+    /// The resolved `ComboBoxBorderThemeBrush` resource.
+    pub combo_box_border_theme_brush: Color,
+    /// The resolved `ComboBoxDisabledBackgroundThemeBrush` resource.
+    pub combo_box_disabled_background_theme_brush: Color,
+    /// The resolved `ComboBoxDisabledBorderThemeBrush` resource.
+    pub combo_box_disabled_border_theme_brush: Color,
+    /// The resolved `ComboBoxDisabledForegroundThemeBrush` resource.
+    pub combo_box_disabled_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxFocusedBackgroundThemeBrush` resource.
+    pub combo_box_focused_background_theme_brush: Color,
+    /// The resolved `ComboBoxFocusedBorderThemeBrush` resource.
+    pub combo_box_focused_border_theme_brush: Color,
+    /// The resolved `ComboBoxFocusedForegroundThemeBrush` resource.
+    pub combo_box_focused_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxForegroundThemeBrush` resource.
+    pub combo_box_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxHeaderForegroundThemeBrush` resource.
+    pub combo_box_header_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxItemDisabledForegroundThemeBrush` resource.
+    pub combo_box_item_disabled_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxItemPointerOverBackgroundThemeBrush` resource.
+    pub combo_box_item_pointer_over_background_theme_brush: Color,
+    /// The resolved `ComboBoxItemPointerOverForegroundThemeBrush` resource.
+    pub combo_box_item_pointer_over_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxItemPressedBackgroundThemeBrush` resource.
+    pub combo_box_item_pressed_background_theme_brush: Color,
+    /// The resolved `ComboBoxItemPressedForegroundThemeBrush` resource.
+    pub combo_box_item_pressed_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxItemSelectedBackgroundThemeBrush` resource.
+    pub combo_box_item_selected_background_theme_brush: Color,
+    /// The resolved `ComboBoxItemSelectedForegroundThemeBrush` resource.
+    pub combo_box_item_selected_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxItemSelectedDisabledBackgroundThemeBrush` resource.
+    pub combo_box_item_selected_disabled_background_theme_brush: Color,
+    /// The resolved `ComboBoxItemSelectedDisabledForegroundThemeBrush` resource.
+    pub combo_box_item_selected_disabled_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxItemSelectedPointerOverBackgroundThemeBrush` resource.
+    pub combo_box_item_selected_pointer_over_background_theme_brush: Color,
+    /// The resolved `ComboBoxPlaceholderTextForegroundThemeBrush` resource.
+    pub combo_box_placeholder_text_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxPointerOverBackgroundThemeBrush` resource.
+    pub combo_box_pointer_over_background_theme_brush: Color,
+    /// The resolved `ComboBoxPointerOverBorderThemeBrush` resource.
+    pub combo_box_pointer_over_border_theme_brush: Color,
+    /// The resolved `ComboBoxPopupBackgroundThemeBrush` resource.
+    pub combo_box_popup_background_theme_brush: Color,
+    /// The resolved `ComboBoxPopupBorderThemeBrush` resource.
+    pub combo_box_popup_border_theme_brush: Color,
+    /// The resolved `ComboBoxPopupForegroundThemeBrush` resource.
+    pub combo_box_popup_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxPressedBackgroundThemeBrush` resource.
+    pub combo_box_pressed_background_theme_brush: Color,
+    /// The resolved `ComboBoxPressedBorderThemeBrush` resource.
+    pub combo_box_pressed_border_theme_brush: Color,
+    /// The resolved `ComboBoxPressedHighlightThemeBrush` resource.
+    pub combo_box_pressed_highlight_theme_brush: Color,
+    /// The resolved `ComboBoxPressedForegroundThemeBrush` resource.
+    pub combo_box_pressed_foreground_theme_brush: Color,
+    /// The resolved `ComboBoxSelectedBackgroundThemeBrush` resource.
+    pub combo_box_selected_background_theme_brush: Color,
+    /// The resolved `ComboBoxSelectedPointerOverBackgroundThemeBrush` resource.
+    pub combo_box_selected_pointer_over_background_theme_brush: Color,
+    /// The resolved `ComboBoxDropDownBackgroundPointerOver` resource.
+    pub combo_box_drop_down_background_pointer_over: Color,
+    /// The resolved `ComboBoxDropDownBackgroundPointerPressed` resource.
+    pub combo_box_drop_down_background_pointer_pressed: Color,
+    /// The resolved `ComboBoxFocusedDropDownBackgroundPointerOver` resource.
+    pub combo_box_focused_drop_down_background_pointer_over: Color,
+    /// The resolved `ComboBoxFocusedDropDownBackgroundPointerPressed` resource.
+    pub combo_box_focused_drop_down_background_pointer_pressed: Color,
+    /// The resolved `ComboBoxEditableDropDownGlyphForeground` resource.
+    pub combo_box_editable_drop_down_glyph_foreground: Color,
+    /// The resolved `ComboBoxItemPillFillBrush` resource.
+    pub combo_box_item_pill_fill_brush: Color,
+    /// The resolved `SystemControlHighlightAltBaseMediumHighBrush` resource.
+    pub system_control_highlight_alt_base_medium_high_brush: Color,
+    /// The resolved `AcrylicInAppFillColorDefaultBrush` resource.
+    pub acrylic_in_app_fill_color_default_brush: AcrylicBrushResources,
+    /// The resolved `SystemControlPageBackgroundMediumAltMediumBrush` resource.
+    pub system_control_page_background_medium_alt_medium_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlHighlightAltBaseHighBrush` resource.
+    pub system_control_highlight_alt_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlTransparentBrush` resource.
+    pub system_control_transparent_brush: Color,
+    /// The resolved `SystemControlHighlightListMediumBrush` resource.
+    pub system_control_highlight_list_medium_brush: Color,
+    /// The resolved `SystemControlHighlightListLowBrush` resource.
+    pub system_control_highlight_list_low_brush: Color,
+    /// The resolved `SystemControlHighlightListAccentLowBrush` resource.
+    pub system_control_highlight_list_accent_low_brush: Color,
+    /// The resolved `SystemControlHighlightListAccentHighBrush` resource.
+    pub system_control_highlight_list_accent_high_brush: Color,
+    /// The resolved `SystemControlHighlightListAccentMediumBrush` resource.
+    pub system_control_highlight_list_accent_medium_brush: Color,
+    /// The resolved `SystemControlBackgroundAltMediumLowBrush` resource.
+    pub system_control_background_alt_medium_low_brush: Color,
+    /// The resolved `SystemControlPageBackgroundAltMediumBrush` resource.
+    pub system_control_page_background_alt_medium_brush: Color,
+    /// The resolved `SystemControlBackgroundListMediumBrush` resource.
+    pub system_control_background_list_medium_brush: Color,
+    /// The resolved `SystemControlBackgroundBaseLowBrush` resource.
+    pub system_control_background_base_low_brush: Color,
+    /// The resolved `SystemControlHighlightTransparentBrush` resource.
+    pub system_control_highlight_transparent_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumLowBrush` resource.
+    pub system_control_highlight_base_medium_low_brush: Color,
+    /// The resolved `SystemControlPageTextBaseMediumBrush` resource.
+    pub system_control_page_text_base_medium_brush: Color,
+    /// The resolved `SystemControlDisabledChromeDisabledLowBrush` resource.
+    pub system_control_disabled_chrome_disabled_low_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumBrush` resource.
+    pub system_control_foreground_base_medium_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumHighBrush` resource.
+    pub system_control_highlight_base_medium_high_brush: Color,
+    /// The resolved `SystemControlHighlightBaseMediumBrush` resource.
+    pub system_control_highlight_base_medium_brush: Color,
+    /// The resolved `SystemControlDisabledBaseLowBrush` resource.
+    pub system_control_disabled_base_low_brush: Color,
+    /// The resolved `SystemControlForegroundBaseMediumHighBrush` resource.
+    pub system_control_foreground_base_medium_high_brush: Color,
+    /// The resolved `SystemControlBackgroundChromeMediumLowBrush` resource.
+    pub system_control_background_chrome_medium_low_brush: Color,
+    /// The resolved `SystemControlForegroundChromeHighBrush` resource.
+    pub system_control_foreground_chrome_high_brush: Color,
+    /// The resolved `SystemControlDescriptionTextForegroundBrush` resource.
+    pub system_control_description_text_foreground_brush: Color,
+    /// The resolved `TextControlBackgroundDisabled` resource.
+    pub text_control_background_disabled: Color,
+    /// The resolved `TextControlBorderBrushDisabled` resource.
+    pub text_control_border_brush_disabled: Color,
+    /// The resolved `TextControlForegroundDisabled` resource.
+    pub text_control_foreground_disabled: Color,
+    /// The resolved `TextControlPlaceholderForegroundDisabled` resource.
+    pub text_control_placeholder_foreground_disabled: Color,
+    /// The resolved `TextControlBackgroundPointerOver` resource.
+    pub text_control_background_pointer_over: Color,
+    /// The resolved `TextControlBorderBrushPointerOver` resource.
+    pub text_control_border_brush_pointer_over: [(f64, Color); 2],
+    /// The resolved `TextControlForegroundPointerOver` resource.
+    pub text_control_foreground_pointer_over: Color,
+    /// The resolved `TextControlPlaceholderForegroundPointerOver` resource.
+    pub text_control_placeholder_foreground_pointer_over: Color,
+    /// The resolved `TextControlBackgroundFocused` resource.
+    pub text_control_background_focused: Color,
+    /// The resolved `TextControlBorderBrushFocused` resource.
+    pub text_control_border_brush_focused: [(f64, Color); 2],
+    /// The resolved `TextControlForegroundFocused` resource.
+    pub text_control_foreground_focused: Color,
+    /// The resolved `TextControlPlaceholderForegroundFocused` resource.
+    pub text_control_placeholder_foreground_focused: Color,
+    /// The resolved `TextControlPlaceholderForeground` resource.
+    pub text_control_placeholder_foreground: Color,
+}
+
+impl ComboBoxResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                combo_box_item_foreground: Color::from_argb(228, 0, 0, 0),
+                combo_box_item_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                combo_box_item_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                combo_box_item_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                combo_box_item_foreground_selected: Color::from_argb(228, 0, 0, 0),
+                combo_box_item_foreground_selected_unfocused: Color::from_argb(228, 0, 0, 0),
+                combo_box_item_foreground_selected_pressed: Color::from_argb(158, 0, 0, 0),
+                combo_box_item_foreground_selected_pointer_over: Color::from_argb(228, 0, 0, 0),
+                combo_box_item_foreground_selected_disabled: Color::from_argb(92, 0, 0, 0),
+                combo_box_item_background: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_background_pressed: Color::from_argb(6, 0, 0, 0),
+                combo_box_item_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                combo_box_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_background_selected: Color::from_argb(9, 0, 0, 0),
+                combo_box_item_background_selected_unfocused: Color::from_argb(6, 0, 0, 0),
+                combo_box_item_background_selected_pressed: Color::from_argb(9, 0, 0, 0),
+                combo_box_item_background_selected_pointer_over: Color::from_argb(6, 0, 0, 0),
+                combo_box_item_background_selected_disabled: Color::from_argb(9, 0, 0, 0),
+                combo_box_item_border_brush: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_border_brush_pressed: Color::from_argb(6, 0, 0, 0),
+                combo_box_item_border_brush_pointer_over: Color::from_argb(9, 0, 0, 0),
+                combo_box_item_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_border_brush_selected: Color::from_argb(9, 0, 0, 0),
+                combo_box_item_border_brush_selected_unfocused: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_border_brush_selected_pressed: Color::from_argb(9, 0, 0, 0),
+                combo_box_item_border_brush_selected_pointer_over: Color::from_argb(6, 0, 0, 0),
+                combo_box_item_border_brush_selected_disabled: Color::from_argb(9, 0, 0, 0),
+                combo_box_background: Color::from_argb(179, 255, 255, 255),
+                combo_box_background_pointer_over: Color::from_argb(128, 249, 249, 249),
+                combo_box_background_pressed: Color::from_argb(77, 249, 249, 249),
+                combo_box_background_disabled: Color::from_argb(77, 249, 249, 249),
+                combo_box_background_unfocused: Color::from_argb(179, 255, 255, 255),
+                combo_box_background_focused: Color::from_argb(179, 255, 255, 255),
+                combo_box_background_border_brush_focused: Color::from_argb(228, 0, 0, 0),
+                combo_box_background_border_brush_unfocused: Color::from_argb(15, 0, 0, 0),
+                combo_box_foreground: Color::from_argb(228, 0, 0, 0),
+                combo_box_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                combo_box_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                combo_box_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                combo_box_foreground_focused: Color::from_argb(228, 0, 0, 0),
+                combo_box_foreground_focused_pressed: Color::from_argb(228, 0, 0, 0),
+                combo_box_header_foreground: Color::from_argb(228, 0, 0, 0),
+                combo_box_header_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                combo_box_place_holder_foreground: Color::from_argb(158, 0, 0, 0),
+                combo_box_place_holder_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                combo_box_place_holder_foreground_pressed: Color::from_argb(114, 0, 0, 0),
+                combo_box_place_holder_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                combo_box_place_holder_foreground_focused: Color::from_argb(158, 0, 0, 0),
+                combo_box_place_holder_foreground_focused_pressed: Color::from_argb(158, 0, 0, 0),
+                combo_box_border_brush: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                combo_box_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                combo_box_border_brush_pressed: Color::from_argb(15, 0, 0, 0),
+                combo_box_border_brush_disabled: Color::from_argb(15, 0, 0, 0),
+                combo_box_drop_down_glyph_foreground: Color::from_argb(158, 0, 0, 0),
+                combo_box_drop_down_glyph_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                combo_box_drop_down_glyph_foreground_focused: Color::from_argb(158, 0, 0, 0),
+                combo_box_drop_down_glyph_foreground_focused_pressed: Color::from_argb(
+                    204, 0, 0, 0,
+                ),
+                combo_box_drop_down_foreground: Color::from_argb(228, 0, 0, 0),
+                combo_box_drop_down_background: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                combo_box_drop_down_border_brush: Color::from_argb(15, 0, 0, 0),
+                combo_box_light_dismiss_overlay_background: Color::from_argb(153, 255, 255, 255),
+                combo_box_arrow_disabled_foreground_theme_brush: Color::from_argb(102, 0, 0, 0),
+                combo_box_arrow_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_arrow_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_background_theme_brush: Color::from_argb(204, 255, 255, 255),
+                combo_box_border_theme_brush: Color::from_argb(69, 0, 0, 0),
+                combo_box_disabled_background_theme_brush: Color::from_argb(102, 202, 202, 202),
+                combo_box_disabled_border_theme_brush: Color::from_argb(38, 0, 0, 0),
+                combo_box_disabled_foreground_theme_brush: Color::from_argb(102, 0, 0, 0),
+                combo_box_focused_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_focused_border_theme_brush: Color::from_argb(112, 0, 0, 0),
+                combo_box_focused_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_header_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_item_disabled_foreground_theme_brush: Color::from_argb(102, 0, 0, 0),
+                combo_box_item_pointer_over_background_theme_brush: Color::from_argb(33, 0, 0, 0),
+                combo_box_item_pointer_over_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_item_pressed_background_theme_brush: Color::from_argb(255, 211, 211, 211),
+                combo_box_item_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_item_selected_background_theme_brush: Color::from_argb(255, 70, 23, 180),
+                combo_box_item_selected_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                combo_box_item_selected_disabled_background_theme_brush: Color::from_argb(
+                    140, 0, 0, 0,
+                ),
+                combo_box_item_selected_disabled_foreground_theme_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                combo_box_item_selected_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 95, 55, 190,
+                ),
+                combo_box_placeholder_text_foreground_theme_brush: Color::from_argb(136, 0, 0, 0),
+                combo_box_pointer_over_background_theme_brush: Color::from_argb(222, 255, 255, 255),
+                combo_box_pointer_over_border_theme_brush: Color::from_argb(112, 0, 0, 0),
+                combo_box_popup_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_popup_border_theme_brush: Color::from_argb(255, 33, 33, 33),
+                combo_box_popup_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_pressed_border_theme_brush: Color::from_argb(163, 0, 0, 0),
+                combo_box_pressed_highlight_theme_brush: Color::from_argb(255, 211, 211, 211),
+                combo_box_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_selected_background_theme_brush: Color::from_argb(255, 70, 23, 180),
+                combo_box_selected_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 95, 55, 190,
+                ),
+                combo_box_drop_down_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                combo_box_drop_down_background_pointer_pressed: Color::from_argb(6, 0, 0, 0),
+                combo_box_focused_drop_down_background_pointer_over: Color::from_argb(
+                    77, 249, 249, 249,
+                ),
+                combo_box_focused_drop_down_background_pointer_pressed: Color::from_argb(
+                    24, 0, 0, 0,
+                ),
+                combo_box_editable_drop_down_glyph_foreground: Color::from_argb(158, 0, 0, 0),
+                combo_box_item_pill_fill_brush: accent.dark1,
+                system_control_highlight_alt_base_medium_high_brush: Color::from_argb(204, 0, 0, 0),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 252, 252, 252),
+                    tint_opacity: 0.0,
+                    tint_luminosity_opacity: Some(0.85),
+                    fallback_color: Color::from_argb(255, 249, 249, 249),
+                },
+                system_control_page_background_medium_alt_medium_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_highlight_alt_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_list_medium_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_highlight_list_low_brush: Color::from_argb(25, 0, 0, 0),
+                system_control_highlight_list_accent_low_brush: {
+                    let color = accent.base;
+                    color.with_values(Some(color.a * 0.4), None, None, None, None)
+                },
+                system_control_highlight_list_accent_high_brush: {
+                    let color = accent.base;
+                    color.with_values(Some(color.a * 0.7), None, None, None, None)
+                },
+                system_control_highlight_list_accent_medium_brush: {
+                    let color = accent.base;
+                    color.with_values(Some(color.a * 0.6), None, None, None, None)
+                },
+                system_control_background_alt_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_page_background_alt_medium_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                system_control_background_list_medium_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_background_base_low_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_page_text_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_disabled_chrome_disabled_low_brush: Color::from_argb(
+                    255, 122, 122, 122,
+                ),
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_highlight_base_medium_high_brush: Color::from_argb(204, 0, 0, 0),
+                system_control_highlight_base_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_disabled_base_low_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_foreground_base_medium_high_brush: Color::from_argb(204, 0, 0, 0),
+                system_control_background_chrome_medium_low_brush: Color::from_argb(
+                    255, 242, 242, 242,
+                ),
+                system_control_foreground_chrome_high_brush: Color::from_argb(255, 204, 204, 204),
+                system_control_description_text_foreground_brush: Color::from_argb(153, 0, 0, 0),
+                text_control_background_disabled: Color::from_argb(77, 249, 249, 249),
+                text_control_border_brush_disabled: Color::from_argb(15, 0, 0, 0),
+                text_control_foreground_disabled: Color::from_argb(92, 1, 1, 1),
+                text_control_placeholder_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                text_control_background_pointer_over: Color::from_argb(128, 249, 249, 249),
+                text_control_border_brush_pointer_over: [
+                    (0.5, Color::from_argb(114, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                text_control_placeholder_foreground_pointer_over: Color::from_argb(158, 0, 0, 0),
+                text_control_background_focused: Color::from_argb(255, 255, 255, 255),
+                text_control_border_brush_focused: [
+                    (1.0, accent.dark1),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                text_control_foreground_focused: Color::from_argb(228, 0, 0, 0),
+                text_control_placeholder_foreground_focused: Color::from_argb(158, 0, 0, 0),
+                text_control_placeholder_foreground: Color::from_argb(158, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                combo_box_item_foreground: Color::from_argb(255, 255, 255, 255),
+                combo_box_item_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                combo_box_item_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                combo_box_item_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                combo_box_item_foreground_selected: Color::from_argb(255, 255, 255, 255),
+                combo_box_item_foreground_selected_unfocused: Color::from_argb(255, 255, 255, 255),
+                combo_box_item_foreground_selected_pressed: Color::from_argb(197, 255, 255, 255),
+                combo_box_item_foreground_selected_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                combo_box_item_foreground_selected_disabled: Color::from_argb(93, 255, 255, 255),
+                combo_box_item_background: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_background_pressed: Color::from_argb(10, 255, 255, 255),
+                combo_box_item_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                combo_box_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_background_selected: Color::from_argb(15, 255, 255, 255),
+                combo_box_item_background_selected_unfocused: Color::from_argb(10, 255, 255, 255),
+                combo_box_item_background_selected_pressed: Color::from_argb(15, 255, 255, 255),
+                combo_box_item_background_selected_pointer_over: Color::from_argb(
+                    10, 255, 255, 255,
+                ),
+                combo_box_item_background_selected_disabled: Color::from_argb(15, 255, 255, 255),
+                combo_box_item_border_brush: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_border_brush_pressed: Color::from_argb(10, 255, 255, 255),
+                combo_box_item_border_brush_pointer_over: Color::from_argb(15, 255, 255, 255),
+                combo_box_item_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_border_brush_selected: Color::from_argb(15, 255, 255, 255),
+                combo_box_item_border_brush_selected_unfocused: Color::from_argb(0, 255, 255, 255),
+                combo_box_item_border_brush_selected_pressed: Color::from_argb(15, 255, 255, 255),
+                combo_box_item_border_brush_selected_pointer_over: Color::from_argb(
+                    10, 255, 255, 255,
+                ),
+                combo_box_item_border_brush_selected_disabled: Color::from_argb(15, 255, 255, 255),
+                combo_box_background: Color::from_argb(15, 255, 255, 255),
+                combo_box_background_pointer_over: Color::from_argb(21, 255, 255, 255),
+                combo_box_background_pressed: Color::from_argb(8, 255, 255, 255),
+                combo_box_background_disabled: Color::from_argb(11, 255, 255, 255),
+                combo_box_background_unfocused: Color::from_argb(15, 255, 255, 255),
+                combo_box_background_focused: Color::from_argb(15, 255, 255, 255),
+                combo_box_background_border_brush_focused: Color::from_argb(255, 255, 255, 255),
+                combo_box_background_border_brush_unfocused: Color::from_argb(18, 255, 255, 255),
+                combo_box_foreground: Color::from_argb(255, 255, 255, 255),
+                combo_box_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                combo_box_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                combo_box_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                combo_box_foreground_focused: Color::from_argb(255, 255, 255, 255),
+                combo_box_foreground_focused_pressed: Color::from_argb(255, 255, 255, 255),
+                combo_box_header_foreground: Color::from_argb(255, 255, 255, 255),
+                combo_box_header_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                combo_box_place_holder_foreground: Color::from_argb(197, 255, 255, 255),
+                combo_box_place_holder_foreground_pointer_over: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                combo_box_place_holder_foreground_pressed: Color::from_argb(135, 255, 255, 255),
+                combo_box_place_holder_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                combo_box_place_holder_foreground_focused: Color::from_argb(197, 255, 255, 255),
+                combo_box_place_holder_foreground_focused_pressed: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                combo_box_border_brush: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                combo_box_border_brush_pointer_over: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                combo_box_border_brush_pressed: Color::from_argb(18, 255, 255, 255),
+                combo_box_border_brush_disabled: Color::from_argb(18, 255, 255, 255),
+                combo_box_drop_down_glyph_foreground: Color::from_argb(197, 255, 255, 255),
+                combo_box_drop_down_glyph_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                combo_box_drop_down_glyph_foreground_focused: Color::from_argb(197, 255, 255, 255),
+                combo_box_drop_down_glyph_foreground_focused_pressed: Color::from_argb(
+                    204, 255, 255, 255,
+                ),
+                combo_box_drop_down_foreground: Color::from_argb(255, 255, 255, 255),
+                combo_box_drop_down_background: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                combo_box_drop_down_border_brush: Color::from_argb(51, 0, 0, 0),
+                combo_box_light_dismiss_overlay_background: Color::from_argb(153, 0, 0, 0),
+                combo_box_arrow_disabled_foreground_theme_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                combo_box_arrow_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_arrow_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_background_theme_brush: Color::from_argb(204, 255, 255, 255),
+                combo_box_border_theme_brush: Color::from_argb(204, 255, 255, 255),
+                combo_box_disabled_background_theme_brush: Color::from_argb(0, 0, 0, 0),
+                combo_box_disabled_border_theme_brush: Color::from_argb(102, 255, 255, 255),
+                combo_box_disabled_foreground_theme_brush: Color::from_argb(102, 255, 255, 255),
+                combo_box_focused_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_focused_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_focused_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_header_foreground_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_item_disabled_foreground_theme_brush: Color::from_argb(102, 0, 0, 0),
+                combo_box_item_pointer_over_background_theme_brush: Color::from_argb(33, 0, 0, 0),
+                combo_box_item_pointer_over_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_item_pressed_background_theme_brush: Color::from_argb(255, 211, 211, 211),
+                combo_box_item_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_item_selected_background_theme_brush: Color::from_argb(255, 70, 23, 180),
+                combo_box_item_selected_foreground_theme_brush: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                combo_box_item_selected_disabled_background_theme_brush: Color::from_argb(
+                    140, 0, 0, 0,
+                ),
+                combo_box_item_selected_disabled_foreground_theme_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                combo_box_item_selected_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 95, 55, 190,
+                ),
+                combo_box_placeholder_text_foreground_theme_brush: Color::from_argb(136, 0, 0, 0),
+                combo_box_pointer_over_background_theme_brush: Color::from_argb(222, 255, 255, 255),
+                combo_box_pointer_over_border_theme_brush: Color::from_argb(222, 255, 255, 255),
+                combo_box_popup_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_popup_border_theme_brush: Color::from_argb(255, 33, 33, 33),
+                combo_box_popup_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_pressed_background_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_pressed_border_theme_brush: Color::from_argb(255, 255, 255, 255),
+                combo_box_pressed_highlight_theme_brush: Color::from_argb(255, 211, 211, 211),
+                combo_box_pressed_foreground_theme_brush: Color::from_argb(255, 0, 0, 0),
+                combo_box_selected_background_theme_brush: Color::from_argb(255, 70, 23, 180),
+                combo_box_selected_pointer_over_background_theme_brush: Color::from_argb(
+                    255, 95, 55, 190,
+                ),
+                combo_box_drop_down_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                combo_box_drop_down_background_pointer_pressed: Color::from_argb(10, 255, 255, 255),
+                combo_box_focused_drop_down_background_pointer_over: Color::from_argb(
+                    8, 255, 255, 255,
+                ),
+                combo_box_focused_drop_down_background_pointer_pressed: Color::from_argb(
+                    18, 255, 255, 255,
+                ),
+                combo_box_editable_drop_down_glyph_foreground: Color::from_argb(197, 255, 255, 255),
+                combo_box_item_pill_fill_brush: accent.light2,
+                system_control_highlight_alt_base_medium_high_brush: Color::from_argb(
+                    204, 255, 255, 255,
+                ),
+                acrylic_in_app_fill_color_default_brush: AcrylicBrushResources {
+                    tint_color: Color::from_argb(255, 44, 44, 44),
+                    tint_opacity: 0.15,
+                    tint_luminosity_opacity: Some(0.96),
+                    fallback_color: Color::from_argb(255, 44, 44, 44),
+                },
+                system_control_page_background_medium_alt_medium_brush: Color::from_argb(
+                    153, 0, 0, 0,
+                ),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_highlight_alt_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_list_medium_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_highlight_list_low_brush: Color::from_argb(25, 255, 255, 255),
+                system_control_highlight_list_accent_low_brush: {
+                    let color = accent.base;
+                    color.with_values(Some(color.a * 0.6), None, None, None, None)
+                },
+                system_control_highlight_list_accent_high_brush: {
+                    let color = accent.base;
+                    color.with_values(Some(color.a * 0.9), None, None, None, None)
+                },
+                system_control_highlight_list_accent_medium_brush: {
+                    let color = accent.base;
+                    color.with_values(Some(color.a * 0.8), None, None, None, None)
+                },
+                system_control_background_alt_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_page_background_alt_medium_brush: Color::from_argb(153, 0, 0, 0),
+                system_control_background_list_medium_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_background_base_low_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_highlight_transparent_brush: Color::from_argb(0, 0, 0, 0),
+                system_control_highlight_base_medium_low_brush: Color::from_argb(
+                    102, 255, 255, 255,
+                ),
+                system_control_page_text_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_disabled_chrome_disabled_low_brush: Color::from_argb(
+                    255, 133, 133, 133,
+                ),
+                system_control_foreground_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_highlight_base_medium_high_brush: Color::from_argb(
+                    204, 255, 255, 255,
+                ),
+                system_control_highlight_base_medium_brush: Color::from_argb(153, 255, 255, 255),
+                system_control_disabled_base_low_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_foreground_base_medium_high_brush: Color::from_argb(
+                    204, 255, 255, 255,
+                ),
+                system_control_background_chrome_medium_low_brush: Color::from_argb(
+                    255, 43, 43, 43,
+                ),
+                system_control_foreground_chrome_high_brush: Color::from_argb(255, 118, 118, 118),
+                system_control_description_text_foreground_brush: Color::from_argb(
+                    153, 255, 255, 255,
+                ),
+                text_control_background_disabled: Color::from_argb(11, 255, 255, 255),
+                text_control_border_brush_disabled: Color::from_argb(18, 255, 255, 255),
+                text_control_foreground_disabled: Color::from_argb(93, 254, 254, 254),
+                text_control_placeholder_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                text_control_background_pointer_over: Color::from_argb(21, 255, 255, 255),
+                text_control_border_brush_pointer_over: [
+                    (0.5, Color::from_argb(139, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                text_control_placeholder_foreground_pointer_over: Color::from_argb(
+                    197, 255, 255, 255,
+                ),
+                text_control_background_focused: Color::from_argb(179, 30, 30, 30),
+                text_control_border_brush_focused: [
+                    (1.0, accent.light2),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                text_control_foreground_focused: Color::from_argb(255, 255, 255, 255),
+                text_control_placeholder_foreground_focused: Color::from_argb(197, 255, 255, 255),
+                text_control_placeholder_foreground: Color::from_argb(197, 255, 255, 255),
+            },
+        }
+    }
+}
+pub const COMBO_BOX_ARROW_THEME_FONT_SIZE: f64 = 21.0;
+pub const COMBO_BOX_THEME_MIN_WIDTH: f64 = 64.0;
+pub const COMBO_BOX_POPUP_THEME_MIN_WIDTH: f64 = 80.0;
+pub const COMBO_BOX_POPUP_THEME_TOUCH_MIN_WIDTH: f64 = 240.0;
+pub const COMBO_BOX_ITEM_PILL_HEIGHT: f64 = 16.0;
+pub const COMBO_BOX_ITEM_PILL_WIDTH: f64 = 3.0;
+pub const COMBO_BOX_ITEM_PILL_MIN_SCALE: f64 = 0.625;
+pub const COMBO_BOX_MIN_HEIGHT: f64 = 32.0;
+pub const COMBO_BOX_POPUP_MAX_NUMBER_OF_ITEMS: i32 = 15;
+pub const COMBO_BOX_POPUP_MAX_NUMBER_OF_ITEMS_THAT_CAN_BE_SHOWN_ON_ONE_SIDE: i32 = 7;
+pub const COMBO_BOX_ITEM_SCALE_ANIMATION_DURATION: Duration = Duration::from_millis(167);
+/// Left, top, right, bottom.
+pub const COMBO_BOX_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_DROPDOWN_BORDER_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_HEADER_THEME_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 4.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_POPUP_BORDER_THEME_THICKNESS: [f64; 4] = [2.0, 2.0, 2.0, 2.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_ITEM_THEME_PADDING: [f64; 4] = [11.0, 5.0, 11.0, 7.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_ITEM_THEME_TOUCH_PADDING: [f64; 4] = [11.0, 11.0, 11.0, 13.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_ITEM_THEME_GAME_CONTROLLER_PADDING: [f64; 4] = [11.0, 11.0, 11.0, 13.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_BACKGROUND_BORDER_THICKNESS_FOCUSED: [f64; 4] = [2.0, 2.0, 2.0, 2.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_DROPDOWN_CONTENT_MARGIN: [f64; 4] = [0.0, 4.0, 0.0, 4.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_TOP_HEADER_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 8.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_PADDING: [f64; 4] = [12.0, 5.0, 0.0, 7.0];
+/// Left, top, right, bottom.
+pub const COMBO_BOX_EDITABLE_TEXT_PADDING: [f64; 4] = [11.0, 5.0, 38.0, 6.0];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const COMBO_BOX_HIGLIGHT_BORDER_CORNER_RADIUS: [f64; 4] = [7.0, 7.0, 7.0, 7.0];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const COMBO_BOX_DROP_DOWN_BUTTON_BACKGROUND_CORNER_RADIUS: [f64; 4] = [4.0, 4.0, 4.0, 4.0];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const COMBO_BOX_ITEM_CORNER_RADIUS: [f64; 4] = [3.0, 3.0, 3.0, 3.0];
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const COMBO_BOX_ITEM_PILL_CORNER_RADIUS: [f64; 4] = [1.5, 1.5, 1.5, 1.5];
+pub const COMBO_BOX_HEADER_THEME_FONT_WEIGHT: FontWeight = FontWeight::NORMAL;
+/// Left, top, right, bottom.
+pub const COMBO_BOX_DROPDOWN_BORDER_PADDING: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Theme-dependent resources of `ColorPicker_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ColorPickerResources {
+    /// The resolved `ColorPickerSliderThumbBackground` resource.
+    pub color_picker_slider_thumb_background: Color,
+    /// The resolved `ColorPickerSliderThumbBackgroundPointerOver` resource.
+    pub color_picker_slider_thumb_background_pointer_over: Color,
+    /// The resolved `ColorPickerSliderThumbBackgroundPressed` resource.
+    pub color_picker_slider_thumb_background_pressed: Color,
+    /// The resolved `ColorPickerSliderThumbBackgroundDisabled` resource.
+    pub color_picker_slider_thumb_background_disabled: Color,
+    /// The resolved `ColorPickerSliderTrackFillDisabled` resource.
+    pub color_picker_slider_track_fill_disabled: Color,
+    /// The resolved `ColorPickerHeaderContentDisabled` resource.
+    pub color_picker_header_content_disabled: Color,
+    /// The resolved `ColorPickerBorderBrush` resource.
+    pub color_picker_border_brush: Color,
+    /// The resolved `SystemControlHighlightChromeAltLowBrush` resource.
+    pub system_control_highlight_chrome_alt_low_brush: Color,
+    /// The resolved `SystemControlForegroundBaseHighBrush` resource.
+    pub system_control_foreground_base_high_brush: Color,
+    /// The resolved `SystemControlDisabledChromeDisabledHighBrush` resource.
+    pub system_control_disabled_chrome_disabled_high_brush: Color,
+    /// The resolved `SystemControlDisabledBaseLowBrush` resource.
+    pub system_control_disabled_base_low_brush: Color,
+    /// The resolved `SystemControlDisabledBaseMediumLowBrush` resource.
+    pub system_control_disabled_base_medium_low_brush: Color,
+    /// The resolved `SystemControlForegroundListLowBrush` resource.
+    pub system_control_foreground_list_low_brush: Color,
+    /// The resolved `SystemListLowColor` resource.
+    pub system_list_low_color: Color,
+    /// The resolved `SystemBaseHighColor` resource.
+    pub system_base_high_color: Color,
+    /// The resolved `SystemBaseMediumColor` resource.
+    pub system_base_medium_color: Color,
+    /// The resolved `SystemBaseMediumLowColor` resource.
+    pub system_base_medium_low_color: Color,
+    /// The resolved `SliderThumbBorderBrush` resource.
+    pub slider_thumb_border_brush: [(f64, Color); 2],
+    /// The resolved `SliderOuterThumbBackground` resource.
+    pub slider_outer_thumb_background: Color,
+    /// The resolved `SliderHeaderForeground` resource.
+    pub slider_header_foreground: Color,
+    /// The resolved `SystemControlBackgroundChromeWhiteBrush` resource.
+    pub system_control_background_chrome_white_brush: Color,
+    /// The resolved `SystemControlBackgroundChromeBlackHighBrush` resource.
+    pub system_control_background_chrome_black_high_brush: Color,
+}
+
+impl ColorPickerResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                color_picker_slider_thumb_background: Color::from_argb(228, 0, 0, 0),
+                color_picker_slider_thumb_background_pointer_over: Color::from_argb(
+                    255, 23, 23, 23,
+                ),
+                color_picker_slider_thumb_background_pressed: Color::from_argb(228, 0, 0, 0),
+                color_picker_slider_thumb_background_disabled: Color::from_argb(81, 0, 0, 0),
+                color_picker_slider_track_fill_disabled: Color::from_argb(55, 0, 0, 0),
+                color_picker_header_content_disabled: Color::from_argb(92, 0, 0, 0),
+                color_picker_border_brush: Color::from_argb(15, 0, 0, 0),
+                system_control_highlight_chrome_alt_low_brush: Color::from_argb(255, 23, 23, 23),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 0, 0, 0),
+                system_control_disabled_chrome_disabled_high_brush: Color::from_argb(
+                    255, 204, 204, 204,
+                ),
+                system_control_disabled_base_low_brush: Color::from_argb(51, 0, 0, 0),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 0, 0, 0),
+                system_control_foreground_list_low_brush: Color::from_argb(25, 0, 0, 0),
+                system_list_low_color: Color::from_argb(25, 0, 0, 0),
+                system_base_high_color: Color::from_argb(255, 0, 0, 0),
+                system_base_medium_color: Color::from_argb(153, 0, 0, 0),
+                system_base_medium_low_color: Color::from_argb(102, 0, 0, 0),
+                slider_thumb_border_brush: [
+                    (0.33, Color::from_argb(41, 0, 0, 0)),
+                    (1.0, Color::from_argb(15, 0, 0, 0)),
+                ],
+                slider_outer_thumb_background: Color::from_argb(255, 255, 255, 255),
+                slider_header_foreground: Color::from_argb(228, 0, 0, 0),
+                system_control_background_chrome_white_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_background_chrome_black_high_brush: Color::from_argb(255, 0, 0, 0),
+            },
+            Theme::Dark => Self {
+                color_picker_slider_thumb_background: Color::from_argb(255, 255, 255, 255),
+                color_picker_slider_thumb_background_pointer_over: Color::from_argb(
+                    255, 242, 242, 242,
+                ),
+                color_picker_slider_thumb_background_pressed: Color::from_argb(255, 255, 255, 255),
+                color_picker_slider_thumb_background_disabled: Color::from_argb(63, 255, 255, 255),
+                color_picker_slider_track_fill_disabled: Color::from_argb(40, 255, 255, 255),
+                color_picker_header_content_disabled: Color::from_argb(93, 255, 255, 255),
+                color_picker_border_brush: Color::from_argb(18, 255, 255, 255),
+                system_control_highlight_chrome_alt_low_brush: Color::from_argb(255, 242, 242, 242),
+                system_control_foreground_base_high_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_disabled_chrome_disabled_high_brush: Color::from_argb(
+                    255, 51, 51, 51,
+                ),
+                system_control_disabled_base_low_brush: Color::from_argb(51, 255, 255, 255),
+                system_control_disabled_base_medium_low_brush: Color::from_argb(102, 255, 255, 255),
+                system_control_foreground_list_low_brush: Color::from_argb(25, 255, 255, 255),
+                system_list_low_color: Color::from_argb(25, 255, 255, 255),
+                system_base_high_color: Color::from_argb(255, 255, 255, 255),
+                system_base_medium_color: Color::from_argb(153, 255, 255, 255),
+                system_base_medium_low_color: Color::from_argb(102, 255, 255, 255),
+                slider_thumb_border_brush: [
+                    (0.33, Color::from_argb(24, 255, 255, 255)),
+                    (1.0, Color::from_argb(18, 255, 255, 255)),
+                ],
+                slider_outer_thumb_background: Color::from_argb(255, 69, 69, 69),
+                slider_header_foreground: Color::from_argb(255, 255, 255, 255),
+                system_control_background_chrome_white_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_background_chrome_black_high_brush: Color::from_argb(255, 0, 0, 0),
+            },
+        }
+    }
+}
+/// Top-left, top-right, bottom-right, bottom-left.
+pub const COLOR_PICKER_SLIDER_CORNER_RADIUS: [f64; 4] = [6.0, 6.0, 6.0, 6.0];
+pub const COLOR_PICKER_SLIDER_INNER_THUMB_WIDTH: f64 = 10.0;
+pub const COLOR_PICKER_SLIDER_INNER_THUMB_HEIGHT: f64 = 10.0;
+pub const COLOR_PICKER_VERTICAL_ORIENTATION_MIN_WIDTH: f64 = 312.0;
+pub const COLOR_PICKER_VERTICAL_ORIENTATION_MAX_WIDTH: f64 = 392.0;
+pub const COLOR_PICKER_VERTICAL_ORIENTATION_MIN_HEIGHT: f64 = 312.0;
+pub const COLOR_PICKER_VERTICAL_ORIENTATION_MAX_HEIGHT: f64 = 392.0;
+pub const COLOR_PICKER_TEXT_INPUT_HORIZONTAL_ORIENTATION_MARGIN: f64 = 122.0;
+/// Theme-dependent resources of `TreeView_themeresources.xaml`, resolved to literals; `Default` in XAML is the dark theme.
+#[derive(Clone, Debug, PartialEq)]
+pub struct TreeViewResources {
+    /// The resolved `TreeViewItemBackground` resource.
+    pub tree_view_item_background: Color,
+    /// The resolved `TreeViewItemBackgroundPointerOver` resource.
+    pub tree_view_item_background_pointer_over: Color,
+    /// The resolved `TreeViewItemBackgroundPressed` resource.
+    pub tree_view_item_background_pressed: Color,
+    /// The resolved `TreeViewItemBackgroundDisabled` resource.
+    pub tree_view_item_background_disabled: Color,
+    /// The resolved `TreeViewItemBackgroundSelected` resource.
+    pub tree_view_item_background_selected: Color,
+    /// The resolved `TreeViewItemBackgroundSelectedPointerOver` resource.
+    pub tree_view_item_background_selected_pointer_over: Color,
+    /// The resolved `TreeViewItemBackgroundSelectedPressed` resource.
+    pub tree_view_item_background_selected_pressed: Color,
+    /// The resolved `TreeViewItemBackgroundSelectedDisabled` resource.
+    pub tree_view_item_background_selected_disabled: Color,
+    /// The resolved `TreeViewItemForeground` resource.
+    pub tree_view_item_foreground: Color,
+    /// The resolved `TreeViewItemForegroundPointerOver` resource.
+    pub tree_view_item_foreground_pointer_over: Color,
+    /// The resolved `TreeViewItemForegroundPressed` resource.
+    pub tree_view_item_foreground_pressed: Color,
+    /// The resolved `TreeViewItemForegroundDisabled` resource.
+    pub tree_view_item_foreground_disabled: Color,
+    /// The resolved `TreeViewItemForegroundSelected` resource.
+    pub tree_view_item_foreground_selected: Color,
+    /// The resolved `TreeViewItemForegroundSelectedPointerOver` resource.
+    pub tree_view_item_foreground_selected_pointer_over: Color,
+    /// The resolved `TreeViewItemForegroundSelectedPressed` resource.
+    pub tree_view_item_foreground_selected_pressed: Color,
+    /// The resolved `TreeViewItemForegroundSelectedDisabled` resource.
+    pub tree_view_item_foreground_selected_disabled: Color,
+    /// The resolved `TreeViewItemBorderBrush` resource.
+    pub tree_view_item_border_brush: Color,
+    /// The resolved `TreeViewItemBorderBrushPointerOver` resource.
+    pub tree_view_item_border_brush_pointer_over: Color,
+    /// The resolved `TreeViewItemBorderBrushPressed` resource.
+    pub tree_view_item_border_brush_pressed: Color,
+    /// The resolved `TreeViewItemBorderBrushDisabled` resource.
+    pub tree_view_item_border_brush_disabled: Color,
+    /// The resolved `TreeViewItemBorderBrushSelected` resource.
+    pub tree_view_item_border_brush_selected: Color,
+    /// The resolved `TreeViewItemBorderBrushSelectedPointerOver` resource.
+    pub tree_view_item_border_brush_selected_pointer_over: Color,
+    /// The resolved `TreeViewItemBorderBrushSelectedPressed` resource.
+    pub tree_view_item_border_brush_selected_pressed: Color,
+    /// The resolved `TreeViewItemBorderBrushSelectedDisabled` resource.
+    pub tree_view_item_border_brush_selected_disabled: Color,
+    /// The resolved `TreeViewItemMultiSelectBorderBrushSelected` resource.
+    pub tree_view_item_multi_select_border_brush_selected: Color,
+    /// The resolved `TreeViewItemCheckBoxBackgroundSelected` resource.
+    pub tree_view_item_check_box_background_selected: Color,
+    /// The resolved `TreeViewItemCheckBoxBorderSelected` resource.
+    pub tree_view_item_check_box_border_selected: Color,
+    /// The resolved `TreeViewItemCheckGlyphSelected` resource.
+    pub tree_view_item_check_glyph_selected: Color,
+    /// The resolved `TreeViewItemSelectionIndicatorForeground` resource.
+    pub tree_view_item_selection_indicator_foreground: Color,
+    /// The resolved `TreeViewItemSelectionIndicatorForegroundPointerOver` resource.
+    pub tree_view_item_selection_indicator_foreground_pointer_over: Color,
+    /// The resolved `TreeViewItemSelectionIndicatorForegroundPressed` resource.
+    pub tree_view_item_selection_indicator_foreground_pressed: Color,
+    /// The resolved `TreeViewItemSelectionIndicatorForegroundDisabled` resource.
+    pub tree_view_item_selection_indicator_foreground_disabled: Color,
+    /// The resolved `SystemControlBackgroundAccentBrush` resource.
+    pub system_control_background_accent_brush: Color,
+    /// The resolved `SystemControlBackgroundChromeWhiteBrush` resource.
+    pub system_control_background_chrome_white_brush: Color,
+    /// The resolved `SystemControlForegroundChromeWhiteBrush` resource.
+    pub system_control_foreground_chrome_white_brush: Color,
+    /// The resolved `ListViewItemForeground` resource.
+    pub list_view_item_foreground: Color,
+    /// The resolved `ListViewItemFocusVisualPrimaryBrush` resource.
+    pub list_view_item_focus_visual_primary_brush: Color,
+    /// The resolved `ListViewItemFocusVisualSecondaryBrush` resource.
+    pub list_view_item_focus_visual_secondary_brush: Color,
+}
+
+impl TreeViewResources {
+    /// Resolves the source dictionary for the requested theme and accent palette.
+    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {
+        match theme {
+            Theme::Light => Self {
+                tree_view_item_background: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_background_pointer_over: Color::from_argb(9, 0, 0, 0),
+                tree_view_item_background_pressed: Color::from_argb(6, 0, 0, 0),
+                tree_view_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_background_selected: Color::from_argb(9, 0, 0, 0),
+                tree_view_item_background_selected_pointer_over: Color::from_argb(6, 0, 0, 0),
+                tree_view_item_background_selected_pressed: Color::from_argb(9, 0, 0, 0),
+                tree_view_item_background_selected_disabled: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_foreground: Color::from_argb(228, 0, 0, 0),
+                tree_view_item_foreground_pointer_over: Color::from_argb(228, 0, 0, 0),
+                tree_view_item_foreground_pressed: Color::from_argb(158, 0, 0, 0),
+                tree_view_item_foreground_disabled: Color::from_argb(92, 0, 0, 0),
+                tree_view_item_foreground_selected: Color::from_argb(228, 0, 0, 0),
+                tree_view_item_foreground_selected_pointer_over: Color::from_argb(228, 0, 0, 0),
+                tree_view_item_foreground_selected_pressed: Color::from_argb(158, 0, 0, 0),
+                tree_view_item_foreground_selected_disabled: Color::from_argb(92, 0, 0, 0),
+                tree_view_item_border_brush: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_selected: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_selected_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tree_view_item_border_brush_selected_pressed: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_selected_disabled: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_multi_select_border_brush_selected: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tree_view_item_check_box_background_selected: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_check_box_border_selected: Color::from_argb(158, 0, 0, 0),
+                tree_view_item_check_glyph_selected: Color::from_argb(158, 0, 0, 0),
+                tree_view_item_selection_indicator_foreground: accent.dark1,
+                tree_view_item_selection_indicator_foreground_pointer_over: accent.dark1,
+                tree_view_item_selection_indicator_foreground_pressed: accent.dark1,
+                tree_view_item_selection_indicator_foreground_disabled: Color::from_argb(
+                    92, 0, 0, 0,
+                ),
+                system_control_background_accent_brush: accent.base,
+                system_control_background_chrome_white_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_foreground_chrome_white_brush: Color::from_argb(255, 255, 255, 255),
+                list_view_item_foreground: Color::from_argb(228, 0, 0, 0),
+                list_view_item_focus_visual_primary_brush: Color::from_argb(228, 0, 0, 0),
+                list_view_item_focus_visual_secondary_brush: Color::from_argb(179, 255, 255, 255),
+            },
+            Theme::Dark => Self {
+                tree_view_item_background: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_background_pointer_over: Color::from_argb(15, 255, 255, 255),
+                tree_view_item_background_pressed: Color::from_argb(10, 255, 255, 255),
+                tree_view_item_background_disabled: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_background_selected: Color::from_argb(15, 255, 255, 255),
+                tree_view_item_background_selected_pointer_over: Color::from_argb(
+                    10, 255, 255, 255,
+                ),
+                tree_view_item_background_selected_pressed: Color::from_argb(15, 255, 255, 255),
+                tree_view_item_background_selected_disabled: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_foreground: Color::from_argb(255, 255, 255, 255),
+                tree_view_item_foreground_pointer_over: Color::from_argb(255, 255, 255, 255),
+                tree_view_item_foreground_pressed: Color::from_argb(197, 255, 255, 255),
+                tree_view_item_foreground_disabled: Color::from_argb(93, 255, 255, 255),
+                tree_view_item_foreground_selected: Color::from_argb(255, 255, 255, 255),
+                tree_view_item_foreground_selected_pointer_over: Color::from_argb(
+                    255, 255, 255, 255,
+                ),
+                tree_view_item_foreground_selected_pressed: Color::from_argb(197, 255, 255, 255),
+                tree_view_item_foreground_selected_disabled: Color::from_argb(93, 255, 255, 255),
+                tree_view_item_border_brush: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_pointer_over: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_pressed: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_disabled: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_selected: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_selected_pointer_over: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tree_view_item_border_brush_selected_pressed: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_border_brush_selected_disabled: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_multi_select_border_brush_selected: Color::from_argb(
+                    0, 255, 255, 255,
+                ),
+                tree_view_item_check_box_background_selected: Color::from_argb(0, 255, 255, 255),
+                tree_view_item_check_box_border_selected: Color::from_argb(197, 255, 255, 255),
+                tree_view_item_check_glyph_selected: Color::from_argb(197, 255, 255, 255),
+                tree_view_item_selection_indicator_foreground: accent.light2,
+                tree_view_item_selection_indicator_foreground_pointer_over: accent.light2,
+                tree_view_item_selection_indicator_foreground_pressed: accent.light2,
+                tree_view_item_selection_indicator_foreground_disabled: Color::from_argb(
+                    93, 255, 255, 255,
+                ),
+                system_control_background_accent_brush: accent.base,
+                system_control_background_chrome_white_brush: Color::from_argb(255, 255, 255, 255),
+                system_control_foreground_chrome_white_brush: Color::from_argb(255, 255, 255, 255),
+                list_view_item_foreground: Color::from_argb(255, 255, 255, 255),
+                list_view_item_focus_visual_primary_brush: Color::from_argb(255, 255, 255, 255),
+                list_view_item_focus_visual_secondary_brush: Color::from_argb(179, 0, 0, 0),
+            },
+        }
+    }
+}
+pub const LIST_VIEW_ITEM_MIN_WIDTH: f64 = 88.0;
+/// Left, top, right, bottom.
+pub const TREE_VIEW_ITEM_BORDER_THEME_THICKNESS: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+/// Left, top, right, bottom.
+pub const TREE_VIEW_ITEM_PRESENTER_MARGIN: [f64; 4] = [4.0, 2.0, 4.0, 2.0];
+/// Left, top, right, bottom.
+pub const TREE_VIEW_ITEM_PRESENTER_PADDING: [f64; 4] = [0.0, 3.0, 0.0, 5.0];
+/// Left, top, right, bottom.
+pub const TREE_VIEW_ITEM_MULTI_SELECT_SELECTED_ITEM_BORDER_MARGIN: [f64; 4] = [0.0, 0.0, 0.0, 0.0];
+pub const TREE_VIEW_ITEM_MIN_HEIGHT: f64 = 28.0;
+pub const TREE_VIEW_ITEM_MULTI_SELECT_CHECK_BOX_MIN_HEIGHT: f64 = 28.0;
+pub const TREE_VIEW_ITEM_CONTENT_HEIGHT: f64 = 20.0;

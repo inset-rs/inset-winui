@@ -59,6 +59,11 @@ DEFAULT_CONTROLS = (
     'InfoBadge',
     'MenuBar',
     'BreadcrumbBar',
+    'ContentDialog',
+    'NumberBox',
+    'ComboBox',
+    'ColorPicker',
+    'TreeView',
 )
 
 NS = {
@@ -67,6 +72,11 @@ NS = {
 }
 # MenuFlyoutPresenter::UpdateTemplateSettings looks up this key in C++, not XAML.
 RUNTIME_RESOURCE_REFERENCES = {'MenuFlyout': ['FlyoutThemeTouchMinWidth']}
+# Templates beside a control's dictionary that its own template uses, besides `<Control>.xaml`.
+COMPANION_TEMPLATES = {'ColorPicker': ['ColorSpectrum'], 'TreeView': ['TreeViewItem']}
+# Styles in another control's dictionary that a control's own styles are based on: the setters
+# they pass on, and the resources those name, belong to the control.
+BASE_STYLES = {'TreeView': [('ListViewItem', 'DefaultListViewItemStyle')]}
 
 X_KEY = '{%s}Key' % NS['x']
 P = '{%s}' % NS['']
@@ -96,6 +106,19 @@ def resource_references(element):
         for value in node.attrib.values():
             references.extend(re.findall(r'\{(?:StaticResource|ThemeResource) (\w+)\}', value))
     return references
+
+
+def inherited_setters(dictionary, style_key, templates):
+    """Returns the setters of the style `style_key` in `dictionary` that the styles in `templates`
+    based on it inherit: those they set no value of, besides `Template`."""
+    style = next(element for element in dictionary.iter(P + 'Style') if element.get(X_KEY) == style_key)
+    based_on = re.compile(r'\{(?:StaticResource|ThemeResource) %s\}' % re.escape(style_key))
+    overridden = {'Template'}
+    for template in templates:
+        for derived in template.iter(P + 'Style'):
+            if based_on.fullmatch(derived.get('BasedOn', '').strip()):
+                overridden.update(setter.get('Property') for setter in derived.findall(P + 'Setter'))
+    return [setter for setter in style.findall(P + 'Setter') if setter.get('Property') not in overridden]
 
 
 def control_source(root, control):
@@ -179,13 +202,18 @@ def read_dictionaries(path, keys=None):
     # A size both themes define identically is a constant too.
     light, dark = themes.get('Light', {}), themes.get('Default', {})
     for name, value in light.items():
-        if value[0] in ('f64', 'thickness', 'corner', 'duration_ms', 'duration_ns', 'spline', 'enum') and dark.get(name) == value:
+        if value[0] in ('f64', 'i32', 'thickness', 'corner', 'duration_ms', 'duration_ns', 'spline', 'enum') and dark.get(name) == value:
             shared.setdefault(name, value)
     return themes, shared
 
 
 def plain_value(kind, text):
     if kind == 'Double':
+        return ('f64', float(text))
+    if kind == 'Int32':
+        return ('i32', int(text))
+    if kind == 'GridLength' and re.match(r'^\s*[\d.]+\s*$', text):
+        # A length in pixels, emitted as its number; `Auto` and star lengths are layout, not sizes.
         return ('f64', float(text))
     if kind == 'Thickness':
         parts = [float(v) for v in text.split(',')]
@@ -332,6 +360,8 @@ def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
         name = snake(key).upper()
         if kind == 'f64':
             out.append(f'pub const {name}: f64 = {value};')
+        elif kind == 'i32':
+            out.append(f'pub const {name}: i32 = {value};')
         elif kind == 'thickness':
             out.append(f'/// Left, top, right, bottom.\npub const {name}: [f64; 4] = {value};')
         elif kind == 'corner':
@@ -346,7 +376,12 @@ def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
             enum, variant = value
             # `FontWeight` in Inset is Flutter's: `FontWeight::NORMAL`, `BOLD`, `W600`...
             if enum == 'FontWeight':
-                variant = {'Normal': 'NORMAL', 'Bold': 'BOLD', 'SemiBold': 'W600', 'Light': 'W300', 'SemiLight': 'W350', 'Medium': 'W500', 'Black': 'W900', 'Thin': 'W100', 'ExtraLight': 'W200', 'ExtraBold': 'W800'}[variant]
+                weights = {'Normal': 'NORMAL', 'Bold': 'BOLD', 'SemiBold': 'W600', 'Light': 'W300', 'Medium': 'W500', 'Black': 'W900', 'Thin': 'W100', 'ExtraLight': 'W200', 'ExtraBold': 'W800'}
+                if variant not in weights:
+                    # Inset names only the hundreds; SemiLight's 350 has no constant to be emitted as.
+                    print(f'warning: {source}: {key} is FontWeight {variant}, which Inset has no constant for; not emitted', file=sys.stderr)
+                    continue
+                variant = weights[variant]
             out.append(f'pub const {name}: {enum} = {enum}::{variant};')
 
 
@@ -390,23 +425,34 @@ def main(argv=None):
     for control, source in sources:
         themes, shared = read_dictionaries(source)
         templates = [ET.parse(source).getroot()]
-        companion = source.with_name(f'{control}.xaml')
-        if companion.is_file():
-            templates.append(ET.parse(companion).getroot())
+        for name in [control, *COMPANION_TEMPLATES.get(control, [])]:
+            companion = source.with_name(f'{name}.xaml')
+            if companion.is_file():
+                templates.append(ET.parse(companion).getroot())
         references = [key for template in templates for key in resource_references(template)]
         references.extend(RUNTIME_RESOURCE_REFERENCES.get(control, []))
+        inherited_themes, inherited_shared = {'Light': {}, 'Default': {}}, {}
+        for dictionary, style_key in BASE_STYLES.get(control, []):
+            dictionary_source = control_source(root, dictionary)
+            setters = inherited_setters(ET.parse(dictionary_source).getroot(), style_key, templates)
+            inherited = [key for setter in setters for key in resource_references(setter)]
+            references.extend(inherited)
+            dictionary_themes, dictionary_shared = read_dictionaries(dictionary_source, inherited)
+            for theme in inherited_themes:
+                inherited_themes[theme].update(dictionary_themes.get(theme, {}))
+            inherited_shared.update({key: value for key, value in dictionary_shared.items() if key in inherited})
         legacy_themes, legacy_shared = read_dictionaries(root / 'dxaml/xcp/dxaml/themes/generic.xaml', references)
-        shared = {**{key: value for key, value in legacy_shared.items() if key not in declared}, **shared}
+        shared = {**{key: value for key, value in legacy_shared.items() if key not in declared}, **inherited_shared, **shared}
         shared = {key: value for key, value in shared.items() if key not in emitted}
         emitted.update(shared)
-        fallback = {theme: {**legacy_themes.get(theme, {}), **common_themes.get(theme, {}), **acrylic_themes.get(theme, {}), **base_themes.get(theme, {}), **control_themes.get(theme, {})}
+        fallback = {theme: {**legacy_themes.get(theme, {}), **common_themes.get(theme, {}), **acrylic_themes.get(theme, {}), **inherited_themes[theme], **base_themes.get(theme, {}), **control_themes.get(theme, {})}
                     for theme in ('Light', 'Default')}
         keys = list(themes.get('Light', {}).keys())
         # Expose system brushes used directly by a template, as well as its
         # named resources. Fluent common tokens retain their existing accessor.
         template_references = references
         for key in template_references:
-            if key not in keys and key not in base_themes.get('Light', {}) and (key in legacy_themes.get('Light', {}) or key in control_themes.get('Light', {})):
+            if key not in keys and key not in base_themes.get('Light', {}) and (key in legacy_themes.get('Light', {}) or key in control_themes.get('Light', {}) or key in inherited_themes['Light']):
                 keys.append(key)
         struct_name = 'AcrylicThemeResources' if control == 'AcrylicBrush' else f'{control}Resources'
         emit_struct(out, struct_name, keys, themes, fallback, shared, source.name)

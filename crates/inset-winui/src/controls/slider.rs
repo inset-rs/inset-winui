@@ -75,6 +75,68 @@ pub type ValueChangedHandler = Rc<dyn Fn(&mut App, f64)>;
 /// Rust equivalent of `ThumbToolTipValueConverter`, returning the displayed value text.
 pub type ThumbToolTipValueConverter = Rc<dyn Fn(f64) -> String>;
 
+/// The `OnKeyDown` of a control derived from Slider, for a key press or repeat: `None` leaves
+/// the key to the slider's own handling, `Some` is the result of the key without it.
+pub type SliderKeyDownHandler = Rc<dyn Fn(&mut App, LogicalKeyboardKey) -> Option<KeyEventResult>>;
+
+/// Builds a Slider `ControlTemplate` for one set of states, placing `SliderContainer` with
+/// [`SliderTemplateParts::slider_container`].
+pub type SliderTemplateBuilder = Rc<
+    dyn Fn(
+        &mut App,
+        BuildContext,
+        &Slider,
+        SliderTemplateStates,
+        &SliderTemplateParts,
+    ) -> WidgetRef,
+>;
+
+/// A Slider `ControlTemplate` replacing the default style's, as a derived control's style sets
+/// one; the slider keeps its input, value and keyboard behaviour.
+#[derive(Clone)]
+pub struct SliderTemplate {
+    /// Builds the template.
+    pub build: SliderTemplateBuilder,
+    /// How far the template's thumb reaches past its layout slot on every side, where a press
+    /// still lands on the thumb and drags it: the default style's `Margin="-2"` on the thumb's
+    /// border is 2.
+    pub thumb_overhang: f64,
+}
+
+impl SliderTemplate {
+    /// A template built by `build`, with a thumb reaching `thumb_overhang` past its slot.
+    pub fn new(
+        thumb_overhang: f64,
+        build: impl Fn(
+            &mut App,
+            BuildContext,
+            &Slider,
+            SliderTemplateStates,
+            &SliderTemplateParts,
+        ) -> WidgetRef
+        + 'static,
+    ) -> SliderTemplate {
+        SliderTemplate {
+            build: Rc::new(build),
+            thumb_overhang,
+        }
+    }
+}
+
+/// The template parts `Slider::OnApplyTemplate` attaches its behaviour to.
+pub struct SliderTemplateParts {
+    /// Wraps `SliderContainer`'s content in the slider's pointer input and names it.
+    container: Rc<dyn Fn(WidgetRef) -> WidgetRef>,
+}
+
+impl SliderTemplateParts {
+    /// `SliderContainer`: `content` as the element that takes the slider's pointer input, and
+    /// whose size the pointer maths reads as the track's.
+    pub fn slider_container<K>(&self, content: impl IntoWidget<K>) -> WidgetRef {
+        (self.container)(content.into_widget())
+    }
+}
+
 /// XAML `Slider`: `Value` between `Minimum` and `Maximum` with `ValueChanged`, `StepFrequency`, ticks, `Orientation` and `Header`.
 #[derive(Clone)]
 pub struct Slider {
@@ -100,6 +162,10 @@ pub struct Slider {
     pub is_thumb_tool_tip_enabled: bool,
     /// Optional replacement for the source step-frequency-based value formatter.
     pub thumb_tool_tip_value_converter: Option<ThumbToolTipValueConverter>,
+    /// The template of a derived control's style; `None` is `DefaultSliderStyle`'s.
+    pub template: Option<SliderTemplate>,
+    /// The `OnKeyDown` override of a derived control, which sees each key first.
+    pub key_down: Option<SliderKeyDownHandler>,
     pub key: Option<KeyRef>,
 }
 
@@ -121,6 +187,8 @@ impl Slider {
             is_enabled: true,
             is_thumb_tool_tip_enabled: true,
             thumb_tool_tip_value_converter: None,
+            template: None,
+            key_down: None,
             key: None,
         }
     }
@@ -206,13 +274,35 @@ impl Slider {
         self
     }
 
+    /// Sets Template, as a derived control's style does.
+    pub fn template(mut self, template: SliderTemplate) -> Slider {
+        self.template = Some(template);
+        self
+    }
+
+    /// Sets the `OnKeyDown` override of a derived control.
+    pub fn key_down(
+        mut self,
+        handler: impl Fn(&mut App, LogicalKeyboardKey) -> Option<KeyEventResult> + 'static,
+    ) -> Slider {
+        self.key_down = Some(Rc::new(handler));
+        self
+    }
+
     pub fn key(mut self, key: KeyRef) -> Slider {
         self.key = Some(key);
         self
     }
 
+    /// How far the thumb reaches past its slot: the template's, or the default style's.
+    fn thumb_overhang(&self) -> f64 {
+        self.template
+            .as_ref()
+            .map_or(THUMB_BORDER_OVERHANG, |template| template.thumb_overhang)
+    }
+
     /// `Minimum`, `Maximum` and `Value` as `CRangeBase` coerces them.
-    fn range(&self) -> RangeBase {
+    pub(crate) fn range(&self) -> RangeBase {
         RangeBase::new(self.minimum, self.maximum, self.value).coerced()
     }
 
@@ -392,11 +482,10 @@ impl SliderState {
         )
     }
 
-    /// Whether `point` lands on the thumb: its `Border` reaches `THUMB_BORDER_OVERHANG` past the slot.
+    /// Whether `point` lands on the thumb: its `Border` reaches the template's overhang past the slot.
     fn hits_thumb(self: Handle<Self>, app: &mut App, point: Offset) -> bool {
-        self.thumb_rect(app)
-            .inflate(THUMB_BORDER_OVERHANG)
-            .contains(point)
+        let overhang = self.widget(app).thumb_overhang();
+        self.thumb_rect(app).inflate(overhang).contains(point)
     }
 
     /// `put_Value`: coerced by `CRangeBase`; `ValueChanged` only when it differs.
@@ -552,6 +641,13 @@ impl SliderState {
         if !widget.is_enabled {
             return KeyEventResult::Ignored;
         }
+        if let Some(result) = widget
+            .key_down
+            .as_ref()
+            .and_then(|handler| handler(app, key))
+        {
+            return result;
+        }
         let reversed = widget.is_direction_reversed;
         let value = match key {
             LogicalKeyboardKey::ARROW_LEFT => widget.step(reversed),
@@ -631,7 +727,7 @@ impl State for SliderState {
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let resources = ThemeResources::of(app, context);
-        let states = TemplateStates {
+        let states = SliderTemplateStates {
             slider: self.slider_state(app),
             thumb: self.thumb_state(app),
             focused: app.get(self).focused && widget.is_enabled,
@@ -643,24 +739,33 @@ impl State for SliderState {
             tooltip_offset: app.get(self).tooltip_offset,
         };
         let container_key: KeyRef = app.get(self).container_key.clone();
-        let container = slider_container(&resources, &widget, states, container_key);
-        let container = if widget.is_enabled {
-            // `ManipulationMode="None"`: the slider keeps every pointer that lands on it.
-            RawGestureDetector::new()
-                .gestures(vec![(
-                    TypeId::of::<EagerGestureRecognizer>(),
-                    GestureRecognizerFactoryWithHandlers::new(
-                        EagerGestureRecognizer::new,
-                        |_, _| {},
-                    )
-                    .into_factory(),
-                )])
-                .child(self.pointer_listener(container))
-                .into_widget()
-        } else {
-            container
+        let enabled = widget.is_enabled;
+        let parts = SliderTemplateParts {
+            container: Rc::new(move |content| {
+                let container = KeyedSubtree::new(content)
+                    .key(container_key.clone())
+                    .into_widget();
+                if !enabled {
+                    return container;
+                }
+                // `ManipulationMode="None"`: the slider keeps every pointer that lands on it.
+                RawGestureDetector::new()
+                    .gestures(vec![(
+                        TypeId::of::<EagerGestureRecognizer>(),
+                        GestureRecognizerFactoryWithHandlers::new(
+                            EagerGestureRecognizer::new,
+                            |_, _| {},
+                        )
+                        .into_factory(),
+                    )])
+                    .child(self.pointer_listener(container))
+                    .into_widget()
+            }),
         };
-        let body = template(&resources, &widget, states, container);
+        let body = match widget.template.clone() {
+            Some(template) => (template.build)(app, context, &widget, states, &parts),
+            None => default_template(&resources, &widget, states, &parts),
+        };
         let mut detector = FocusableActionDetector::new(body)
             .enabled(widget.is_enabled)
             .on_show_focus_highlight(move |app, value| {
@@ -693,18 +798,23 @@ impl State for SliderState {
     }
 }
 
-/// What the template is built for: the two `CommonStates` groups, focus, the thumb's value and the pixel scale.
+/// What a Slider template is built for: the two `CommonStates` groups, focus, the thumb's value and the pixel scale.
 #[derive(Clone, Copy, Debug, PartialEq)]
-struct TemplateStates {
-    slider: CommonState,
-    thumb: CommonState,
-    focused: bool,
-    intermediate_value: f64,
-    zoom_scale: f64,
+pub struct SliderTemplateStates {
+    /// The slider's `CommonStates`.
+    pub slider: CommonState,
+    /// The thumb's `CommonStates`.
+    pub thumb: CommonState,
+    /// The focus visual shows.
+    pub focused: bool,
+    /// `IntermediateValue`, where the thumb is laid out.
+    pub intermediate_value: f64,
+    /// Physical pixels per logical pixel.
+    pub zoom_scale: f64,
     /// Source-controlled thumb tooltip visibility.
-    tooltip_open: bool,
+    pub tooltip_open: bool,
     /// Separation chosen by the input that opened the tooltip.
-    tooltip_offset: f64,
+    pub tooltip_offset: f64,
 }
 
 /// The brushes the slider's `CommonStates` storyboards set for one state.
@@ -761,6 +871,17 @@ fn brushes(resources: &ThemeResources, r: &SliderResources, state: CommonState) 
     }
 }
 
+/// `DefaultSliderStyle`'s template: `SliderContainer`, its background and the template for the orientation, in the root.
+fn default_template(
+    resources: &ThemeResources,
+    widget: &Slider,
+    states: SliderTemplateStates,
+    parts: &SliderTemplateParts,
+) -> WidgetRef {
+    let container = parts.slider_container(slider_container(resources, widget, states));
+    template(resources, widget, states, container)
+}
+
 /// `Slider::UpdateTrackLayout`: the decrease rect's length is `multiplier × (track − thumb)`, never negative.
 fn decrease_length(track_length: f64, thumb_length: f64, fraction: f64) -> f64 {
     (fraction * (track_length - thumb_length)).max(0.0)
@@ -805,7 +926,7 @@ fn thumb_rect(
 fn template(
     resources: &ThemeResources,
     widget: &Slider,
-    states: TemplateStates,
+    states: SliderTemplateStates,
     container: WidgetRef,
 ) -> WidgetRef {
     let brushes = brushes(resources, &resources.slider(), states.slider);
@@ -847,12 +968,11 @@ fn template(
         .into_widget()
 }
 
-/// `SliderContainer`: its background and the template for the orientation.
+/// `SliderContainer`'s content: its background and the template for the orientation.
 fn slider_container(
     resources: &ThemeResources,
     widget: &Slider,
-    states: TemplateStates,
-    key: KeyRef,
+    states: SliderTemplateStates,
 ) -> WidgetRef {
     let brushes = brushes(resources, &resources.slider(), states.slider);
     let template = match widget.orientation {
@@ -860,13 +980,15 @@ fn slider_container(
         Orientation::Vertical => vertical_template(resources, widget, states, &brushes),
     };
     ColoredBox::new(brushes.container)
-        .key(key)
         .child(template)
         .into_widget()
 }
 
 /// `Slider::UpdateTrackLayout` gives the decrease rect `multiplier × (track − thumb)` of the star space and the rest to the star column or row beyond the thumb; the same split as star weights, which need no actual size at build time.
-fn decrease_definitions(fraction: f64, is_direction_reversed: bool) -> (GridLength, GridLength) {
+pub(crate) fn decrease_definitions(
+    fraction: f64,
+    is_direction_reversed: bool,
+) -> (GridLength, GridLength) {
     let decrease = GridLength::star(fraction);
     let remainder = GridLength::star(1.0 - fraction);
     if is_direction_reversed {
@@ -887,7 +1009,7 @@ fn track_rectangle(fill: Color) -> ControlBorder {
 }
 
 /// A `TickBar` of the slider with `fill`, laid out from the slider's properties.
-fn tick_bar(widget: &Slider, states: TemplateStates, fill: Color) -> TickBar {
+fn tick_bar(widget: &Slider, states: SliderTemplateStates, fill: Color) -> TickBar {
     let range = widget.range();
     TickBar::new(fill, widget.orientation)
         .tick_frequency(widget.tick_frequency)
@@ -901,7 +1023,7 @@ fn tick_bar(widget: &Slider, states: TemplateStates, fill: Color) -> TickBar {
 fn horizontal_template(
     resources: &ThemeResources,
     widget: &Slider,
-    states: TemplateStates,
+    states: SliderTemplateStates,
     brushes: &SliderBrushes,
 ) -> WidgetRef {
     let reversed = widget.is_direction_reversed;
@@ -1039,7 +1161,7 @@ fn horizontal_template(
 fn vertical_template(
     resources: &ThemeResources,
     widget: &Slider,
-    states: TemplateStates,
+    states: SliderTemplateStates,
     brushes: &SliderBrushes,
 ) -> WidgetRef {
     let reversed = widget.is_direction_reversed;
@@ -1180,7 +1302,7 @@ fn vertical_template(
 fn thumb(
     resources: &ThemeResources,
     widget: &Slider,
-    states: TemplateStates,
+    states: SliderTemplateStates,
     fill: Color,
     state: CommonState,
     width: f64,

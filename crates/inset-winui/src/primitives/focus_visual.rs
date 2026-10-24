@@ -19,6 +19,10 @@ pub struct FocusVisual {
     pub margin: [f64; 4],
     pub corner_radius: f64,
     pub theme: Theme,
+    /// XAML `FocusVisualPrimaryBrush`; `None` is `SystemControlFocusVisualPrimaryBrush`.
+    pub primary_brush: Option<Color>,
+    /// XAML `FocusVisualSecondaryBrush`; `None` is `SystemControlFocusVisualSecondaryBrush`.
+    pub secondary_brush: Option<Color>,
 }
 
 impl FocusVisual {
@@ -29,6 +33,8 @@ impl FocusVisual {
             margin: [0.0; 4],
             corner_radius: 0.0,
             theme,
+            primary_brush: None,
+            secondary_brush: None,
         }
     }
 
@@ -45,6 +51,18 @@ impl FocusVisual {
 
     pub fn corner_radius(mut self, radius: f64) -> FocusVisual {
         self.corner_radius = radius;
+        self
+    }
+
+    /// XAML `FocusVisualPrimaryBrush`.
+    pub fn primary_brush(mut self, color: Color) -> FocusVisual {
+        self.primary_brush = Some(color);
+        self
+    }
+
+    /// XAML `FocusVisualSecondaryBrush`.
+    pub fn secondary_brush(mut self, color: Color) -> FocusVisual {
+        self.secondary_brush = Some(color);
         self
     }
 
@@ -72,8 +90,14 @@ impl StatelessWidget for FocusVisual {
         let [left, top, right, bottom] = self.margin;
         let ring = FocusRingPainter {
             visible: self.visible,
-            primary: Brush::Solid(FocusVisual::primary_color(self.theme)),
-            secondary: Brush::Solid(FocusVisual::secondary_color(self.theme)),
+            primary: Brush::Solid(
+                self.primary_brush
+                    .unwrap_or_else(|| FocusVisual::primary_color(self.theme)),
+            ),
+            secondary: Brush::Solid(
+                self.secondary_brush
+                    .unwrap_or_else(|| FocusVisual::secondary_color(self.theme)),
+            ),
             corner_radius: self.corner_radius - left.min(0.0),
         };
         // Passthrough: the child sees the constraints it would see without the ring.

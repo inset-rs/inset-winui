@@ -704,8 +704,6 @@ fn control_tab_moves_page_focus_and_close_recovers_adjacent_header_focus() {
 /// Collection reconciliation must finish before the first layout after removal.
 #[test]
 fn collection_replacement_is_visible_in_the_first_frame() {
-    use inset_scheduler::SchedulerBinding;
-
     for (initial_selection, removed, disabled, hidden, expected) in [
         (Some(3), 3, vec![], vec![], 2),
         (Some(3), 3, vec![2], vec![0], 1),
@@ -724,11 +722,7 @@ fn collection_replacement_is_visible_in_the_first_frame() {
         owner.set_state(&mut fixture.cell.borrow_mut(), |state| {
             state.items.remove(removed);
         });
-        fixture.at += Duration::from_millis(20);
-        SchedulerBinding::handle_begin_frame(&mut fixture.cell.borrow_mut(), Some(fixture.at));
-        fixture.cell.checkpoint();
-        SchedulerBinding::handle_draw_frame(&mut fixture.cell.borrow_mut());
-        fixture.cell.checkpoint();
+        fixture.frame_after(Duration::from_millis(20));
         // No second build is allowed here: selection_changed only queued that frame.
         fixture.find(&format!("Page {expected} count 0"));
         let state = fixture.cell.borrow();

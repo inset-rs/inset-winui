@@ -16,6 +16,8 @@ pub enum Feature {
     MenuFlyout,
     /// Reusable anchored content and dismissal policies.
     Flyout,
+    /// Modal questions with command buttons and a result.
+    ContentDialog,
     /// Buttons that open an associated flyout.
     DropDownButton,
     /// Determinate and animated progress states.
@@ -34,6 +36,10 @@ pub enum Feature {
     TextBox,
     /// Concealed entry and password reveal modes.
     PasswordBox,
+    /// Numbers, expressions and spin buttons.
+    NumberBox,
+    /// Choosing one item from a drop-down list, or typing it.
+    ComboBox,
     /// Switch content, headers and dragging.
     ToggleSwitch,
     /// Pixel, auto and star layout.
@@ -50,6 +56,8 @@ pub enum Feature {
     HyperlinkButton,
     /// Continuous and stepped values.
     Slider,
+    /// A color from a spectrum, sliders, channels or hex.
+    ColorPicker,
     /// Inline and overlay panes.
     SplitView,
     /// Backdrop blur and tint with sharp foreground content.
@@ -64,11 +72,13 @@ pub enum Feature {
     Icons,
     /// Adaptive panes, hierarchy and top navigation.
     NavigationView,
+    /// Nested nodes to expand, select and reorder.
+    TreeView,
 }
 
 impl Feature {
     /// Display order in the navigation pane.
-    pub const ALL: [Self; 30] = [
+    pub const ALL: [Self; 35] = [
         Self::Button,
         Self::DropDownButton,
         Self::SplitButton,
@@ -77,8 +87,11 @@ impl Feature {
         Self::MenuBar,
         Self::BreadcrumbBar,
         Self::Flyout,
+        Self::ContentDialog,
         Self::TextBox,
         Self::PasswordBox,
+        Self::NumberBox,
+        Self::ComboBox,
         Self::ToggleSwitch,
         Self::Grid,
         Self::CheckBox,
@@ -87,6 +100,7 @@ impl Feature {
         Self::RepeatButton,
         Self::HyperlinkButton,
         Self::Slider,
+        Self::ColorPicker,
         Self::ProgressBar,
         Self::ProgressRing,
         Self::Expander,
@@ -97,6 +111,7 @@ impl Feature {
         Self::ToolTip,
         Self::TabView,
         Self::NavigationView,
+        Self::TreeView,
         Self::Typography,
         Self::Icons,
     ];
@@ -110,10 +125,13 @@ impl Feature {
             Self::MenuBar => "MenuBar",
             Self::BreadcrumbBar => "BreadcrumbBar",
             Self::Flyout => "Flyout",
+            Self::ContentDialog => "ContentDialog",
             Self::DropDownButton => "DropDownButton",
             Self::Button => "Button",
             Self::TextBox => "TextBox",
             Self::PasswordBox => "PasswordBox",
+            Self::NumberBox => "NumberBox",
+            Self::ComboBox => "ComboBox",
             Self::ToggleSwitch => "ToggleSwitch",
             Self::Grid => "Grid",
             Self::CheckBox => "CheckBox",
@@ -122,6 +140,7 @@ impl Feature {
             Self::RepeatButton => "RepeatButton",
             Self::HyperlinkButton => "HyperlinkButton",
             Self::Slider => "Slider",
+            Self::ColorPicker => "ColorPicker",
             Self::ProgressBar => "ProgressBar",
             Self::ProgressRing => "ProgressRing",
             Self::Expander => "Expander",
@@ -132,6 +151,7 @@ impl Feature {
             Self::ToolTip => "ToolTip",
             Self::TabView => "TabView",
             Self::NavigationView => "NavigationView",
+            Self::TreeView => "TreeView",
             Self::Typography => "Typography",
             Self::Icons => "Icons",
         }
@@ -146,10 +166,13 @@ impl Feature {
             Self::MenuBar => FluentSymbol::MenuList,
             Self::BreadcrumbBar => FluentSymbol::ChevronLeft,
             Self::Flyout => FluentSymbol::ChevronRight,
+            Self::ContentDialog => FluentSymbol::Warning,
             Self::DropDownButton => FluentSymbol::ChevronDown,
             Self::Button => FluentSymbol::CursorClick,
             Self::TextBox => FluentSymbol::TextField,
             Self::PasswordBox => FluentSymbol::LockClosed,
+            Self::NumberBox => FluentSymbol::ChevronUpDown,
+            Self::ComboBox => FluentSymbol::CheckmarkCircle,
             Self::ToggleSwitch => FluentSymbol::ToggleLeft,
             Self::Grid => FluentSymbol::Grid,
             Self::CheckBox => FluentSymbol::CheckboxChecked,
@@ -158,6 +181,7 @@ impl Feature {
             Self::RepeatButton => FluentSymbol::ArrowRepeatAll,
             Self::HyperlinkButton => FluentSymbol::Link,
             Self::Slider => FluentSymbol::Options,
+            Self::ColorPicker => FluentSymbol::Color,
             Self::ProgressBar => FluentSymbol::Timer,
             Self::ProgressRing => FluentSymbol::SpinnerIos,
             Self::Expander => FluentSymbol::ChevronDownUp,
@@ -168,6 +192,7 @@ impl Feature {
             Self::ToolTip => FluentSymbol::TooltipQuote,
             Self::TabView => FluentSymbol::Tab,
             Self::NavigationView => FluentSymbol::Navigation,
+            Self::TreeView => FluentSymbol::TextBulletListTree,
             Self::Typography => FluentSymbol::TextFont,
             Self::Icons => FluentSymbol::Apps,
         }
@@ -186,11 +211,18 @@ impl Feature {
                 "Organize application commands into menus with pointer and keyboard navigation."
             }
             Self::Flyout => "Show reusable content beside its opening control.",
+            Self::ContentDialog => "Ask a modal question with up to three command buttons.",
             Self::DropDownButton => "Open a flyout from a button with a dropdown chevron.",
             Self::Button => "Activate an action using the pointer or keyboard.",
             Self::TextBox => "Enter and edit text, select words, and explore multiline input.",
             Self::PasswordBox => {
                 "Enter a password and compare Peek, Hidden and Visible reveal modes."
+            }
+            Self::NumberBox => {
+                "Enter a number or an expression, and step it with keys, the wheel or spin buttons."
+            }
+            Self::ComboBox => {
+                "Choose one item from a drop-down list with the pointer or the keyboard, or type it."
             }
             Self::ToggleSwitch => "Switch settings on and off, or drag the thumb.",
             Self::Grid => "Arrange content with fixed, content-sized and proportional tracks.",
@@ -200,6 +232,9 @@ impl Feature {
             Self::RepeatButton => "Hold the button to repeat its action.",
             Self::HyperlinkButton => "Present an action as a text link.",
             Self::Slider => "Adjust a value continuously or in steps.",
+            Self::ColorPicker => {
+                "Choose a color on a spectrum, with sliders, or by its channels and hex value."
+            }
             Self::ProgressBar => {
                 "Show completion or ongoing work, including paused and error states."
             }
@@ -214,6 +249,9 @@ impl Feature {
             Self::ToolTip => "Hover or focus a control to reveal its help text.",
             Self::TabView => "Add, close, reorder and move tabs between strips.",
             Self::NavigationView => "Explore pane modes, nested destinations and top overflow.",
+            Self::TreeView => {
+                "Expand, select and reorder nested items, one at a time or with check boxes."
+            }
             Self::Typography => "Choose text styles and build a clear hierarchy.",
             Self::Icons => "Use Fluent symbols in navigation, actions and status indicators.",
         }

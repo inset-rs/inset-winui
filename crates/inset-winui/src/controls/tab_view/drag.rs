@@ -345,6 +345,7 @@ impl TabViewState {
                     self.bring_tab_into_view(app, index, focus);
                 }
             }),
+            View::maybe_id_of(app, self.context(app)),
         );
     }
 

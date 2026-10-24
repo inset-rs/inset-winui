@@ -12,10 +12,13 @@ use std::{rc::Rc, time::Duration};
 pub(crate) struct ScrollBarViewport {
     /// Caller-owned scroll state, also used by the native scrollbar drag recognizer.
     controller: Handle<ScrollViewportController>,
-    /// Content measured by the native single-child scrolling viewport.
+    /// Content measured by the native single-child scrolling viewport, or a scroller of its own.
     child: WidgetRef,
     /// Scroll direction; navigation uses vertical and flyouts may use either axis.
     axis: Axis,
+    /// Whether `child` is a native scroller attached to `controller`, such as a lazy ListView,
+    /// rather than content to put in a viewport.
+    child_scrolls: bool,
 }
 
 impl ScrollBarViewport {
@@ -28,6 +31,19 @@ impl ScrollBarViewport {
             controller,
             child: child.into_widget(),
             axis: Axis::Vertical,
+            child_scrolls: false,
+        }
+    }
+
+    /// Puts the scrollbar on `scroller`, a native scroller attached to `controller` with
+    /// whatever lies between them, such as a lazy ListView inside a fixed margin.
+    pub(crate) fn scroller<K>(
+        controller: Handle<ScrollViewportController>,
+        scroller: impl IntoWidget<K>,
+    ) -> Self {
+        Self {
+            child_scrolls: true,
+            ..Self::new(controller, scroller)
         }
     }
 
@@ -96,8 +112,12 @@ impl ScrollBarViewportState {
         let metrics = widget.controller.metrics(app);
         let overflow = metrics.scrollable_length > 0.0;
         let expanded = app.get(self).expanded && overflow;
-        let mut parts =
-            vec![ScrollViewport::new(widget.axis, widget.controller, widget.child).into_widget()];
+        let viewport = if widget.child_scrolls {
+            ScrollMetricsObserver::new(widget.controller, widget.child).into_widget()
+        } else {
+            ScrollViewport::new(widget.axis, widget.controller, widget.child).into_widget()
+        };
+        let mut parts = vec![viewport];
         if overflow {
             let mut chrome = Vec::new();
             if expanded {

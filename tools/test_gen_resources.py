@@ -7,7 +7,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-from gen_resources import DEFAULT_SOURCE, DEFAULT_OUTPUT, control_source, emit_struct, plain_value, read_dictionaries, resolve
+import xml.etree.ElementTree as ET
+
+from gen_resources import DEFAULT_SOURCE, DEFAULT_OUTPUT, control_source, emit_struct, inherited_setters, plain_value, read_dictionaries, resolve
 
 
 class ResourceGenerationTests(unittest.TestCase):
@@ -86,6 +88,14 @@ class ResourceGenerationTests(unittest.TestCase):
         self.assertEqual(plain_value('String', '00:00:00.19999'), ('duration_ns', 199990000))
         self.assertEqual(plain_value('String', '00:00:00.2'), ('duration_ms', 200))
 
+    def test_a_grid_length_in_pixels_is_a_size_and_auto_or_star_is_not(self):
+        self.assertEqual(plain_value('GridLength', '8'), ('f64', 8.0))
+        self.assertIsNone(plain_value('GridLength', 'Auto'))
+        self.assertIsNone(plain_value('GridLength', '2*'))
+
+    def test_an_int32_is_a_count(self):
+        self.assertEqual(plain_value('Int32', '15'), ('i32', 15))
+
     def test_acrylic_alias_preserves_recipe_and_source_fallback(self):
         source = DEFAULT_SOURCE
         if not source.exists():
@@ -103,6 +113,63 @@ class ResourceGenerationTests(unittest.TestCase):
         base = {'Stroke': ('color', (255, 1, 2, 3))}
         self.assertEqual(resolve(entries, base, 'Border'),
                          ('gradient', [(1.0, ('color', (0, 0, 0, 0))), (1.0, ('color', (255, 1, 2, 3)))]))
+
+    def test_color_picker_reads_the_spectrum_template_beside_it(self):
+        source = DEFAULT_SOURCE
+        if not source.exists():
+            self.skipTest('local WinUI source checkout unavailable')
+        generator = Path(__file__).with_name('gen_resources.py')
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'resources.rs'
+            subprocess.run(
+                [sys.executable, str(generator), str(source), str(output), 'ColorPicker'],
+                check=True, capture_output=True, text=True,
+            )
+            generated = output.read_text()
+        picker = generated.split('pub struct ColorPickerResources {', 1)[1]
+        # `ColorSpectrum.xaml` strokes the selection ellipse with these.
+        self.assertIn('pub system_control_background_chrome_white_brush: Color', picker)
+        self.assertIn('pub system_control_background_chrome_black_high_brush: Color', picker)
+
+    def test_a_derived_style_inherits_only_the_setters_it_does_not_set(self):
+        namespaces = 'xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"'
+        base = ET.fromstring(f'''<ResourceDictionary {namespaces}>
+            <Style x:Key="BaseStyle" TargetType="ListViewItem">
+              <Setter Property="Foreground" Value="{{ThemeResource BaseForeground}}" />
+              <Setter Property="MinHeight" Value="{{ThemeResource BaseMinHeight}}" />
+              <Setter Property="Template"><Setter.Value><ControlTemplate /></Setter.Value></Setter>
+            </Style>
+            </ResourceDictionary>''')
+        derived = ET.fromstring(f'''<ResourceDictionary {namespaces}>
+            <Style x:Key="DerivedStyle" TargetType="TreeViewItem" BasedOn="{{StaticResource BaseStyle}}">
+              <Setter Property="MinHeight" Value="{{ThemeResource DerivedMinHeight}}" />
+            </Style>
+            </ResourceDictionary>''')
+        setters = inherited_setters(base, 'BaseStyle', [derived])
+        self.assertEqual([setter.get('Property') for setter in setters], ['Foreground'])
+
+    def test_tree_view_takes_the_list_view_item_setters_its_item_style_inherits(self):
+        source = DEFAULT_SOURCE
+        if not source.exists():
+            self.skipTest('local WinUI source checkout unavailable')
+        generator = Path(__file__).with_name('gen_resources.py')
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'resources.rs'
+            subprocess.run(
+                [sys.executable, str(generator), str(source), str(output), 'TreeView'],
+                check=True, capture_output=True, text=True,
+            )
+            generated = output.read_text()
+        tree = generated.split('pub struct TreeViewResources {', 1)[1]
+        # `DefaultListViewItemStyle`'s `Foreground`, `MinWidth` and focus visual brushes reach
+        # `TreeViewItem`; its `Background` and `MinHeight` the item style sets itself.
+        self.assertIn('pub list_view_item_foreground: Color', tree)
+        self.assertIn('pub list_view_item_focus_visual_primary_brush: Color', tree)
+        self.assertIn('pub const LIST_VIEW_ITEM_MIN_WIDTH: f64 = 88.0;', generated)
+        self.assertNotIn('list_view_item_background', tree)
+        self.assertNotIn('LIST_VIEW_ITEM_MIN_HEIGHT', generated)
+        # `TreeViewItem.xaml`, beside the dictionary, draws the drag count on these.
+        self.assertIn('pub system_control_background_accent_brush: Color', tree)
 
     def test_control_source_finds_companion_control_in_parent_directory(self):
         with tempfile.TemporaryDirectory() as directory:

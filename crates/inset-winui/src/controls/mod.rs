@@ -71,6 +71,33 @@ pub(crate) use navigation_indicator_transition::NavigationIndicatorTransition;
 mod flyout;
 pub use flyout::*;
 
+mod content_dialog;
+pub use content_dialog::*;
+
+mod number_box;
+pub use number_box::*;
+
+mod combo_box;
+pub use combo_box::*;
+
+mod color_helpers;
+pub use color_helpers::{
+    ColorChangedEventArgs, ColorPickerHsvChannel, ColorSpectrumComponents, ColorSpectrumShape,
+};
+pub(crate) use color_helpers::{
+    IncrementAmount, IncrementDirection, checkered_background_pixels, image_from_pixel_data,
+    increment_alpha_channel, increment_color_channel,
+};
+
+mod color_spectrum;
+pub use color_spectrum::*;
+
+mod color_picker_slider;
+pub use color_picker_slider::*;
+
+mod color_picker;
+pub use color_picker::*;
+
 mod drop_down_button;
 pub use drop_down_button::*;
 
@@ -88,3 +115,6 @@ pub use menu_bar::*;
 
 mod breadcrumb_bar;
 pub use breadcrumb_bar::*;
+
+mod tree_view;
+pub use tree_view::*;

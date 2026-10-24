@@ -5,7 +5,6 @@ use inset_embedder::{Offset, PointerChange, Rect};
 use inset_foundation::{App, Handle, Listener};
 use inset_painting::EdgeInsetsGeometry;
 use inset_rendering::{CrossAxisAlignment, MainAxisSize, RenderParagraph};
-use inset_scheduler::SchedulerBinding;
 use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey, PhysicalKeyboardKey,
 };
@@ -213,11 +212,7 @@ fn settle(f: &mut Fixture) {
 
 fn frames(f: &mut Fixture, count: u32) {
     for _ in 0..count {
-        f.at += Duration::from_millis(20);
-        SchedulerBinding::handle_begin_frame(&mut f.cell.borrow_mut(), Some(f.at));
-        f.cell.checkpoint();
-        SchedulerBinding::handle_draw_frame(&mut f.cell.borrow_mut());
-        f.cell.checkpoint();
+        f.frame_after(Duration::from_millis(20));
     }
 }
 

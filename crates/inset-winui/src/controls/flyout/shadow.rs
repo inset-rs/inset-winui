@@ -1,6 +1,6 @@
 //! ElevationHelper.cpp and DropShadowRecipe.h, using Inset's native shadow blur.
 
-use crate::{OVERLAY_CORNER_RADIUS, Theme};
+use crate::{NUMBER_BOX_POPUP_SHADOW_DEPTH, OVERLAY_CORNER_RADIUS, Theme};
 use inset_embedder::{BlurStyle, Canvas, ClipOp, Color, Offset, RRect, Radius, Size};
 use inset_foundation::App;
 use inset_painting::{BoxShadow, draw_rrect};
@@ -8,19 +8,60 @@ use inset_rendering::CustomPainter;
 
 /// Paints only outside the popup, so acrylic samples an undarkened background.
 #[derive(Clone, Debug, PartialEq)]
-pub(super) struct PopupShadow {
+pub(crate) struct PopupShadow {
     /// Theme used by the popup's content.
-    pub theme: Theme,
+    theme: Theme,
 
-    /// Number of submenu ancestors, as used by ApplyElevationEffect.
-    pub depth: usize,
+    /// The `Translation.Z` ApplyElevationEffect raises the popup to.
+    translation_z: f64,
+
+    /// The popup's corner radii, top-left first and clockwise.
+    corner_radius: [f64; 4],
 }
 
 impl PopupShadow {
+    /// A flyout's, `depth` submenus deep: ElevationHelper's base Z of 32 and 8 more per level.
+    pub(crate) fn for_flyout(theme: Theme, depth: usize) -> PopupShadow {
+        PopupShadow {
+            theme,
+            translation_z: 32.0 + depth as f64 * 8.0,
+            corner_radius: OVERLAY_CORNER_RADIUS,
+        }
+    }
+
+    /// A dialog's: ContentDialog raises its background element to a Z of 128.
+    pub(crate) fn for_dialog(theme: Theme) -> PopupShadow {
+        PopupShadow {
+            theme,
+            translation_z: 128.0,
+            corner_radius: OVERLAY_CORNER_RADIUS,
+        }
+    }
+
+    /// NumberBox's popup: `OnApplyTemplate` raises `PopupContentRoot` to a Z of
+    /// `NumberBoxPopupShadowDepth`.
+    pub(crate) fn for_number_box_popup(theme: Theme) -> PopupShadow {
+        PopupShadow {
+            theme,
+            translation_z: NUMBER_BOX_POPUP_SHADOW_DEPTH,
+            corner_radius: OVERLAY_CORNER_RADIUS,
+        }
+    }
+
+    /// ComboBox's popup: `OnOpen` gives `PopupBorder` ElevationHelper's base Z of 32; an
+    /// editable box's popup squares the corners next to the box.
+    pub(crate) fn for_combo_box_popup(theme: Theme, corner_radius: [f64; 4]) -> PopupShadow {
+        PopupShadow {
+            theme,
+            translation_z: 32.0,
+            corner_radius,
+        }
+    }
+
     /// Source shadow colors and offsets, with blur radii interpreted by BoxShadow.
     fn shadows(&self) -> [BoxShadow; 2] {
-        // ElevationHelper uses Translation.Z = 32 + depth * 8; the recipe halves it.
-        let elevation = (16.0 + self.depth as f64 * 4.0).min(64.0);
+        // The recipe halves the Z translation, up to 64.
+        let elevation = (self.translation_z / 2.0).min(64.0);
         let (ambient_blur, ambient_offset, ambient_opacity, directional_opacity) =
             if elevation <= 16.0 {
                 (
@@ -62,11 +103,23 @@ impl PopupShadow {
 impl CustomPainter for PopupShadow {
     fn paint(&self, _app: &mut App, canvas: &mut Canvas, size: Size) {
         let bounds = Offset::ZERO & size;
-        let radius = OVERLAY_CORNER_RADIUS[0].min(size.shortest_side() / 2.0);
-        let outline = RRect::from_rect_and_radius(bounds, Radius::circular(radius));
+        let radii = self
+            .corner_radius
+            .map(|radius| radius.min(size.shortest_side() / 2.0));
+        let outline = RRect::from_rect_and_corners(
+            bounds,
+            Radius::circular(radii[0]),
+            Radius::circular(radii[1]),
+            Radius::circular(radii[2]),
+            Radius::circular(radii[3]),
+        );
 
         canvas.save();
-        canvas.clip_rrect(bounds, radius as f32, ClipOp::Difference);
+        canvas.clip_rrect_radii(
+            bounds,
+            radii.map(|radius| radius as f32),
+            ClipOp::Difference,
+        );
         for shadow in self.shadows() {
             if shadow.color.a == 0.0 {
                 continue;

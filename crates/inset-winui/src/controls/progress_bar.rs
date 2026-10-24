@@ -472,6 +472,10 @@ impl State for ProgressBarState {
         }
     }
 
+    fn activate(self: Handle<Self>, app: &mut App) {
+        SingleTickerProviderStateMixin::activate(self, app);
+    }
+
     /// Releases the storyboard clock before disposing its ticker provider.
     fn dispose(self: Handle<Self>, app: &mut App) {
         app.get(self).ticker.unwrap().dispose(app);

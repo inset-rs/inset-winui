@@ -4,7 +4,7 @@ mod catalog;
 mod sections;
 pub use catalog::Feature;
 
-use inset_embedder::Color;
+use inset_embedder::{Color, WindowConfig};
 use inset_foundation::{App, Handle, ValueKey};
 use inset_painting::{Axis, EdgeInsetsGeometry, PaintingBinding};
 use inset_rendering::{CrossAxisAlignment, MainAxisSize, StackFit};
@@ -13,9 +13,18 @@ use inset_winui::*;
 use std::rc::Rc;
 
 /// Starts the gallery with the native or web host selected by Inset.
-#[inset::main(title = "WinUI Gallery", size = [1080.0, 780.0])]
+#[inset::main]
 fn main(app: &mut App) {
     run(app);
+}
+
+/// The window a desktop opens for the gallery; a host that gives the app its view opens none.
+fn gallery_window() -> WindowConfig {
+    WindowConfig {
+        title: "WinUI Gallery".to_owned(),
+        size: [1080.0, 780.0],
+        ..WindowConfig::default()
+    }
 }
 
 /// The gallery switches directly between expanded and minimal navigation.
@@ -44,7 +53,7 @@ pub fn run(app: &mut App) {
 /// Starts the same gallery at a chosen feature, useful for focused host tests.
 pub fn run_feature(app: &mut App, feature: Feature) {
     install_fonts(app);
-    run_app(
+    run_app_with(
         app,
         WidgetsApp::new(AccentPalette::default().base)
             .title("WinUI Gallery")
@@ -61,6 +70,7 @@ pub fn run_feature(app: &mut App, feature: Feature) {
                 initial_feature: feature,
             })
             .into_widget(),
+        gallery_window(),
     );
 }
 
@@ -215,9 +225,12 @@ impl GalleryState {
             Feature::MenuBar => sections::menu_bar::page(resources),
             Feature::BreadcrumbBar => sections::breadcrumb_bar::page(resources),
             Feature::Flyout => sections::flyout::flyout(resources),
+            Feature::ContentDialog => sections::content_dialog::build(resources),
             Feature::DropDownButton => sections::flyout::drop_down_button(resources),
             Feature::TextBox => sections::text_input::text_box(resources),
             Feature::PasswordBox => sections::text_input::password_box(resources),
+            Feature::NumberBox => sections::number_box::build(resources),
+            Feature::ComboBox => sections::combo_box::build(resources),
             Feature::ToggleSwitch => sections::toggle_switch::build(self, app, resources),
             Feature::Grid => sections::grid::build(resources),
             Feature::CheckBox => sections::check_box::build(resources),
@@ -226,6 +239,7 @@ impl GalleryState {
             Feature::RepeatButton => sections::button_family::repeat_button(resources),
             Feature::HyperlinkButton => sections::button_family::hyperlink_button(resources),
             Feature::Slider => sections::slider::build(resources),
+            Feature::ColorPicker => sections::color_picker::build(resources),
             Feature::ProgressBar => sections::progress_bar::build(resources),
             Feature::InfoBadge => sections::info_badge::build(resources),
             Feature::ProgressRing => sections::progress_ring::build(resources),
@@ -236,6 +250,7 @@ impl GalleryState {
             Feature::ToolTip => sections::tool_tip::build(resources),
             Feature::TabView => sections::tab_view::build(resources),
             Feature::NavigationView => sections::navigation_view::build(resources),
+            Feature::TreeView => sections::tree_view::build(resources),
             Feature::Typography => sections::typography::build(resources),
             Feature::Icons => sections::icons::build(resources),
         };

@@ -359,6 +359,7 @@ impl InfoBarState {
                     app.get_mut(self).pending_close = None;
                 }
             }),
+            View::maybe_id_of(app, self.context(app)),
         );
     }
 
@@ -418,6 +419,7 @@ impl State for InfoBarState {
                     );
                 }
             }),
+            View::maybe_id_of(app, self.context(app)),
         );
     }
 

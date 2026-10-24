@@ -3,7 +3,6 @@
 
 use inset_embedder::PointerChange;
 use inset_foundation::{App, Handle};
-use inset_scheduler::SchedulerBinding;
 use inset_widgets::*;
 use inset_winui::*;
 use inset_winui_test_support::Fixture;
@@ -71,11 +70,7 @@ impl State for PageState {
 }
 
 fn frame(f: &mut Fixture) {
-    f.at += Duration::from_millis(10);
-    SchedulerBinding::handle_begin_frame(&mut f.cell.borrow_mut(), Some(f.at));
-    f.cell.checkpoint();
-    SchedulerBinding::handle_draw_frame(&mut f.cell.borrow_mut());
-    f.cell.checkpoint();
+    f.frame_after(Duration::from_millis(10));
 }
 
 /// Bounds of opaque accent pixels isolate the indicator from text and neutral item fills.
@@ -283,10 +278,7 @@ fn active_indicator_follows_scroll_and_mode_reparenting() {
         })
         .unwrap();
     scroll.scroll_by(&mut f.cell.borrow_mut(), 20.0, true);
-    SchedulerBinding::handle_begin_frame(&mut f.cell.borrow_mut(), Some(f.at));
-    f.cell.checkpoint();
-    SchedulerBinding::handle_draw_frame(&mut f.cell.borrow_mut());
-    f.cell.checkpoint();
+    f.frame_after(Duration::ZERO);
     let after = indicator_pixels(&f);
     assert_eq!(after.1 + 20, before.1);
     assert_eq!(after.3 + 20, before.3);
