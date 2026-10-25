@@ -538,6 +538,8 @@ impl State for InfoBarState {
                 GridCell::new(
                     Align::new()
                         .alignment(Alignment::CENTER_LEFT.into())
+                        .width_factor(1.0)
+                        .height_factor(1.0)
                         .child(content),
                 )
                 .column(1)

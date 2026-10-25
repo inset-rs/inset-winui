@@ -351,7 +351,7 @@ impl TextControlState {
                                 .border_thickness_ltrb(TEXT_CONTROL_BORDER_THEME_THICKNESS)
                                 .corner_radius(corner)
                                 .child(
-                                    Center::new().child(
+                                    Center::new().width_factor(1.0).height_factor(1.0).child(
                                         FontIcon::symbol(if password {
                                             FluentSymbol::Eye
                                         } else {

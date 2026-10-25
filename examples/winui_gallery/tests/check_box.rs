@@ -3,7 +3,7 @@
 mod common;
 use common::Fixture;
 use common::GalleryFixtureExt;
-use inset_embedder::{Color, PointerChange};
+use inset_embedder::{Color, PointerChange, Size};
 use inset_foundation::{App, Handle};
 use inset_painting::EdgeInsetsGeometry;
 use inset_widgets::*;
@@ -109,4 +109,16 @@ fn check_box_draws_the_check_on() {
     // 40 ms into the 68 ms `NormalOnToNormalOff` segment: `TrimStart` has eaten part of the check.
     tap_and_pump(&mut fixture, "Lone option", 2);
     fixture.capture("check_box_lone_erasing");
+}
+
+/// Like WinUI's style (`HorizontalAlignment` Left, `VerticalAlignment` Center), a box given more
+/// room than it needs keeps its `MinWidth` and `MinHeight`.
+#[test]
+fn a_box_given_spare_room_keeps_its_own_size() {
+    let size = common::size_under_center([300, 300], |_| {
+        CheckBox::new(Some(true), |_, _| {})
+            .content(Text::new("Check"))
+            .into_widget()
+    });
+    assert_eq!(size, Size::new(CHECK_BOX_MIN_WIDTH, CHECK_BOX_HEIGHT));
 }

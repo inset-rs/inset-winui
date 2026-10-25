@@ -2535,21 +2535,25 @@ impl ComboBoxState {
         cells.push(
             GridCell::new(Margin::new(
                 PILL_MARGIN,
-                Align::new().alignment(Alignment::CENTER_LEFT.into()).child(
-                    Opacity::new(if focused { 1.0 } else { 0.0 }).child(
-                        SizedBox::new()
-                            .width(COMBO_BOX_ITEM_PILL_WIDTH)
-                            .height(COMBO_BOX_ITEM_PILL_HEIGHT)
-                            .child(
-                                ControlBorder::new(
-                                    Brush::Solid(r.combo_box_item_pill_fill_brush),
-                                    Brush::Solid(Color::new(0)),
-                                )
-                                .border_thickness(0.0)
-                                .corner_radius_corners(COMBO_BOX_ITEM_PILL_CORNER_RADIUS),
-                            ),
+                Align::new()
+                    .alignment(Alignment::CENTER_LEFT.into())
+                    .width_factor(1.0)
+                    .height_factor(1.0)
+                    .child(
+                        Opacity::new(if focused { 1.0 } else { 0.0 }).child(
+                            SizedBox::new()
+                                .width(COMBO_BOX_ITEM_PILL_WIDTH)
+                                .height(COMBO_BOX_ITEM_PILL_HEIGHT)
+                                .child(
+                                    ControlBorder::new(
+                                        Brush::Solid(r.combo_box_item_pill_fill_brush),
+                                        Brush::Solid(Color::new(0)),
+                                    )
+                                    .border_thickness(0.0)
+                                    .corner_radius_corners(COMBO_BOX_ITEM_PILL_CORNER_RADIUS),
+                                ),
+                        ),
                     ),
-                ),
             ))
             .into_widget(),
         );
@@ -2608,6 +2612,8 @@ impl ComboBoxState {
                 IgnorePointer::new().child(
                     Align::new()
                         .alignment(Alignment::CENTER_RIGHT.into())
+                        .width_factor(1.0)
+                        .height_factor(1.0)
                         .child(Margin::new(
                             GLYPH_MARGIN,
                             SizedBox::new()

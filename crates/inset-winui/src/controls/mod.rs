@@ -52,7 +52,7 @@ pub use toggle_switch::*;
 pub use tool_tip::*;
 
 mod scroll_tab_viewer;
-pub(crate) use scroll_tab_viewer::TabScrollViewer;
+pub(crate) use scroll_tab_viewer::{TabScrollViewer, bottom_border_line};
 
 mod navigation_view_item;
 mod top_navigation_view_data_provider;

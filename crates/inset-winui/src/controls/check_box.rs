@@ -375,6 +375,8 @@ fn check_area(brushes: &CheckBoxBrushes, check: CheckState) -> WidgetRef {
         GridCell::new(glyph).into_widget(),
     ]);
     Center::new()
+        .width_factor(1.0)
+        .height_factor(1.0)
         .child(
             SizedBox::new()
                 .width(CHECK_BOX_SIZE)
@@ -392,7 +394,10 @@ fn content_presenter(widget: &CheckBox, brushes: &CheckBoxBrushes) -> WidgetRef 
         FontWeight::W400,
         brushes.foreground,
     );
-    let presenter = Align::new().alignment(AlignmentGeometry::TOP_LEFT);
+    let presenter = Align::new()
+        .alignment(AlignmentGeometry::TOP_LEFT)
+        .width_factor(1.0)
+        .height_factor(1.0);
     let presenter = match &widget.content {
         Some(content) => presenter.child(DefaultTextStyle::new(text, content.clone())),
         None => presenter,

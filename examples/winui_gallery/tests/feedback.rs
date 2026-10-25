@@ -405,3 +405,39 @@ fn info_bar_status_glyphs_keep_their_natural_line_height() {
     }
     assert!(checked >= 4);
 }
+
+/// Like WinUI's style (`HorizontalAlignment` Left), an expander given more width than its header
+/// needs keeps its own: a narrow header leaves it at the style's `MinWidth`.
+#[test]
+fn an_expander_given_spare_width_keeps_its_own() {
+    let size = common::size_under_center([300, 300], |_| {
+        Expander::new(false, |_, _| {})
+            .header(SizedBox::new().width(10.0).height(10.0))
+            .into_widget()
+    });
+    assert_eq!(
+        size,
+        inset_embedder::Size::new(
+            inset_winui::FLYOUT_THEME_MIN_WIDTH,
+            inset_winui::EXPANDER_MIN_HEIGHT
+        )
+    );
+}
+
+/// An InfoBar's content measures at its own width, so content narrower than the message leaves a
+/// bar given spare width as wide as it is without content.
+#[test]
+fn an_info_bar_given_spare_width_keeps_its_own() {
+    let bar = || {
+        InfoBar::new(true, |_, _| {})
+            .title("Title")
+            .message("Message")
+    };
+    let without_content = common::size_under_center([300, 300], move |_| bar().into_widget());
+    let with_content = common::size_under_center([300, 300], move |_| {
+        bar()
+            .content(SizedBox::new().width(10.0).height(10.0))
+            .into_widget()
+    });
+    assert_eq!(with_content.width(), without_content.width());
+}

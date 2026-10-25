@@ -527,12 +527,20 @@ fn expander_header(
             ColumnDefinition::new(GridLength::AUTO),
         ])
         .children([
-            GridCell::new(Align::new().alignment(Alignment::CENTER_LEFT.into()).child(
-                DefaultTextStyle::new(
-                    control_text_style(CONTROL_CONTENT_FONT_SIZE, FontWeight::NORMAL, foreground),
-                    content,
-                ),
-            ))
+            GridCell::new(
+                Align::new()
+                    .alignment(Alignment::CENTER_LEFT.into())
+                    .width_factor(1.0)
+                    .height_factor(1.0)
+                    .child(DefaultTextStyle::new(
+                        control_text_style(
+                            CONTROL_CONTENT_FONT_SIZE,
+                            FontWeight::NORMAL,
+                            foreground,
+                        ),
+                        content,
+                    )),
+            )
             .into_widget(),
             GridCell::new(Center::new().child(chevron))
                 .column(1)

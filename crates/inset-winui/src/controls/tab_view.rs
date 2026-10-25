@@ -7,8 +7,8 @@ pub use drag::{
     TabViewTabDragStartingEventArgs, TabViewTabStripDropEventArgs,
 };
 
-use super::TabScrollViewer;
 use super::tab_view_item::{TabBottomBorderState, TabViewItemHeader};
+use super::{TabScrollViewer, bottom_border_line};
 use crate::*;
 use inset_animation::Curves;
 use inset_embedder::{FontWeight, TextDirection};
@@ -1121,6 +1121,8 @@ impl TabViewState {
         );
         let trailing = Align::new()
             .alignment(Alignment::CENTER_LEFT.into())
+            .width_factor(1.0)
+            .height_factor(1.0)
             .child(trailing);
         let mut strip_children = vec![
             GridCell::new(leading).into_widget(),
@@ -1155,22 +1157,24 @@ impl TabViewState {
                 .into_widget(),
             );
         }
-        // LeftBottomBorderLine / RightBottomBorderLine remain beneath their column content.
-        for (column, span) in [(0, 1), (2, 2)] {
+        // LeftBottomBorderLine / RightBottomBorderLine remain beneath their column content. While
+        // a tab is dragged, `SingleBottomBorderLine` spans the left one across the strip and
+        // collapses the right one.
+        let lines: &[_] = if app.get(self).drag.item.is_some() {
+            &[("LeftBottomBorderLine", 0, 4)]
+        } else {
+            &[
+                ("LeftBottomBorderLine", 0, 1),
+                ("RightBottomBorderLine", 2, 2),
+            ]
+        };
+        for &(name, column, span) in lines {
             strip_children.insert(
                 0,
-                GridCell::new(
-                    Align::new()
-                        .alignment(Alignment::BOTTOM_CENTER.into())
-                        .child(
-                            SizedBox::new()
-                                .height(1.0)
-                                .child(ColoredBox::new(r.tab_view_border_brush)),
-                        ),
-                )
-                .column(column)
-                .column_span(span)
-                .into_widget(),
+                bottom_border_line(name, r.tab_view_border_brush)
+                    .column(column)
+                    .column_span(span)
+                    .into_widget(),
             );
         }
         let strip = Grid::new()
@@ -1202,7 +1206,7 @@ impl TabViewState {
             })
             .collect();
         let content = Stack::new().fit(StackFit::Passthrough).children(pages);
-        Grid::new()
+        let layout_root = Grid::new()
             .row_definitions([
                 RowDefinition::new(GridLength::AUTO),
                 RowDefinition::new(GridLength::star(1.0)),
@@ -1210,8 +1214,17 @@ impl TabViewState {
             .children([
                 GridCell::new(strip).into_widget(),
                 GridCell::new(content).row(1).into_widget(),
-            ])
-            .into_widget()
+            ]);
+        // Like a page-level container, the TabView fills a bounded width; in an unbounded one it
+        // is as wide as its strip.
+        if constraints.has_bounded_width() {
+            SizedBox::new()
+                .width(constraints.max_width)
+                .child(layout_root)
+                .into_widget()
+        } else {
+            layout_root.into_widget()
+        }
     }
 }
 

@@ -786,3 +786,14 @@ fn the_application_owns_the_selection_and_the_drop_down() {
     assert_eq!(log.take(), ["open true", "opened", "closed"]);
     assert!(!shows(&f, "One"));
 }
+
+/// Like WinUI's style (`VerticalAlignment` Top), a box given more height than it needs keeps the
+/// height it needs, so a row of controls lines it up with the others.
+#[test]
+fn a_box_given_spare_height_keeps_its_own() {
+    let size = common::size_under_center([300, 300], |_| {
+        let items = vec![ComboBoxItem::text("One", "One")];
+        ComboBox::new(items, Some(0), |_, _| {}).into_widget()
+    });
+    assert_eq!(size.height(), COMBO_BOX_MIN_HEIGHT);
+}

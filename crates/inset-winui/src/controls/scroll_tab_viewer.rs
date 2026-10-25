@@ -68,25 +68,11 @@ impl TabScrollViewer {
             button_states(metrics.offset, metrics.scrollable_length);
         let mut children = Vec::new();
         if self.bottom_border_visible {
-            // LeftBottomBorderLine, RightBottomBorderLine.
-            for column in [0, 2] {
+            for (name, column) in [("LeftBottomBorderLine", 0), ("RightBottomBorderLine", 2)] {
                 children.push(
-                    GridCell::new(
-                        Align::new()
-                            .alignment(Alignment::BOTTOM_CENTER.into())
-                            .child(
-                                SizedBox::new()
-                                    .height(1.0)
-                                    .child(ColoredBox::new(resources.tab_view_border_brush)),
-                            ),
-                    )
-                    .column(column)
-                    .key(Rc::new(ValueKey::new(if column == 0 {
-                        "LeftBottomBorderLine"
-                    } else {
-                        "RightBottomBorderLine"
-                    })))
-                    .into_widget(),
+                    bottom_border_line(name, resources.tab_view_border_brush)
+                        .column(column)
+                        .into_widget(),
                 );
             }
         }
@@ -189,6 +175,18 @@ impl StatelessWidget for TabScrollViewer {
         })
         .into_widget()
     }
+}
+
+/// `LeftBottomBorderLine` or `RightBottomBorderLine` of TabView's templates, keyed `name`: a
+/// `Border` with a `color` background, `Height="1"` and `VerticalAlignment="Bottom"`, stretched
+/// across its cell. As a bottom border it paints and hit-tests that one-pixel row while measuring
+/// 0 × 1, as the source element does; an aligned `ColoredBox` would paint nothing.
+pub(crate) fn bottom_border_line(name: &'static str, color: Color) -> GridCell {
+    GridCell::new(
+        ControlBorder::new_optional(None, Some(Brush::Solid(color)))
+            .border_thickness_ltrb([0.0, 0.0, 0.0, 1.0]),
+    )
+    .key(Rc::new(ValueKey::new(name)))
 }
 
 /// TabView::UpdateScrollViewerDecreaseAndIncreaseButtonsViewState's edge tolerance.

@@ -545,3 +545,15 @@ fn an_equal_formatter_built_again_leaves_typed_text_alone() {
     key(&mut f, Key::ENTER, Physical::ENTER);
     assert_eq!(text(&f, &input), "12.00");
 }
+
+/// Like WinUI's template (`PopupIndicator` is `VerticalAlignment` Center), a box with compact spin
+/// buttons given more height than it needs keeps the height it needs.
+#[test]
+fn a_compact_box_given_spare_height_keeps_its_own() {
+    let size = common::size_under_center([300, 300], |_| {
+        NumberBox::new(1.0, |_, _| {})
+            .spin_button_placement_mode(NumberBoxSpinButtonPlacementMode::Compact)
+            .into_widget()
+    });
+    assert_eq!(size.height(), TEXT_CONTROL_THEME_MIN_HEIGHT);
+}

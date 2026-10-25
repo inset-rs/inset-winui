@@ -399,7 +399,7 @@ impl NumberBoxTextBoxStyle {
         Some(
             Margin::new(
                 NUMBER_BOX_POPUP_INDICATOR_MARGIN,
-                Center::new().child(
+                Center::new().width_factor(1.0).height_factor(1.0).child(
                     FontIcon::symbol(FluentSymbol::ChevronUpDown)
                         .font_size(POPUP_INDICATOR_FONT_SIZE)
                         .foreground(foreground),

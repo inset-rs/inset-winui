@@ -1,8 +1,11 @@
 //! TabView collection changes exercise real layout, input, focus and retained pages.
 #![feature(arbitrary_self_types)]
+mod common;
 
-use inset_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind};
-use inset_foundation::{App, Handle, Listener};
+use inset_embedder::{
+    Offset, PointerChange, PointerData, PointerDataPacket, PointerDeviceKind, Rect,
+};
+use inset_foundation::{App, Handle, Listener, ValueKey};
 use inset_gestures::GestureBinding;
 use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey, PhysicalKeyboardKey,
@@ -729,4 +732,93 @@ fn collection_replacement_is_visible_in_the_first_frame() {
         let selected = state.get(owner).selected.unwrap();
         assert_eq!(state.get(owner).items[selected], expected);
     }
+}
+
+/// The bounds of the laid-out elements keyed `name` that have any width.
+fn named_bounds(f: &Fixture, name: &'static str) -> Vec<Rect> {
+    let expected = ValueKey::new(name);
+    let elements = f.elements();
+    let app = f.cell.borrow();
+    elements
+        .into_iter()
+        .filter(|element| {
+            element
+                .widget(&app)
+                .key()
+                .is_some_and(|key| key.as_ref().eq_key(&expected))
+        })
+        .filter_map(|element| {
+            let object = element.find_render_object(&app)?.as_box()?;
+            let size = object.size(&app);
+            (size.width() > 0.0).then(|| object.local_to_global(&app, Offset::ZERO, None) & size)
+        })
+        .collect()
+}
+
+/// The colour of the frame's pixel containing `x`, `y`.
+fn pixel(f: &Fixture, x: f64, y: f64) -> [u8; 4] {
+    let pixels = f.view.pixels.borrow();
+    let index = (y as usize * f.view.size[0] as usize + x as usize) * 4;
+    pixels[index..index + 4].try_into().unwrap()
+}
+
+/// Whether `line` paints the bottom pixel row of its cell at both ends, against the row above.
+fn paints_bottom_row(f: &Fixture, line: Rect) -> bool {
+    let bottom = line.bottom - 1.0;
+    [line.left, line.right - 1.0]
+        .into_iter()
+        .all(|x| pixel(f, x, bottom) != pixel(f, x, bottom - 1.0))
+}
+
+/// Like the source's one-pixel `Border`s, `LeftBottomBorderLine` and `RightBottomBorderLine` of the
+/// strip and of its scroll viewer paint the bottom row of their cells.
+#[test]
+fn the_bottom_border_lines_paint_the_bottom_row_of_their_cells() {
+    let (mut f, _) = fixture(2);
+    settle(&mut f);
+    let lines: Vec<_> = ["LeftBottomBorderLine", "RightBottomBorderLine"]
+        .into_iter()
+        .flat_map(|name| named_bounds(&f, name))
+        .collect();
+    // The strip's two lines and the scroll viewer's left one; its right column is empty without
+    // scroll buttons.
+    assert_eq!(lines.len(), 3, "{lines:?}");
+    for line in lines {
+        assert!(paints_bottom_row(&f, line), "{line:?}");
+    }
+}
+
+/// While a tab is dragged (`SingleBottomBorderLine`), the strip's left line runs under the whole
+/// strip and no other line is shown.
+#[test]
+fn a_dragged_tab_leaves_one_bottom_border_line_across_the_strip() {
+    let (mut f, _) = fixture(2);
+    settle(&mut f);
+    let start = f.find("Tab 0");
+    f.send_mouse(PointerChange::Down, start, 1);
+    move_tab_pointer(&mut f, start, start + Offset::new(60.0, 0.0));
+    settle(&mut f);
+    let lines = named_bounds(&f, "LeftBottomBorderLine");
+    assert!(named_bounds(&f, "RightBottomBorderLine").is_empty());
+    assert_eq!(lines.len(), 1, "{lines:?}");
+    assert_eq!(
+        (lines[0].left, lines[0].right),
+        (0.0, f64::from(f.view.size[0]))
+    );
+    assert!(paints_bottom_row(&f, lines[0]));
+    f.send_mouse(PointerChange::Up, start, 0);
+}
+
+/// Like a page-level container, a TabView fills the width its parent bounds.
+#[test]
+fn a_tab_view_fills_the_width_it_is_given() {
+    let size = common::size_under_center([400, 300], |_| {
+        TabView::new(
+            vec![TabViewItem::text("one", "One", Text::new("Page"))],
+            Some(0),
+            |_, _| {},
+        )
+        .into_widget()
+    });
+    assert_eq!(size.width(), 400.0);
 }

@@ -3,8 +3,9 @@
 mod common;
 use common::Fixture;
 use common::GalleryFixtureExt;
-use inset_embedder::{Offset, PointerChange, Rect};
-use inset_rendering::RenderParagraph;
+use inset_embedder::{Offset, PointerChange, Rect, Size};
+use inset_rendering::{MainAxisSize, RenderParagraph};
+use inset_widgets::*;
 use inset_winui::*;
 use std::time::Duration;
 
@@ -130,4 +131,61 @@ fn mouse_drag_updates_the_thumb_without_acquiring_focus() {
         inset_widgets::primary_focus(&mut fixture.cell.borrow_mut()),
         focus,
     );
+}
+
+/// Like Flutter's `Slider`, a slider fills the width its parent bounds, with or without tick marks.
+#[test]
+fn a_slider_fills_the_width_it_is_given() {
+    for ticks in [
+        TickPlacement::None,
+        TickPlacement::Outside,
+        TickPlacement::Inline,
+    ] {
+        let size = common::size_under_center([300, 300], move |_| {
+            Slider::new(10.0, |_, _| {})
+                .tick_frequency(10.0)
+                .tick_placement(ticks)
+                .into_widget()
+        });
+        assert_eq!(
+            size,
+            Size::new(300.0, SLIDER_HORIZONTAL_HEIGHT),
+            "{ticks:?}"
+        );
+    }
+}
+
+/// A vertical slider fills the height its parent bounds, with or without tick marks.
+#[test]
+fn a_vertical_slider_fills_the_height_it_is_given() {
+    for ticks in [
+        TickPlacement::None,
+        TickPlacement::Outside,
+        TickPlacement::Inline,
+    ] {
+        let size = common::size_under_center([300, 300], move |_| {
+            Slider::new(10.0, |_, _| {})
+                .orientation(inset_winui::Orientation::Vertical)
+                .tick_frequency(10.0)
+                .tick_placement(ticks)
+                .into_widget()
+        });
+        assert_eq!(size, Size::new(SLIDER_VERTICAL_WIDTH, 300.0), "{ticks:?}");
+    }
+}
+
+/// Where its width is unbounded, as in a `Row`, a slider with tick marks is as wide as its thumb,
+/// as XAML measures it.
+#[test]
+fn a_slider_in_a_row_is_as_wide_as_its_thumb() {
+    let size = common::size_under_center([300, 300], |_| {
+        Row::new()
+            .main_axis_size(MainAxisSize::Min)
+            .children([Slider::new(10.0, |_, _| {})
+                .tick_frequency(10.0)
+                .tick_placement(TickPlacement::Outside)
+                .into_widget()])
+            .into_widget()
+    });
+    assert_eq!(size.width(), SLIDER_HORIZONTAL_THUMB_WIDTH);
 }

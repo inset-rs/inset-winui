@@ -727,3 +727,12 @@ fn the_picker_is_as_tall_as_what_it_shows() {
     f.tap("Less");
     assert_eq!(picker(&f).height(), collapsed);
 }
+
+/// Like `Slider`, a `ColorPickerSlider` fills the width its parent bounds.
+#[test]
+fn a_color_picker_slider_fills_the_width_it_is_given() {
+    let size = common::size_under_center([300, 300], |_| {
+        ColorPickerSlider::new(10.0, |_, _| {}).into_widget()
+    });
+    assert_eq!(size.width(), 300.0);
+}

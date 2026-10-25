@@ -26,8 +26,8 @@ use crate::{
     SLIDER_HORIZONTAL_THUMB_WIDTH, SLIDER_POST_CONTENT_MARGIN, SLIDER_PRE_CONTENT_MARGIN,
     SLIDER_THUMB_CORNER_RADIUS, Slider, SliderTemplate, SliderTemplateParts, SliderTemplateStates,
     ThemeResources, ToolTip, ToolTipService, ValueChangedHandler, color_display_name,
-    color_from_rgba, control_text_style, decrease_definitions, hsv_to_rgb, increment_alpha_channel,
-    increment_color_channel,
+    color_from_rgba, control_text_style, decrease_definitions, fill_bounded, hsv_to_rgb,
+    increment_alpha_channel, increment_color_channel,
 };
 use inset_embedder::{Canvas, Color, Rect, Size};
 use inset_foundation::{App, Handle};
@@ -468,7 +468,12 @@ impl ColorPickerSliderState {
         if states.tooltip_open || state.focused {
             tool_tip = tool_tip.is_open(true);
         }
-        // `HorizontalTrackRect` and `HorizontalDecreaseRect` are transparent at opacity 0.
+        // `HorizontalTrackRect` and `HorizontalDecreaseRect` are transparent at opacity 0; the
+        // track only stretches the slider to its bounded width, as `Slider`'s does.
+        let track = GridCell::new(fill_bounded(Orientation::Horizontal, SizedBox::shrink()))
+            .row(1)
+            .column_span(3)
+            .into_widget();
         let thumb = GridCell::new(
             Center::new()
                 .width_factor(1.0)
@@ -492,7 +497,7 @@ impl ColorPickerSliderState {
                 RowDefinition::new(GridLength::AUTO),
                 RowDefinition::new(GridLength::pixel(SLIDER_POST_CONTENT_MARGIN)),
             ])
-            .children([thumb]);
+            .children([track, thumb]);
         ConstrainedBox::new(BoxConstraints::new().min_height(TEMPLATE_MIN_SIZE))
             .child(grid)
             .into_widget()
@@ -517,6 +522,11 @@ fn vertical_template(
     if states.tooltip_open {
         tool_tip = tool_tip.is_open(true);
     }
+    // `VerticalTrackRect`, transparent: it only stretches the slider to its bounded height.
+    let track = GridCell::new(fill_bounded(Orientation::Vertical, SizedBox::shrink()))
+        .column(1)
+        .row_span(3)
+        .into_widget();
     let thumb = GridCell::new(
         Center::new()
             .width_factor(1.0)
@@ -541,7 +551,7 @@ fn vertical_template(
             ColumnDefinition::new(GridLength::AUTO),
             ColumnDefinition::new(GridLength::pixel(SLIDER_POST_CONTENT_MARGIN)),
         ])
-        .children([thumb]);
+        .children([track, thumb]);
     ConstrainedBox::new(BoxConstraints::new().min_width(TEMPLATE_MIN_SIZE))
         .child(grid)
         .into_widget()

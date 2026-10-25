@@ -998,6 +998,21 @@ pub(crate) fn decrease_definitions(
     }
 }
 
+/// `child` stretched along `orientation` to a bounded length, adding nothing to an unbounded one.
+/// The track and tick bars use it so that a slider fills the width or height its parent bounds, as
+/// Flutter's `Slider` does, and in an unbounded length is as long as its thumb, as XAML measures it.
+pub(crate) fn fill_bounded<K>(orientation: Orientation, child: impl IntoWidget<K>) -> WidgetRef {
+    match orientation {
+        Orientation::Horizontal => LimitedBox::new()
+            .max_width(0.0)
+            .child(SizedBox::new().width(f64::INFINITY).child(child)),
+        Orientation::Vertical => LimitedBox::new()
+            .max_height(0.0)
+            .child(SizedBox::new().height(f64::INFINITY).child(child)),
+    }
+    .into_widget()
+}
+
 /// A track `Rectangle`: `RadiusX` / `RadiusY` from the control's `CornerRadius` (`SliderTrackCornerRadius`).
 fn track_rectangle(fill: Color) -> ControlBorder {
     ControlBorder::new(
@@ -1031,11 +1046,12 @@ fn horizontal_template(
     let placement = widget.tick_placement;
     let mut children = vec![
         // `HorizontalTrackRect`.
-        GridCell::new(
+        GridCell::new(fill_bounded(
+            Orientation::Horizontal,
             SizedBox::new()
                 .height(SLIDER_TRACK_THEME_HEIGHT)
                 .child(track_rectangle(brushes.track)),
-        )
+        ))
         .row(1)
         .column_span(3)
         .into_widget(),
@@ -1062,12 +1078,12 @@ fn horizontal_template(
                 .child(
                     Align::new()
                         .alignment(AlignmentGeometry::BOTTOM_CENTER)
-                        .child(
+                        .child(fill_bounded(
+                            Orientation::Horizontal,
                             SizedBox::new()
-                                .width(f64::INFINITY)
                                 .height(SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT)
                                 .child(tick_bar(widget, states, brushes.tick_bar)),
-                        ),
+                        )),
                 ),
             )
             .row(0)
@@ -1078,16 +1094,16 @@ fn horizontal_template(
     if placement.shows_inline() {
         // `HorizontalInlineTickBar`: over the track, `SliderInlineTickBarFill`.
         children.push(
-            GridCell::new(
+            GridCell::new(fill_bounded(
+                Orientation::Horizontal,
                 SizedBox::new()
-                    .width(f64::INFINITY)
                     .height(SLIDER_TRACK_THEME_HEIGHT)
                     .child(tick_bar(
                         widget,
                         states,
                         resources.slider().slider_inline_tick_bar_fill,
                     )),
-            )
+            ))
             .row(1)
             .column_span(3)
             .into_widget(),
@@ -1104,12 +1120,14 @@ fn horizontal_template(
                     0.0,
                 ))
                 .child(
-                    Align::new().alignment(AlignmentGeometry::TOP_CENTER).child(
-                        SizedBox::new()
-                            .width(f64::INFINITY)
-                            .height(SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT)
-                            .child(tick_bar(widget, states, brushes.tick_bar)),
-                    ),
+                    Align::new()
+                        .alignment(AlignmentGeometry::TOP_CENTER)
+                        .child(fill_bounded(
+                            Orientation::Horizontal,
+                            SizedBox::new()
+                                .height(SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT)
+                                .child(tick_bar(widget, states, brushes.tick_bar)),
+                        )),
                 ),
             )
             .row(2)
@@ -1169,11 +1187,12 @@ fn vertical_template(
     let placement = widget.tick_placement;
     let mut children = vec![
         // `VerticalTrackRect`.
-        GridCell::new(
+        GridCell::new(fill_bounded(
+            Orientation::Vertical,
             SizedBox::new()
                 .width(SLIDER_TRACK_THEME_HEIGHT)
                 .child(track_rectangle(brushes.track)),
-        )
+        ))
         .column(1)
         .row_span(3)
         .into_widget(),
@@ -1200,12 +1219,12 @@ fn vertical_template(
                 .child(
                     Align::new()
                         .alignment(AlignmentGeometry::CENTER_RIGHT)
-                        .child(
+                        .child(fill_bounded(
+                            Orientation::Vertical,
                             SizedBox::new()
                                 .width(SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT)
-                                .height(f64::INFINITY)
                                 .child(tick_bar(widget, states, brushes.tick_bar)),
-                        ),
+                        )),
                 ),
             )
             .column(0)
@@ -1216,16 +1235,16 @@ fn vertical_template(
     if placement.shows_inline() {
         // `VerticalInlineTickBar`.
         children.push(
-            GridCell::new(
+            GridCell::new(fill_bounded(
+                Orientation::Vertical,
                 SizedBox::new()
                     .width(SLIDER_TRACK_THEME_HEIGHT)
-                    .height(f64::INFINITY)
                     .child(tick_bar(
                         widget,
                         states,
                         resources.slider().slider_inline_tick_bar_fill,
                     )),
-            )
+            ))
             .column(1)
             .row_span(3)
             .into_widget(),
@@ -1244,12 +1263,12 @@ fn vertical_template(
                 .child(
                     Align::new()
                         .alignment(AlignmentGeometry::CENTER_LEFT)
-                        .child(
+                        .child(fill_bounded(
+                            Orientation::Vertical,
                             SizedBox::new()
                                 .width(SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT)
-                                .height(f64::INFINITY)
                                 .child(tick_bar(widget, states, brushes.tick_bar)),
-                        ),
+                        )),
                 ),
             )
             .column(2)

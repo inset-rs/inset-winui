@@ -338,3 +338,14 @@ fn native_keyboard_selection_deletion_and_password_copy_policy() {
         assert_eq!(c.text_value(&f.cell.borrow()), "sample");
     }
 }
+
+/// Like WinUI's `DeleteButtonStyle` (`GlyphElement` is `VerticalAlignment` Center), a focused box
+/// showing its delete button, given more height than it needs, keeps the height it needs.
+#[test]
+fn a_box_showing_its_delete_button_given_spare_height_keeps_its_own() {
+    let size = common::size_under_center([300, 300], |app| {
+        let controller = TextEditingController::new(app).text(app, "Text");
+        TextBox::new(controller).autofocus(true).into_widget()
+    });
+    assert_eq!(size.height(), TEXT_CONTROL_THEME_MIN_HEIGHT);
+}

@@ -214,7 +214,10 @@ fn template(
         brushes.foreground,
     );
     let [left, top, right, bottom] = RADIO_BUTTON_PADDING;
-    let mut presenter = Align::new().alignment(AlignmentGeometry::TOP_LEFT);
+    let mut presenter = Align::new()
+        .alignment(AlignmentGeometry::TOP_LEFT)
+        .width_factor(1.0)
+        .height_factor(1.0);
     if let Some(content) = &widget.content {
         presenter = presenter.child(
             Padding::new(EdgeInsetsGeometry::from_ltrb(left, top, right, bottom))
@@ -321,6 +324,8 @@ fn glyph_area(
         .into_widget();
     Align::new()
         .alignment(AlignmentGeometry::TOP_CENTER)
+        .width_factor(1.0)
+        .height_factor(1.0)
         .child(area)
         .into_widget()
 }

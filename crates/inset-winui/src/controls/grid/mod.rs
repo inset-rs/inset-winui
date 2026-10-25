@@ -1,6 +1,7 @@
 //! XAML `Grid` (`dxaml/xcp/core/core/elements/grid.cpp`): rows and columns of `Auto`, pixel and star lengths, spacing, spans, and the panel background and border.
 //!
 //! Children fill their cell, as XAML's default `Stretch` alignment does; a child a template aligns or sizes inside its cell is wrapped in `Align` or `SizedBox`.
+//! An `Align` or `Center` wrapper takes `width_factor(1.0)` and `height_factor(1.0)`, so it measures at its child's size as an aligned XAML element does; without them it measures at all its cell offers, and a star row or column grows to the space the Grid is given.
 
 mod definition;
 mod layout;

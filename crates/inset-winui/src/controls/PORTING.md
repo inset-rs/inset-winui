@@ -14,6 +14,10 @@ Ported against: aa3207e6
   Reason: framework — WinUI changes values on persistent control objects, while Inset follows Flutter by rebuilding widgets from application state.
   Affect: A value-change callback that the caller ignores leaves the corresponding control unchanged.
 
+- Change: A control takes the size its parent forces and, where the parent leaves room, its own size, instead of applying its style's `HorizontalAlignment` and `VerticalAlignment`; `TextBox`, `NumberBox`, `Slider`, `ColorPickerSlider`, `ProgressBar` and `TabView` take the whole of a bounded width (a vertical slider, of a bounded height), and `NavigationView` and `SplitView` the whole bounded space, as Flutter's text fields, sliders and scaffolds do.
+  Reason: framework — a XAML element aligns itself within the slot its panel gives it, while a Flutter parent decides a child's size through tight or loose constraints.
+  Affect: Under `Center` or in a start-aligned `Column`, a `CheckBox`, `Expander` or `InfoBar` is as wide as its content, and a stretched `Column` or a `Grid` cell makes it fill the width as WinUI's default `Stretch` does.
+
 ## button.rs → `ControlTemplate`
 
 - Change: `Button` accepts a drawing function to customize its appearance while retaining its input behavior.
@@ -91,12 +95,6 @@ Ported against: aa3207e6
 - Change: `RadioButton` keeps its selected dot’s outline when the pointer moves over it.
   Reason: framework — the port chooses one appearance for the current state rather than letting several WinUI animations overwrite the same color in sequence.
   Affect: Hovering a selected radio button does not briefly change its one-pixel dot outline.
-
-## check_box.rs → `CheckBox`
-
-- Change: `CheckBox` takes its parent’s allocated size without applying the style’s alignment.
-  Reason: framework — WinUI combines alignment and sizing on each element, while Inset uses separate alignment wrappers and requires each render box to obey its parent’s size constraints.
-  Affect: In a stretched column, `CheckBox`’s hit area and focus ring span the column.
 
 ## repeat_button.rs → `RepeatButton`
 

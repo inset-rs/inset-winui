@@ -77,12 +77,13 @@ impl State for InfoBarDemoState {
         ]
         .into_iter()
         .map(|(severity, title, message)| {
-            InfoBar::new(true, |_, _| {})
-                .severity(severity)
-                .title(title)
-                .message(message)
-                .is_closable(false)
-                .into_widget()
+            stretched(
+                InfoBar::new(true, |_, _| {})
+                    .severity(severity)
+                    .title(title)
+                    .message(message)
+                    .is_closable(false),
+            )
         })
         .collect();
 
@@ -126,26 +127,31 @@ impl State for InfoBarDemoState {
                                 ],
                                 12.0,
                             ),
-                            InfoBar::new(open, move |app, open| {
-                                self.set_state(app, |state| state.open = open);
-                            })
-                            .title("Download ready")
-                            .message("The file is ready to open.")
-                            .closing(move |app, args| {
-                                args.cancel = app.get(self).cancel;
-                                self.set_state(app, |state| {
-                                    state.event = format!("Closing: {:?}", args.reason)
-                                });
-                            })
-                            .closed(move |app, args| {
-                                self.set_state(app, |state| {
-                                    state.event = format!("Closed: {:?}", args.reason)
-                                });
-                            })
-                            .opened(Listener::new(move |app| {
-                                self.set_state(app, |state| state.event = "Opened".to_owned());
-                            }))
-                            .into_widget(),
+                            stretched(
+                                InfoBar::new(open, move |app, open| {
+                                    self.set_state(app, |state| state.open = open);
+                                })
+                                .title("Download ready")
+                                .message("The file is ready to open.")
+                                .closing(move |app, args| {
+                                    args.cancel = app.get(self).cancel;
+                                    self.set_state(app, |state| {
+                                        state.event = format!("Closing: {:?}", args.reason)
+                                    });
+                                })
+                                .closed(move |app, args| {
+                                    self.set_state(app, |state| {
+                                        state.event = format!("Closed: {:?}", args.reason)
+                                    });
+                                })
+                                .opened(Listener::new(
+                                    move |app| {
+                                        self.set_state(app, |state| {
+                                            state.event = "Opened".to_owned()
+                                        });
+                                    },
+                                )),
+                            ),
                             Text::new(event).into_widget(),
                         ],
                         12.0,
@@ -155,24 +161,25 @@ impl State for InfoBarDemoState {
                     "Action and extra content",
                     "The title, message and action stack when space is limited. Extra content supplies its own spacing.",
                     &resources,
-                    InfoBar::new(true, |_, _| {})
-                        .title("Sync paused")
-                        .message("Review your connection before continuing.")
-                        .severity(InfoBarSeverity::Warning)
-                        .is_closable(false)
-                        .action_button(HyperlinkButton::text(
-                            "Resume sync",
-                            Listener::new(move |app| {
-                                self.set_state(app, |state| {
-                                    state.event = "Resume requested".to_owned()
-                                });
-                            }),
-                        ))
-                        .content(
-                            Padding::new(EdgeInsetsGeometry::from_ltrb(0.0, 0.0, 16.0, 16.0))
-                                .child(Text::new("Your local changes are preserved.")),
-                        )
-                        .into_widget(),
+                    stretched(
+                        InfoBar::new(true, |_, _| {})
+                            .title("Sync paused")
+                            .message("Review your connection before continuing.")
+                            .severity(InfoBarSeverity::Warning)
+                            .is_closable(false)
+                            .action_button(HyperlinkButton::text(
+                                "Resume sync",
+                                Listener::new(move |app| {
+                                    self.set_state(app, |state| {
+                                        state.event = "Resume requested".to_owned()
+                                    });
+                                }),
+                            ))
+                            .content(
+                                Padding::new(EdgeInsetsGeometry::from_ltrb(0.0, 0.0, 16.0, 16.0))
+                                    .child(Text::new("Your local changes are preserved.")),
+                            ),
+                    ),
                 ),
                 example(
                     "Custom icon",
@@ -180,16 +187,18 @@ impl State for InfoBarDemoState {
                     &resources,
                     column(
                         vec![
-                            InfoBar::new(true, |_, _| {})
-                                .title("Scheduled update")
-                                .icon_source(FontIcon::symbol(FluentSymbol::Timer))
-                                .is_closable(false)
-                                .into_widget(),
-                            InfoBar::new(true, |_, _| {})
-                                .message("A quiet notification without an icon.")
-                                .is_icon_visible(false)
-                                .is_closable(false)
-                                .into_widget(),
+                            stretched(
+                                InfoBar::new(true, |_, _| {})
+                                    .title("Scheduled update")
+                                    .icon_source(FontIcon::symbol(FluentSymbol::Timer))
+                                    .is_closable(false),
+                            ),
+                            stretched(
+                                InfoBar::new(true, |_, _| {})
+                                    .message("A quiet notification without an icon.")
+                                    .is_icon_visible(false)
+                                    .is_closable(false),
+                            ),
                         ],
                         12.0,
                     ),
@@ -198,4 +207,13 @@ impl State for InfoBarDemoState {
             16.0,
         )
     }
+}
+
+/// `bar` across its example's width, where WinUI's default `HorizontalAlignment` of Stretch
+/// places it.
+fn stretched(bar: InfoBar) -> WidgetRef {
+    SizedBox::new()
+        .width(f64::INFINITY)
+        .child(bar)
+        .into_widget()
 }
