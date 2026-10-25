@@ -99,3 +99,41 @@ fn repeat_button_repeats_under_a_mouse() {
     fixture.pump();
     fixture.find("RepeatButton: 8 clicks");
 }
+
+/// The width of a button showing a 16 px square with `padding`, or the style's own.
+fn button_width(padding: Option<[f64; 4]>) -> f64 {
+    use common::mount;
+    use inset_foundation::{App, Listener};
+    use inset_widgets::*;
+    use inset_winui::*;
+    use std::rc::Rc;
+
+    let key = Rc::new(GlobalKey::new());
+    let button_key = key.clone();
+    let fixture = Fixture::with_root(
+        [200, 200],
+        mount(move |app: &mut App| {
+            winui_gallery::install_fonts(app);
+            let square = SizedBox::new().width(16.0).height(16.0);
+            let mut button = Button::new(square, Listener::new(|_| {})).key(button_key);
+            if let Some(padding) = padding {
+                button = button.padding(padding);
+            }
+            WidgetsApp::new(AccentPalette::default().base)
+                .debug_show_checked_mode_banner(false)
+                .builder(move |_, _, _| Center::new().child(button.clone()).into_widget())
+                .into_widget()
+        }),
+    );
+    let mut app = fixture.cell.borrow_mut();
+    let context = key.current_context(&mut app).unwrap();
+    let object = context.find_render_object(&app).unwrap().as_box().unwrap();
+    object.size(&app).width()
+}
+
+#[test]
+fn a_buttons_padding_replaces_the_styles() {
+    let wide = button_width(None);
+    let narrow = button_width(Some([4.0; 4]));
+    assert_eq!(wide - narrow, (11.0 + 11.0) - (4.0 + 4.0));
+}

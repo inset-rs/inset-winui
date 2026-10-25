@@ -463,6 +463,30 @@ fn the_rows_are_the_open_nodes_and_rows_are_32_pixels_apart() {
     assert_eq!(row(&f, "Root.0").dy() - row(&f, "Root").dy(), 32.0);
 }
 
+/// The colour drawn at `point`.
+fn pixel(f: &Fixture, point: Offset) -> [u8; 4] {
+    let pixels = f.view.pixels.borrow();
+    let index = (point.dy() as usize * f.view.size[0] as usize + point.dx() as usize) * 4;
+    [
+        pixels[index],
+        pixels[index + 1],
+        pixels[index + 2],
+        pixels[index + 3],
+    ]
+}
+
+#[test]
+fn single_mode_draws_every_node_the_application_selects() {
+    let (mut f, p) = single();
+    p.set(&mut f, |state| {
+        state.selected = vec!["Root.0".to_owned(), "Root.2".to_owned()];
+    });
+    let background = |f: &Fixture, text: &str| pixel(f, Offset::new(300.0, row(f, text).dy()));
+    let (first, second) = (background(&f, "Root.0"), background(&f, "Root.2"));
+    assert_eq!(first, second, "both drawn selected");
+    assert_ne!(first, background(&f, "Root.1"), "unlike a row not selected");
+}
+
 #[test]
 fn the_chevron_toggles_on_press_without_invoking_or_selecting() {
     let (mut f, p) = single();

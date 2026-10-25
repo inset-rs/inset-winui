@@ -126,6 +126,9 @@ pub struct Button {
     pub click: Listener,
     /// The standard source style used when no template override is supplied.
     pub style: ButtonStyle,
+    /// `Padding` between the bezel and the content, in left, top, right, bottom order; the style's
+    /// `ButtonPadding` by default.
+    pub padding: [f64; 4],
     /// Whether pointer and keyboard input can activate this button.
     pub is_enabled: bool,
     /// Whether sequential keyboard navigation stops here.
@@ -145,6 +148,7 @@ impl Button {
             content: content.into_widget(),
             click,
             style: ButtonStyle::Default,
+            padding: BUTTON_PADDING,
             is_enabled: true,
             is_tab_stop: true,
             focus_node: None,
@@ -161,6 +165,12 @@ impl Button {
     /// Selects one of the standard source styles.
     pub fn style(mut self, style: ButtonStyle) -> Button {
         self.style = style;
+        self
+    }
+
+    /// XAML `Padding`.
+    pub fn padding(mut self, padding: [f64; 4]) -> Button {
+        self.padding = padding;
         self
     }
 
@@ -213,13 +223,13 @@ impl StatelessWidget for Button {
     }
 
     fn build(&self, _app: &mut App, _context: BuildContext) -> WidgetRef {
-        let (content, style) = (self.content.clone(), self.style);
+        let (content, style, padding) = (self.content.clone(), self.style, self.padding);
         let custom_template = self.template.clone();
         let mut states = CommonStates::new(self.click.clone(), move |app, context, states| {
             if let Some(builder) = &custom_template {
                 builder(app, context, states, content.clone())
             } else {
-                template(app, context, style, content.clone(), states)
+                template(app, context, style, padding, content.clone(), states)
             }
         })
         .is_enabled(self.is_enabled)
@@ -236,6 +246,7 @@ fn template(
     app: &mut App,
     context: BuildContext,
     style: ButtonStyle,
+    padding: [f64; 4],
     content: WidgetRef,
     states: ControlStates,
 ) -> WidgetRef {
@@ -260,7 +271,7 @@ fn template(
                 .border_thickness(BUTTON_BORDER_THICKNESS)
                 .corner_radius(CONTROL_CORNER_RADIUS[0])
                 .background_sizing(style.background_sizing())
-                .padding(BUTTON_PADDING)
+                .padding(padding)
                 .child(label.clone())
                 .into_widget()
         },

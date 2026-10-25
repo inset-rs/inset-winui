@@ -209,9 +209,10 @@ pub struct TreeView {
     /// `RootNodes`, with their descendants.
     pub root_nodes: Vec<TreeViewNode>,
 
-    /// `SelectedNodes`, by id: the nodes drawn selected. In Single mode only the first counts. In
-    /// Multiple mode a node not among them is drawn partly selected when one of its descendants
-    /// is among them.
+    /// `SelectedNodes`, by id: the nodes drawn selected. In Single mode the first is the list's
+    /// selection, which clicks and the arrow keys replace, and every one is drawn selected, so an
+    /// application can keep several selected. In Multiple mode a node not among them is drawn
+    /// partly selected when one of its descendants is among them.
     pub selected_nodes: Vec<String>,
 
     /// `SelectionChanged`: asks the application for another selection.
@@ -1484,7 +1485,8 @@ impl TreeViewState {
             is_expanded: node.is_expanded,
             is_enabled: widget.is_enabled,
             multi_select,
-            is_selected: self.list_selection(app).as_deref() == Some(id),
+            is_selected: self.mode(app) == TreeViewSelectionMode::Single
+                && self.is_node_selected(app, id),
             drag: self.item_drag(app, id, focus.is_none()),
             focus,
         }

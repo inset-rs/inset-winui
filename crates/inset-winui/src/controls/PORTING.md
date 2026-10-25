@@ -558,6 +558,10 @@ Ported against: aa3207e6
   Reason: framework — WinUI's `SelectedNodes` is a collection on the control whose `Append` also selects the node's descendants and completes its ancestors, while an Inset widget only reads what the application passes.
   Affect: In Multiple mode, an application selecting a node itself also passes its descendants, and a parent whose children are all passed is drawn partly selected until it is passed too; the check boxes and Space apply WinUI's rules and report the full selection in `selected_nodes`.
 
+- Change: In Single mode, `TreeView` draws every node of `selected_nodes` selected, not only the list's selection, which is the first.
+  Reason: framework — WinUI's Single-mode list holds one selected item of its own, while an Inset widget draws the selection its application passes, which an application such as a layers panel extends with clicks it reads itself.
+  Affect: An application can show several nodes selected in Single mode, deciding them from `item_invoked` and the keys held; clicks, the arrow keys and Ctrl+click still ask for one node, or none, through `selection_changed`.
+
 - Change: `TreeView` has no `Expand`, `Collapse`, `SelectAll`, `SelectedItem`, `NodeFromContainer` or `ContainerFromNode`, and no content mode with `ItemsSource`, `ItemTemplate`, `ItemTemplateSelector`, `ItemContainerStyle` or `ItemContainerStyleSelector`.
   Reason: language — the methods act on the control's own nodes and containers, and the content mode turns application objects into rows through XAML templates, while in Rust the application passes `TreeViewNode`s with the widget each row shows.
   Affect: An application sets `is_expanded` and `selected_nodes` itself, chooses each node's `content` widget where it would choose a template, and cannot set a property, such as `AllowDrop`, on a single row.
