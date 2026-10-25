@@ -1261,7 +1261,7 @@ dependencies = [
 
 [[package]]
 name = "inset-winui"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
  "inset-animation",
  "inset-embedder",
