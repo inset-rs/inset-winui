@@ -1,5 +1,6 @@
-//! XAML's `CommonStates` visual state group (`Normal`, `PointerOver`, `Pressed`, `Disabled`) as the framework machinery that computes it from the pointer, plus native focus highlighting for the system focus visual.
+//! XAML's `CommonStates` visual state group (`Normal`, `PointerOver`, `Pressed`, `Disabled`) as the framework machinery that computes it from the pointer, plus whether the system focus visual shows.
 
+use crate::{FocusState, InputDevice};
 use inset_foundation::{App, Handle, Listener};
 use inset_rendering::HitTestBehavior;
 use inset_scheduler::{FrameCallback, SchedulerBinding};
@@ -17,7 +18,8 @@ pub enum CommonState {
     Disabled,
 }
 
-/// What the state tracker knows: the common state and whether the native focus highlight shows.
+/// What the state tracker knows: the common state and whether the system focus visual shows,
+/// which it does while the control has the focus and the focus arrived by keyboard.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct ControlStates {
     pub common: CommonState,
@@ -233,7 +235,8 @@ impl CommonStatesData {
         }
     }
 
-    fn states(self: Handle<Self>, app: &App) -> ControlStates {
+    fn states(self: Handle<Self>, app: &mut App) -> ControlStates {
+        let shows_focus_visual = FocusState::current(app).shows_focus_visual();
         let widget = self.widget(app);
         let data = app.get(self);
         if !widget.is_enabled {
@@ -250,7 +253,7 @@ impl CommonStatesData {
             } else {
                 CommonState::Normal
             },
-            focused: data.focused,
+            focused: data.focused && shows_focus_visual,
         }
     }
 }
@@ -260,6 +263,7 @@ impl State for CommonStatesData {
     inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
+        InputDevice::initialize(app);
         let external = self.widget(app).focus_node;
         let node = external.unwrap_or_else(|| FocusNode::new(app).as_node());
         app.get_mut(self).owns_focus_node = external.is_none();
@@ -375,11 +379,9 @@ impl State for CommonStatesData {
                 if !focused {
                     self.clear_state_flags(app);
                 }
+                self.update_states(app, |state| state.focused = focused);
             })
             .actions(app.get(self).actions.clone())
-            .on_show_focus_highlight(move |app, value| {
-                self.update_states(app, |state| state.focused = value)
-            })
             .on_show_hover_highlight(move |app, value| {
                 self.update_states(app, |state| state.hovered = value)
             })

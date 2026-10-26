@@ -576,6 +576,7 @@ impl State for SplitButtonState {
     inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
+        crate::InputDevice::initialize(app);
         self.attach_focus(app);
     }
 
@@ -630,7 +631,8 @@ impl State for SplitButtonState {
         let content = FocusableActionDetector::new(content)
             .focus_node(app.get(self).focus.unwrap())
             .enabled(widget.is_enabled)
-            .on_show_focus_highlight(move |app, value| {
+            .on_focus_change(move |app, focused| {
+                let value = focused && crate::FocusState::current(app).shows_focus_visual();
                 self.set_state(app, |state| state.focused = value)
             });
         let content = content.into_widget();

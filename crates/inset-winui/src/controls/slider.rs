@@ -687,6 +687,7 @@ impl State for SliderState {
     inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
+        crate::InputDevice::initialize(app);
         let node = FocusNode::new(app).as_node();
         node.set_on_key_event(
             app,
@@ -765,19 +766,18 @@ impl State for SliderState {
         };
         let mut detector = FocusableActionDetector::new(body)
             .enabled(widget.is_enabled)
-            .on_show_focus_highlight(move |app, value| {
+            .on_focus_change(move |app, focused| {
+                let value = focused && crate::FocusState::current(app).shows_focus_visual();
                 self.set_state(app, |state| {
                     state.focused = value;
                     if value {
                         state.tooltip_open = true;
                         state.tooltip_offset = 12.0;
                     }
+                    if !focused {
+                        state.tooltip_open = false;
+                    }
                 })
-            })
-            .on_focus_change(move |app, focused| {
-                if !focused {
-                    self.set_state(app, |state| state.tooltip_open = false);
-                }
             })
             .on_show_hover_highlight(move |app, value| {
                 // `Slider::OnPointerEntered` / `OnPointerExited`; the thumb exits with the control.

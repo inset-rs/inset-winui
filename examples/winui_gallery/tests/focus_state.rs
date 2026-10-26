@@ -2,7 +2,7 @@
 #![feature(arbitrary_self_types)]
 
 use inset_embedder::{Offset, PointerChange, TextDirection};
-use inset_foundation::Listener;
+use inset_foundation::{Handle, Listener};
 use inset_rendering::CrossAxisAlignment;
 use inset_services::{
     HardwareKeyboard, KeyDownEvent, KeyEvent, KeyUpEvent, LogicalKeyboardKey, PhysicalKeyboardKey,
@@ -205,4 +205,114 @@ fn arrow_key_on_the_only_item_shows_its_ring() {
         1,
         "CycleFocus re-focuses with FocusState_Keyboard even on the same item"
     );
+}
+
+/// A button whose focus node the test holds, above a SelectorBar of two views.
+fn controls_fixture() -> (Fixture, Handle<FocusNode>) {
+    let slot = Rc::new(std::cell::Cell::new(None));
+    let node = slot.clone();
+    let f = Fixture::with_root([600, 300], move |app| {
+        winui_gallery::install_fonts(app);
+        let focus = FocusNode::new(app);
+        node.set(Some(focus));
+        let entry = OverlayEntry::new(
+            app,
+            Rc::new(move |_, _| {
+                let views = vec![
+                    SelectorBarItem::new("recent", "Recent"),
+                    SelectorBarItem::new("shared", "Shared"),
+                ];
+                Directionality::new(
+                    TextDirection::Ltr,
+                    ThemeScope::new(
+                        Theme::Light,
+                        Column::new()
+                            .cross_axis_alignment(CrossAxisAlignment::Start)
+                            .children([
+                                Button::text("Target", Listener::new(|_| {}))
+                                    .focus_node(focus.as_node())
+                                    .into_widget(),
+                                SizedBox::new().height(60.0).into_widget(),
+                                Text::new("Elsewhere").into_widget(),
+                                SelectorBar::new(views, Some(0), |_, _| {}).into_widget(),
+                            ]),
+                    ),
+                )
+                .into_widget()
+            }),
+            false,
+            true,
+            false,
+        );
+        run_app(
+            app,
+            WidgetsApp::new(AccentPalette::default().base)
+                .debug_show_checked_mode_banner(false)
+                .builder(move |_, _, _| {
+                    FocusScope::new(Overlay::new().initial_entries([entry]))
+                        .autofocus(true)
+                        .into_widget()
+                })
+                .into_widget(),
+        );
+    });
+    let node = slot.get().expect("made by the fixture");
+    (f, node)
+}
+
+/// Focuses `node` from code, as a dialog focuses its button when it opens.
+fn focus_by_code(f: &mut Fixture, node: Handle<FocusNode>) {
+    node.request_focus(&mut f.cell.borrow_mut(), None);
+    f.cell.checkpoint();
+    f.pump();
+}
+
+#[test]
+fn a_button_focused_by_code_after_a_click_draws_no_ring() {
+    let (mut f, node) = controls_fixture();
+    f.send_mouse(PointerChange::Add, Offset::new(500.0, 250.0), 0);
+    click(&mut f, "Elsewhere");
+    focus_by_code(&mut f, node);
+    assert!(focus_contains(&f, f.find("Target")));
+    assert_eq!(
+        visible_rings(&f),
+        0,
+        "programmatic focus after a click is pointer focus"
+    );
+}
+
+#[test]
+fn a_button_focused_by_code_after_a_key_draws_its_ring() {
+    let (mut f, node) = controls_fixture();
+    key(
+        &mut f,
+        PhysicalKeyboardKey::SHIFT_LEFT,
+        LogicalKeyboardKey::SHIFT_LEFT,
+    );
+    focus_by_code(&mut f, node);
+    assert!(focus_contains(&f, f.find("Target")));
+    assert_eq!(
+        visible_rings(&f),
+        1,
+        "programmatic focus after a key is keyboard focus"
+    );
+}
+
+#[test]
+fn a_selector_bar_view_clicked_draws_no_ring_and_arrowed_to_does() {
+    let (mut f, _) = controls_fixture();
+    f.send_mouse(PointerChange::Add, Offset::new(500.0, 250.0), 0);
+    click(&mut f, "Recent");
+    assert!(
+        focus_contains(&f, f.find("Recent")),
+        "a pressed view takes the focus"
+    );
+    assert_eq!(visible_rings(&f), 0);
+    key(
+        &mut f,
+        PhysicalKeyboardKey::ARROW_RIGHT,
+        LogicalKeyboardKey::ARROW_RIGHT,
+    );
+    assert!(focus_contains(&f, f.find("Shared")));
+    assert_eq!(visible_rings(&f), 1);
 }

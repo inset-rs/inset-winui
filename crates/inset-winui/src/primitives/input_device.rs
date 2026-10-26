@@ -1,9 +1,10 @@
-//! XAML's `CInputManager` last-input-device record: menus read it to pick their padding states, and `CFocusManager::CoerceFocusState` reads it to decide whether programmatic focus shows the system focus visual.
+//! XAML's `CInputManager` last-input-device record, which menus read to pick their padding states, and `CFocusManager`'s record of how the focus arrived, which decides whether the system focus visual shows.
 
 use inset_embedder::PointerDeviceKind;
 use inset_foundation::{App, Handle};
+use inset_foundation::{Listenable, Listener};
 use inset_gestures::{GestureBinding, PointerEvent, PointerRoute};
-use inset_widgets::{FocusManager, KeyEventResult};
+use inset_widgets::{AnyFocusNode, FocusManager, KeyEventResult};
 use std::rc::Rc;
 
 /// WinUI's input categories needed by menu layout on the desktop host.
@@ -32,6 +33,13 @@ struct InputDeviceTracker {
     /// Device associated with the latest observed input.
     last: InputDevice,
 
+    /// The focused node and how its focus arrived, recorded for the node that had the primary
+    /// focus when last read.
+    focus: Option<(AnyFocusNode, FocusState)>,
+
+    /// The cause a control named for the focus it is giving a node, until the focus arrives.
+    named: Option<(AnyFocusNode, FocusState)>,
+
     /// Prevents registering the observers more than once.
     installed: bool,
 }
@@ -58,6 +66,14 @@ impl InputDevice {
             Rc::new(move |app, _| {
                 app.get_mut(tracker).last = Self::Keyboard;
                 KeyEventResult::Ignored
+            }),
+        );
+        // Records each focus change as it happens, so that later input can't stand in for its
+        // cause before anything reads it.
+        FocusManager::instance(app).add_listener(
+            app,
+            Listener::new(|app| {
+                FocusState::current(app);
             }),
         );
     }
@@ -111,5 +127,42 @@ impl FocusState {
     /// Whether `CFocusManager` draws the system focus visual for this state (`GetRealFocusStateForFocusedElement() == FocusState::Keyboard`).
     pub(crate) fn shows_focus_visual(self) -> bool {
         self == Self::Keyboard
+    }
+
+    /// How the current focus arrived, as `CFocusManager` records it for the focused element: the
+    /// cause a control named for it, else the input that moved it. A focus change is applied in a
+    /// microtask right after the event that asked for it, so the first read after it, at the
+    /// latest the focus manager's listener, finds that event as the last input.
+    pub(crate) fn current(app: &mut App) -> Self {
+        let primary = FocusManager::instance(app).primary_focus(app);
+        let tracker: Handle<InputDeviceTracker> = app.singleton();
+        let record = app.get(tracker);
+        if let Some((node, state)) = record.focus
+            && Some(node) == primary
+        {
+            return state;
+        }
+        let state = match record.named {
+            Some((node, state)) if Some(node) == primary => state,
+            _ => Self::coerce_programmatic(app),
+        };
+        let record = app.get_mut(tracker);
+        record.focus = primary.map(|node| (node, state));
+        if record.named.is_some_and(|(node, _)| Some(node) == primary) {
+            record.named = None;
+        }
+        state
+    }
+
+    /// Names `state` as the cause of the focus a control is giving `node`, as XAML's
+    /// `Focus(state)` does; the control then focuses `node` as it would. Focus already on `node`
+    /// moves nothing to hear, so the record changes at once, and the control builds again.
+    pub(crate) fn name(app: &mut App, node: AnyFocusNode, state: Self) {
+        let tracker: Handle<InputDeviceTracker> = app.singleton();
+        if node.has_primary_focus(app) {
+            app.get_mut(tracker).focus = Some((node, state));
+        } else {
+            app.get_mut(tracker).named = Some((node, state));
+        }
     }
 }

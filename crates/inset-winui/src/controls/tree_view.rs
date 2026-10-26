@@ -417,8 +417,6 @@ impl StatefulWidget for TreeView {
             realized: HashSet::new(),
             focused: None,
             last_focused: None,
-            item_focus_state: FocusState::Pointer,
-            focus_request: None,
             focus_epoch: 0,
             pressed_part: None,
             scroll: None,
@@ -475,12 +473,6 @@ pub struct TreeViewState {
 
     /// `LastFocusedIndex`, by node: the row Tab enters the list at.
     last_focused: Option<String>,
-
-    /// How the focused row got the focus, which decides its focus visual.
-    item_focus_state: FocusState,
-
-    /// The focus state of a pending focus request.
-    focus_request: Option<FocusState>,
 
     /// Invalidates focus requests a later one replaced.
     focus_epoch: u64,
@@ -876,12 +868,11 @@ impl TreeViewState {
         tree_state.last_focused = Some(id.to_owned());
         tree_state.focus_epoch += 1;
         let epoch = tree_state.focus_epoch;
+        FocusState::name(app, node.as_node(), state);
         if node.has_primary_focus(app) {
-            app.get_mut(self).item_focus_state = state;
             self.set_state(app, |_| {});
             return;
         }
-        app.get_mut(self).focus_request = Some(state);
         self.request_item_focus(app, id.to_owned(), node, epoch, 0);
     }
 
@@ -931,13 +922,7 @@ impl TreeViewState {
     /// focused, and `ItemUnfocused`.
     fn item_focus_changed(self: Handle<Self>, app: &mut App, id: &str, focused: bool) {
         if focused {
-            let state = app
-                .get_mut(self)
-                .focus_request
-                .take()
-                .unwrap_or_else(|| FocusState::coerce_programmatic(app));
             let tree_state = app.get_mut(self);
-            tree_state.item_focus_state = state;
             tree_state.focused = Some(id.to_owned());
             tree_state.last_focused = Some(id.to_owned());
         } else if app.get(self).focused.as_deref() == Some(id) {
@@ -1506,12 +1491,12 @@ impl TreeViewState {
     ) -> Option<WidgetRef> {
         let id = app.get(self).rows.get(index)?.to_owned();
         let node = self.item_focus_node(app, &id);
+        let keyboard = FocusState::current(app).shows_focus_visual();
         let state = app.get(self);
         let focus = ItemFocus {
             node,
             is_tab_stop: tab_stop == Some(id.as_str()),
-            shows_focus_visual: state.focused.as_deref() == Some(id.as_str())
-                && state.item_focus_state.shows_focus_visual(),
+            shows_focus_visual: state.focused.as_deref() == Some(id.as_str()) && keyboard,
         };
         let container = self.container(app, &id, Some(focus));
         let row = self.drag_source(app, &id, index, container);

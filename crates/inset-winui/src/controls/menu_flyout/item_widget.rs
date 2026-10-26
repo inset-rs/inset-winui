@@ -61,11 +61,8 @@ pub(super) struct MenuItemState {
     /// Pointer release qualified for invocation.
     should_perform_actions: bool,
 
-    /// Native focus-highlight visibility.
+    /// Whether the item has the focus.
     focused: bool,
-
-    /// Source real focus state: what a kit focus request passed, or the last input device's coercion when focus arrives from elsewhere.
-    focus_state: FocusState,
 
     /// Retained child collection, created only for SubItem.
     submenu: Option<Handle<MenuFlyout>>,
@@ -98,7 +95,6 @@ impl StatefulWidget for MenuItemWidget {
             gamepad_down: false,
             should_perform_actions: false,
             focused: false,
-            focus_state: FocusState::Pointer,
             submenu: None,
             open_timer: None,
             close_timer: None,
@@ -121,11 +117,12 @@ impl MenuItemState {
         app.get(self).focus.unwrap()
     }
 
-    /// `Focus(FocusState)` on this item as MenuFlyoutPresenter::CycleFocus calls it: the requested state is recorded even when the item already holds focus, then focus moves and the item scrolls into view.
+    /// `Focus(FocusState)` on this item as MenuFlyoutPresenter::CycleFocus calls it: focus moves and the item scrolls into view.
     pub(super) fn request_focus(self: Handle<Self>, app: &mut App, state: FocusState) {
-        self.set_state(app, |data| data.focus_state = state);
         let node = self.focus_node(app);
+        FocusState::name(app, node, state);
         default_traversal_request_focus_callback(app, node, None, None, None, None);
+        self.set_state(app, |_| {});
     }
 
     /// Disabled entries and separators do not participate in focus cycling.
@@ -348,6 +345,7 @@ impl MenuItemState {
     /// Builds the template with the current source CommonStates and SubMenuOpened state.
     fn template(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
+        let shows_focus_visual = FocusState::current(app).shows_focus_visual();
         let state = app.get(self);
         let visual = MenuVisualState {
             common: if !widget.item.is_enabled {
@@ -359,7 +357,7 @@ impl MenuItemState {
             } else {
                 CommonState::Normal
             },
-            focused: state.focused && state.focus_state.shows_focus_visual(),
+            focused: state.focused && shows_focus_visual,
             submenu_open: state.close_timer.is_none()
                 && state.submenu.is_some_and(|menu| menu.is_open(app)),
         };
@@ -483,14 +481,9 @@ impl State for MenuItemState {
         let control = FocusableActionDetector::new(gesture)
             .focus_node(focus)
             .enabled(widget.item.is_enabled)
-            .on_show_focus_highlight(move |app, value| {
-                self.set_state(app, |state| state.focused = value)
-            })
             .on_focus_change(move |app, focused| {
-                if focused {
-                    let focus_state = FocusState::coerce_programmatic(app);
-                    self.set_state(app, |state| state.focus_state = focus_state);
-                } else {
+                self.set_state(app, |state| state.focused = focused);
+                if !focused {
                     self.clear_press(app);
                 }
             });

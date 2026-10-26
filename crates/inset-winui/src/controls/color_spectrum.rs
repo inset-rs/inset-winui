@@ -387,8 +387,7 @@ impl StatefulWidget for ColorSpectrum {
             is_pointer_over: false,
             is_pointer_pressed: false,
             should_show_large_selection: false,
-            focus_state: None,
-            focus_request: None,
+            focused: false,
             layout_root_size: Size::ZERO,
             creation: None,
         }
@@ -421,11 +420,8 @@ pub struct ColorSpectrumState {
     /// `m_shouldShowLargeSelection`: the press is a pen's or a touch.
     should_show_large_selection: bool,
 
-    /// `FocusState`: how the control took the focus, `None` while it does not have it.
-    focus_state: Option<FocusState>,
-
-    /// The focus state a pointer press asks for as it focuses the control.
-    focus_request: Option<FocusState>,
+    /// Whether the control has the focus.
+    focused: bool,
 
     /// `LayoutRoot`'s size after the last layout.
     layout_root_size: Size,
@@ -599,8 +595,9 @@ impl ColorSpectrumState {
     /// `OnInputTargetPointerPressed`: the control takes the focus, the pointer is pressed (large
     /// for a pen or touch) and the colour under it is chosen.
     fn pointer_pressed(self: Handle<Self>, app: &mut App, event: &PointerDownEvent) {
-        app.get_mut(self).focus_request = Some(FocusState::Pointer);
-        self.focus(app).request_focus(app, None);
+        let focus = self.focus(app);
+        FocusState::name(app, focus.as_node(), FocusState::Pointer);
+        focus.request_focus(app, None);
         let large = matches!(
             event.kind,
             PointerDeviceKind::Touch
@@ -634,18 +631,11 @@ impl ColorSpectrumState {
         self.set_state(app, |state| state.is_pointer_over = over);
     }
 
-    /// `OnGotFocus` and `OnLostFocus`: arriving focus records how it came, from a press or else
-    /// as programmatic focus is coerced, and opens the name tooltip; leaving closes it.
+    /// `OnGotFocus` and `OnLostFocus`: arriving focus opens the name tooltip; leaving closes it.
     fn focus_changed(self: Handle<Self>, app: &mut App) {
         let focused = self.focus(app).has_primary_focus(app);
-        let focus_state = if focused {
-            let request = app.get_mut(self).focus_request.take();
-            Some(request.unwrap_or_else(|| FocusState::coerce_programmatic(app)))
-        } else {
-            None
-        };
-        if focus_state != app.get(self).focus_state {
-            self.set_state(app, |state| state.focus_state = focus_state);
+        if focused != app.get(self).focused {
+            self.set_state(app, |state| state.focused = focused);
         }
     }
 
@@ -796,13 +786,14 @@ impl ColorSpectrumState {
         }
     }
 
-    /// `UpdateVisualState`'s `FocusStates`.
-    fn focus_visual_state(self: Handle<Self>, app: &App) -> SpectrumFocusState {
-        match app.get(self).focus_state {
-            Some(_) if !self.widget(app).is_enabled => SpectrumFocusState::Unfocused,
-            Some(FocusState::Pointer) => SpectrumFocusState::PointerFocused,
-            Some(FocusState::Keyboard) => SpectrumFocusState::Focused,
-            None => SpectrumFocusState::Unfocused,
+    /// `UpdateVisualState`'s `FocusStates`, by how the focus arrived.
+    fn focus_visual_state(self: Handle<Self>, app: &mut App) -> SpectrumFocusState {
+        if !app.get(self).focused || !self.widget(app).is_enabled {
+            return SpectrumFocusState::Unfocused;
+        }
+        match FocusState::current(app) {
+            FocusState::Pointer => SpectrumFocusState::PointerFocused,
+            FocusState::Keyboard => SpectrumFocusState::Focused,
         }
     }
 
@@ -1235,7 +1226,7 @@ impl State for ColorSpectrumState {
             })),
             ToolTip::text(app.get(self).color_name).vertical_offset(COLOR_NAME_TOOL_TIP_OFFSET),
         )
-        .is_open(app.get(self).focus_state.is_some() && widget.is_enabled);
+        .is_open(app.get(self).focused && widget.is_enabled);
         // `SelectionEllipsePanel`, with `FocusEllipse` 2 larger on every side.
         let mut panel_children = Vec::new();
         if focus_state == SpectrumFocusState::Focused {

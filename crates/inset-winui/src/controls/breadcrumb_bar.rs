@@ -369,11 +369,8 @@ struct BreadcrumbItemState {
     /// Outer control focus; the inline button is not a Tab stop.
     focus: Option<AnyFocusNode>,
 
-    /// Native highlight visibility.
-    highlight: bool,
-
-    /// WinUI pointer/keyboard focus distinction.
-    focus_state: FocusState,
+    /// Whether the item has the focus.
+    focused: bool,
 
     /// Context below FlyoutTarget for the ellipsis.
     target: Option<BuildContext>,
@@ -390,8 +387,7 @@ impl StatefulWidget for BreadcrumbItemControl {
         BreadcrumbItemState {
             state: StateData::new(),
             focus: None,
-            highlight: false,
-            focus_state: FocusState::Pointer,
+            focused: false,
             target: None,
         }
     }
@@ -405,7 +401,8 @@ impl BreadcrumbItemState {
 
     /// Same-element focus requests also update the WinUI focus state.
     fn request_focus(self: Handle<Self>, app: &mut App, source: FocusState) {
-        self.set_state(app, |state| state.focus_state = source);
+        FocusState::name(app, self.node(app), source);
+        self.set_state(app, |_| {});
         self.node(app).request_focus(app, None);
     }
 
@@ -458,7 +455,7 @@ impl BreadcrumbItemState {
         let widget = self.widget(app).clone();
         let theme = ThemeResources::of(app, context);
         let r = theme.clone();
-        let focused = app.get(self).highlight && app.get(self).focus_state.shows_focus_visual();
+        let focused = app.get(self).focused && FocusState::current(app).shows_focus_visual();
         let body = widget
             .item
             .as_ref()
@@ -635,15 +632,7 @@ impl State for BreadcrumbItemState {
         })))
         .focus_node(self.node(app))
         .enabled(self.widget(app).enabled)
-        .on_show_focus_highlight(move |app, value| {
-            self.set_state(app, |state| state.highlight = value)
-        })
-        .on_focus_change(move |app, focused| {
-            if focused {
-                let source = FocusState::coerce_programmatic(app);
-                self.set_state(app, |state| state.focus_state = source);
-            }
-        })
+        .on_focus_change(move |app, focused| self.set_state(app, |state| state.focused = focused))
         .into_widget()
     }
 }

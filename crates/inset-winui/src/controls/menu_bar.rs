@@ -271,11 +271,8 @@ struct MenuHeaderState {
     /// Context below FlyoutTarget, excluding the header's outer margin.
     target: Option<BuildContext>,
 
-    /// Native focus-highlight visibility.
+    /// Whether the header has the focus.
     focused: bool,
-
-    /// Source real focus state: what a kit focus request passed, or the last input device's coercion when focus arrives from elsewhere.
-    focus_state: FocusState,
 }
 
 impl StatefulWidget for MenuHeader {
@@ -292,7 +289,6 @@ impl StatefulWidget for MenuHeader {
             menu: None,
             target: None,
             focused: false,
-            focus_state: FocusState::Pointer,
         }
     }
 }
@@ -313,10 +309,12 @@ impl MenuHeaderState {
         app.get(self).focus.unwrap()
     }
 
-    /// `Focus(FocusState)` on this header as MoveFocusTo calls it: the state is recorded even when the header already holds focus, then focus moves.
+    /// `Focus(FocusState)` on this header as MoveFocusTo calls it.
     fn request_focus(self: Handle<Self>, app: &mut App, state: FocusState) {
-        self.set_state(app, |data| data.focus_state = state);
-        self.focus(app).request_focus(app, None);
+        let node = self.focus(app);
+        FocusState::name(app, node, state);
+        node.request_focus(app, None);
+        self.set_state(app, |_| {});
     }
 
     /// ShowMenuFlyout uses a point at the button's bottom edge and excludes the button itself.
@@ -545,23 +543,19 @@ impl State for MenuHeaderState {
             .focus_node(self.focus(app))
             .enabled(widget.enabled)
             .on_focus_change(move |app, focused| {
+                self.set_state(app, |state| state.focused = focused);
                 if focused {
-                    let focus_state = FocusState::coerce_programmatic(app);
-                    self.set_state(app, |state| state.focus_state = focus_state);
                     let widget = self.widget(app).clone();
                     widget.owner.focused(app, widget.item.id);
                 }
-            })
-            .on_show_focus_highlight(move |app, focused| {
-                self.set_state(app, |state| state.focused = focused)
             });
+        let shows_focus_visual =
+            app.get(self).focused && FocusState::current(app).shows_focus_visual();
         Margin::new(
             r.menu_bar_item_margin,
             TapRegion::new(
                 FocusVisual::new(content, ThemeResources::of(app, context).theme)
-                    .visible(
-                        app.get(self).focused && app.get(self).focus_state.shows_focus_visual(),
-                    )
+                    .visible(shows_focus_visual)
                     .margin([-3.0; 4])
                     .corner_radius(r.control_corner_radius[0]),
             )

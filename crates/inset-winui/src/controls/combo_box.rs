@@ -491,9 +491,6 @@ impl StatefulWidget for ComboBox {
             closing_due_to_cancel: false,
             ignore_cancel_key_downs: false,
             focused_index: None,
-            item_focus_state: FocusState::Pointer,
-            box_focus_state: FocusState::Pointer,
-            box_focus_request: None,
             forced_selected: None,
             forced_unselected: None,
             selection_active: false,
@@ -596,15 +593,6 @@ pub struct ComboBoxState {
 
     /// The Selector's `m_focusedIndex`.
     focused_index: Option<usize>,
-
-    /// How the focused item got the focus, which decides its focus visual.
-    item_focus_state: FocusState,
-
-    /// How the box got the focus, which decides `Focused` against `PointerFocused`.
-    box_focus_state: FocusState,
-
-    /// The focus state of the box's pending focus request.
-    box_focus_request: Option<FocusState>,
 
     /// `m_indexForcedToSelectedVisual`.
     forced_selected: Option<usize>,
@@ -1066,20 +1054,9 @@ impl ComboBoxState {
 
     /// `Focus(state)` on the box itself.
     fn focus_box(self: Handle<Self>, app: &mut App, state: FocusState) {
-        app.get_mut(self).box_focus_request = Some(state);
-        self.box_focus(app).request_focus(app, None);
-    }
-
-    /// The focus state of the focused element, which `SetFocusedItem` passes on to the element
-    /// it focuses.
-    fn focused_element_state(self: Handle<Self>, app: &mut App) -> FocusState {
-        if self.box_focus(app).has_primary_focus(app) {
-            app.get(self).box_focus_state
-        } else if self.focused_item_index(app).is_some() {
-            app.get(self).item_focus_state
-        } else {
-            FocusState::coerce_programmatic(app)
-        }
+        let node = self.box_focus(app);
+        FocusState::name(app, node.as_node(), state);
+        node.request_focus(app, None);
     }
 
     /// `SetFocusedItem` with the focus state of the element that has the focus, or programmatic
@@ -1091,7 +1068,7 @@ impl ComboBoxState {
         scroll: bool,
     ) {
         let state = if self.has_focus(app) {
-            self.focused_element_state(app)
+            FocusState::current(app)
         } else {
             FocusState::coerce_programmatic(app)
         };
@@ -1139,7 +1116,7 @@ impl ComboBoxState {
     fn focus_item(self: Handle<Self>, app: &mut App, index: usize, state: FocusState) {
         let id = self.widget(app).items[index].id.clone();
         let node = self.item_focus_node(app, &id);
-        app.get_mut(self).item_focus_state = state;
+        FocusState::name(app, node.as_node(), state);
         self.request_item_focus(app, node, app.get(self).open_epoch, 0);
     }
 
@@ -1234,16 +1211,9 @@ impl ComboBoxState {
         }
     }
 
-    /// The box's focus changed: it records how the focus came, and arriving focus runs
-    /// `OnGotFocus`.
+    /// The box's focus changed: arriving focus runs `OnGotFocus`.
     fn box_focus_changed(self: Handle<Self>, app: &mut App) {
         if self.box_focus(app).has_primary_focus(app) {
-            let state = app
-                .get_mut(self)
-                .box_focus_request
-                .take()
-                .unwrap_or_else(|| FocusState::coerce_programmatic(app));
-            app.get_mut(self).box_focus_state = state;
             self.on_got_focus(app);
         }
         self.set_state(app, |_| {});
@@ -2185,8 +2155,9 @@ impl ComboBoxState {
     /// `ChangeVisualState` chooses them.
     fn visual_states(
         self: Handle<Self>,
-        app: &App,
+        app: &mut App,
     ) -> (CommonState, ComboBoxFocusState, Option<EditableModeState>) {
+        let shows_focus_visual = FocusState::current(app).shows_focus_visual();
         let widget = self.widget(app);
         let state = app.get(self);
         let editable = widget.is_editable.then(|| {
@@ -2217,7 +2188,7 @@ impl ComboBoxState {
             ComboBoxFocusState::FocusedDropDown
         } else if !box_focused {
             ComboBoxFocusState::Unfocused
-        } else if !state.box_focus_state.shows_focus_visual() {
+        } else if !shows_focus_visual {
             ComboBoxFocusState::PointerFocused
         } else if state.pressed {
             ComboBoxFocusState::FocusedPressed
@@ -3066,11 +3037,12 @@ impl ComboBoxState {
         let item = self.widget(app).items.get(index)?.clone();
         let id = item.id.clone();
         let focus_node = self.item_focus_node(app, &id);
+        let shows_focus_visual = FocusState::current(app).shows_focus_visual();
         let state = app.get(self);
         let container = ComboBoxItemContainer {
             appears_selected: self.appears_selected(app, index),
             selection_active: state.selection_active,
-            shows_focus_visual: state.item_focus_state.shows_focus_visual(),
+            shows_focus_visual,
             focus_node,
             clicked: Rc::new(move |app, index| self.item_clicked(app, index)),
             focus_changed: Rc::new(move |app, index, focused| {

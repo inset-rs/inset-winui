@@ -168,6 +168,7 @@ impl State for ToggleSwitchState {
     inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
+        crate::InputDevice::initialize(app);
         app.get_mut(self).focus_node = Some(FocusNode::new(app));
     }
 
@@ -216,7 +217,8 @@ impl State for ToggleSwitchState {
         let detector = FocusableActionDetector::new(tapped)
             .focus_node(node.as_node())
             .enabled(is_enabled)
-            .on_show_focus_highlight(move |app, focused| {
+            .on_focus_change(move |app, focused| {
+                let focused = focused && crate::FocusState::current(app).shows_focus_visual();
                 self.set_state(app, |state| state.focused = focused);
             })
             .on_show_hover_highlight(move |app, hovered| {

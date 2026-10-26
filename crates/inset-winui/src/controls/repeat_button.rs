@@ -391,6 +391,7 @@ impl State for RepeatButtonState {
     inset_widgets::state_accessors!();
 
     fn init_state(self: Handle<Self>, app: &mut App) {
+        crate::InputDevice::initialize(app);
         let node = FocusNode::new(app).as_node();
         node.set_skip_traversal(app, !self.widget(app).is_tab_stop);
         node.set_on_key_event(
@@ -459,9 +460,6 @@ impl State for RepeatButtonState {
         FocusableActionDetector::new(pointer)
             .enabled(widget.is_enabled)
             .focus_node(app.get(self).focus_node.expect("initialized focus node"))
-            .on_show_focus_highlight(move |app, value| {
-                self.set_state(app, |state| state.focused = value)
-            })
             .on_show_hover_highlight(move |app, value| {
                 self.set_state(app, |state| state.pointer_over = value);
                 if value {
@@ -469,6 +467,8 @@ impl State for RepeatButtonState {
                 }
             })
             .on_focus_change(move |app, has_focus| {
+                let value = has_focus && crate::FocusState::current(app).shows_focus_visual();
+                self.set_state(app, |state| state.focused = value);
                 if !has_focus {
                     self.reset_repeat(app);
                 }
