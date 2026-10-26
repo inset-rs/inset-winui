@@ -111,7 +111,6 @@ impl State for PageState {
                     },
                     AccentPalette::default(),
                 )
-                .common
                 .solid_background_fill_color_base,
             )
             .child(Align::new().alignment(Alignment::TOP_LEFT.into()).child(

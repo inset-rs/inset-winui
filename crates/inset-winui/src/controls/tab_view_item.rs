@@ -311,7 +311,7 @@ impl TabViewItemHeader {
         interactive: bool,
     ) -> WidgetRef {
         let theme = ThemeResources::of(app, context);
-        let r = theme.tab_view();
+        let r = &theme;
         let selected = self.selected;
         let compact = self.width_mode == TabViewWidthMode::Compact && !selected;
         let close_visible = self.close_visible(states);
@@ -365,11 +365,12 @@ impl TabViewItemHeader {
         if let Some(icon) = &self.item.icon_source {
             // IconBox / IconControl, independently coloured from ContentPresenter.
             let icon = SizedBox::new()
-                .width(TAB_VIEW_ITEM_HEADER_ICON_SIZE)
-                .height(TAB_VIEW_ITEM_HEADER_ICON_SIZE)
+                .width(r.tab_view_item_header_icon_size)
+                .height(r.tab_view_item_header_icon_size)
                 .child(FittedBox::new().child(DefaultTextStyle::new(
                     control_text_style(
-                        TAB_VIEW_ITEM_HEADER_ICON_SIZE,
+                        &theme,
+                        r.tab_view_item_header_icon_size,
                         FontWeight::NORMAL,
                         icon_foreground,
                     ),
@@ -384,7 +385,7 @@ impl TabViewItemHeader {
                             if compact {
                                 0.0
                             } else {
-                                TAB_VIEW_ITEM_HEADER_ICON_MARGIN[2]
+                                r.tab_view_item_header_icon_margin[2]
                             },
                             0.0,
                         ))
@@ -402,7 +403,8 @@ impl TabViewItemHeader {
                     Align::new().alignment(Alignment::CENTER_LEFT.into()).child(
                         DefaultTextStyle::new(
                             control_text_style(
-                                TAB_VIEW_ITEM_HEADER_FONT_SIZE,
+                                &theme,
+                                r.tab_view_item_header_font_size,
                                 if selected {
                                     FontWeight::W600
                                 } else {
@@ -426,7 +428,7 @@ impl TabViewItemHeader {
             let close = if interactive {
                 Button::new(
                     FontIcon::symbol(FluentSymbol::Dismiss)
-                        .font_size(TAB_VIEW_ITEM_HEADER_CLOSE_FONT_SIZE),
+                        .font_size(r.tab_view_item_header_close_font_size),
                     self.close.clone(),
                 )
                 .is_enabled(self.item.is_enabled)
@@ -445,14 +447,14 @@ impl TabViewItemHeader {
                 .into_widget()
             } else {
                 close_button_template(
-                    &r,
+                    r,
                     theme_kind,
                     ControlStates {
                         common: CommonState::Normal,
                         focused: false,
                     },
                     FontIcon::symbol(FluentSymbol::Dismiss)
-                        .font_size(TAB_VIEW_ITEM_HEADER_CLOSE_FONT_SIZE)
+                        .font_size(r.tab_view_item_header_close_font_size)
                         .into_widget(),
                     close_background,
                     close_foreground,
@@ -461,7 +463,7 @@ impl TabViewItemHeader {
             children.push(
                 GridCell::new(
                     Padding::new(EdgeInsetsGeometry::only(
-                        TAB_VIEW_ITEM_HEADER_CLOSE_MARGIN[0],
+                        r.tab_view_item_header_close_margin[0],
                         0.0,
                         0.0,
                         0.0,
@@ -480,7 +482,7 @@ impl TabViewItemHeader {
         let grid = Grid::new()
             .column_definitions([
                 ColumnDefinition::new(if compact {
-                    GridLength::pixel(TAB_VIEW_ITEM_HEADER_ICON_SIZE)
+                    GridLength::pixel(r.tab_view_item_header_icon_size)
                 } else {
                     GridLength::AUTO
                 }),
@@ -499,27 +501,32 @@ impl TabViewItemHeader {
         // TabContainer: top corners only; the selected background supplies the lower outward curves.
         let content = ControlBorder::new(Brush::Solid(background), border)
             .border_thickness_ltrb(if selected {
-                TAB_VIEW_SELECTED_ITEM_BORDER_THICKNESS
+                r.tab_view_selected_item_border_thickness
             } else {
-                TAB_VIEW_ITEM_BORDER_THICKNESS
+                r.tab_view_item_border_thickness
             })
-            .corner_radius_corners([OVERLAY_CORNER_RADIUS[0], OVERLAY_CORNER_RADIUS[1], 0.0, 0.0])
+            .corner_radius_corners([
+                r.overlay_corner_radius[0],
+                r.overlay_corner_radius[1],
+                0.0,
+                0.0,
+            ])
             .padding(if close_visible {
-                TAB_VIEW_ITEM_HEADER_PADDING_WITH_CLOSE_BUTTON
+                r.tab_view_item_header_padding_with_close_button
             } else {
-                TAB_VIEW_ITEM_HEADER_PADDING_WITHOUT_CLOSE_BUTTON
+                r.tab_view_item_header_padding_without_close_button
             })
             .child(grid);
         let content = Margin::new(
             if selected {
-                TAB_VIEW_SELECTED_ITEM_HEADER_MARGIN
+                r.tab_view_selected_item_header_margin
             } else {
                 [0.0; 4]
             },
             content,
         );
         let content =
-            ConstrainedBox::new(BoxConstraints::new().min_height(TAB_VIEW_ITEM_MIN_HEIGHT))
+            ConstrainedBox::new(BoxConstraints::new().min_height(r.tab_view_item_min_height))
                 .child(content);
         let content = CustomPaint::new()
             .painter(TabChromePainter {
@@ -534,12 +541,14 @@ impl TabViewItemHeader {
                 selected_fill: r.tab_view_item_header_background_selected,
                 border: r.tab_view_border_brush,
                 separator_color: r.tab_view_item_separator,
+                separator_margin: r.tab_view_item_separator_margin,
+                selected_corner_radius: r.overlay_corner_radius,
             })
             .child(content);
         FocusVisual::new(content, theme.theme)
             .visible(states.focused)
             .margin([-3.0; 4])
-            .corner_radius(OVERLAY_CORNER_RADIUS[0])
+            .corner_radius(r.overlay_corner_radius[0])
             .into_widget()
     }
 }
@@ -547,7 +556,7 @@ impl TabViewItemHeader {
 /// TabViewCloseButtonStyle receives the parent item's rest brushes through template bindings.
 /// Builds the source close-button chrome independently of its interaction wrapper.
 fn close_button_template(
-    r: &TabViewResources,
+    r: &ThemeResources,
     theme: Theme,
     states: ControlStates,
     content: WidgetRef,
@@ -577,15 +586,16 @@ fn close_button_template(
         ),
     };
     let content = SizedBox::new()
-        .width(TAB_VIEW_ITEM_HEADER_CLOSE_BUTTON_WIDTH)
-        .height(TAB_VIEW_ITEM_HEADER_CLOSE_BUTTON_HEIGHT)
+        .width(r.tab_view_item_header_close_button_width)
+        .height(r.tab_view_item_header_close_button_height)
         .child(
             ControlBorder::new(Brush::Solid(background), Brush::Solid(border))
-                .border_thickness_ltrb(TAB_VIEW_ITEM_HEADER_CLOSE_BUTTON_BORDER_THICKNESS)
-                .corner_radius(CONTROL_CORNER_RADIUS[0])
+                .border_thickness_ltrb(r.tab_view_item_header_close_button_border_thickness)
+                .corner_radius(r.control_corner_radius[0])
                 .child(Center::new().child(DefaultTextStyle::new(
                     control_text_style(
-                        TAB_VIEW_ITEM_HEADER_CLOSE_FONT_SIZE,
+                        r,
+                        r.tab_view_item_header_close_font_size,
                         FontWeight::NORMAL,
                         foreground,
                     ),
@@ -595,7 +605,7 @@ fn close_button_template(
     FocusVisual::new(content, theme)
         .visible(states.focused)
         .margin([-3.0; 4])
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(r.control_corner_radius[0])
         .into_widget()
 }
 
@@ -620,6 +630,12 @@ struct TabChromePainter {
 
     /// Theme brush for the trailing separator.
     separator_color: Color,
+
+    /// `TabViewItemSeparatorMargin`: the separator's inset in left, top, right, bottom order.
+    separator_margin: [f64; 4],
+
+    /// `OverlayCornerRadius`: the selected background's top corners.
+    selected_corner_radius: [f64; 4],
 }
 
 impl CustomPainter for TabChromePainter {
@@ -627,7 +643,7 @@ impl CustomPainter for TabChromePainter {
         let (w, h) = (size.width() as f32, size.height() as f32);
         if self.selected {
             canvas.draw_path(
-                &selected_tab_geometry(w, h),
+                &selected_tab_geometry(self.selected_corner_radius, w, h),
                 FillRule::NonZero,
                 &Paint::from_color(self.selected_fill.into()),
             );
@@ -689,10 +705,9 @@ impl CustomPainter for TabChromePainter {
             canvas.draw_rect(
                 inset_embedder::valo::Rect::new(
                     w - 1.0,
-                    TAB_VIEW_ITEM_SEPARATOR_MARGIN[1] as f32,
+                    self.separator_margin[1] as f32,
                     1.0,
-                    (h - TAB_VIEW_ITEM_SEPARATOR_MARGIN[1] as f32
-                        - TAB_VIEW_ITEM_SEPARATOR_MARGIN[3] as f32)
+                    (h - self.separator_margin[1] as f32 - self.separator_margin[3] as f32)
                         .max(0.0),
                 ),
                 &Paint::from_color(self.separator_color.into()),
@@ -710,10 +725,10 @@ impl CustomPainter for TabChromePainter {
 }
 
 /// UpdateTabGeometry: four-pixel outward lower corners and the theme's upper radii.
-fn selected_tab_geometry(width: f32, height: f32) -> std::sync::Arc<Path> {
+fn selected_tab_geometry(corner_radius: [f64; 4], width: f32, height: f32) -> std::sync::Arc<Path> {
     use std::f32::consts::{FRAC_PI_2, PI};
-    let left = OVERLAY_CORNER_RADIUS[0] as f32;
-    let right = OVERLAY_CORNER_RADIUS[1] as f32;
+    let left = corner_radius[0] as f32;
+    let right = corner_radius[1] as f32;
     let mut path = PathBuilder::new();
     path.move_to((-4.0, height))
         .arc((-4.0, height - 4.0), 4.0, FRAC_PI_2, -FRAC_PI_2)

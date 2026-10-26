@@ -26,11 +26,7 @@
 use super::toggle_button::{ToggleButtonSetters, toggle_button_presenter};
 use crate::after_next_frame;
 use crate::{
-    Brush, COLOR_PICKER_BORDER_THICKNESS, COLOR_PICKER_SLIDER_CORNER_RADIUS,
-    COLOR_PICKER_TEXT_INPUT_HORIZONTAL_ORIENTATION_MARGIN,
-    COLOR_PICKER_VERTICAL_ORIENTATION_MAX_HEIGHT, COLOR_PICKER_VERTICAL_ORIENTATION_MAX_WIDTH,
-    COLOR_PICKER_VERTICAL_ORIENTATION_MIN_HEIGHT, COLOR_PICKER_VERTICAL_ORIENTATION_MIN_WIDTH,
-    CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, ColorChangedEventArgs, ColorPickerHsvChannel,
+    Brush, COLOR_PICKER_BORDER_THICKNESS, ColorChangedEventArgs, ColorPickerHsvChannel,
     ColorPickerSlider, ColorSpectrum, ColorSpectrumColorChangedEventArgs, ColorSpectrumComponents,
     ColorSpectrumShape, ColumnDefinition, ComboBox, ComboBoxItem, CommonState, FluentSymbol,
     FontIcon, Grid, GridCell, GridLength, Hsv, HsvColor, Margin, Orientation, Rgb, RowDefinition,
@@ -137,8 +133,8 @@ pub struct ColorPicker {
     pub orientation: Orientation,
 
     /// `CornerRadius` of the spectrum, the preview and the opacity slider's background;
-    /// `ControlCornerRadius` by default.
-    pub corner_radius: f64,
+    /// `ControlCornerRadius` by default; the theme's `ControlCornerRadius` when `None`.
+    pub corner_radius: Option<f64>,
 
     /// `IsEnabled`.
     pub is_enabled: bool,
@@ -183,7 +179,7 @@ impl ColorPicker {
             color_spectrum_shape: ColorSpectrumShape::Box,
             color_spectrum_components: ColorSpectrumComponents::HueSaturation,
             orientation: Orientation::Vertical,
-            corner_radius: CONTROL_CORNER_RADIUS[0],
+            corner_radius: None,
             is_enabled: true,
             key: None,
         }
@@ -311,7 +307,7 @@ impl ColorPicker {
 
     /// Sets CornerRadius.
     pub fn corner_radius(mut self, value: f64) -> Self {
-        self.corner_radius = value;
+        self.corner_radius = Some(value);
         self
     }
 
@@ -1133,9 +1129,7 @@ impl State for ColorPickerState {
 
     fn did_change_dependencies(self: Handle<Self>, app: &mut App) {
         // `OnCheckerColorChanged`: `CheckerColorBrush` is `SystemListLowColor` of the theme.
-        let checker = ThemeResources::of(app, self.context(app))
-            .color_picker()
-            .system_list_low_color;
+        let checker = ThemeResources::of(app, self.context(app)).system_list_low_color;
         if app.get(self).checker_color != Some(checker) {
             app.get_mut(self).checker_color = Some(checker);
             self.create_checkered_backgrounds(app);
@@ -1229,12 +1223,12 @@ impl State for ColorPickerState {
         // `RootGrid`.
         let constraints = if vertical {
             BoxConstraints::new()
-                .min_width(COLOR_PICKER_VERTICAL_ORIENTATION_MIN_WIDTH)
-                .max_width(COLOR_PICKER_VERTICAL_ORIENTATION_MAX_WIDTH)
+                .min_width(resources.color_picker_vertical_orientation_min_width)
+                .max_width(resources.color_picker_vertical_orientation_max_width)
         } else {
             BoxConstraints::new()
-                .min_height(COLOR_PICKER_VERTICAL_ORIENTATION_MIN_HEIGHT)
-                .max_height(COLOR_PICKER_VERTICAL_ORIENTATION_MAX_HEIGHT)
+                .min_height(resources.color_picker_vertical_orientation_min_height)
+                .max_height(resources.color_picker_vertical_orientation_max_height)
                 .max_width(10000.0)
         };
         let root = ConstrainedBox::new(constraints).child(Margin::new([0.0, 4.0, 0.0, 4.0], grid));
@@ -1275,7 +1269,7 @@ impl ColorPickerState {
     ) -> WidgetRef {
         let mut cells = Vec::new();
         if states.color_spectrum_visible {
-            cells.push(GridCell::new(self.color_spectrum(app)).into_widget());
+            cells.push(GridCell::new(self.color_spectrum(resources, app)).into_widget());
         }
         if states.color_preview_visible {
             let vertical = states.orientation == Orientation::Vertical;
@@ -1308,7 +1302,7 @@ impl ColorPickerState {
     }
 
     /// `ColorSpectrum`: 256 to 336 square, its height following its width.
-    fn color_spectrum(self: Handle<Self>, app: &App) -> WidgetRef {
+    fn color_spectrum(self: Handle<Self>, r: &ThemeResources, app: &App) -> WidgetRef {
         let widget = self.widget(app);
         let height = app
             .get(self)
@@ -1330,7 +1324,7 @@ impl ColorPickerState {
         .max_value(widget.max_value)
         .shape(widget.color_spectrum_shape)
         .components(widget.color_spectrum_components)
-        .corner_radius(widget.corner_radius)
+        .corner_radius(widget.corner_radius.unwrap_or(r.control_corner_radius[0]))
         .is_enabled(widget.is_enabled);
         tab_order(
             0,
@@ -1351,7 +1345,10 @@ impl ColorPickerState {
         states: VisualStates,
     ) -> WidgetRef {
         let state = app.get(self);
-        let radius = self.widget(app).corner_radius;
+        let radius = self
+            .widget(app)
+            .corner_radius
+            .unwrap_or(resources.control_corner_radius[0]);
         let rectangle = |fill: Option<ShapeFill>, stroke: Option<Color>| {
             CustomPaint::new()
                 .painter(RectanglePainter::new(fill, stroke, radius))
@@ -1389,13 +1386,10 @@ impl ColorPickerState {
             cells.push(previous_cell.into_widget());
         }
         cells.push(
-            GridCell::new(rectangle(
-                None,
-                Some(resources.color_picker().color_picker_border_brush),
-            ))
-            .row_span(2)
-            .column_span(2)
-            .into_widget(),
+            GridCell::new(rectangle(None, Some(resources.color_picker_border_brush)))
+                .row_span(2)
+                .column_span(2)
+                .into_widget(),
         );
         SizeObserver::new(
             Grid::new()
@@ -1426,7 +1420,7 @@ impl ColorPickerState {
                         rotated: vertical_slider,
                     }),
                     None,
-                    COLOR_PICKER_SLIDER_CORNER_RADIUS[0],
+                    _resources.color_picker_slider_corner_radius[0],
                 )
                 .slider_background(vertical_slider),
             )
@@ -1511,7 +1505,9 @@ impl ColorPickerState {
                 RectanglePainter::new(
                     state.alpha_checkers.clone().map(ShapeFill::Image),
                     None,
-                    widget.corner_radius,
+                    widget
+                        .corner_radius
+                        .unwrap_or(_resources.control_corner_radius[0]),
                 )
                 .slider_background(vertical_slider),
             )
@@ -1525,7 +1521,7 @@ impl ColorPickerState {
                         rotated: vertical_slider,
                     }),
                     None,
-                    COLOR_PICKER_SLIDER_CORNER_RADIUS[0],
+                    _resources.color_picker_slider_corner_radius[0],
                 )
                 .slider_background(vertical_slider),
             )
@@ -1617,7 +1613,7 @@ impl ColorPickerState {
                 &resources,
                 more_button_brushes(&resources, is_checked == Some(true), states.common),
                 ToggleButtonSetters {
-                    padding: [0.0; 4],
+                    padding: Some([0.0; 4]),
                     horizontal_content_alignment: AlignmentGeometry::CENTER_RIGHT,
                 },
                 content.unwrap_or_else(|| SizedBox::shrink().into_widget()),
@@ -1784,6 +1780,7 @@ impl ColorPickerState {
                 .collect::<Vec<_>>();
             cells.push(
                 GridCell::new(channel_panel(
+                    resources,
                     states,
                     [RowDefinition::new(GridLength::STAR); 3],
                     rows,
@@ -1804,7 +1801,12 @@ impl ColorPickerState {
             cells.push(
                 GridCell::new(Margin::new(
                     [0.0, 12.0, 0.0, 0.0],
-                    channel_panel(states, [RowDefinition::new(GridLength::STAR)], row),
+                    channel_panel(
+                        resources,
+                        states,
+                        [RowDefinition::new(GridLength::STAR)],
+                        row,
+                    ),
                 ))
                 .row(cells.len())
                 .into_widget(),
@@ -1830,9 +1832,10 @@ impl ColorPickerState {
             [0.0, 12.0, 0.0, 0.0]
         };
         let text = control_text_style(
-            CONTROL_CONTENT_FONT_SIZE,
+            resources,
+            resources.control_content_theme_font_size,
             FontWeight::NORMAL,
-            resources.common.text_fill_color_primary,
+            resources.text_fill_color_primary,
         );
         vec![
             GridCell::new(Margin::new(
@@ -1864,6 +1867,7 @@ impl ColorPickerState {
 /// `RgbPanel`, `HsvPanel` or `AlphaPanel`: columns Auto, 8 and the label column, which the
 /// `Horizontal` orientation makes 122 wide.
 fn channel_panel<const N: usize>(
+    r: &ThemeResources,
     states: VisualStates,
     rows: [RowDefinition; N],
     children: Vec<WidgetRef>,
@@ -1871,7 +1875,7 @@ fn channel_panel<const N: usize>(
     let label_column = if states.orientation == Orientation::Vertical {
         GridLength::STAR
     } else {
-        GridLength::pixel(COLOR_PICKER_TEXT_INPUT_HORIZONTAL_ORIENTATION_MARGIN)
+        GridLength::pixel(r.color_picker_text_input_horizontal_orientation_margin)
     };
     Grid::new()
         .column_definitions([
@@ -1920,14 +1924,14 @@ fn more_button_brushes(
     is_checked: bool,
     state: CommonState,
 ) -> ToggleButtonBrushes {
-    let r = resources.color_picker();
+    let r = &resources;
     let transparent = Color::from_argb(0, 0, 0, 0);
     let foreground = match state {
         CommonState::Normal => r.system_base_high_color,
         CommonState::PointerOver => r.system_base_medium_color,
         CommonState::Pressed | CommonState::Disabled => r.system_base_medium_low_color,
     };
-    let base = crate::toggle_button_brushes(&resources.toggle_button(), Some(is_checked), state);
+    let base = crate::toggle_button_brushes(resources, Some(is_checked), state);
     ToggleButtonBrushes {
         background: transparent,
         border: Brush::Solid(transparent),

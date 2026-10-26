@@ -5,14 +5,9 @@
 //! Behaviour is `ToggleSwitch_Partial.cpp`: a tap on the thumb toggles (`TapHandler`); a drag moves the knob with the pointer (`DragStartedHandler`, `DragDeltaHandler` → `MoveDelta`) and toggles at release when the knob passed half the track (`DragCompletedHandler` → `MoveCompleted`).
 
 use crate::{
-    BackgroundSizing, Brush, CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS,
-    CONTROL_FAST_ANIMATION_DURATION, CONTROL_FAST_OUT_SLOW_IN_KEY_SPLINE,
-    CONTROL_FASTER_ANIMATION_DURATION, CONTROL_NORMAL_ANIMATION_DURATION, ColumnDefinition,
-    CommonState, ControlBorder, ControlStates, FocusVisual, Grid, GridCell, GridLength,
-    RowDefinition, TOGGLE_SWITCH_ON_STROKE_THICKNESS, TOGGLE_SWITCH_OUTER_BORDER_STROKE_THICKNESS,
-    TOGGLE_SWITCH_POST_CONTENT_MARGIN, TOGGLE_SWITCH_PRE_CONTENT_MARGIN,
-    TOGGLE_SWITCH_THEME_MIN_WIDTH, TOGGLE_SWITCH_TOP_HEADER_MARGIN, Theme, ThemeResources,
-    ToggleSwitchResources, control_text_style,
+    BackgroundSizing, Brush, ColumnDefinition, CommonState, ControlBorder, ControlStates,
+    FocusVisual, Grid, GridCell, GridLength, RowDefinition, Theme, ThemeResources,
+    control_text_style,
 };
 use inset_animation::{Cubic, Curve};
 use inset_embedder::{Clip, Color, FontWeight};
@@ -32,8 +27,6 @@ pub const TRACK_WIDTH: f64 = 40.0;
 pub const TRACK_HEIGHT: f64 = 20.0;
 /// `SwitchKnob`: the grid the knob shapes are arranged in.
 pub const KNOB_AREA: f64 = 20.0;
-/// `ToggleSwitchOuterBorderStrokeThickness`.
-pub const OUTER_BORDER_STROKE_THICKNESS: f64 = TOGGLE_SWITCH_OUTER_BORDER_STROKE_THICKNESS;
 /// The gap column between the switch and its content.
 pub const CONTENT_GAP: f64 = 12.0;
 /// `FocusVisualMargin` of the style.
@@ -55,21 +48,18 @@ pub fn knob_size(state: CommonState) -> (f64, f64) {
 }
 
 /// How long the knob takes to reach `knob_size`: `ControlNormalAnimationDuration` into `Disabled`, `ControlFasterAnimationDuration` into the other states.
-pub fn knob_size_duration(state: CommonState) -> Duration {
+pub fn knob_size_duration(r: &ThemeResources, state: CommonState) -> Duration {
     match state {
-        CommonState::Disabled => CONTROL_NORMAL_ANIMATION_DURATION,
-        _ => CONTROL_FASTER_ANIMATION_DURATION,
+        CommonState::Disabled => r.control_normal_animation_duration,
+        _ => r.control_faster_animation_duration,
     }
 }
 
 /// XAML `ControlFastOutSlowInKeySpline` as a curve.
-pub fn fast_out_slow_in() -> Rc<dyn Curve> {
-    let [x1, y1, x2, y2] = CONTROL_FAST_OUT_SLOW_IN_KEY_SPLINE;
+pub fn fast_out_slow_in(r: &ThemeResources) -> Rc<dyn Curve> {
+    let [x1, y1, x2, y2] = r.control_fast_out_slow_in_key_spline;
     Rc::new(Cubic::new(x1, y1, x2, y2))
 }
-
-/// How long the knob takes to travel between the ends. XAML animates it with `RepositionThemeAnimation`, whose timing lives in the OS animation library rather than in the source; `ControlFastAnimationDuration` stands in.
-pub const KNOB_TRAVEL_DURATION: Duration = CONTROL_FAST_ANIMATION_DURATION;
 
 /// XAML `Toggled` handler, given the value the switch wants.
 pub type ToggledHandler = Rc<dyn Fn(&mut App, bool)>;
@@ -146,8 +136,6 @@ pub struct ToggleSwitchState {
     was_dragged: bool,
     /// `m_knobTranslation`: the horizontal change since the drag started, accumulated unclamped; `SetTranslations` clamps what the knob shows.
     knob_translation: f64,
-    /// `ControlFastOutSlowInKeySpline`, shared by every animation of the template.
-    curve: Rc<dyn Curve>,
     focus_node: Option<Handle<FocusNode>>,
     hovered: bool,
     focused: bool,
@@ -167,7 +155,6 @@ impl StatefulWidget for ToggleSwitch {
             is_dragging: false,
             was_dragged: false,
             knob_translation: 0.0,
-            curve: fast_out_slow_in(),
             focus_node: None,
             hovered: false,
             focused: false,
@@ -377,11 +364,11 @@ impl ToggleSwitchState {
         } else {
             states.common
         };
-        let brushes = brushes(&resources.toggle_switch(), common);
+        let brushes = brushes(&resources, common);
         let header = widget
             .header
             .clone()
-            .map(|header| header_content_presenter(header, brushes.header));
+            .map(|header| header_content_presenter(&resources, header, brushes.header));
         let inner = self.inner_grid(app, &widget, &resources, &brushes, common, states.focused);
         // `HorizontalAlignment="Left"` `VerticalAlignment="Top"`: sized to the content and placed top-left in the star row.
         let inner = GridCell::new(
@@ -402,9 +389,11 @@ impl ToggleSwitchState {
             ])
             .children(header.into_iter().chain([inner]));
         // The style's `MinWidth`.
-        ConstrainedBox::new(BoxConstraints::new().min_width(TOGGLE_SWITCH_THEME_MIN_WIDTH))
-            .child(root)
-            .into_widget()
+        ConstrainedBox::new(
+            BoxConstraints::new().min_width(resources.toggle_switch_theme_min_width),
+        )
+        .child(root)
+        .into_widget()
     }
 
     /// The inner `Grid`: the switch, the gap and the content, in rows of `ToggleSwitchPreContentMargin`, Auto and `ToggleSwitchPostContentMargin`.
@@ -419,7 +408,8 @@ impl ToggleSwitchState {
     ) -> Grid {
         let is_on = widget.is_on;
         let text = control_text_style(
-            CONTROL_CONTENT_FONT_SIZE,
+            resources,
+            resources.control_content_theme_font_size,
             FontWeight::W400,
             brushes.foreground,
         );
@@ -433,9 +423,13 @@ impl ToggleSwitchState {
             .unwrap_or_else(|| Text::new("On").into_widget());
         Grid::new()
             .row_definitions([
-                RowDefinition::new(GridLength::pixel(TOGGLE_SWITCH_PRE_CONTENT_MARGIN)),
+                RowDefinition::new(GridLength::pixel(
+                    resources.toggle_switch_pre_content_margin,
+                )),
                 RowDefinition::new(GridLength::AUTO),
-                RowDefinition::new(GridLength::pixel(TOGGLE_SWITCH_POST_CONTENT_MARGIN)),
+                RowDefinition::new(GridLength::pixel(
+                    resources.toggle_switch_post_content_margin,
+                )),
             ])
             .column_definitions([
                 ColumnDefinition::new(GridLength::AUTO),
@@ -444,6 +438,7 @@ impl ToggleSwitchState {
             ])
             .children([
                 GridCell::new(switch_area_grid(
+                    resources,
                     resources.theme,
                     brushes.container,
                     focused,
@@ -459,10 +454,10 @@ impl ToggleSwitchState {
                     .row_span(3)
                     .column(2)
                     .into_widget(),
-                GridCell::new(outer_border(brushes, is_on))
+                GridCell::new(outer_border(resources, brushes, is_on))
                     .row(1)
                     .into_widget(),
-                GridCell::new(switch_knob_bounds(brushes, is_on))
+                GridCell::new(switch_knob_bounds(resources, brushes, is_on))
                     .row(1)
                     .into_widget(),
                 GridCell::new(self.switch_knob(app, resources, brushes, common, is_on))
@@ -475,7 +470,7 @@ impl ToggleSwitchState {
             ])
     }
 
-    /// `SwitchKnob`: `HorizontalAlignment="Left"`, 20 × 20, moved by `KnobTranslateTransform`. `X` is 20 in the `On` state, the clamped `m_knobTranslation` while dragging (`SetTranslations`) and 0 otherwise; the `ToggleStates` transitions move it with `RepositionThemeAnimation`, here `KNOB_TRAVEL_DURATION` with `ControlFastOutSlowInKeySpline`.
+    /// `SwitchKnob`: `HorizontalAlignment="Left"`, 20 × 20, moved by `KnobTranslateTransform`. `X` is 20 in the `On` state, the clamped `m_knobTranslation` while dragging (`SetTranslations`) and 0 otherwise; the `ToggleStates` transitions move it with `RepositionThemeAnimation`, here `control_fast_animation_duration` with `ControlFastOutSlowInKeySpline`.
     fn switch_knob(
         self: Handle<Self>,
         app: &App,
@@ -485,20 +480,23 @@ impl ToggleSwitchState {
         is_on: bool,
     ) -> WidgetRef {
         let state = app.get(self);
-        let curve = state.curve.clone();
+        let curve = fast_out_slow_in(resources);
         let (translation, duration) = if state.is_dragging {
             let translation = state.knob_translation.clamp(0.0, KNOB_TRANSLATION_RANGE);
             (translation, Duration::ZERO)
         } else if is_on {
-            (KNOB_TRANSLATION_RANGE, KNOB_TRAVEL_DURATION)
+            (
+                KNOB_TRANSLATION_RANGE,
+                resources.control_fast_animation_duration,
+            )
         } else {
-            (0.0, KNOB_TRAVEL_DURATION)
+            (0.0, resources.control_fast_animation_duration)
         };
         let (knob_width, knob_height) = knob_size(common);
         // `VerticalAlignment` `Stretch` with an explicit `Height`: centred in the 20 pt grid.
         let top = (KNOB_AREA - knob_height) / 2.0;
         let shape = |child: WidgetRef, left: f64| {
-            AnimatedPositioned::new(child, knob_size_duration(common))
+            AnimatedPositioned::new(child, knob_size_duration(resources, common))
                 .curve(curve.clone())
                 .left(left)
                 .top(top)
@@ -512,7 +510,7 @@ impl ToggleSwitchState {
                 knob_on_left(common, knob_width),
             ),
             shape(
-                switch_knob_off(brushes, is_on),
+                switch_knob_off(resources, brushes, is_on),
                 knob_off_left(common, knob_width),
             ),
         ]);
@@ -571,7 +569,7 @@ struct SwitchBrushes {
     header: Color,
 }
 
-fn brushes(r: &ToggleSwitchResources, state: CommonState) -> SwitchBrushes {
+fn brushes(r: &ThemeResources, state: CommonState) -> SwitchBrushes {
     match state {
         CommonState::Normal => SwitchBrushes {
             fill_off: r.toggle_switch_fill_off,
@@ -621,9 +619,14 @@ fn brushes(r: &ToggleSwitchResources, state: CommonState) -> SwitchBrushes {
 }
 
 /// `HeaderContentPresenter`: `x:DeferLoadStrategy="Lazy"` and `Visibility="Collapsed"` until a `Header` is set, so it exists only with one; `Margin` `ToggleSwitchTopHeaderMargin`, `Foreground` per state, `TextWrapping="Wrap"`.
-fn header_content_presenter(header: WidgetRef, foreground: Color) -> WidgetRef {
-    let [left, top, right, bottom] = TOGGLE_SWITCH_TOP_HEADER_MARGIN;
-    let text = control_text_style(CONTROL_CONTENT_FONT_SIZE, FontWeight::W400, foreground);
+fn header_content_presenter(r: &ThemeResources, header: WidgetRef, foreground: Color) -> WidgetRef {
+    let [left, top, right, bottom] = r.toggle_switch_top_header_margin;
+    let text = control_text_style(
+        r,
+        r.control_content_theme_font_size,
+        FontWeight::W400,
+        foreground,
+    );
     GridCell::new(
         Padding::new(EdgeInsetsGeometry::from_ltrb(left, top, right, bottom))
             .child(DefaultTextStyle::new(text, header)),
@@ -633,17 +636,22 @@ fn header_content_presenter(header: WidgetRef, foreground: Color) -> WidgetRef {
 }
 
 /// `SwitchAreaGrid`: spans the inner grid with `Margin="0,5"` and the container background (transparent in every state) under the style's `CornerRadius`; `Control.IsTemplateFocusTarget`, so the system focus visual draws around it with the style's `FocusVisualMargin`.
-fn switch_area_grid(theme: Theme, container: Color, focused: bool) -> WidgetRef {
+fn switch_area_grid(
+    r: &ThemeResources,
+    theme: Theme,
+    container: Color,
+    focused: bool,
+) -> WidgetRef {
     let [left, top, right, bottom] = SWITCH_AREA_MARGIN;
     let area = Grid::new()
         .background(Brush::Solid(container))
-        .corner_radius(CONTROL_CORNER_RADIUS[0]);
+        .corner_radius(r.control_corner_radius[0]);
     Padding::new(EdgeInsetsGeometry::from_ltrb(left, top, right, bottom))
         .child(
             FocusVisual::new(area, theme)
                 .visible(focused)
                 .margin(FOCUS_VISUAL_MARGIN)
-                .corner_radius(CONTROL_CORNER_RADIUS[0]),
+                .corner_radius(r.control_corner_radius[0]),
         )
         .into_widget()
 }
@@ -662,10 +670,16 @@ fn content_presenter(text: TextStyle, content: WidgetRef, visible: bool) -> Widg
 }
 
 /// A 40 × 20 `Rectangle` with `RadiusX` / `RadiusY` 10, faded by the `ToggleStates` storyboards over `ControlFasterAnimationDuration`.
-fn track(fill: Color, stroke: Color, stroke_thickness: f64, visible: bool) -> WidgetRef {
+fn track(
+    r: &ThemeResources,
+    fill: Color,
+    stroke: Color,
+    stroke_thickness: f64,
+    visible: bool,
+) -> WidgetRef {
     AnimatedOpacity::new(
         if visible { 1.0 } else { 0.0 },
-        CONTROL_FASTER_ANIMATION_DURATION,
+        r.control_faster_animation_duration,
     )
     .child(
         SizedBox::new()
@@ -681,21 +695,23 @@ fn track(fill: Color, stroke: Color, stroke_thickness: f64, visible: bool) -> Wi
 }
 
 /// `OuterBorder`: the off track, `StrokeThickness` `ToggleSwitchOuterBorderStrokeThickness`, faded out by the `On` state.
-fn outer_border(brushes: &SwitchBrushes, is_on: bool) -> WidgetRef {
+fn outer_border(r: &ThemeResources, brushes: &SwitchBrushes, is_on: bool) -> WidgetRef {
     track(
+        r,
         brushes.fill_off,
         brushes.stroke_off,
-        OUTER_BORDER_STROKE_THICKNESS,
+        r.toggle_switch_outer_border_stroke_thickness,
         !is_on,
     )
 }
 
 /// `SwitchKnobBounds`: the on track, `StrokeThickness` `ToggleSwitchOnStrokeThickness`, faded in by the `On` state.
-fn switch_knob_bounds(brushes: &SwitchBrushes, is_on: bool) -> WidgetRef {
+fn switch_knob_bounds(r: &ThemeResources, brushes: &SwitchBrushes, is_on: bool) -> WidgetRef {
     track(
+        r,
         brushes.fill_on,
         brushes.stroke_on,
-        TOGGLE_SWITCH_ON_STROKE_THICKNESS,
+        r.toggle_switch_on_stroke_thickness,
         is_on,
     )
 }
@@ -704,12 +720,12 @@ fn switch_knob_bounds(brushes: &SwitchBrushes, is_on: bool) -> WidgetRef {
 fn switch_knob_on(resources: &ThemeResources, brushes: &SwitchBrushes, is_on: bool) -> WidgetRef {
     AnimatedOpacity::new(
         if is_on { 1.0 } else { 0.0 },
-        CONTROL_FASTER_ANIMATION_DURATION,
+        resources.control_faster_animation_duration,
     )
     .child(
         ControlBorder::new(
             Brush::Solid(brushes.knob_on),
-            Brush::CircleElevation(resources.toggle_switch().toggle_switch_knob_stroke_on),
+            Brush::CircleElevation(resources.toggle_switch_knob_stroke_on),
         )
         .border_thickness(0.0)
         .background_sizing(BackgroundSizing::OuterBorderEdge)
@@ -719,10 +735,10 @@ fn switch_knob_on(resources: &ThemeResources, brushes: &SwitchBrushes, is_on: bo
 }
 
 /// `SwitchKnobOff`: a `Rectangle` filled with `ToggleSwitchKnobFillOff`, `RadiusX` / `RadiusY` 7, faded out by the `On` state.
-fn switch_knob_off(brushes: &SwitchBrushes, is_on: bool) -> WidgetRef {
+fn switch_knob_off(r: &ThemeResources, brushes: &SwitchBrushes, is_on: bool) -> WidgetRef {
     AnimatedOpacity::new(
         if is_on { 0.0 } else { 1.0 },
-        CONTROL_FASTER_ANIMATION_DURATION,
+        r.control_faster_animation_duration,
     )
     .child(
         ControlBorder::new(

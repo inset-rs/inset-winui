@@ -3,9 +3,8 @@
 //! The template is one `ContentPresenter` (`x:Name="ContentPresenter"`) carrying `Background`, `BorderBrush`, `BorderThickness`, `CornerRadius`, `Padding` and `Foreground`, with a `BrushTransition` of 83 ms on `Background`; the `CommonStates` storyboards swap those brushes per state.
 
 use crate::{
-    BUTTON_PADDING, BackgroundSizing, Brush, ButtonResources, CONTROL_CONTENT_FONT_SIZE,
-    CONTROL_CORNER_RADIUS, CONTROL_FASTER_ANIMATION_DURATION, ColorTransition, CommonState,
-    CommonStates, ControlBorder, ControlStates, FocusVisual, ThemeResources, control_text_style,
+    BackgroundSizing, Brush, ColorTransition, CommonState, CommonStates, ControlBorder,
+    ControlStates, FocusVisual, ThemeResources, control_text_style,
 };
 use inset_embedder::{Color, FontWeight};
 use inset_foundation::{App, Listener};
@@ -42,7 +41,7 @@ pub struct ButtonBrushes {
 
 impl ButtonStyle {
     /// The `{ThemeResource …}` values the style's `CommonStates` storyboards name for `state`.
-    pub fn brushes(self, resources: &ButtonResources, state: CommonState) -> ButtonBrushes {
+    pub fn brushes(self, resources: &ThemeResources, state: CommonState) -> ButtonBrushes {
         let r = resources;
         match (self, state) {
             (ButtonStyle::Default, CommonState::Normal) => ButtonBrushes {
@@ -126,9 +125,9 @@ pub struct Button {
     pub click: Listener,
     /// The standard source style used when no template override is supplied.
     pub style: ButtonStyle,
-    /// `Padding` between the bezel and the content, in left, top, right, bottom order; the style's
-    /// `ButtonPadding` by default.
-    pub padding: [f64; 4],
+    /// `Padding` between the bezel and the content, in left, top, right, bottom order; the theme's
+    /// `ButtonPadding` when `None`, as the style sets it.
+    pub padding: Option<[f64; 4]>,
     /// Whether pointer and keyboard input can activate this button.
     pub is_enabled: bool,
     /// Whether sequential keyboard navigation stops here.
@@ -148,7 +147,7 @@ impl Button {
             content: content.into_widget(),
             click,
             style: ButtonStyle::Default,
-            padding: BUTTON_PADDING,
+            padding: None,
             is_enabled: true,
             is_tab_stop: true,
             focus_node: None,
@@ -170,7 +169,7 @@ impl Button {
 
     /// XAML `Padding`.
     pub fn padding(mut self, padding: [f64; 4]) -> Button {
-        self.padding = padding;
+        self.padding = Some(padding);
         self
     }
 
@@ -246,14 +245,17 @@ fn template(
     app: &mut App,
     context: BuildContext,
     style: ButtonStyle,
-    padding: [f64; 4],
+    padding: Option<[f64; 4]>,
     content: WidgetRef,
     states: ControlStates,
 ) -> WidgetRef {
-    let resources = ThemeResources::of(app, context);
-    let brushes = style.brushes(&resources.button(), states.common);
+    let r = ThemeResources::of(app, context);
+    let brushes = style.brushes(&r, states.common);
+    let padding = padding.unwrap_or(r.button_padding);
+    let corner_radius = r.control_corner_radius[0];
     let text = control_text_style(
-        CONTROL_CONTENT_FONT_SIZE,
+        &r,
+        r.control_content_theme_font_size,
         FontWeight::W400,
         brushes.foreground,
     );
@@ -265,20 +267,20 @@ fn template(
         .into_widget();
     let presenter = ColorTransition::new(
         brushes.background,
-        CONTROL_FASTER_ANIMATION_DURATION,
+        r.control_faster_animation_duration,
         move |_app, background| {
             ControlBorder::new(Brush::Solid(background), brushes.border)
                 .border_thickness(BUTTON_BORDER_THICKNESS)
-                .corner_radius(CONTROL_CORNER_RADIUS[0])
+                .corner_radius(corner_radius)
                 .background_sizing(style.background_sizing())
                 .padding(padding)
                 .child(label.clone())
                 .into_widget()
         },
     );
-    FocusVisual::new(presenter, resources.theme)
+    FocusVisual::new(presenter, r.theme)
         .visible(states.focused)
         .margin(BUTTON_FOCUS_VISUAL_MARGIN)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(corner_radius)
         .into_widget()
 }

@@ -77,7 +77,7 @@ impl State for SplitViewDemoState {
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);
-        let text = resources.common.text_fill_color_primary;
+        let text = resources.text_fill_color_primary;
         let (open, mode, placement, dim, cancel, page, event) = {
             let state = app.get(self);
             (
@@ -178,8 +178,8 @@ impl State for SplitViewDemoState {
             ],
             8.0,
         ));
-        let content = ColoredBox::new(resources.common.solid_background_fill_color_secondary)
-            .child(Center::new().child(column(
+        let content = ColoredBox::new(resources.solid_background_fill_color_secondary).child(
+            Center::new().child(column(
                 vec![
                     label(page, TextBlockStyle::Subtitle, text),
                     label(
@@ -189,7 +189,8 @@ impl State for SplitViewDemoState {
                     ),
                 ],
                 8.0,
-            )));
+            )),
+        );
         let split = SplitView::new(open, move |app, value| {
             self.set_state(app, |s| s.open = value)
         })
@@ -235,7 +236,7 @@ impl State for SplitViewDemoState {
                 label(
                     format!("{mode_name} · {event}"),
                     TextBlockStyle::Caption,
-                    resources.common.text_fill_color_secondary,
+                    resources.text_fill_color_secondary,
                 ),
             ],
             8.0,

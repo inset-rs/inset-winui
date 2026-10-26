@@ -2,11 +2,7 @@
 
 mod positioning;
 
-use crate::{
-    Brush, CONTROL_CORNER_RADIUS, ControlBorder, TOOL_TIP_BORDER_PADDING,
-    TOOL_TIP_BORDER_THEME_THICKNESS, TOOL_TIP_CONTENT_THEME_FONT_SIZE, TOOL_TIP_MAX_WIDTH,
-    ThemeResources, control_text_style,
-};
+use crate::{Brush, ControlBorder, ThemeResources, control_text_style};
 use inset_embedder::{Color, FontWeight, Offset, PointerDeviceKind, Rect, Size, TextDirection};
 use inset_foundation::{App, Handle, Listener, Timer, ValueKey};
 use inset_gestures::{GestureBinding, PointerEvent, PointerRoute};
@@ -54,14 +50,17 @@ pub struct ToolTip {
     pub foreground: Option<Color>,
     /// Optional border brush override.
     pub border_brush: Option<Brush>,
-    /// Border thickness in left, top, right, bottom order.
-    pub border_thickness: [f64; 4],
-    /// Content padding in left, top, right, bottom order.
-    pub padding: [f64; 4],
-    /// Maximum popup width before text wraps.
-    pub max_width: f64,
-    /// Rounded corners in top-left, top-right, bottom-right, bottom-left order.
-    pub corner_radius: [f64; 4],
+    /// Border thickness in left, top, right, bottom order; the theme's `ToolTipBorderThemeThickness`
+    /// when `None`.
+    pub border_thickness: Option<[f64; 4]>,
+    /// Content padding in left, top, right, bottom order; the theme's `ToolTipBorderPadding` when
+    /// `None`.
+    pub padding: Option<[f64; 4]>,
+    /// Maximum popup width before text wraps; the theme's `ToolTipMaxWidth` when `None`.
+    pub max_width: Option<f64>,
+    /// Rounded corners in top-left, top-right, bottom-right, bottom-left order; the theme's
+    /// `ControlCornerRadius` when `None`.
+    pub corner_radius: Option<[f64; 4]>,
     /// Raised when the native overlay has opened.
     pub opened: Option<Listener>,
     /// Raised after the closing fade has removed the overlay.
@@ -80,10 +79,10 @@ impl ToolTip {
             background: None,
             foreground: None,
             border_brush: None,
-            border_thickness: TOOL_TIP_BORDER_THEME_THICKNESS,
-            padding: TOOL_TIP_BORDER_PADDING,
-            max_width: TOOL_TIP_MAX_WIDTH,
-            corner_radius: CONTROL_CORNER_RADIUS,
+            border_thickness: None,
+            padding: None,
+            max_width: None,
+            corner_radius: None,
             opened: None,
             closed: None,
         }
@@ -138,25 +137,25 @@ impl ToolTip {
 
     /// Overrides all border sides equally.
     pub fn border_thickness(mut self, value: f64) -> Self {
-        self.border_thickness = [value; 4];
+        self.border_thickness = Some([value; 4]);
         self
     }
 
     /// Overrides content padding.
     pub fn padding(mut self, value: [f64; 4]) -> Self {
-        self.padding = value;
+        self.padding = Some(value);
         self
     }
 
     /// Overrides the wrapping width.
     pub fn max_width(mut self, width: f64) -> Self {
-        self.max_width = width;
+        self.max_width = Some(width);
         self
     }
 
     /// Overrides all four corner radii equally.
     pub fn corner_radius(mut self, value: f64) -> Self {
-        self.corner_radius = [value; 4];
+        self.corner_radius = Some([value; 4]);
         self
     }
 
@@ -184,14 +183,16 @@ impl fmt::Debug for ToolTip {
 
 impl StatelessWidget for ToolTip {
     fn build(&self, app: &mut App, context: BuildContext) -> WidgetRef {
-        let r = ThemeResources::of(app, context).tool_tip();
+        let r = ThemeResources::of(app, context);
         let style = control_text_style(
-            TOOL_TIP_CONTENT_THEME_FONT_SIZE,
+            &r,
+            r.tool_tip_content_theme_font_size,
             FontWeight::W400,
             self.foreground.unwrap_or(r.tool_tip_foreground_brush),
         );
         // LayoutRoot, the template's ContentPresenter.
-        ConstrainedBox::new(BoxConstraints::new().max_width(self.max_width))
+        let max_width = self.max_width.unwrap_or(r.tool_tip_max_width);
+        ConstrainedBox::new(BoxConstraints::new().max_width(max_width))
             .child(
                 ControlBorder::new(
                     self.background
@@ -199,9 +200,12 @@ impl StatelessWidget for ToolTip {
                     self.border_brush
                         .unwrap_or(Brush::Solid(r.tool_tip_border_brush)),
                 )
-                .border_thickness_ltrb(self.border_thickness)
-                .corner_radius_corners(self.corner_radius)
-                .padding(self.padding)
+                .border_thickness_ltrb(
+                    self.border_thickness
+                        .unwrap_or(r.tool_tip_border_theme_thickness),
+                )
+                .corner_radius_corners(self.corner_radius.unwrap_or(r.control_corner_radius))
+                .padding(self.padding.unwrap_or(r.tool_tip_border_padding))
                 .child(DefaultTextStyle::new(style, self.content.clone()).soft_wrap(true)),
             )
             .into_widget()

@@ -100,27 +100,27 @@ struct VerticalLayout {
 /// `GetMeasureDeltaForVisualsBetweenPopupAndCarouselPanel`: the height between `PopupBorder`
 /// and the items, which the panel measures as what its first measure lacked of the popup's
 /// initial height.
-fn chrome_height() -> f64 {
-    COMBO_BOX_DROPDOWN_BORDER_THICKNESS[1]
-        + COMBO_BOX_DROPDOWN_BORDER_THICKNESS[3]
-        + COMBO_BOX_DROPDOWN_BORDER_PADDING[1]
-        + COMBO_BOX_DROPDOWN_BORDER_PADDING[3]
-        + COMBO_BOX_DROPDOWN_CONTENT_MARGIN[1]
-        + COMBO_BOX_DROPDOWN_CONTENT_MARGIN[3]
+fn chrome_height(r: &ThemeResources) -> f64 {
+    r.combo_box_dropdown_border_thickness[1]
+        + r.combo_box_dropdown_border_thickness[3]
+        + r.combo_box_dropdown_border_padding[1]
+        + r.combo_box_dropdown_border_padding[3]
+        + r.combo_box_dropdown_content_margin[1]
+        + r.combo_box_dropdown_content_margin[3]
 }
 
 /// `TemplateSettings.DropDownContentMinWidth` for the mouse and the keyboard, plus the border:
 /// the narrowest the popup is.
-pub(super) fn popup_min_width(window: Size) -> f64 {
-    window.width().min(COMBO_BOX_POPUP_THEME_MIN_WIDTH)
-        + COMBO_BOX_DROPDOWN_BORDER_THICKNESS[0]
-        + COMBO_BOX_DROPDOWN_BORDER_THICKNESS[2]
+pub(super) fn popup_min_width(r: &ThemeResources, window: Size) -> f64 {
+    window.width().min(r.combo_box_popup_theme_min_width)
+        + r.combo_box_dropdown_border_thickness[0]
+        + r.combo_box_dropdown_border_thickness[2]
 }
 
 /// `ArrangePopup` for a popup opened with the mouse or the keyboard: the popup at least as wide
 /// as the box and within the window, with the selected item over the box where it fits, or, for
 /// an editable box, below the box or else above it. None while the box has no size.
-pub(super) fn arrange(input: &ArrangeInput) -> Option<Arrangement> {
+pub(super) fn arrange(r: &ThemeResources, input: &ArrangeInput) -> Option<Arrangement> {
     let target = input.target;
     let window = input.window;
     if window.width() == 0.0 || window.height() == 0.0 {
@@ -149,6 +149,7 @@ pub(super) fn arrange(input: &ArrangeInput) -> Option<Arrangement> {
         popup_left(target.left, child_width, window.width())
     };
     let pannable = is_pannable(
+        r,
         input.heights,
         input.fallback_height,
         max_drop_down_height,
@@ -157,25 +158,18 @@ pub(super) fn arrange(input: &ArrangeInput) -> Option<Arrangement> {
     );
     let vertical = match input.editable {
         Some(text_box_height) => editable_layout(
+            r,
             input.heights,
             target.top,
             cb_height.max(text_box_height),
             window,
         ),
-        None => non_pannable_layout(
-            input.heights,
-            input.fallback_height,
-            input.selected,
-            target.top,
-            cb_height,
-            window,
-            max_drop_down_height,
-        ),
+        None => non_pannable_layout(r, input, max_drop_down_height),
     };
     // The layouts counted the items and their margin; the border remains.
-    let height = vertical.height + chrome_height()
-        - COMBO_BOX_DROPDOWN_CONTENT_MARGIN[1]
-        - COMBO_BOX_DROPDOWN_CONTENT_MARGIN[3];
+    let height = vertical.height + chrome_height(r)
+        - r.combo_box_dropdown_content_margin[1]
+        - r.combo_box_dropdown_content_margin[3];
     let mut top = vertical.top;
     if top + height > window.height() {
         top = (top - (top + height - window.height())).max(0.0);
@@ -208,6 +202,7 @@ fn popup_left(box_left: f64, child_width: f64, window_width: f64) -> f64 {
 /// `UpdateIsPopupPannable`: whether the items do not all fit, which is always so for more than
 /// `ComboBoxPopupMaxNumberOfItems` of them. Like the source, it counts the last item twice.
 fn is_pannable(
+    r: &ThemeResources,
     heights: &[f64],
     fallback_height: f64,
     max_drop_down_height: f64,
@@ -218,7 +213,7 @@ fn is_pannable(
     if count == 0 {
         return false;
     }
-    if count > COMBO_BOX_POPUP_MAX_NUMBER_OF_ITEMS as usize {
+    if count > r.combo_box_popup_max_number_of_items as usize {
         return true;
     }
     let max_allowed = max_drop_down_height.min(window.height());
@@ -240,16 +235,19 @@ fn is_pannable(
 /// above it as fit up to `ComboBoxPopupMaxNumberOfItemsThatCanBeShownOnOneSide`, then items below
 /// and, while room is left, more on either side, up to `ComboBoxPopupMaxNumberOfItems` in all.
 fn non_pannable_layout(
-    heights: &[f64],
-    fallback_height: f64,
-    selected: Option<usize>,
-    cb_y: f64,
-    cb_height: f64,
-    window: Size,
+    r: &ThemeResources,
+    input: &ArrangeInput,
     max_height: f64,
 ) -> VerticalLayout {
+    let (heights, fallback_height, selected, window) = (
+        input.heights,
+        input.fallback_height,
+        input.selected,
+        input.window,
+    );
+    let (cb_y, cb_height) = (input.target.top, input.target.height());
     let count = heights.len() as i64;
-    let margin = COMBO_BOX_DROPDOWN_CONTENT_MARGIN;
+    let margin = r.combo_box_dropdown_content_margin;
     let height = |index: i64| {
         heights
             .get(index as usize)
@@ -285,8 +283,8 @@ fn non_pannable_layout(
     let mut index_below = center + 1;
     let mut laid = 1;
     let max_on_one_side =
-        (COMBO_BOX_POPUP_MAX_NUMBER_OF_ITEMS_THAT_CAN_BE_SHOWN_ON_ONE_SIDE as i64).min(count);
-    let max_allowed = (COMBO_BOX_POPUP_MAX_NUMBER_OF_ITEMS as i64).min(count);
+        (r.combo_box_popup_max_number_of_items_that_can_be_shown_on_one_side as i64).min(count);
+    let max_allowed = (r.combo_box_popup_max_number_of_items as i64).min(count);
     if calculated_below > window.height() {
         above = (above - calculated_below + window.height()).max(0.0);
     }
@@ -350,7 +348,13 @@ fn non_pannable_layout(
 
 /// `GetEditableComboBoxPopupLayout`: up to `ComboBoxPopupMaxNumberOfItems` items below the box,
 /// or above it when they do not fit below and do above.
-fn editable_layout(heights: &[f64], cb_y: f64, cb_height: f64, window: Size) -> VerticalLayout {
+fn editable_layout(
+    r: &ThemeResources,
+    heights: &[f64],
+    cb_y: f64,
+    cb_height: f64,
+    window: Size,
+) -> VerticalLayout {
     if heights.is_empty() {
         return VerticalLayout {
             top: cb_y,
@@ -359,12 +363,12 @@ fn editable_layout(heights: &[f64], cb_y: f64, cb_height: f64, window: Size) -> 
             opened_up: false,
         };
     }
-    let margin = COMBO_BOX_DROPDOWN_CONTENT_MARGIN;
+    let margin = r.combo_box_dropdown_content_margin;
     // The IME candidate window's height, which this host does not report, would be added here.
     let above = (cb_y + cb_height).max(0.0);
     let shown = heights
         .iter()
-        .take(COMBO_BOX_POPUP_MAX_NUMBER_OF_ITEMS as usize);
+        .take(r.combo_box_popup_max_number_of_items as usize);
     let below = above + margin[1] + margin[3] + shown.sum::<f64>();
     let height = below - above;
     let (top, opened_up) = if above + height > window.height() && cb_y - height >= 0.0 {
@@ -673,6 +677,11 @@ mod tests {
 
     const WINDOW: Size = Size::new(1080.0, 780.0);
 
+    /// WinUI's own values.
+    fn winui() -> ThemeResources {
+        ThemeResources::new(Theme::Light, AccentPalette::default())
+    }
+
     fn input(heights: &[f64], selected: Option<usize>, top: f64) -> ArrangeInput<'_> {
         ArrangeInput {
             target: Rect::from_ltwh(100.0, top, 200.0, 32.0),
@@ -691,7 +700,7 @@ mod tests {
     #[test]
     fn a_short_list_puts_the_selected_item_over_the_box() {
         let heights = [36.0; 5];
-        let a = arrange(&input(&heights, Some(2), 300.0)).unwrap();
+        let a = arrange(&winui(), &input(&heights, Some(2), 300.0)).unwrap();
         // The items and their 4-pixel margins, and the border.
         assert_eq!(a.max_height, 5.0 * 36.0 + 8.0 + 2.0);
         assert_eq!(a.top, 222.0 - 0.5);
@@ -705,7 +714,7 @@ mod tests {
     #[test]
     fn a_long_list_shows_up_to_seven_items_above_and_scrolls_to_the_first() {
         let heights = vec![36.0; 300];
-        let a = arrange(&input(&heights, Some(150), 300.0)).unwrap();
+        let a = arrange(&winui(), &input(&heights, Some(150), 300.0)).unwrap();
         assert!(a.pannable);
         assert_eq!(a.first_item, 144);
         assert_eq!(a.top, 78.0 - 0.5);
@@ -715,7 +724,7 @@ mod tests {
     #[test]
     fn near_the_window_top_the_items_above_go_below() {
         let heights = [36.0; 5];
-        let a = arrange(&input(&heights, Some(2), 10.0)).unwrap();
+        let a = arrange(&winui(), &input(&heights, Some(2), 10.0)).unwrap();
         assert_eq!(a.top, 4.0 - 0.5);
         assert_eq!(a.first_item, 0);
         assert_eq!(a.max_height, 188.0 + 2.0);
@@ -724,7 +733,7 @@ mod tests {
     #[test]
     fn without_a_selection_the_middle_item_is_over_the_box() {
         let heights = [36.0; 3];
-        let a = arrange(&input(&heights, None, 300.0)).unwrap();
+        let a = arrange(&winui(), &input(&heights, None, 300.0)).unwrap();
         // Item 1 is centered on the box: one item above it.
         assert_eq!(a.top, 300.0 + 16.0 - 18.0 - 4.0 - 36.0 - 0.5);
     }
@@ -734,10 +743,10 @@ mod tests {
         let heights = [36.0; 3];
         let mut wide = input(&heights, None, 300.0);
         wide.content_width = 120.0;
-        assert_eq!(arrange(&wide).unwrap().width, 200.0);
+        assert_eq!(arrange(&winui(), &wide).unwrap().width, 200.0);
         wide.content_width = 400.0;
         wide.target = Rect::from_ltwh(900.0, 300.0, 100.0, 32.0);
-        let a = arrange(&wide).unwrap();
+        let a = arrange(&winui(), &wide).unwrap();
         assert_eq!(a.width, 400.0);
         assert_eq!(a.left, WINDOW.width() - 400.0);
     }
@@ -750,12 +759,15 @@ mod tests {
         rtl.content_width = 400.0;
         // Its right edge on the box's.
         rtl.target = Rect::from_ltwh(600.0, 300.0, 200.0, 32.0);
-        assert_eq!(arrange(&rtl).unwrap().left, 400.0);
+        assert_eq!(arrange(&winui(), &rtl).unwrap().left, 400.0);
         // Moved in from the window's left edge, and from its right where the box goes past it.
         rtl.target = Rect::from_ltwh(100.0, 300.0, 200.0, 32.0);
-        assert_eq!(arrange(&rtl).unwrap().left, 0.0);
+        assert_eq!(arrange(&winui(), &rtl).unwrap().left, 0.0);
         rtl.target = Rect::from_ltwh(1000.0, 300.0, 200.0, 32.0);
-        assert_eq!(arrange(&rtl).unwrap().left, WINDOW.width() - 400.0);
+        assert_eq!(
+            arrange(&winui(), &rtl).unwrap().left,
+            WINDOW.width() - 400.0
+        );
     }
 
     #[test]
@@ -763,22 +775,36 @@ mod tests {
         let heights = [36.0; 5];
         let mut below = input(&heights, Some(4), 300.0);
         below.editable = Some(32.0);
-        let a = arrange(&below).unwrap();
+        let a = arrange(&winui(), &below).unwrap();
         assert!(!a.opened_up);
         assert_eq!(a.top, 332.0 - 0.5);
         assert_eq!(a.max_height, 188.0 + 2.0);
         below.target = Rect::from_ltwh(100.0, 700.0, 200.0, 32.0);
-        let a = arrange(&below).unwrap();
+        let a = arrange(&winui(), &below).unwrap();
         assert!(a.opened_up);
         assert_eq!(a.top, 700.0 - 188.0 - 0.5);
     }
 
     #[test]
     fn fifteen_items_of_one_height_fit_and_sixteen_pan() {
-        assert!(!is_pannable(&[30.0; 15], 30.0, 504.0, WINDOW, 0.0));
-        assert!(is_pannable(&[30.0; 16], 30.0, 504.0, WINDOW, 0.0));
+        assert!(!is_pannable(
+            &winui(),
+            &[30.0; 15],
+            30.0,
+            504.0,
+            WINDOW,
+            0.0
+        ));
+        assert!(is_pannable(&winui(), &[30.0; 16], 30.0, 504.0, WINDOW, 0.0));
         // The last item counts twice: 13 items of 36 make 504.
-        assert!(!is_pannable(&[36.0; 13], 36.0, 504.0, WINDOW, 0.0));
-        assert!(is_pannable(&[36.0; 14], 36.0, 504.0, WINDOW, 0.0));
+        assert!(!is_pannable(
+            &winui(),
+            &[36.0; 13],
+            36.0,
+            504.0,
+            WINDOW,
+            0.0
+        ));
+        assert!(is_pannable(&winui(), &[36.0; 14], 36.0, 504.0, WINDOW, 0.0));
     }
 }

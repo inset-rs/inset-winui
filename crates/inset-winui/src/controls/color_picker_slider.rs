@@ -17,14 +17,10 @@
 //! The application owns the value, as for `Slider`.
 
 use crate::{
-    Brush, COLOR_PICKER_SLIDER_INNER_THUMB_HEIGHT, COLOR_PICKER_SLIDER_INNER_THUMB_WIDTH,
-    CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, ColorPickerHsvChannel, ColorPickerResources,
-    ColorPickerState, ColumnDefinition, CommonState, ControlBorder, FocusVisual, Grid, GridCell,
-    GridLength, Hsv, IncrementAmount, IncrementDirection, Orientation, RangeBase, RowDefinition,
-    SLIDER_DEFAULT_MAXIMUM, SLIDER_DEFAULT_STEP_FREQUENCY, SLIDER_FOCUS_VISUAL_MARGIN,
-    SLIDER_HEADER_THEME_FONT_WEIGHT, SLIDER_HEADER_THEME_MARGIN, SLIDER_HORIZONTAL_THUMB_HEIGHT,
-    SLIDER_HORIZONTAL_THUMB_WIDTH, SLIDER_POST_CONTENT_MARGIN, SLIDER_PRE_CONTENT_MARGIN,
-    SLIDER_THUMB_CORNER_RADIUS, Slider, SliderTemplate, SliderTemplateParts, SliderTemplateStates,
+    Brush, ColorPickerHsvChannel, ColorPickerState, ColumnDefinition, CommonState, ControlBorder,
+    FocusVisual, Grid, GridCell, GridLength, Hsv, IncrementAmount, IncrementDirection, Orientation,
+    RangeBase, RowDefinition, SLIDER_DEFAULT_MAXIMUM, SLIDER_DEFAULT_STEP_FREQUENCY,
+    SLIDER_FOCUS_VISUAL_MARGIN, Slider, SliderTemplate, SliderTemplateParts, SliderTemplateStates,
     ThemeResources, ToolTip, ToolTipService, ValueChangedHandler, color_display_name,
     color_from_rgba, control_text_style, decrease_definitions, fill_bounded, hsv_to_rgb,
     increment_alpha_channel, increment_color_channel,
@@ -69,8 +65,8 @@ pub struct ColorPickerSlider {
     /// they are enabled before the slider first takes the focus or changes value.
     pub is_thumb_tool_tip_enabled: bool,
     /// `CornerRadius`: of `SliderContainer`, which the focus visual follows; `ControlCornerRadius`
-    /// by default.
-    pub corner_radius: f64,
+    /// by default; the theme's `ControlCornerRadius` when `None`.
+    pub corner_radius: Option<f64>,
     /// `IsEnabled`.
     pub is_enabled: bool,
     /// Identity retained across parent rebuilds.
@@ -92,7 +88,7 @@ impl ColorPickerSlider {
             is_direction_reversed: false,
             header: None,
             is_thumb_tool_tip_enabled: true,
-            corner_radius: CONTROL_CORNER_RADIUS[0],
+            corner_radius: None,
             is_enabled: true,
             key: None,
         }
@@ -148,7 +144,7 @@ impl ColorPickerSlider {
 
     /// Sets CornerRadius.
     pub fn corner_radius(mut self, value: f64) -> Self {
-        self.corner_radius = value;
+        self.corner_radius = Some(value);
         self
     }
 
@@ -400,12 +396,12 @@ impl ColorPickerSliderState {
         parts: &SliderTemplateParts,
     ) -> WidgetRef {
         let resources = ThemeResources::of(app, context);
-        let r = resources.color_picker();
+        let r = &resources;
         let widget = self.widget(app).clone();
-        let thumbs = ThumbVisuals::of(&r, states.slider);
+        let thumbs = ThumbVisuals::of(r, states.slider);
         let content = match slider.orientation {
-            Orientation::Horizontal => self.horizontal_template(app, &r, slider, states, thumbs),
-            Orientation::Vertical => vertical_template(&r, slider, states, thumbs),
+            Orientation::Horizontal => self.horizontal_template(app, r, slider, states, thumbs),
+            Orientation::Vertical => vertical_template(r, slider, states, thumbs),
         };
         // `SliderContainer`: transparent, and the target of the focus visual.
         let container =
@@ -413,10 +409,11 @@ impl ColorPickerSliderState {
         let mut children = Vec::new();
         if let Some(header) = &slider.header {
             // `HeaderContentPresenter`.
-            let [left, top, right, bottom] = SLIDER_HEADER_THEME_MARGIN;
+            let [left, top, right, bottom] = r.slider_header_theme_margin;
             let text = control_text_style(
-                CONTROL_CONTENT_FONT_SIZE,
-                SLIDER_HEADER_THEME_FONT_WEIGHT,
+                &resources,
+                r.control_content_theme_font_size,
+                r.slider_header_theme_font_weight,
                 thumbs.header,
             );
             children.push(
@@ -433,7 +430,7 @@ impl ColorPickerSliderState {
                 FocusVisual::new(container, resources.theme)
                     .visible(states.focused)
                     .margin(SLIDER_FOCUS_VISUAL_MARGIN)
-                    .corner_radius(widget.corner_radius),
+                    .corner_radius(widget.corner_radius.unwrap_or(r.control_corner_radius[0])),
             )
             .row(1)
             .into_widget(),
@@ -451,7 +448,7 @@ impl ColorPickerSliderState {
     fn horizontal_template(
         self: Handle<Self>,
         app: &App,
-        r: &ColorPickerResources,
+        r: &ThemeResources,
         slider: &Slider,
         states: SliderTemplateStates,
         thumbs: ThumbVisuals,
@@ -462,7 +459,7 @@ impl ColorPickerSliderState {
             thumb(r, thumbs.horizontal),
             ToolTip::text(state.tool_tip_text.clone())
                 .vertical_offset(THUMB_TOOL_TIP_OFFSET)
-                .placement_rect(thumb_slot()),
+                .placement_rect(thumb_slot(r)),
         )
         .is_enabled(state.tool_tip_enabled);
         if states.tooltip_open || state.focused {
@@ -493,9 +490,9 @@ impl ColorPickerSliderState {
                 ColumnDefinition::new(last),
             ])
             .row_definitions([
-                RowDefinition::new(GridLength::pixel(SLIDER_PRE_CONTENT_MARGIN)),
+                RowDefinition::new(GridLength::pixel(r.slider_pre_content_margin)),
                 RowDefinition::new(GridLength::AUTO),
-                RowDefinition::new(GridLength::pixel(SLIDER_POST_CONTENT_MARGIN)),
+                RowDefinition::new(GridLength::pixel(r.slider_post_content_margin)),
             ])
             .children([track, thumb]);
         ConstrainedBox::new(BoxConstraints::new().min_height(TEMPLATE_MIN_SIZE))
@@ -507,7 +504,7 @@ impl ColorPickerSliderState {
 /// `VerticalTemplate`: the thumb in row 1, across all columns, with `VerticalToolTip`, which
 /// only the slider's own thumb tooltip logic opens and which has no content.
 fn vertical_template(
-    r: &ColorPickerResources,
+    r: &ThemeResources,
     slider: &Slider,
     states: SliderTemplateStates,
     thumbs: ThumbVisuals,
@@ -516,7 +513,7 @@ fn vertical_template(
         thumb(r, thumbs.vertical),
         ToolTip::new(SizedBox::shrink())
             .vertical_offset(THUMB_TOOL_TIP_OFFSET)
-            .placement_rect(thumb_slot()),
+            .placement_rect(thumb_slot(r)),
     )
     .is_enabled(slider.is_thumb_tool_tip_enabled);
     if states.tooltip_open {
@@ -547,9 +544,9 @@ fn vertical_template(
             RowDefinition::new(last),
         ])
         .column_definitions([
-            ColumnDefinition::new(GridLength::pixel(SLIDER_PRE_CONTENT_MARGIN)),
+            ColumnDefinition::new(GridLength::pixel(r.slider_pre_content_margin)),
             ColumnDefinition::new(GridLength::AUTO),
-            ColumnDefinition::new(GridLength::pixel(SLIDER_POST_CONTENT_MARGIN)),
+            ColumnDefinition::new(GridLength::pixel(r.slider_post_content_margin)),
         ])
         .children([track, thumb]);
     ConstrainedBox::new(BoxConstraints::new().min_width(TEMPLATE_MIN_SIZE))
@@ -558,12 +555,12 @@ fn vertical_template(
 }
 
 /// A thumb's slot, which its tooltip docks to as a slider thumb's does.
-fn thumb_slot() -> Rect {
+fn thumb_slot(r: &ThemeResources) -> Rect {
     Rect::from_ltwh(
         0.0,
         0.0,
-        SLIDER_HORIZONTAL_THUMB_WIDTH,
-        SLIDER_HORIZONTAL_THUMB_HEIGHT,
+        r.slider_horizontal_thumb_width,
+        r.slider_horizontal_thumb_height,
     )
 }
 
@@ -580,7 +577,7 @@ struct ThumbVisuals {
 }
 
 impl ThumbVisuals {
-    fn of(r: &ColorPickerResources, state: CommonState) -> ThumbVisuals {
+    fn of(r: &ThemeResources, state: CommonState) -> ThumbVisuals {
         let horizontal = match state {
             CommonState::Normal => r.color_picker_slider_thumb_background,
             CommonState::PointerOver => r.color_picker_slider_thumb_background_pointer_over,
@@ -602,22 +599,22 @@ impl ThumbVisuals {
 /// A thumb in the template's `SliderThumbStyle`: an 18 square `Border` with
 /// `SliderThumbCornerRadius`, `SliderOuterThumbBackground` inside `SliderThumbBorderBrush`, and
 /// the 10 pixel `SliderInnerThumb` filled with `fill`.
-fn thumb(r: &ColorPickerResources, fill: Color) -> WidgetRef {
+fn thumb(r: &ThemeResources, fill: Color) -> WidgetRef {
     SizedBox::new()
-        .width(SLIDER_HORIZONTAL_THUMB_WIDTH)
-        .height(SLIDER_HORIZONTAL_THUMB_HEIGHT)
+        .width(r.slider_horizontal_thumb_width)
+        .height(r.slider_horizontal_thumb_height)
         .child(
             ControlBorder::new(
                 Brush::Solid(r.slider_outer_thumb_background),
                 Brush::ControlElevation(r.slider_thumb_border_brush),
             )
             .border_thickness(THUMB_BORDER_THICKNESS)
-            .corner_radius(SLIDER_THUMB_CORNER_RADIUS[0])
+            .corner_radius(r.slider_thumb_corner_radius[0])
             .child(
                 Center::new().child(
                     SizedBox::new()
-                        .width(COLOR_PICKER_SLIDER_INNER_THUMB_WIDTH)
-                        .height(COLOR_PICKER_SLIDER_INNER_THUMB_HEIGHT)
+                        .width(r.color_picker_slider_inner_thumb_width)
+                        .height(r.color_picker_slider_inner_thumb_height)
                         .child(CustomPaint::new().painter(InnerThumbPainter { fill })),
                 ),
             ),

@@ -52,10 +52,10 @@ const FOCUS_VISUAL_MARGIN: [f64; 4] = [0.0, -1.0, 0.0, -1.0];
 
 /// The height a row of one line of text takes: `ContentPresenterGrid`'s padding around the
 /// content's `MinHeight`, within the item's `MinHeight`, and the grid's margin.
-pub(super) fn estimated_row_height() -> f64 {
-    let padding = TREE_VIEW_ITEM_PRESENTER_PADDING;
-    let margin = TREE_VIEW_ITEM_PRESENTER_MARGIN;
-    (padding[1] + padding[3] + TREE_VIEW_ITEM_CONTENT_HEIGHT).max(TREE_VIEW_ITEM_MIN_HEIGHT)
+pub(super) fn estimated_row_height(r: &ThemeResources) -> f64 {
+    let padding = r.tree_view_item_presenter_padding;
+    let margin = r.tree_view_item_presenter_margin;
+    (padding[1] + padding[3] + r.tree_view_item_content_height).max(r.tree_view_item_min_height)
         + margin[1]
         + margin[3]
 }
@@ -191,7 +191,7 @@ struct StateBrushes {
 
 impl StateBrushes {
     /// The setters of `state`, or the template's own values where it sets none.
-    fn of(r: &TreeViewResources, state: ItemCommonState) -> StateBrushes {
+    fn of(r: &ThemeResources, state: ItemCommonState) -> StateBrushes {
         use ItemCommonState::*;
         match state {
             // The template's values: `Background`, `BorderBrush`, `Foreground` and `GlyphBrush`
@@ -334,9 +334,9 @@ impl TreeViewItemContainerState {
     fn template(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let resources = ThemeResources::of(app, context);
-        let r = resources.tree_view();
+        let r = &resources;
         let state = self.common_state(app);
-        let brushes = StateBrushes::of(&r, state);
+        let brushes = StateBrushes::of(r, state);
         let multi = widget.multi_select.is_some();
         // `SelectionIndicator`.
         let (width, height) = SELECTION_INDICATOR_SIZE;
@@ -352,19 +352,19 @@ impl TreeViewItemContainerState {
                 ),
             ),
         );
-        let multi_select_grid = self.multi_select_grid(app, context, &r, &brushes);
+        let multi_select_grid = self.multi_select_grid(app, context, r, &brushes);
         // `ReorderedPlaceholder`'s `FadeOutThemeAnimation` on `MultiSelectGrid`.
         let shown = state != ItemCommonState::ReorderedPlaceholder;
         let presenter_grid = Grid::new()
             .background(Brush::Solid(brushes.background))
             .border_brush(Brush::Solid(brushes.border))
-            .border_thickness_ltrb(TREE_VIEW_ITEM_BORDER_THEME_THICKNESS)
-            .corner_radius_corners(CONTROL_CORNER_RADIUS)
+            .border_thickness_ltrb(r.tree_view_item_border_theme_thickness)
+            .corner_radius_corners(r.control_corner_radius)
             // `TreeViewMultiSelectEnabled*` sets the padding to 0.
             .padding(if multi {
                 [0.0; 4]
             } else {
-                TREE_VIEW_ITEM_PRESENTER_PADDING
+                r.tree_view_item_presenter_padding
             })
             .children([
                 GridCell::new(indicator).into_widget(),
@@ -373,10 +373,13 @@ impl TreeViewItemContainerState {
             ]);
         let item = ConstrainedBox::new(
             BoxConstraints::new()
-                .min_width(LIST_VIEW_ITEM_MIN_WIDTH)
-                .min_height(TREE_VIEW_ITEM_MIN_HEIGHT),
+                .min_width(r.list_view_item_min_width)
+                .min_height(r.tree_view_item_min_height),
         )
-        .child(Margin::new(TREE_VIEW_ITEM_PRESENTER_MARGIN, presenter_grid));
+        .child(Margin::new(
+            r.tree_view_item_presenter_margin,
+            presenter_grid,
+        ));
         let focused = widget
             .focus
             .as_ref()
@@ -384,7 +387,7 @@ impl TreeViewItemContainerState {
         FocusVisual::new(item, resources.theme)
             .visible(focused)
             .margin(FOCUS_VISUAL_MARGIN)
-            .corner_radius(CONTROL_CORNER_RADIUS[0])
+            .corner_radius(r.control_corner_radius[0])
             .primary_brush(r.list_view_item_focus_visual_primary_brush)
             .secondary_brush(r.list_view_item_focus_visual_secondary_brush)
             .into_widget()
@@ -396,7 +399,7 @@ impl TreeViewItemContainerState {
         self: Handle<Self>,
         app: &mut App,
         _context: BuildContext,
-        r: &TreeViewResources,
+        r: &ThemeResources,
         brushes: &StateBrushes,
     ) -> WidgetRef {
         let widget = self.widget(app).clone();
@@ -412,7 +415,7 @@ impl TreeViewItemContainerState {
             Color::new(0)
         };
         let content =
-            ConstrainedBox::new(BoxConstraints::new().min_height(TREE_VIEW_ITEM_CONTENT_HEIGHT))
+            ConstrainedBox::new(BoxConstraints::new().min_height(r.tree_view_item_content_height))
                 .child(
                     // `VerticalContentAlignment` is `Center`; `HorizontalContentAlignment` `Stretch`.
                     Align::new().alignment(Alignment::CENTER_LEFT.into()).child(
@@ -421,7 +424,8 @@ impl TreeViewItemContainerState {
                             .alignment(Alignment::CENTER_LEFT.into())
                             .child(DefaultTextStyle::new(
                                 control_text_style(
-                                    CONTROL_CONTENT_FONT_SIZE,
+                                    r,
+                                    r.control_content_theme_font_size,
                                     FontWeight::NORMAL,
                                     brushes.foreground,
                                 ),
@@ -447,14 +451,14 @@ impl TreeViewItemContainerState {
             ])
             .background(Brush::Solid(background))
             .border_brush(Brush::Solid(border))
-            .border_thickness_ltrb(TREE_VIEW_ITEM_BORDER_THEME_THICKNESS)
-            .corner_radius_corners(CONTROL_CORNER_RADIUS)
+            .border_thickness_ltrb(r.tree_view_item_border_theme_thickness)
+            .corner_radius_corners(r.control_corner_radius)
             .padding([
                 widget.depth as f64 * INDENTATION_PER_DEPTH
-                    + TREE_VIEW_ITEM_MULTI_SELECT_SELECTED_ITEM_BORDER_MARGIN[0],
-                TREE_VIEW_ITEM_MULTI_SELECT_SELECTED_ITEM_BORDER_MARGIN[1],
-                TREE_VIEW_ITEM_MULTI_SELECT_SELECTED_ITEM_BORDER_MARGIN[2],
-                TREE_VIEW_ITEM_MULTI_SELECT_SELECTED_ITEM_BORDER_MARGIN[3],
+                    + r.tree_view_item_multi_select_selected_item_border_margin[0],
+                r.tree_view_item_multi_select_selected_item_border_margin[1],
+                r.tree_view_item_multi_select_selected_item_border_margin[2],
+                r.tree_view_item_multi_select_selected_item_border_margin[3],
             ])
             .children(cells)
             .into_widget()
@@ -465,7 +469,7 @@ impl TreeViewItemContainerState {
     fn selection_column(
         self: Handle<Self>,
         app: &mut App,
-        r: &TreeViewResources,
+        r: &ThemeResources,
     ) -> Option<WidgetRef> {
         let widget = self.widget(app).clone();
         let dragging = multiple_dragging_primary(widget.drag);
@@ -491,7 +495,7 @@ impl TreeViewItemContainerState {
                 .child(ExcludeFocus::new(
                     SizedBox::new()
                         .width(CHECK_BOX_WIDTH)
-                        .height(TREE_VIEW_ITEM_MULTI_SELECT_CHECK_BOX_MIN_HEIGHT)
+                        .height(r.tree_view_item_multi_select_check_box_min_height)
                         .child(check_box),
                 ));
             // `MultipleDraggingPrimary` hides the check box by its opacity: it keeps its place.
@@ -626,7 +630,7 @@ impl TreeViewItemContainerState {
 
 /// `MultiArrangeOverlayTextBorder` with `MultiArrangeOverlayText`: the number of nodes a drag
 /// carries.
-fn drag_count(r: &TreeViewResources, drag: ItemDrag) -> WidgetRef {
+fn drag_count(r: &ThemeResources, drag: ItemDrag) -> WidgetRef {
     ConstrainedBox::new(
         BoxConstraints::new()
             .min_width(DRAG_COUNT_MIN_WIDTH)
@@ -639,13 +643,13 @@ fn drag_count(r: &TreeViewResources, drag: ItemDrag) -> WidgetRef {
             Brush::Solid(r.system_control_background_chrome_white_brush),
         )
         .border_thickness(DRAG_COUNT_BORDER_THICKNESS)
-        .corner_radius_corners(CONTROL_CORNER_RADIUS)
+        .corner_radius_corners(r.control_corner_radius)
         .child(
             Center::new().width_factor(1.0).child(
                 Text::new(drag.drag_items_count_display.to_string())
                     .style(
                         TextBlockStyle::Caption
-                            .text_style(r.system_control_foreground_chrome_white_brush),
+                            .text_style(r, r.system_control_foreground_chrome_white_brush),
                     )
                     .soft_wrap(false),
             ),

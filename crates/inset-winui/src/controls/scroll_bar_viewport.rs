@@ -81,15 +81,16 @@ impl StatefulWidget for ScrollBarViewport {
 impl ScrollBarViewportState {
     /// Applies the source delayed bar-hover state, leaving scrolling to native widgets.
     fn hover_bar(self: Handle<Self>, app: &mut App, enter: bool) {
+        let r = ThemeResources::of(app, self.context(app));
         if let Some(timer) = app.get_mut(self).timer.take() {
             timer.cancel(app);
         }
         let timer = Timer::new(
             app,
             if enter {
-                SCROLL_BAR_EXPAND_BEGIN_TIME
+                r.scroll_bar_expand_begin_time
             } else {
-                SCROLL_BAR_CONTRACT_BEGIN_TIME
+                r.scroll_bar_contract_begin_time
             },
             Listener::new(move |app| {
                 if app.contains(self) && self.mounted(app) {
@@ -106,7 +107,7 @@ impl ScrollBarViewportState {
     /// ScrollContentPresenter followed by VerticalScrollBar's track and small-change buttons.
     fn template(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
-        let r = ThemeResources::of(app, context).scroll_bar();
+        let r = ThemeResources::of(app, context);
         let vertical = widget.axis == Axis::Vertical;
         let rtl = Directionality::of(app, context) == TextDirection::Rtl;
         let metrics = widget.controller.metrics(app);
@@ -145,7 +146,7 @@ impl ScrollBarViewportState {
                         } else {
                             FluentSymbol::ChevronLeft
                         })
-                        .font_size(SCROLL_BAR_BUTTON_ARROW_ICON_FONT_SIZE),
+                        .font_size(r.scroll_bar_button_arrow_icon_font_size),
                         Listener::new(move |app| {
                             // ScrollViewerLineDelta in ScrollViewer_Partial.h.
                             controller.scroll_by(app, if increase { 16.0 } else { -16.0 }, true);
@@ -163,14 +164,14 @@ impl ScrollBarViewportState {
                     });
                     let button = Positioned::new(button);
                     let button = if vertical {
-                        let button = button.left(0.0).right(0.0).height(SCROLL_BAR_SIZE);
+                        let button = button.left(0.0).right(0.0).height(r.scroll_bar_size);
                         if increase {
                             button.bottom(0.0)
                         } else {
                             button.top(0.0)
                         }
                     } else {
-                        let button = button.top(0.0).bottom(0.0).width(SCROLL_BAR_SIZE);
+                        let button = button.top(0.0).bottom(0.0).width(r.scroll_bar_size);
                         if increase != rtl {
                             button.right(0.0)
                         } else {
@@ -189,47 +190,50 @@ impl ScrollBarViewportState {
             );
             parts.push(
                 if vertical {
-                    bar.right(0.0).top(0.0).bottom(0.0).width(SCROLL_BAR_SIZE)
+                    bar.right(0.0).top(0.0).bottom(0.0).width(r.scroll_bar_size)
                 } else {
-                    bar.left(0.0).right(0.0).bottom(0.0).height(SCROLL_BAR_SIZE)
+                    bar.left(0.0)
+                        .right(0.0)
+                        .bottom(0.0)
+                        .height(r.scroll_bar_size)
                 }
                 .into_widget(),
             );
         }
         // ThumbVisual has a six-pixel transparent stroke; RawScrollbar paints only its visible fill.
         let thickness = if expanded {
-            SCROLL_BAR_SIZE
+            r.scroll_bar_size
         } else {
             if vertical {
-                SCROLL_BAR_VERTICAL_THUMB_MIN_WIDTH
+                r.scroll_bar_vertical_thumb_min_width
             } else {
-                SCROLL_BAR_HORIZONTAL_THUMB_MIN_HEIGHT
+                r.scroll_bar_horizontal_thumb_min_height
             }
-        } - SCROLL_BAR_THUMB_STROKE_THICKNESS;
+        } - r.scroll_bar_thumb_stroke_thickness;
         RawScrollbar::new(Stack::new().children(parts))
             .controller(widget.controller.native_controller(app))
             .interactive(true)
             .thumb_visibility(app.get(self).hovered && overflow)
             .thumb_color(r.scroll_bar_thumb_fill)
             .thickness(thickness)
-            .radius(Radius::circular(SCROLL_BAR_CORNER_RADIUS[0]))
+            .radius(Radius::circular(r.scroll_bar_corner_radius[0]))
             .min_thumb_length(
                 (if vertical {
-                    SCROLL_BAR_VERTICAL_THUMB_MIN_HEIGHT
+                    r.scroll_bar_vertical_thumb_min_height
                 } else {
-                    SCROLL_BAR_HORIZONTAL_THUMB_MIN_WIDTH
-                }) - SCROLL_BAR_THUMB_STROKE_THICKNESS,
+                    r.scroll_bar_horizontal_thumb_min_width
+                }) - r.scroll_bar_thumb_stroke_thickness,
             )
-            .main_axis_margin(SCROLL_BAR_SIZE + SCROLL_BAR_THUMB_STROKE_THICKNESS / 2.0)
-            .cross_axis_margin((SCROLL_BAR_SIZE - thickness) / 2.0)
+            .main_axis_margin(r.scroll_bar_size + r.scroll_bar_thumb_stroke_thickness / 2.0)
+            .cross_axis_margin((r.scroll_bar_size - thickness) / 2.0)
             .padding(EdgeInsetsGeometry::ZERO)
             .scrollbar_orientation(if vertical {
                 ScrollbarOrientation::Right
             } else {
                 ScrollbarOrientation::Bottom
             })
-            .fade_duration(SCROLL_BAR_OPACITY_CHANGE_DURATION)
-            .time_to_fade(SCROLL_BAR_CONTRACT_DELAY)
+            .fade_duration(r.scroll_bar_opacity_change_duration)
+            .time_to_fade(r.scroll_bar_contract_delay)
             .into_widget()
     }
 }
@@ -269,7 +273,7 @@ fn arrow_template(
     increase: bool,
     vertical: bool,
 ) -> WidgetRef {
-    let r = ThemeResources::of(app, context).scroll_bar();
+    let r = ThemeResources::of(app, context);
     let (background, foreground) = match states.common {
         CommonState::Normal => (
             r.scroll_bar_button_background,
@@ -292,15 +296,15 @@ fn arrow_template(
         .border_thickness(0.0)
         .padding(if vertical {
             if increase {
-                SCROLL_BAR_VERTICAL_INCREASE_MARGIN
+                r.scroll_bar_vertical_increase_margin
             } else {
-                SCROLL_BAR_VERTICAL_DECREASE_MARGIN
+                r.scroll_bar_vertical_decrease_margin
             }
         } else {
             if increase {
-                SCROLL_BAR_HORIZONTAL_INCREASE_MARGIN
+                r.scroll_bar_horizontal_increase_margin
             } else {
-                SCROLL_BAR_HORIZONTAL_DECREASE_MARGIN
+                r.scroll_bar_horizontal_decrease_margin
             }
         })
         .child(Center::new().child(DefaultTextStyle::new(

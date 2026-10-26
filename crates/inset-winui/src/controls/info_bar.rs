@@ -104,11 +104,11 @@ pub struct InfoBar {
     /// Optional outer border brush.
     pub border_brush: Option<Brush>,
 
-    /// Outer border widths in left, top, right, bottom order.
-    pub border_thickness: [f64; 4],
+    /// Outer border widths in left, top, right, bottom order; the theme's `InfoBarBorderThickness` when `None`.
+    pub border_thickness: Option<[f64; 4]>,
 
-    /// Outer and background corner radius.
-    pub corner_radius: f64,
+    /// Outer and background corner radius; the theme's `ControlCornerRadius` when `None`.
+    pub corner_radius: Option<f64>,
 
     /// Optional close-button template, retaining the source close behavior.
     pub close_button_style: Option<ButtonTemplate>,
@@ -146,8 +146,8 @@ impl InfoBar {
             foreground: None,
             background: None,
             border_brush: None,
-            border_thickness: INFO_BAR_BORDER_THICKNESS,
-            corner_radius: CONTROL_CORNER_RADIUS[0],
+            border_thickness: None,
+            corner_radius: None,
             close_button_style: None,
             close_button_click: None,
             closing: None,
@@ -225,13 +225,13 @@ impl InfoBar {
 
     /// Sets BorderThickness.
     pub fn border_thickness(mut self, value: [f64; 4]) -> Self {
-        self.border_thickness = value;
+        self.border_thickness = Some(value);
         self
     }
 
     /// Sets CornerRadius.
     pub fn corner_radius(mut self, value: f64) -> Self {
-        self.corner_radius = value;
+        self.corner_radius = Some(value);
         self
     }
 
@@ -427,23 +427,25 @@ impl State for InfoBarState {
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let theme = ThemeResources::of(app, context);
-        let resources = theme.info_bar();
+        let resources = &theme;
         let (background, icon_background, icon_foreground, symbol) =
-            severity_brushes(&resources, widget.severity);
+            severity_brushes(resources, widget.severity);
         let none = Brush::Solid(Color::from_argb(0, 0, 0, 0));
         let banner_empty =
             widget.title.is_empty() && widget.message.is_empty() && widget.action_button.is_none();
 
         let title = Text::new(widget.title.clone()).style(control_text_style(
-            INFO_BAR_TITLE_FONT_SIZE,
-            INFO_BAR_TITLE_FONT_WEIGHT,
+            &theme,
+            resources.info_bar_title_font_size,
+            resources.info_bar_title_font_weight,
             widget
                 .foreground
                 .unwrap_or(resources.info_bar_title_foreground),
         ));
         let message = Text::new(widget.message.clone()).style(control_text_style(
-            INFO_BAR_MESSAGE_FONT_SIZE,
-            INFO_BAR_MESSAGE_FONT_WEIGHT,
+            &theme,
+            resources.info_bar_message_font_size,
+            resources.info_bar_message_font_weight,
             widget
                 .foreground
                 .unwrap_or(resources.info_bar_message_foreground),
@@ -453,26 +455,36 @@ impl State for InfoBarState {
             .clone()
             .map(|child| {
                 if downcast_widget::<HyperlinkButton>(child.as_ref()).is_some() {
-                    Margin::new(INFO_BAR_HYPERLINK_BUTTON_MARGIN, child).into_widget()
+                    Margin::new(resources.info_bar_hyperlink_button_margin, child).into_widget()
                 } else {
                     child
                 }
             })
             .unwrap_or_else(|| SizedBox::shrink().into_widget());
         let panel = InfoBarPanel::new()
-            .horizontal_orientation_padding(INFO_BAR_PANEL_HORIZONTAL_ORIENTATION_PADDING)
-            .vertical_orientation_padding(INFO_BAR_PANEL_VERTICAL_ORIENTATION_PADDING)
+            .horizontal_orientation_padding(resources.info_bar_panel_horizontal_orientation_padding)
+            .vertical_orientation_padding(resources.info_bar_panel_vertical_orientation_padding)
             .parent_min_height(
-                INFO_BAR_MIN_HEIGHT - INFO_BAR_PANEL_MARGIN[1] - INFO_BAR_PANEL_MARGIN[3],
+                resources.info_bar_min_height
+                    - resources.info_bar_panel_margin[1]
+                    - resources.info_bar_panel_margin[3],
             )
             .children([
                 InfoBarPanelChild::new(title)
-                    .horizontal_orientation_margin(INFO_BAR_TITLE_HORIZONTAL_ORIENTATION_MARGIN)
-                    .vertical_orientation_margin(INFO_BAR_TITLE_VERTICAL_ORIENTATION_MARGIN)
+                    .horizontal_orientation_margin(
+                        resources.info_bar_title_horizontal_orientation_margin,
+                    )
+                    .vertical_orientation_margin(
+                        resources.info_bar_title_vertical_orientation_margin,
+                    )
                     .into_widget(),
                 InfoBarPanelChild::new(message)
-                    .horizontal_orientation_margin(INFO_BAR_MESSAGE_HORIZONTAL_ORIENTATION_MARGIN)
-                    .vertical_orientation_margin(INFO_BAR_MESSAGE_VERTICAL_ORIENTATION_MARGIN)
+                    .horizontal_orientation_margin(
+                        resources.info_bar_message_horizontal_orientation_margin,
+                    )
+                    .vertical_orientation_margin(
+                        resources.info_bar_message_vertical_orientation_margin,
+                    )
                     .into_widget(),
                 InfoBarPanelChild::new(
                     Align::new()
@@ -481,8 +493,10 @@ impl State for InfoBarState {
                         .height_factor(1.0)
                         .child(action),
                 )
-                .horizontal_orientation_margin(INFO_BAR_ACTION_HORIZONTAL_ORIENTATION_MARGIN)
-                .vertical_orientation_margin(INFO_BAR_ACTION_VERTICAL_ORIENTATION_MARGIN)
+                .horizontal_orientation_margin(
+                    resources.info_bar_action_horizontal_orientation_margin,
+                )
+                .vertical_orientation_margin(resources.info_bar_action_vertical_orientation_margin)
                 .into_widget(),
             ]);
 
@@ -493,8 +507,8 @@ impl State for InfoBarState {
                 .clone()
                 .map(|icon| {
                     SizedBox::new()
-                        .width(INFO_BAR_ICON_FONT_SIZE)
-                        .height(INFO_BAR_ICON_FONT_SIZE)
+                        .width(resources.info_bar_icon_font_size)
+                        .height(resources.info_bar_icon_font_size)
                         .child(FittedBox::new().child(icon))
                         .into_widget()
                 })
@@ -504,16 +518,16 @@ impl State for InfoBarState {
                         .alignment(Alignment::CENTER.into())
                         .children([
                             SizedBox::new()
-                                .width(INFO_BAR_ICON_FONT_SIZE)
-                                .height(INFO_BAR_ICON_FONT_SIZE)
+                                .width(resources.info_bar_icon_font_size)
+                                .height(resources.info_bar_icon_font_size)
                                 .child(
                                     ControlBorder::new(Brush::Solid(icon_background), none)
                                         .border_thickness(0.0)
-                                        .corner_radius(INFO_BAR_ICON_FONT_SIZE / 2.0),
+                                        .corner_radius(resources.info_bar_icon_font_size / 2.0),
                                 )
                                 .into_widget(),
                             FontIcon::symbol(symbol)
-                                .font_size(INFO_BAR_ICON_FONT_SIZE)
+                                .font_size(resources.info_bar_icon_font_size)
                                 .foreground(icon_foreground)
                                 .into_widget(),
                         ])
@@ -523,13 +537,13 @@ impl State for InfoBarState {
                 GridCell::new(
                     Align::new()
                         .alignment(Alignment::TOP_LEFT.into())
-                        .child(Margin::new(INFO_BAR_ICON_MARGIN, icon)),
+                        .child(Margin::new(resources.info_bar_icon_margin, icon)),
                 )
                 .into_widget(),
             );
         }
         cells.push(
-            GridCell::new(Margin::new(INFO_BAR_PANEL_MARGIN, panel))
+            GridCell::new(Margin::new(resources.info_bar_panel_margin, panel))
                 .column(1)
                 .into_widget(),
         );
@@ -549,7 +563,8 @@ impl State for InfoBarState {
         }
         if widget.is_closable {
             let mut button = Button::new(
-                FontIcon::symbol(FluentSymbol::Dismiss).font_size(INFO_BAR_CLOSE_BUTTON_GLYPH_SIZE),
+                FontIcon::symbol(FluentSymbol::Dismiss)
+                    .font_size(resources.info_bar_close_button_glyph_size),
                 Listener::new(move |app| self.close_button(app)),
             )
             .template(close_button_template);
@@ -564,8 +579,8 @@ impl State for InfoBarState {
                         .child(Margin::new(
                             [5.0; 4],
                             SizedBox::new()
-                                .width(INFO_BAR_CLOSE_BUTTON_SIZE)
-                                .height(INFO_BAR_CLOSE_BUTTON_SIZE)
+                                .width(resources.info_bar_close_button_size)
+                                .height(resources.info_bar_close_button_size)
                                 .child(button),
                         )),
                 )
@@ -585,8 +600,12 @@ impl State for InfoBarState {
                 ColumnDefinition::new(GridLength::AUTO),
             ])
             .background(widget.background.unwrap_or(none))
-            .corner_radius(widget.corner_radius)
-            .padding(INFO_BAR_CONTENT_ROOT_PADDING)
+            .corner_radius(
+                widget
+                    .corner_radius
+                    .unwrap_or(theme.control_corner_radius[0]),
+            )
+            .padding(resources.info_bar_content_root_padding)
             .children(cells);
         let body = ControlBorder::new(
             Brush::Solid(background),
@@ -594,10 +613,19 @@ impl State for InfoBarState {
                 .border_brush
                 .unwrap_or(Brush::Solid(resources.info_bar_border_brush)),
         )
-        .border_thickness_ltrb(widget.border_thickness)
-        .corner_radius(widget.corner_radius)
+        .border_thickness_ltrb(
+            widget
+                .border_thickness
+                .unwrap_or(theme.info_bar_border_thickness),
+        )
+        .corner_radius(
+            widget
+                .corner_radius
+                .unwrap_or(theme.control_corner_radius[0]),
+        )
         .child(
-            ConstrainedBox::new(BoxConstraints::new().min_height(INFO_BAR_MIN_HEIGHT)).child(grid),
+            ConstrainedBox::new(BoxConstraints::new().min_height(resources.info_bar_min_height))
+                .child(grid),
         );
         let visible = app.get(self).visible;
         Offstage::new()
@@ -612,7 +640,7 @@ impl State for InfoBarState {
 
 /// The SeverityLevels setters and the default Informational values.
 fn severity_brushes(
-    r: &InfoBarResources,
+    r: &ThemeResources,
     severity: InfoBarSeverity,
 ) -> (Color, Color, Color, FluentSymbol) {
     match severity {
@@ -651,7 +679,7 @@ fn close_button_template(
     content: WidgetRef,
 ) -> WidgetRef {
     let theme = ThemeResources::of(app, context);
-    let r = theme.info_bar();
+    let r = theme.clone();
     let (background, border, foreground) = match states.common {
         CommonState::PointerOver => (
             r.app_bar_button_background_pointer_over,
@@ -677,7 +705,8 @@ fn close_button_template(
     let content = Center::new()
         .child(DefaultTextStyle::new(
             control_text_style(
-                CONTROL_CONTENT_FONT_SIZE,
+                &theme,
+                r.control_content_theme_font_size,
                 inset_embedder::FontWeight::NORMAL,
                 foreground,
             ),
@@ -686,11 +715,11 @@ fn close_button_template(
         .into_widget();
     let body = ColorTransition::new(
         background,
-        CONTROL_FASTER_ANIMATION_DURATION,
+        r.control_faster_animation_duration,
         move |_, color| {
             ControlBorder::new(Brush::Solid(color), Brush::Solid(border))
-                .border_thickness_ltrb(BUTTON_BORDER_THEME_THICKNESS)
-                .corner_radius(CONTROL_CORNER_RADIUS[0])
+                .border_thickness_ltrb(r.button_border_theme_thickness)
+                .corner_radius(r.control_corner_radius[0])
                 .child(content.clone())
                 .into_widget()
         },

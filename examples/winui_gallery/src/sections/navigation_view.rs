@@ -74,7 +74,7 @@ impl State for NavigationDemoState {
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);
-        let text = resources.common.text_fill_color_primary;
+        let text = resources.text_fill_color_primary;
         let s = app.get(self);
         let (mode, footer, back, selected, event) = (
             s.mode,
@@ -218,10 +218,7 @@ impl State for NavigationDemoState {
         let surface = SizedBox::new()
             .width(if narrow { 360.0 } else { 1000.0 })
             .height(400.0)
-            .child(
-                ColoredBox::new(resources.common.solid_background_fill_color_base)
-                    .child(navigation),
-            );
+            .child(ColoredBox::new(resources.solid_background_fill_color_base).child(navigation));
         column(
             vec![
                 controls,

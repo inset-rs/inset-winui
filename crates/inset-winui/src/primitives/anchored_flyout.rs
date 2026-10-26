@@ -1,9 +1,5 @@
 //! In-window interactive popup used by NavigationView's attached-flyout templates.
 
-use crate::theme::{
-    FLYOUT_BORDER_THEME_THICKNESS, FLYOUT_CONTENT_PADDING, FLYOUT_THEME_MAX_HEIGHT,
-    FLYOUT_THEME_MAX_WIDTH, FLYOUT_THEME_MIN_HEIGHT, FLYOUT_THEME_MIN_WIDTH, OVERLAY_CORNER_RADIUS,
-};
 use crate::{Brush, ControlBorder, ThemeResources};
 use inset_embedder::{Color, Offset, Rect, Size, TextDirection};
 use inset_foundation::{App, Handle, Listener, ValueKey};
@@ -41,12 +37,13 @@ pub(crate) struct AnchoredFlyout {
     dismissed: Listener,
     /// Source attached placement.
     placement: AnchoredFlyoutPlacement,
-    /// ContentPresenter padding, overridden by NavigationView's styles.
-    padding: [f64; 4],
+    /// ContentPresenter padding, overridden by NavigationView's styles; the theme's
+    /// `FlyoutContentPadding` when `None`.
+    padding: Option<[f64; 4]>,
     /// Presenter margin adjustment, including children-flyout top margin -4.
     offset: Offset,
-    /// Style maximum width.
-    max_width: f64,
+    /// Style maximum width; the theme's `FlyoutThemeMaxWidth` when `None`.
+    max_width: Option<f64>,
 }
 
 impl AnchoredFlyout {
@@ -63,9 +60,9 @@ impl AnchoredFlyout {
             content: content.into_widget(),
             dismissed,
             placement: AnchoredFlyoutPlacement::default(),
-            padding: FLYOUT_CONTENT_PADDING,
+            padding: None,
             offset: Offset::ZERO,
-            max_width: FLYOUT_THEME_MAX_WIDTH,
+            max_width: None,
         }
     }
 
@@ -77,7 +74,7 @@ impl AnchoredFlyout {
 
     /// Sets the presenter's content padding in left, top, right, bottom order.
     pub(crate) fn padding(mut self, padding: [f64; 4]) -> Self {
-        self.padding = padding;
+        self.padding = Some(padding);
         self
     }
 
@@ -89,7 +86,7 @@ impl AnchoredFlyout {
 
     /// Overrides the source FlyoutThemeMaxWidth.
     pub(crate) fn max_width(mut self, width: f64) -> Self {
-        self.max_width = width.max(0.0);
+        self.max_width = Some(width.max(0.0));
         self
     }
 }
@@ -214,15 +211,15 @@ impl State for AnchoredFlyoutState {
             app.get(self).portal.unwrap(),
             move |app, context, info| {
                 let widget = self.widget(app).clone();
-                let r = ThemeResources::of(app, context).flyout_presenter();
+                let r = ThemeResources::of(app, context);
                 // NavigationView presenter template: ScrollViewer > ContentPresenter chrome/content.
                 let presenter = ControlBorder::new(
                     Brush::Acrylic(r.flyout_presenter_background),
                     Brush::Solid(r.flyout_border_theme_brush),
                 )
-                .border_thickness_ltrb(FLYOUT_BORDER_THEME_THICKNESS)
-                .corner_radius_corners(OVERLAY_CORNER_RADIUS)
-                .padding(widget.padding)
+                .border_thickness_ltrb(r.flyout_border_theme_thickness)
+                .corner_radius_corners(r.overlay_corner_radius)
+                .padding(widget.padding.unwrap_or(r.flyout_content_padding))
                 .child(widget.content);
                 let popup = FocusScope::new(SingleChildScrollView::new().child(presenter))
                     .node(app.get(self).focus.unwrap())
@@ -253,7 +250,9 @@ impl State for AnchoredFlyoutState {
                     target,
                     placement: widget.placement,
                     offset: widget.offset,
-                    max_width: widget.max_width,
+                    max_width: widget.max_width.unwrap_or(r.flyout_theme_max_width),
+                    minimum: Size::new(r.flyout_theme_min_width, r.flyout_theme_min_height),
+                    max_height: r.flyout_theme_max_height,
                     rtl,
                 }))
                 .children([
@@ -300,6 +299,10 @@ struct FlyoutLayout {
     offset: Offset,
     /// Presenter style constraint.
     max_width: f64,
+    /// The style's `FlyoutThemeMinWidth` and `FlyoutThemeMinHeight`.
+    minimum: Size,
+    /// The style's `FlyoutThemeMaxHeight`.
+    max_height: f64,
     /// Effective flow direction.
     rtl: bool,
 }
@@ -328,9 +331,9 @@ impl MultiChildLayoutDelegate for FlyoutLayout {
             Side::Right => Side::Left,
         };
         let minimum = if horizontal {
-            FLYOUT_THEME_MIN_WIDTH
+            self.minimum.width()
         } else {
-            FLYOUT_THEME_MIN_HEIGHT
+            self.minimum.height()
         };
         if available(side) < minimum && available(opposite) > available(side) {
             side = opposite;
@@ -343,7 +346,8 @@ impl MultiChildLayoutDelegate for FlyoutLayout {
             } else {
                 f64::INFINITY
             });
-        let height = FLYOUT_THEME_MAX_HEIGHT
+        let height = self
+            .max_height
             .min((size.height() - 8.0).max(0.0))
             .min(if horizontal {
                 f64::INFINITY
@@ -354,9 +358,9 @@ impl MultiChildLayoutDelegate for FlyoutLayout {
             app,
             &id("presenter"),
             BoxConstraints::new()
-                .min_width(FLYOUT_THEME_MIN_WIDTH.min(width))
+                .min_width(self.minimum.width().min(width))
                 .max_width(width)
-                .min_height(FLYOUT_THEME_MIN_HEIGHT.min(height))
+                .min_height(self.minimum.height().min(height))
                 .max_height(height),
         );
         let x = match side {

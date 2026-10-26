@@ -3,11 +3,8 @@
 //! The template is one `ContentPresenter` (`x:Name="ContentPresenter"`) carrying `Background`, `BorderBrush`, `BorderThickness`, `CornerRadius`, `Padding`, `Foreground` and `BackgroundSizing`, with a `BrushTransition` of 83 ms on `Background`. `CommonStates` has twelve states: `Normal`, `PointerOver`, `Pressed` and `Disabled`, their `Checked*` twins (which also set `BackgroundSizing` to `ToggleButtonCheckedStateBackgroundSizing`) and their `Indeterminate*` twins; `ToggleButton::ChangeVisualState` (`ToggleButton_Partial.cpp`) picks the row from `IsChecked` and the column from the pointer.
 
 use crate::{
-    BUTTON_PADDING, BackgroundSizing, Brush, CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS,
-    CONTROL_FASTER_ANIMATION_DURATION, ColorTransition, CommonState, CommonStates, ControlBorder,
-    ControlStates, FocusVisual, TOGGLE_BUTTON_BORDER_THEME_THICKNESS,
-    TOGGLE_BUTTON_CHECKED_STATE_BACKGROUND_SIZING, ThemeResources, ToggleButtonResources,
-    control_text_style,
+    BackgroundSizing, Brush, ColorTransition, CommonState, CommonStates, ControlBorder,
+    ControlStates, FocusVisual, ThemeResources, control_text_style,
 };
 use inset_embedder::{Color, FontWeight};
 use inset_foundation::{App, Listener};
@@ -15,8 +12,6 @@ use inset_painting::AlignmentGeometry;
 use inset_widgets::*;
 use std::{fmt, rc::Rc};
 
-/// XAML `ToggleButtonBorderThemeThickness`.
-pub const TOGGLE_BUTTON_BORDER_THICKNESS: f64 = TOGGLE_BUTTON_BORDER_THEME_THICKNESS[0];
 /// The `FocusVisualMargin` the style sets.
 pub const TOGGLE_BUTTON_FOCUS_VISUAL_MARGIN: [f64; 4] = [-3.0; 4];
 
@@ -31,7 +26,7 @@ pub struct ToggleButtonBrushes {
 
 /// The `{ThemeResource …}` values the `CommonStates` storyboards name for `is_checked` (`Some(true)` the `Checked*` row, `None` the `Indeterminate*` row) and `state`.
 pub fn toggle_button_brushes(
-    resources: &ToggleButtonResources,
+    resources: &ThemeResources,
     is_checked: Option<bool>,
     state: CommonState,
 ) -> ToggleButtonBrushes {
@@ -46,7 +41,7 @@ pub fn toggle_button_brushes(
         background,
         border,
         foreground,
-        background_sizing: TOGGLE_BUTTON_CHECKED_STATE_BACKGROUND_SIZING,
+        background_sizing: resources.toggle_button_checked_state_background_sizing,
     };
     match (is_checked, state) {
         // `Normal`: the style's own setters.
@@ -270,7 +265,7 @@ fn template(
     states: ControlStates,
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
-    let brushes = toggle_button_brushes(&resources.toggle_button(), is_checked, states.common);
+    let brushes = toggle_button_brushes(&resources, is_checked, states.common);
     let content = content.unwrap_or_else(|| SizedBox::shrink().into_widget());
     toggle_button_presenter(
         &resources,
@@ -284,8 +279,8 @@ fn template(
 /// The properties a style sets that `DefaultToggleButtonStyle`'s template binds.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) struct ToggleButtonSetters {
-    /// `Padding`: left, top, right, bottom.
-    pub(crate) padding: [f64; 4],
+    /// `Padding`: left, top, right, bottom; the theme's `ButtonPadding` when `None`.
+    pub(crate) padding: Option<[f64; 4]>,
     /// `HorizontalContentAlignment`, where the content sits across the button.
     pub(crate) horizontal_content_alignment: AlignmentGeometry,
 }
@@ -293,7 +288,7 @@ pub(crate) struct ToggleButtonSetters {
 impl ToggleButtonSetters {
     /// `DefaultToggleButtonStyle`'s own.
     pub(crate) const DEFAULT: ToggleButtonSetters = ToggleButtonSetters {
-        padding: BUTTON_PADDING,
+        padding: None,
         horizontal_content_alignment: AlignmentGeometry::CENTER,
     };
 }
@@ -307,7 +302,8 @@ pub(crate) fn toggle_button_presenter(
     states: ControlStates,
 ) -> WidgetRef {
     let text = control_text_style(
-        CONTROL_CONTENT_FONT_SIZE,
+        resources,
+        resources.control_content_theme_font_size,
         FontWeight::W400,
         brushes.foreground,
     );
@@ -318,15 +314,18 @@ pub(crate) fn toggle_button_presenter(
         .height_factor(1.0)
         .child(DefaultTextStyle::new(text, content))
         .into_widget();
+    let padding = setters.padding.unwrap_or(resources.button_padding);
+    let border_thickness = resources.toggle_button_border_theme_thickness[0];
+    let corner_radius = resources.control_corner_radius[0];
     let presenter = ColorTransition::new(
         brushes.background,
-        CONTROL_FASTER_ANIMATION_DURATION,
+        resources.control_faster_animation_duration,
         move |_app, background| {
             ControlBorder::new(Brush::Solid(background), brushes.border)
-                .border_thickness(TOGGLE_BUTTON_BORDER_THICKNESS)
-                .corner_radius(CONTROL_CORNER_RADIUS[0])
+                .border_thickness(border_thickness)
+                .corner_radius(corner_radius)
                 .background_sizing(brushes.background_sizing)
-                .padding(setters.padding)
+                .padding(padding)
                 .child(label.clone())
                 .into_widget()
         },
@@ -334,6 +333,6 @@ pub(crate) fn toggle_button_presenter(
     FocusVisual::new(presenter, resources.theme)
         .visible(states.focused)
         .margin(TOGGLE_BUTTON_FOCUS_VISUAL_MARGIN)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(resources.control_corner_radius[0])
         .into_widget()
 }

@@ -1,7 +1,7 @@
 //! WinUI PasswordBox template and behavior, using Inset’s native editing engine.
 
 use super::text_control::TextControl;
-use crate::{Brush, CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, TEXT_CONTROL_THEME_PADDING};
+use crate::Brush;
 use inset_embedder::Color;
 use inset_foundation::{App, Handle};
 use inset_services::TextInputFormatterRef;
@@ -43,14 +43,14 @@ pub struct PasswordBox {
     /// Whether the editor accepts pointer and keyboard input.
     pub is_enabled: bool,
 
-    /// The editor font size and basis of the helper-button width threshold.
-    pub font_size: f64,
+    /// The editor font size and basis of the helper-button width threshold; the theme's `ControlContentThemeFontSize` when `None`.
+    pub font_size: Option<f64>,
 
-    /// Editor padding in left, top, right, bottom order.
-    pub padding: [f64; 4],
+    /// Editor padding in left, top, right, bottom order; the theme's `TextControlThemePadding` when `None`.
+    pub padding: Option<[f64; 4]>,
 
     /// The template border and helper-button corner radius.
-    pub corner_radius: f64,
+    pub corner_radius: Option<f64>,
 
     /// Overrides the normal editor foreground; visual states use their source theme resources.
     pub foreground: Option<Color>,
@@ -99,9 +99,9 @@ impl PasswordBox {
             description: None,
             placeholder_text: String::new(),
             is_enabled: true,
-            font_size: CONTROL_CONTENT_FONT_SIZE,
-            padding: TEXT_CONTROL_THEME_PADDING,
-            corner_radius: CONTROL_CORNER_RADIUS[0],
+            font_size: None,
+            padding: None,
+            corner_radius: None,
             foreground: None,
             background: None,
             border_brush: None,
@@ -149,19 +149,19 @@ impl PasswordBox {
 
     /// Sets FontSize.
     pub fn font_size(mut self, value: f64) -> Self {
-        self.font_size = value;
+        self.font_size = Some(value);
         self
     }
 
     /// Sets Padding.
     pub fn padding(mut self, value: [f64; 4]) -> Self {
-        self.padding = value;
+        self.padding = Some(value);
         self
     }
 
     /// Sets CornerRadius.
     pub fn corner_radius(mut self, value: f64) -> Self {
-        self.corner_radius = value;
+        self.corner_radius = Some(value);
         self
     }
 

@@ -16,6 +16,15 @@ use inset_services::KeyEvent;
 use inset_widgets::*;
 use std::{fmt, rc::Rc};
 
+/// MenuFlyoutPresenter's style: at least `FlyoutThemeMinWidth` wide and `MenuFlyoutThemeMinHeight`
+/// tall, and no maximum.
+fn menu_flyout_presenter_sizes(r: &ThemeResources) -> (Size, Size) {
+    (
+        Size::new(r.flyout_theme_min_width, r.menu_flyout_theme_min_height),
+        Size::new(f64::INFINITY, f64::INFINITY),
+    )
+}
+
 /// MenuBar receives unhandled keys from the menu collection that originated them.
 pub(crate) type MenuKeyHandler =
     Rc<dyn Fn(&mut App, Handle<MenuFlyout>, &KeyEvent) -> KeyEventResult>;
@@ -87,8 +96,7 @@ impl MenuFlyout {
         });
         let base = app.get_mut(flyout);
         base.is_sub_menu = root.is_some();
-        base.minimum_size = Size::new(FLYOUT_THEME_MIN_WIDTH, MENU_FLYOUT_THEME_MIN_HEIGHT);
-        base.maximum_size = Size::new(f64::INFINITY, f64::INFINITY);
+        base.presenter_sizes = menu_flyout_presenter_sizes;
         base.on_opening = Some(Listener::new(move |app| menu.on_opening(app)));
         base.on_closed = Some(Listener::new(move |app| {
             if let Some(presenter) = app.get(menu).presenter {

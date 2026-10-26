@@ -233,7 +233,6 @@ impl State for PageState {
             )
         });
         let background = ThemeResources::new(state.theme, AccentPalette::default())
-            .common
             .solid_background_fill_color_base;
         ThemeScope::new(
             state.theme,

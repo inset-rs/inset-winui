@@ -73,7 +73,7 @@ impl State for PageState {
         let resources = ThemeResources::new(theme, AccentPalette::default());
         ThemeScope::new(
             theme,
-            ColoredBox::new(resources.common.solid_background_fill_color_base).child(
+            ColoredBox::new(resources.solid_background_fill_color_base).child(
                 Padding::new(EdgeInsetsGeometry::all(inset)).child(
                     SplitView::new(open, move |app, value| {
                         changes.borrow_mut().push(if value {
@@ -102,8 +102,10 @@ impl State for PageState {
                             .children(vec![
                                 Text::new("Content bounds")
                                     .style(
-                                        TextBlockStyle::Body
-                                            .text_style(resources.common.text_fill_color_primary),
+                                        TextBlockStyle::Body.text_style(
+                                            &resources,
+                                            resources.text_fill_color_primary,
+                                        ),
                                     )
                                     .into_widget(),
                                 Button::text(
@@ -143,9 +145,7 @@ impl State for PaneCounterState {
     type Widget = PaneCounter;
     inset_widgets::state_accessors!();
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
-        let color = ThemeResources::of(app, context)
-            .common
-            .text_fill_color_primary;
+        let resources = ThemeResources::of(app, context);
         let count = app.get(self).count;
         SizedBox::new()
             .width(160.0)
@@ -155,7 +155,10 @@ impl State for PaneCounterState {
                     .cross_axis_alignment(CrossAxisAlignment::Stretch)
                     .children(vec![
                         Text::new("Pane bounds")
-                            .style(TextBlockStyle::Body.text_style(color))
+                            .style(
+                                TextBlockStyle::Body
+                                    .text_style(&resources, resources.text_fill_color_primary),
+                            )
                             .into_widget(),
                         Button::text(
                             format!("Pane count {count}"),

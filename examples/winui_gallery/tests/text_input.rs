@@ -343,9 +343,10 @@ fn native_keyboard_selection_deletion_and_password_copy_policy() {
 /// showing its delete button, given more height than it needs, keeps the height it needs.
 #[test]
 fn a_box_showing_its_delete_button_given_spare_height_keeps_its_own() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let size = common::size_under_center([300, 300], |app| {
         let controller = TextEditingController::new(app).text(app, "Text");
         TextBox::new(controller).autofocus(true).into_widget()
     });
-    assert_eq!(size.height(), TEXT_CONTROL_THEME_MIN_HEIGHT);
+    assert_eq!(size.height(), r.text_control_theme_min_height);
 }

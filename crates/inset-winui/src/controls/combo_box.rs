@@ -1910,11 +1910,12 @@ impl ComboBoxState {
         let Some(metrics) = self.scroll_metrics(app) else {
             return false;
         };
+        let r = ThemeResources::of(app, self.context(app));
         let heights = self.item_heights(app, self.context(app));
         let top = heights[..index].iter().sum::<f64>() - metrics.offset;
         let bottom = top + heights[index];
         // The scroll host is the viewport with the items' fixed margin around it.
-        let margin = COMBO_BOX_DROPDOWN_CONTENT_MARGIN;
+        let margin = r.combo_box_dropdown_content_margin;
         let (host_top, host_bottom) = (-margin[1], metrics.viewport_length + margin[3]);
         if partial {
             top < host_bottom && host_top < bottom
@@ -2115,8 +2116,9 @@ impl ComboBoxState {
         first_item: usize,
         window: Size,
     ) -> f64 {
+        let r = ThemeResources::of(app, context);
         let widget = self.widget(app).clone();
-        let shown = first_item..first_item + COMBO_BOX_POPUP_MAX_NUMBER_OF_ITEMS as usize;
+        let shown = first_item..first_item + r.combo_box_popup_max_number_of_items as usize;
         let mut widest: f64 = 0.0;
         for (index, item) in widget.items.iter().enumerate() {
             let measured = app.get(self).widths.get(&item.id).copied();
@@ -2129,8 +2131,8 @@ impl ComboBoxState {
             }
         }
         let border =
-            COMBO_BOX_DROPDOWN_BORDER_THICKNESS[0] + COMBO_BOX_DROPDOWN_BORDER_THICKNESS[2];
-        (widest + border).max(popup::popup_min_width(window))
+            r.combo_box_dropdown_border_thickness[0] + r.combo_box_dropdown_border_thickness[2];
+        (widest + border).max(popup::popup_min_width(&r, window))
     }
 
     /// `ArrangePopup` with the box at `target` in a window of `window`.
@@ -2165,12 +2167,16 @@ impl ComboBoxState {
             last_height: app.get(self).last_popup_height.get(),
             rtl,
         };
-        let first_item = popup::arrange(&input)?.first_item;
+        let r = ThemeResources::of(app, context);
+        let first_item = popup::arrange(&r, &input)?.first_item;
         let content_width = self.content_width(app, context, first_item, window);
-        popup::arrange(&ArrangeInput {
-            content_width,
-            ..input
-        })
+        popup::arrange(
+            &r,
+            &ArrangeInput {
+                content_width,
+                ..input
+            },
+        )
     }
 
     // MARK: Template
@@ -2415,7 +2421,7 @@ impl State for ComboBoxState {
         self.settle_drop_down_open(app);
         let widget = self.widget(app).clone();
         let resources = ThemeResources::of(app, context);
-        let r = resources.combo_box();
+        let r = &resources;
         let (common, _, _) = self.visual_states(app);
         let mut cells = Vec::new();
         if let Some(header) = widget.header.clone() {
@@ -2427,14 +2433,15 @@ impl State for ComboBoxState {
             };
             cells.push(
                 GridCell::new(Margin::new(
-                    COMBO_BOX_TOP_HEADER_MARGIN,
+                    r.combo_box_top_header_margin,
                     DefaultTextStyle::new(
                         control_text_style(
-                            CONTROL_CONTENT_FONT_SIZE,
-                            COMBO_BOX_HEADER_THEME_FONT_WEIGHT,
+                            &resources,
+                            r.control_content_theme_font_size,
+                            r.combo_box_header_theme_font_weight,
                             foreground,
                         )
-                        .height(HEADER_LINE_HEIGHT / CONTROL_CONTENT_FONT_SIZE),
+                        .height(HEADER_LINE_HEIGHT / r.control_content_theme_font_size),
                         header,
                     ),
                 ))
@@ -2473,7 +2480,7 @@ impl ComboBoxState {
     fn target_area(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let resources = ThemeResources::of(app, context);
-        let r = resources.combo_box();
+        let r = &resources;
         let (common, focus, editable_state) = self.visual_states(app);
         let text_box_enabled = widget.is_editable && app.get(self).text_box_enabled;
         let focused = matches!(
@@ -2490,8 +2497,8 @@ impl ComboBoxState {
                         Brush::Solid(r.combo_box_background_focused),
                         Brush::Solid(r.combo_box_background_border_brush_focused),
                     )
-                    .border_thickness_ltrb(COMBO_BOX_BACKGROUND_BORDER_THICKNESS_FOCUSED)
-                    .corner_radius_corners(COMBO_BOX_HIGLIGHT_BORDER_CORNER_RADIUS),
+                    .border_thickness_ltrb(r.combo_box_background_border_thickness_focused)
+                    .corner_radius_corners(r.combo_box_higlight_border_corner_radius),
                 )),
             )
             .column_span(2)
@@ -2517,11 +2524,12 @@ impl ComboBoxState {
             ),
         };
         let background = KeyedSubtree::new(
-            ConstrainedBox::new(BoxConstraints::new().min_width(COMBO_BOX_THEME_MIN_WIDTH)).child(
-                ControlBorder::new(background, border)
-                    .border_thickness_ltrb(COMBO_BOX_BORDER_THEME_THICKNESS)
-                    .corner_radius_corners(CONTROL_CORNER_RADIUS),
-            ),
+            ConstrainedBox::new(BoxConstraints::new().min_width(r.combo_box_theme_min_width))
+                .child(
+                    ControlBorder::new(background, border)
+                        .border_thickness_ltrb(r.combo_box_border_theme_thickness)
+                        .corner_radius_corners(r.control_corner_radius),
+                ),
         )
         .key(Rc::new(app.get(self).background_key.clone()));
         let popup = OverlayPortal::overlay_child_layout_builder(
@@ -2542,15 +2550,15 @@ impl ComboBoxState {
                     .child(
                         Opacity::new(if focused { 1.0 } else { 0.0 }).child(
                             SizedBox::new()
-                                .width(COMBO_BOX_ITEM_PILL_WIDTH)
-                                .height(COMBO_BOX_ITEM_PILL_HEIGHT)
+                                .width(r.combo_box_item_pill_width)
+                                .height(r.combo_box_item_pill_height)
                                 .child(
                                     ControlBorder::new(
                                         Brush::Solid(r.combo_box_item_pill_fill_brush),
                                         Brush::Solid(Color::new(0)),
                                     )
                                     .border_thickness(0.0)
-                                    .corner_radius_corners(COMBO_BOX_ITEM_PILL_CORNER_RADIUS),
+                                    .corner_radius_corners(r.combo_box_item_pill_corner_radius),
                                 ),
                         ),
                     ),
@@ -2618,7 +2626,7 @@ impl ComboBoxState {
                             GLYPH_MARGIN,
                             SizedBox::new()
                                 .width(GLYPH_SIZE)
-                                .height(COMBO_BOX_MIN_HEIGHT)
+                                .height(r.combo_box_min_height)
                                 .child(
                                     Center::new().child(
                                         FontIcon::symbol(FluentSymbol::ChevronDown)
@@ -2650,7 +2658,8 @@ impl ComboBoxState {
                         app,
                         DefaultTextStyle::new(
                             control_text_style(
-                                CONTROL_CONTENT_FONT_SIZE,
+                                &resources,
+                                r.control_content_theme_font_size,
                                 FontWeight::NORMAL,
                                 r.system_control_description_text_foreground_brush,
                             ),
@@ -2755,7 +2764,7 @@ impl ComboBoxState {
         focus: ComboBoxFocusState,
     ) -> WidgetRef {
         let widget = self.widget(app).clone();
-        let r = ThemeResources::of(app, context).combo_box();
+        let r = ThemeResources::of(app, context);
         let foreground = match (focus, common) {
             (ComboBoxFocusState::Focused, _) => r.combo_box_foreground_focused,
             (ComboBoxFocusState::FocusedPressed, _) => r.combo_box_foreground_focused_pressed,
@@ -2789,7 +2798,8 @@ impl ComboBoxState {
                     .child(
                         Text::new(widget.placeholder_text.clone())
                             .style(control_text_style(
-                                CONTROL_CONTENT_FONT_SIZE,
+                                &r,
+                                r.control_content_theme_font_size,
                                 FontWeight::NORMAL,
                                 placeholder,
                             ))
@@ -2799,7 +2809,12 @@ impl ComboBoxState {
             }
         };
         let content = DefaultTextStyle::new(
-            control_text_style(CONTROL_CONTENT_FONT_SIZE, FontWeight::NORMAL, foreground),
+            control_text_style(
+                &r,
+                r.control_content_theme_font_size,
+                FontWeight::NORMAL,
+                foreground,
+            ),
             content,
         );
         // `HorizontalContentAlignment` is Stretch, and `VerticalContentAlignment` Center,
@@ -2811,7 +2826,7 @@ impl ComboBoxState {
                 RowDefinition::new(GridLength::STAR),
             ])
             .children([GridCell::new(content).row(1).into_widget()]);
-        Margin::new(COMBO_BOX_PADDING, aligned).into_widget()
+        Margin::new(r.combo_box_padding, aligned).into_widget()
     }
 
     /// `EditableText`: a TextBox in `ComboBoxTextBoxStyle` at `ComboBoxEditableTextPadding`, its
@@ -2819,12 +2834,12 @@ impl ComboBoxState {
     /// square.
     fn editable_text(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
-        let r = ThemeResources::of(app, context).combo_box();
+        let r = ThemeResources::of(app, context);
         let mut config = TextBox::new(self.text(app))
             .focus_node(self.text_focus(app))
             .placeholder_text(widget.placeholder_text.clone())
             .is_enabled(widget.is_enabled)
-            .padding(COMBO_BOX_EDITABLE_TEXT_PADDING)
+            .padding(r.combo_box_editable_text_padding)
             .border_brush(Brush::Solid(Color::new(0)))
             .foreground(
                 widget
@@ -2835,7 +2850,7 @@ impl ComboBoxState {
         if let Some(color) = widget.placeholder_foreground {
             config = config.placeholder_foreground(color);
         }
-        let radius = CONTROL_CORNER_RADIUS;
+        let radius = r.control_corner_radius;
         let corner_radius = match (app.get(self).open, app.get(self).opened_up) {
             (false, _) => radius,
             (true, false) => [radius[0], radius[1], 0.0, 0.0],
@@ -2855,7 +2870,7 @@ impl ComboBoxState {
         state: Option<EditableModeState>,
         text_box_enabled: bool,
     ) -> WidgetRef {
-        let r = ThemeResources::of(app, context).combo_box();
+        let r = ThemeResources::of(app, context);
         let background = match state {
             Some(
                 EditableModeState::TextBoxFocusedOverlayPointerOver
@@ -2880,7 +2895,9 @@ impl ComboBoxState {
                 KeyedSubtree::new(
                     ControlBorder::new(Brush::Solid(background), Brush::Solid(Color::new(0)))
                         .border_thickness(0.0)
-                        .corner_radius_corners(COMBO_BOX_DROP_DOWN_BUTTON_BACKGROUND_CORNER_RADIUS),
+                        .corner_radius_corners(
+                            r.combo_box_drop_down_button_background_corner_radius,
+                        ),
                 )
                 .key(Rc::new(app.get(self).overlay_key.clone())),
             );
@@ -2973,11 +2990,11 @@ impl ComboBoxState {
         arrangement: Arrangement,
     ) -> WidgetRef {
         let resources = ThemeResources::of(app, context);
-        let r = resources.combo_box();
+        let r = &resources;
         let Some(scroll) = app.get(self).scroll else {
             return SizedBox::shrink().into_widget();
         };
-        let overlay = OVERLAY_CORNER_RADIUS;
+        let overlay = r.overlay_corner_radius;
         let corner_radius = if !self.is_editable(app) {
             overlay
         } else if arrangement.opened_up {
@@ -3006,19 +3023,20 @@ impl ComboBoxState {
         // `ItemsPresenter`'s margin stays while the items scroll.
         let scroll_viewer = ScrollBarViewport::scroller(
             scroll,
-            Padding::new(insets(COMBO_BOX_DROPDOWN_CONTENT_MARGIN)).child(list),
+            Padding::new(insets(r.combo_box_dropdown_content_margin)).child(list),
         );
         let border = ControlBorder::new(
             Brush::Acrylic(r.combo_box_drop_down_background),
             Brush::Solid(r.combo_box_drop_down_border_brush),
         )
-        .border_thickness_ltrb(COMBO_BOX_DROPDOWN_BORDER_THICKNESS)
+        .border_thickness_ltrb(r.combo_box_dropdown_border_thickness)
         .corner_radius_corners(corner_radius)
         .background_sizing(BackgroundSizing::InnerBorderEdge)
-        .padding(COMBO_BOX_DROPDOWN_BORDER_PADDING)
+        .padding(r.combo_box_dropdown_border_padding)
         .child(DefaultTextStyle::new(
             control_text_style(
-                CONTROL_CONTENT_FONT_SIZE,
+                &resources,
+                r.control_content_theme_font_size,
                 FontWeight::NORMAL,
                 r.combo_box_drop_down_foreground,
             ),
@@ -3116,20 +3134,26 @@ fn is_text_box_key(key: LogicalKeyboardKey) -> bool {
 /// The size an item container takes for one line of `text`: its content's, `Padding`, and
 /// `LayoutRoot`'s margin, at least `Pill`'s height.
 fn text_item_size(app: &mut App, context: BuildContext, text: &str) -> Size {
+    let r = ThemeResources::of(app, context);
     let fonts = PaintingBinding::instance(app).fonts(app);
     let mut painter = TextPainter::new();
     painter.set_text(Some(Rc::new(TextSpan::new().text(text.to_owned()).style(
-        control_text_style(CONTROL_CONTENT_FONT_SIZE, FontWeight::NORMAL, Color::new(0)),
+        control_text_style(
+            &r,
+            r.control_content_theme_font_size,
+            FontWeight::NORMAL,
+            Color::new(0),
+        ),
     ))));
     painter.set_text_direction(Some(Directionality::of(app, context)));
     painter.set_text_scaler(MediaQuery::text_scaler_of(app, context));
     painter.layout(app.get_mut(fonts), 0.0, f64::INFINITY);
     let size = Size::new(painter.width(), painter.height());
     painter.dispose();
-    let padding = COMBO_BOX_ITEM_THEME_PADDING;
+    let padding = r.combo_box_item_theme_padding;
     Size::new(
         size.width() + padding[0] + padding[2] + ITEM_MARGIN[0] + ITEM_MARGIN[2],
-        (size.height() + padding[1] + padding[3]).max(COMBO_BOX_ITEM_PILL_HEIGHT)
+        (size.height() + padding[1] + padding[3]).max(r.combo_box_item_pill_height)
             + ITEM_MARGIN[1]
             + ITEM_MARGIN[3],
     )

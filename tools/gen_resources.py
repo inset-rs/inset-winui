@@ -9,8 +9,9 @@ Reads controls/dev/CommonStyles/Common_themeresources_any.xaml (the Fluent base
 tokens) and one <Control>_themeresources.xaml per named control, preferring
 CommonStyles and then controls/dev/<Control>. Missing shared aliases resolve
 through Common_themeresources.xaml and the base generic.xaml dictionary.
-Emits one Rust struct per file with
-a `for_theme` constructor for the Light and Dark (XAML "Default") dictionaries.
+Emits one Rust struct,
+`ThemeResources`, whose fields are the keys of every dictionary read, and its `new`
+constructor resolving the Light and Dark (XAML "Default") dictionaries for an accent palette.
 High contrast is not emitted: its values are the OS's system colours.
 """
 import argparse
@@ -64,6 +65,7 @@ DEFAULT_CONTROLS = (
     'ComboBox',
     'ColorPicker',
     'TreeView',
+    'SelectorBar',
 )
 
 NS = {
@@ -202,7 +204,7 @@ def read_dictionaries(path, keys=None):
     # A size both themes define identically is a constant too.
     light, dark = themes.get('Light', {}), themes.get('Default', {})
     for name, value in light.items():
-        if value[0] in ('f64', 'i32', 'thickness', 'corner', 'duration_ms', 'duration_ns', 'spline', 'enum') and dark.get(name) == value:
+        if value[0] in ('f64', 'i32', 'thickness', 'corner', 'duration_ms', 'duration_ns', 'spline', 'enum', 'font_family') and dark.get(name) == value:
             shared.setdefault(name, value)
     return themes, shared
 
@@ -231,6 +233,8 @@ def plain_value(kind, text):
         return ('duration_ms', nanoseconds // 1_000_000) if nanoseconds % 1_000_000 == 0 else ('duration_ns', nanoseconds)
     if kind == 'String' and re.match(r'^[\d., -]+$', text):
         return ('spline', [float(v) for v in text.split(',')])
+    if kind == 'FontFamily':
+        return ('font_family', text)
     if kind in ('BackgroundSizing', 'FontWeight'):
         # Enum-valued resources: the Rust enum shares the XAML names.
         return ('enum', (kind, text.strip()))
@@ -308,108 +312,148 @@ def acrylic_literal(value):
             f'fallback_color: {value_literal(value["fallback_color"])} }}')
 
 
-def emit_struct(out, struct_name, keys, themes, base_themes, shared, source):
-    fields = []
-    values = {'Light': [], 'Default': []}
-    for key in keys:
-        light = resolve(themes.get('Light', {}), base_themes.get('Light', {}), key)
-        dark = resolve(themes.get('Default', {}), base_themes.get('Default', {}), key)
-        if light is None or dark is None:
-            missing = ', '.join(theme for theme, value in (('Light', light), ('Default', dark)) if value is None)
-            print(f'warning: {source}: unresolved resource {key} ({missing}); not emitted', file=sys.stderr)
-            continue
-        kinds = {light[0], dark[0]}
-        if kinds <= {'color', 'accent', 'opacity'}:
-            fields.append((snake(key), 'Color'))
-            values['Light'].append(value_literal(light))
-            values['Default'].append(value_literal(dark))
-        elif kinds == {'gradient'}:
-            stops = lambda g: '[' + ', '.join(f'({o}, {value_literal(c)})' for o, c in g if c) + ']'
-            fields.append((snake(key), '[(f64, Color); 2]'))
-            values['Light'].append(stops(light[1]))
-            values['Default'].append(stops(dark[1]))
-        elif kinds == {'acrylic'}:
-            fields.append((snake(key), 'AcrylicBrushResources'))
-            values['Light'].append(acrylic_literal(light[1]))
-            values['Default'].append(acrylic_literal(dark[1]))
-        elif light != dark:
-            # A size, duration or spline each theme states differently has no
-            # constant to be emitted as, and the struct holds brushes only.
-            print(f'warning: {source}: {key} differs by theme ({light[1]} light, {dark[1]} dark); not emitted', file=sys.stderr)
-    out.append(f'/// Theme-dependent resources of `{source}`, resolved to literals; `Default` in XAML is the dark theme.')
-    out.append('#[derive(Clone, Debug, PartialEq)]')
-    out.append(f'pub struct {struct_name} {{')
-    for field, ty in fields:
-        out.append(f'    /// The resolved `{next(key for key in keys if snake(key) == field)}` resource.')
-        out.append(f'    pub {field}: {ty},')
-    out.append('}')
-    out.append('')
-    out.append(f'impl {struct_name} {{')
-    out.append('    /// Resolves the source dictionary for the requested theme and accent palette.')
-    out.append('    pub fn for_theme(theme: Theme, accent: &AccentPalette) -> Self {')
-    out.append('        match theme {')
-    for theme, label in (('Light', 'Theme::Light'), ('Default', 'Theme::Dark')):
-        out.append(f'            {label} => Self {{')
-        for (field, _), value in zip(fields, values[theme]):
-            out.append(f'                {field}: {value},')
-        out.append('            },')
-    out.append('        }')
-    out.append('    }')
-    out.append('}')
-    for key, (kind, value) in shared.items():
-        name = snake(key).upper()
-        if kind == 'f64':
-            out.append(f'pub const {name}: f64 = {value};')
-        elif kind == 'i32':
-            out.append(f'pub const {name}: i32 = {value};')
-        elif kind == 'thickness':
-            out.append(f'/// Left, top, right, bottom.\npub const {name}: [f64; 4] = {value};')
-        elif kind == 'corner':
-            out.append(f'/// Top-left, top-right, bottom-right, bottom-left.\npub const {name}: [f64; 4] = {value};')
-        elif kind == 'duration_ms':
-            out.append(f'pub const {name}: Duration = Duration::from_millis({value});')
-        elif kind == 'duration_ns':
-            out.append(f'pub const {name}: Duration = Duration::from_nanos({value});')
-        elif kind == 'spline':
-            out.append(f'/// Cubic Bézier control points (x1, y1, x2, y2).\npub const {name}: [f64; 4] = {value};')
-        elif kind == 'enum':
-            enum, variant = value
-            # `FontWeight` in Inset is Flutter's: `FontWeight::NORMAL`, `BOLD`, `W600`...
-            if enum == 'FontWeight':
-                weights = {'Normal': 'NORMAL', 'Bold': 'BOLD', 'SemiBold': 'W600', 'Light': 'W300', 'Medium': 'W500', 'Black': 'W900', 'Thin': 'W100', 'ExtraLight': 'W200', 'ExtraBold': 'W800'}
-                if variant not in weights:
-                    # Inset names only the hundreds; SemiLight's 350 has no constant to be emitted as.
-                    print(f'warning: {source}: {key} is FontWeight {variant}, which Inset has no constant for; not emitted', file=sys.stderr)
-                    continue
-                variant = weights[variant]
-            out.append(f'pub const {name}: {enum} = {enum}::{variant};')
+# Fonts Windows supplies, as the Rust names of the kit's open stand-ins for them (`PORTING.md`).
+FONT_STAND_INS = {'XamlAutoFontFamily': 'FONT_FAMILY'}
+FONT_WEIGHTS = {'Normal': 'NORMAL', 'Bold': 'BOLD', 'SemiBold': 'W600', 'Light': 'W300', 'Medium': 'W500',
+                'Black': 'W900', 'Thin': 'W100', 'ExtraLight': 'W200', 'ExtraBold': 'W800'}
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description="Generate the kit’s Rust theme resources from WinUI XAML.")
-    parser.add_argument('root', nargs='?', type=Path, default=DEFAULT_SOURCE,
-                        help='WinUI source checkout (default: .reference/microsoft-ui-xaml)')
-    parser.add_argument('output', nargs='?', type=Path, default=DEFAULT_OUTPUT,
-                        help='generated Rust file (default: this kit’s theme/generated.rs)')
-    parser.add_argument('controls', nargs='*',
-                        help='optional subset; defaults to the dictionaries in DEFAULT_CONTROLS')
-    args = parser.parse_args(argv)
-    root, output = args.root, args.output
-    controls = args.controls or DEFAULT_CONTROLS
+def themed_value(light, dark):
+    """The Rust type and the light and dark literals of a brush or colour, or None for a size,
+    duration or spline, which the themes share."""
+    kinds = {light[0], dark[0]}
+    if kinds <= {'color', 'accent', 'opacity'}:
+        return 'Color', value_literal(light), value_literal(dark)
+    if kinds == {'gradient'}:
+        stops = lambda g: '[' + ', '.join(f'({o}, {value_literal(c)})' for o, c in g if c) + ']'
+        return '[(f64, Color); 2]', stops(light[1]), stops(dark[1])
+    if kinds == {'acrylic'}:
+        return 'AcrylicBrushResources', acrylic_literal(light[1]), acrylic_literal(dark[1])
+    return None
+
+
+def shared_value(kind, value):
+    """The Rust type and literal of a value both themes share, or None and why it has none: a
+    font the kit has no stand-in for, or a font weight Inset names no constant for (it names only
+    the hundreds, so not SemiLight's 350)."""
+    if kind == 'font_family':
+        if value not in FONT_STAND_INS:
+            return None, f'the font {value}, which the kit has no stand-in for'
+        return "&'static str", FONT_STAND_INS[value]
+    if kind == 'f64':
+        return 'f64', f'{value}'
+    if kind == 'i32':
+        return 'i32', f'{value}'
+    if kind in ('thickness', 'corner', 'spline'):
+        return '[f64; 4]', f'{value}'
+    if kind == 'duration_ms':
+        return 'Duration', f'Duration::from_millis({value})'
+    if kind == 'duration_ns':
+        return 'Duration', f'Duration::from_nanos({value})'
+    enum, variant = value
+    # `FontWeight` in Inset is Flutter's: `FontWeight::NORMAL`, `BOLD`, `W600`...
+    if enum == 'FontWeight':
+        if variant not in FONT_WEIGHTS:
+            return None, f'FontWeight {variant}, which Inset has no constant for'
+        variant = FONT_WEIGHTS[variant]
+    return enum, f'{enum}::{variant}'
+
+
+class ThemeResources:
+    """Every resource of the dictionaries read, in one struct whose fields are WinUI's keys, as
+    WinUI merges the dictionaries into one: the brushes and colours each theme states, and the
+    sizes, durations and weights both share. A key two dictionaries resolve differently keeps the
+    first and is reported."""
+
+    def __init__(self):
+        self.fields = {}
+        self.sections = []
+
+    def add_dictionary(self, source, keys, themes, base_themes, shared):
+        """Adds the resources `source` states for `keys` in each theme, resolved through
+        `base_themes`, and the values in `shared`."""
+        section = []
+        for key in keys:
+            light = resolve(themes.get('Light', {}), base_themes.get('Light', {}), key)
+            dark = resolve(themes.get('Default', {}), base_themes.get('Default', {}), key)
+            if light is None or dark is None:
+                missing = ', '.join(theme for theme, value in (('Light', light), ('Default', dark)) if value is None)
+                print(f'warning: {source}: unresolved resource {key} ({missing}); not emitted', file=sys.stderr)
+                continue
+            value = themed_value(light, dark)
+            if value is None:
+                if light != dark:
+                    # A size, duration or spline each theme states differently has no
+                    # shared value to be emitted as.
+                    print(f'warning: {source}: {key} differs by theme ({light[1]} light, {dark[1]} dark); not emitted', file=sys.stderr)
+                continue
+            self.add(section, source, key, *value)
+        for key, (kind, value) in shared.items():
+            ty, literal = shared_value(kind, value)
+            if ty is None:
+                print(f'warning: {source}: {key} is {literal}; not emitted', file=sys.stderr)
+                continue
+            self.add(section, source, key, ty, literal, literal)
+        self.sections.append((source, section))
+
+    def add(self, section, source, key, ty, light, dark):
+        field = snake(key)
+        known = self.fields.get(field)
+        if known is None:
+            self.fields[field] = (key, ty, light, dark, source)
+            section.append(field)
+        elif known[1:4] != (ty, light, dark):
+            print(f'warning: {source}: {key} differs from {known[4]}; the first is kept', file=sys.stderr)
+
+    def emit(self, out):
+        out.append('/// Every WinUI theme resource the kit uses, by its key, for one theme and accent palette: the')
+        out.append("/// brushes and colours of WinUI's Light and Dark (XAML `Default`) dictionaries, and the sizes,")
+        out.append('/// durations and weights both share.')
+        out.append('#[derive(Clone, Debug, PartialEq)]')
+        out.append('pub struct ThemeResources {')
+        out.append('    /// The dictionary the brushes and colours come from.')
+        out.append('    pub theme: Theme,')
+        out.append('    /// The `SystemAccentColor*` shades the accent brushes come from.')
+        out.append('    pub accent: AccentPalette,')
+        for source, section in self.sections:
+            if not section:
+                continue
+            out.append(f'    // `{source}`')
+            for field in section:
+                key, ty, _, _, _ = self.fields[field]
+                out.append(f'    /// `{key}`.')
+                out.append(f'    pub {field}: {ty},')
+        out.append('}')
+        out.append('')
+        out.append('impl ThemeResources {')
+        out.append("    /// WinUI's resources for `theme`, in the `accent` palette.")
+        out.append('    pub fn new(theme: Theme, accent: AccentPalette) -> ThemeResources {')
+        out.append('        ThemeResources {')
+        out.append('            theme,')
+        out.append('            accent,')
+        for field, (_, _, light, dark, _) in self.fields.items():
+            if light == dark:
+                out.append(f'            {field}: {light},')
+            else:
+                out.append(f'            {field}: match theme {{ Theme::Light => {light}, Theme::Dark => {dark} }},')
+        out.append('        }')
+        out.append('    }')
+        out.append('}')
+
+
+def gather(root, controls):
+    """The resources of WinUI's base dictionaries and of each of `controls`, in order, from the
+    WinUI checkout at `root`."""
     styles = root / 'controls/dev/CommonStyles'
     base_themes, base_shared = read_dictionaries(styles / 'Common_themeresources_any.xaml')
     common_themes, common_shared = read_dictionaries(styles / 'Common_themeresources.xaml')
     base_shared = {**base_shared, **common_shared}
     acrylic_themes, _ = read_dictionaries(root / 'controls/dev/Materials/Acrylic/AcrylicBrush_themeresources.xaml')
-    out = ['//! Generated by tools/gen_resources.py from microsoft-ui-xaml; do not edit by hand.',
-           '//! Colours are ARGB literals resolved through every StaticResource alias in the',
-           '//! XAML theme dictionaries; the XAML "Default" dictionary is the dark theme.',
-           '#![allow(clippy::excessive_precision, unused_variables)]',
-           'use super::{AccentPalette, AcrylicBrushResources, Theme};', 'use crate::BackgroundSizing;', 'use inset_embedder::{Color, FontWeight};', 'use std::time::Duration;', '']
     # Brush keys alias a colour rather than stating one, so the alias kind belongs
-    # in the shared struct as much as a literal colour does.
+    # with the base resources as much as a literal colour does.
     common_keys = [k for k, v in base_themes['Light'].items() if v[0] in ('color', 'gradient', 'alias', 'opacity')]
-    emit_struct(out, 'CommonResources', common_keys, base_themes, {}, base_shared, 'Common_themeresources_any.xaml')
+    resources = ThemeResources()
+    resources.add_dictionary('Common_themeresources_any.xaml', common_keys, base_themes, {}, base_shared)
     sources = [(control, control_source(root, control)) for control in controls]
     # Control dictionaries share named resources in WinUI's merged theme dictionary.
     # A sibling's Fluent definition must take precedence over generic.xaml fallback.
@@ -448,17 +492,34 @@ def main(argv=None):
         fallback = {theme: {**legacy_themes.get(theme, {}), **common_themes.get(theme, {}), **acrylic_themes.get(theme, {}), **inherited_themes[theme], **base_themes.get(theme, {}), **control_themes.get(theme, {})}
                     for theme in ('Light', 'Default')}
         keys = list(themes.get('Light', {}).keys())
-        # Expose system brushes used directly by a template, as well as its
-        # named resources. Fluent common tokens retain their existing accessor.
-        template_references = references
-        for key in template_references:
+        # Expose system brushes a template uses directly, as well as its named
+        # resources; the base dictionary's own tokens are already there.
+        for key in references:
             if key not in keys and key not in base_themes.get('Light', {}) and (key in legacy_themes.get('Light', {}) or key in control_themes.get('Light', {}) or key in inherited_themes['Light']):
                 keys.append(key)
-        struct_name = 'AcrylicThemeResources' if control == 'AcrylicBrush' else f'{control}Resources'
-        emit_struct(out, struct_name, keys, themes, fallback, shared, source.name)
-    output.write_text('\n'.join(out) + '\n')
-    subprocess.run(['rustfmt', '--edition', '2024', str(output)], check=True)
-    print(f'wrote {output}')
+        resources.add_dictionary(source.name, keys, themes, fallback, shared)
+    return resources
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Generate the kit’s Rust theme resources from WinUI XAML.")
+    parser.add_argument('root', nargs='?', type=Path, default=DEFAULT_SOURCE,
+                        help='WinUI source checkout (default: .reference/microsoft-ui-xaml)')
+    parser.add_argument('output', nargs='?', type=Path, default=DEFAULT_OUTPUT,
+                        help='generated Rust file (default: this kit’s theme/generated.rs)')
+    parser.add_argument('controls', nargs='*',
+                        help='optional subset; defaults to the dictionaries in DEFAULT_CONTROLS')
+    args = parser.parse_args(argv)
+    resources = gather(args.root, args.controls or DEFAULT_CONTROLS)
+    out = ['//! Generated by tools/gen_resources.py from microsoft-ui-xaml; do not edit by hand.',
+           '//! Colours are ARGB literals resolved through every StaticResource alias in the',
+           '//! XAML theme dictionaries; the XAML "Default" dictionary is the dark theme.',
+           '#![allow(clippy::excessive_precision)]',
+           'use super::{AccentPalette, AcrylicBrushResources, FONT_FAMILY, Theme};', 'use crate::BackgroundSizing;', 'use inset_embedder::{Color, FontWeight};', 'use std::time::Duration;', '']
+    resources.emit(out)
+    args.output.write_text('\n'.join(out) + '\n')
+    subprocess.run(['rustfmt', '--edition', '2024', str(args.output)], check=True)
+    print(f'wrote {args.output}')
 
 
 if __name__ == '__main__':

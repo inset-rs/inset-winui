@@ -397,7 +397,7 @@ impl State for ProgressRingState {
     }
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
-        let resources = ThemeResources::of(app, context).progress_ring();
+        let resources = ThemeResources::of(app, context);
         let widget = self.widget(app).clone();
         let painter = ProgressRingVisual {
             progress: self.progress(app),

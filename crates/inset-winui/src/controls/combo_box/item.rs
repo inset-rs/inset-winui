@@ -287,28 +287,30 @@ impl ComboBoxItemContainerState {
     /// One frame of the storyboard.
     fn tick(self: Handle<Self>, app: &mut App, elapsed: Duration) {
         self.set_state(app, |state| state.pressed_for = elapsed);
-        if elapsed >= COMBO_BOX_ITEM_SCALE_ANIMATION_DURATION {
+        let duration =
+            ThemeResources::of(app, self.context(app)).combo_box_item_scale_animation_duration;
+        if elapsed >= duration {
             app.get(self).ticker.unwrap().stop(app, false);
         }
     }
 
     /// `PillTransform`'s `ScaleY`: 1, or on its way to `ComboBoxItemPillMinScale` in
     /// `SelectedPressed`.
-    fn pill_scale(self: Handle<Self>, app: &App) -> f64 {
+    fn pill_scale(self: Handle<Self>, r: &ThemeResources, app: &App) -> f64 {
         if self.common_state(app) != ComboBoxItemCommonState::SelectedPressed {
             return 1.0;
         }
         let progress = (app.get(self).pressed_for.as_secs_f64()
-            / COMBO_BOX_ITEM_SCALE_ANIMATION_DURATION.as_secs_f64())
+            / r.combo_box_item_scale_animation_duration.as_secs_f64())
         .min(1.0);
         let eased = Cubic::new(0.0, 0.0, 0.0, 1.0).transform(progress);
-        1.0 + (COMBO_BOX_ITEM_PILL_MIN_SCALE - 1.0) * eased
+        1.0 + (r.combo_box_item_pill_min_scale - 1.0) * eased
     }
 
     /// The template, `LayoutRoot` with `Pill` and `ContentPresenter`, in the current state.
     fn template(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);
-        let r = resources.combo_box();
+        let r = &resources;
         let widget = self.widget(app).clone();
         let common = self.common_state(app);
         use ComboBoxItemCommonState::*;
@@ -344,35 +346,40 @@ impl ComboBoxItemContainerState {
             ),
         };
         let pill_opacity = if common.shows_pill() { 1.0 } else { 0.0 };
-        let pill_scale = self.pill_scale(app);
+        let pill_scale = self.pill_scale(&resources, app);
         // `Pill`, in `ComboBoxItemPill`: 3 by 16 at the left, centered, scaled about its center.
         let pill = Align::new().alignment(Alignment::CENTER_LEFT.into()).child(
             Opacity::new(pill_opacity).child(
                 Transform::scale(None, None, Some(pill_scale)).child(
                     SizedBox::new()
-                        .width(COMBO_BOX_ITEM_PILL_WIDTH)
-                        .height(COMBO_BOX_ITEM_PILL_HEIGHT)
+                        .width(r.combo_box_item_pill_width)
+                        .height(r.combo_box_item_pill_height)
                         .child(
                             ControlBorder::new(
                                 Brush::Solid(r.combo_box_item_pill_fill_brush),
                                 Brush::Solid(Color::new(0)),
                             )
                             .border_thickness(0.0)
-                            .corner_radius_corners(COMBO_BOX_ITEM_PILL_CORNER_RADIUS),
+                            .corner_radius_corners(r.combo_box_item_pill_corner_radius),
                         ),
                 ),
             ),
         );
         // `ContentPresenter`: the content at `Padding`, stretched, in the state's foreground.
         let content =
-            Padding::new(insets(COMBO_BOX_ITEM_THEME_PADDING)).child(DefaultTextStyle::new(
-                control_text_style(CONTROL_CONTENT_FONT_SIZE, FontWeight::NORMAL, foreground),
+            Padding::new(insets(r.combo_box_item_theme_padding)).child(DefaultTextStyle::new(
+                control_text_style(
+                    &resources,
+                    r.control_content_theme_font_size,
+                    FontWeight::NORMAL,
+                    foreground,
+                ),
                 widget.item.content.clone(),
             ));
         // `LayoutRoot`; the style sets no `BorderThickness`, so its border brushes never show.
         let layout_root = Grid::new()
             .background(Brush::Solid(background))
-            .corner_radius_corners(COMBO_BOX_ITEM_CORNER_RADIUS)
+            .corner_radius_corners(r.combo_box_item_corner_radius)
             .children([
                 GridCell::new(pill).into_widget(),
                 GridCell::new(content).into_widget(),
@@ -381,7 +388,7 @@ impl ComboBoxItemContainerState {
         FocusVisual::new(layout_root, resources.theme)
             .visible(focused)
             .margin([ITEM_FOCUS_VISUAL_MARGIN; 4])
-            .corner_radius(COMBO_BOX_ITEM_CORNER_RADIUS[0])
+            .corner_radius(r.combo_box_item_corner_radius[0])
             .into_widget()
     }
 }

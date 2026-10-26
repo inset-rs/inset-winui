@@ -5,12 +5,8 @@
 //! Behaviour (`RadioButton_Partial.cpp`, `ToggleButton_Partial.cpp`): `ToggleButton::OnClick` calls `OnToggle`, which `RadioButton::OnToggle` overrides to set `IsChecked` to `true` only, so a checked radio button does not uncheck on click; `RadioButton::UpdateRadioButtonGroup` unchecks the other members of the group when one becomes checked.
 
 use crate::{
-    Brush, CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, CONTROL_FAST_ANIMATION_DURATION,
-    CONTROL_NORMAL_ANIMATION_DURATION, ColumnDefinition, CommonState, CommonStates, ControlStates,
-    FocusVisual, Grid, GridCell, GridLength, RADIO_BUTTON_BORDER_THEME_THICKNESS,
-    RADIO_BUTTON_CHECK_GLYPH_POINTER_OVER_SIZE, RADIO_BUTTON_CHECK_GLYPH_PRESSED_OVER_SIZE,
-    RADIO_BUTTON_CHECK_GLYPH_SIZE, RadioButtonResources, ThemeResources, control_text_style,
-    fast_out_slow_in,
+    Brush, ColumnDefinition, CommonState, CommonStates, ControlStates, FocusVisual, Grid, GridCell,
+    GridLength, ThemeResources, control_text_style, fast_out_slow_in,
 };
 use inset_embedder::{Canvas, Color, FontWeight, Offset, Size};
 use inset_foundation::{App, Listener};
@@ -41,21 +37,21 @@ pub const RADIO_BUTTON_MIN_WIDTH: f64 = 120.0;
 pub const RADIO_BUTTON_FOCUS_VISUAL_MARGIN: [f64; 4] = [-7.0, -3.0, -7.0, -3.0];
 
 /// The size `CheckGlyph` has in each common state: `RadioButtonCheckGlyphSize` (12) at rest, the `PointerOver` storyboard's 14, the `Pressed` storyboard's 10 and the `Disabled` storyboard's 14.
-pub fn check_glyph_size(state: CommonState) -> f64 {
+pub fn check_glyph_size(r: &ThemeResources, state: CommonState) -> f64 {
     match state {
-        CommonState::Normal => RADIO_BUTTON_CHECK_GLYPH_SIZE,
-        CommonState::PointerOver => RADIO_BUTTON_CHECK_GLYPH_POINTER_OVER_SIZE,
-        CommonState::Pressed => RADIO_BUTTON_CHECK_GLYPH_PRESSED_OVER_SIZE,
+        CommonState::Normal => r.radio_button_check_glyph_size,
+        CommonState::PointerOver => r.radio_button_check_glyph_pointer_over_size,
+        CommonState::Pressed => r.radio_button_check_glyph_pressed_over_size,
         CommonState::Disabled => CHECK_GLYPH_DISABLED_SIZE,
     }
 }
 
 /// How long `CheckGlyph` takes to reach its size for `state`: the `KeyTime` of the state's `SplineDoubleKeyFrame` (`ControlNormalAnimationDuration` for `PointerOver` and `Pressed`, `ControlFastAnimationDuration` for `Disabled`). `Normal` declares no size animation, so the glyph returns to its base size at once, as a stopped storyboard releases the property.
-pub fn check_glyph_duration(state: CommonState) -> Duration {
+pub fn check_glyph_duration(r: &ThemeResources, state: CommonState) -> Duration {
     match state {
         CommonState::Normal => Duration::ZERO,
-        CommonState::PointerOver | CommonState::Pressed => CONTROL_NORMAL_ANIMATION_DURATION,
-        CommonState::Disabled => CONTROL_FAST_ANIMATION_DURATION,
+        CommonState::PointerOver | CommonState::Pressed => r.control_normal_animation_duration,
+        CommonState::Disabled => r.control_fast_animation_duration,
     }
 }
 
@@ -147,7 +143,7 @@ struct RadioBrushes {
     check_glyph_stroke: [(f64, Color); 2],
 }
 
-fn brushes(r: &RadioButtonResources, state: CommonState) -> RadioBrushes {
+fn brushes(r: &ThemeResources, state: CommonState) -> RadioBrushes {
     match state {
         CommonState::Normal => RadioBrushes {
             foreground: r.radio_button_foreground,
@@ -204,12 +200,13 @@ fn template(
     states: ControlStates,
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
-    let r = resources.radio_button();
-    let brushes = brushes(&r, states.common);
-    let glyphs = glyph_area(&r, &brushes, widget.is_checked, states.common);
+    let r = &resources;
+    let brushes = brushes(r, states.common);
+    let glyphs = glyph_area(r, &brushes, widget.is_checked, states.common);
     // `ContentPresenter`: `Margin="{TemplateBinding Padding}"`, `HorizontalContentAlignment="Left"`, `VerticalContentAlignment="Top"`, `TextWrapping="Wrap"`.
     let text = control_text_style(
-        CONTROL_CONTENT_FONT_SIZE,
+        &resources,
+        r.control_content_theme_font_size,
         FontWeight::W400,
         brushes.foreground,
     );
@@ -229,7 +226,7 @@ fn template(
         .background(Brush::Solid(brushes.background))
         .border_brush(Brush::Solid(brushes.border))
         .border_thickness(0.0)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(r.control_corner_radius[0])
         .column_definitions([
             ColumnDefinition::new(GridLength::pixel(GLYPH_COLUMN_WIDTH)),
             ColumnDefinition::new(GridLength::STAR),
@@ -243,13 +240,13 @@ fn template(
     FocusVisual::new(body, resources.theme)
         .visible(states.focused)
         .margin(RADIO_BUTTON_FOCUS_VISUAL_MARGIN)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(r.control_corner_radius[0])
         .into_widget()
 }
 
 /// The 32-high grid aligned `Top` in column 0, with the two rings and the two dots centred in it.
 fn glyph_area(
-    r: &RadioButtonResources,
+    r: &ThemeResources,
     brushes: &RadioBrushes,
     is_checked: bool,
     state: CommonState,
@@ -269,7 +266,7 @@ fn glyph_area(
     let ring = SizedBox::new()
         .width(RING_SIZE)
         .height(RING_SIZE)
-        .child(ring.stroke_thickness(RADIO_BUTTON_BORDER_THEME_THICKNESS))
+        .child(ring.stroke_thickness(r.radio_button_border_theme_thickness))
         .into_widget();
     let mut layers = vec![Center::new().child(ring).into_widget()];
     // `CheckGlyph`: `Opacity="0"`, 1 in `Checked`. Its `Stroke` is the `CommonStates` storyboards' `RadioButtonCheckGlyphStroke*` (`CircleElevationBorderBrush`) until the `Checked` storyboard, applied after them, sets `RadioButtonCheckGlyphStrokeChecked` (`AccentControlElevationBorderBrush`).
@@ -280,9 +277,9 @@ fn glyph_area(
     };
     let glyph = Ellipse::new(Brush::Solid(brushes.check_glyph_fill), stroke)
         .stroke_thickness(CHECK_GLYPH_STROKE_THICKNESS);
-    let size = check_glyph_size(state);
-    let glyph = AnimatedContainer::new(check_glyph_duration(state))
-        .curve(fast_out_slow_in())
+    let size = check_glyph_size(r, state);
+    let glyph = AnimatedContainer::new(check_glyph_duration(r, state))
+        .curve(fast_out_slow_in(r))
         .width(size)
         .height(size)
         .child(glyph);
@@ -304,12 +301,12 @@ fn glyph_area(
         PRESSED_GLYPH_SIZE
     };
     let duration = if pressed {
-        CONTROL_FAST_ANIMATION_DURATION
+        r.control_fast_animation_duration
     } else {
         Duration::ZERO
     };
     let pressed_glyph = AnimatedContainer::new(duration)
-        .curve(fast_out_slow_in())
+        .curve(fast_out_slow_in(r))
         .width(size)
         .height(size)
         .child(pressed_glyph);

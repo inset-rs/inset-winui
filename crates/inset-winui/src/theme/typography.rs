@@ -4,11 +4,8 @@ use super::generated::*;
 use inset_embedder::{Color, FontWeight};
 use inset_painting::TextStyle;
 
-/// The family name the gallery registers Selawik under; `XamlAutoFontFamily` resolves to Segoe UI Variable on Windows.
+/// The family name an app registers Selawik under, the kit's stand-in for `XamlAutoFontFamily` (Segoe UI Variable on Windows) and the default `content_control_theme_font_family`.
 pub const FONT_FAMILY: &str = "Selawik";
-
-/// XAML `ControlContentThemeFontSize`: the size control content (button labels, toggle content) uses.
-pub const CONTROL_CONTENT_FONT_SIZE: f64 = 14.0;
 
 /// One of WinUI's text block styles; XAML `{StaticResource BodyTextBlockStyle}` and its siblings.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -26,31 +23,38 @@ pub enum TextBlockStyle {
 
 impl TextBlockStyle {
     /// The style's size and weight from `TextBlock_themeresources.xaml`: every style is based on `BaseTextBlockStyle` (SemiBold) and the body and caption styles set `Normal`.
-    pub fn font(self) -> (f64, FontWeight) {
+    pub fn font(self, r: &ThemeResources) -> (f64, FontWeight) {
         match self {
-            TextBlockStyle::Caption => (CAPTION_TEXT_BLOCK_FONT_SIZE, FontWeight::W400),
-            TextBlockStyle::Body => (BODY_TEXT_BLOCK_FONT_SIZE, FontWeight::W400),
-            TextBlockStyle::BodyStrong => (BODY_TEXT_BLOCK_FONT_SIZE, FontWeight::W600),
-            TextBlockStyle::BodyLarge => (BODY_LARGE_TEXT_BLOCK_FONT_SIZE, FontWeight::W400),
-            TextBlockStyle::BodyLargeStrong => (BODY_LARGE_TEXT_BLOCK_FONT_SIZE, FontWeight::W600),
-            TextBlockStyle::Subtitle => (SUBTITLE_TEXT_BLOCK_FONT_SIZE, FontWeight::W600),
-            TextBlockStyle::Title => (TITLE_TEXT_BLOCK_FONT_SIZE, FontWeight::W600),
-            TextBlockStyle::TitleLarge => (TITLE_LARGE_TEXT_BLOCK_FONT_SIZE, FontWeight::W600),
-            TextBlockStyle::Display => (DISPLAY_TEXT_BLOCK_FONT_SIZE, FontWeight::W600),
+            TextBlockStyle::Caption => (r.caption_text_block_font_size, FontWeight::W400),
+            TextBlockStyle::Body => (r.body_text_block_font_size, FontWeight::W400),
+            TextBlockStyle::BodyStrong => (r.body_text_block_font_size, FontWeight::W600),
+            TextBlockStyle::BodyLarge => (r.body_large_text_block_font_size, FontWeight::W400),
+            TextBlockStyle::BodyLargeStrong => {
+                (r.body_large_text_block_font_size, FontWeight::W600)
+            }
+            TextBlockStyle::Subtitle => (r.subtitle_text_block_font_size, FontWeight::W600),
+            TextBlockStyle::Title => (r.title_text_block_font_size, FontWeight::W600),
+            TextBlockStyle::TitleLarge => (r.title_large_text_block_font_size, FontWeight::W600),
+            TextBlockStyle::Display => (r.display_text_block_font_size, FontWeight::W600),
         }
     }
 
     /// The reveal text style in `color` (a `TextBlock`'s `Foreground`).
-    pub fn text_style(self, color: Color) -> TextStyle {
-        let (size, weight) = self.font();
-        control_text_style(size, weight, color)
+    pub fn text_style(self, r: &ThemeResources, color: Color) -> TextStyle {
+        let (size, weight) = self.font(r);
+        control_text_style(r, size, weight, color)
     }
 }
 
-/// A text style in the control font; XAML `ContentControlThemeFontFamily` at `size` and `weight`.
-pub fn control_text_style(size: f64, weight: FontWeight, color: Color) -> TextStyle {
+/// A text style in the control font, `ContentControlThemeFontFamily`, at `size` and `weight`.
+pub fn control_text_style(
+    r: &ThemeResources,
+    size: f64,
+    weight: FontWeight,
+    color: Color,
+) -> TextStyle {
     TextStyle::new()
-        .font_family(FONT_FAMILY)
+        .font_family(r.content_control_theme_font_family)
         .font_size(size)
         .font_weight(weight)
         .color(color)

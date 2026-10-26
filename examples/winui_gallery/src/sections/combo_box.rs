@@ -192,7 +192,7 @@ impl State for ComboBoxDemoState {
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let r = ThemeResources::of(app, context);
-        let secondary = r.common.text_fill_color_secondary;
+        let secondary = r.text_fill_color_secondary;
         let s = app.get(self);
         let (color, font, size, custom_size) = (s.color, s.font, s.size, s.custom_size.clone());
         let (handle_submitted, shape, event) = (s.handle_submitted, s.shape, s.event.clone());

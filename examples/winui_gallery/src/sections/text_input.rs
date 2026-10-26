@@ -148,7 +148,7 @@ impl State for TextExamplesState {
                                 label(
                                     format!("User edits: {edits}"),
                                     TextBlockStyle::Caption,
-                                    r.common.text_fill_color_secondary,
+                                    r.text_fill_color_secondary,
                                 ),
                             ],
                             16.0,
@@ -226,7 +226,7 @@ impl State for TextExamplesState {
                                 label(
                                     format!("User edits: {edits}"),
                                     TextBlockStyle::Caption,
-                                    r.common.text_fill_color_secondary,
+                                    r.text_fill_color_secondary,
                                 ),
                                 TextBox::new(controllers[1])
                                     .header(Text::new("Read-only sample"))

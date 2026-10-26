@@ -4,13 +4,9 @@
 //! remains the only horizontal viewport. The two RepeatButtons follow TabView.cpp.
 
 use crate::{
-    Brush, CONTROL_CORNER_RADIUS, ColumnDefinition, CommonState, ControlBorder, ControlStates,
-    FluentSymbol, FocusVisual, FontIcon, Grid, GridCell, GridLength, RepeatButton,
-    ScrollMetricsObserver, ScrollViewportController, TAB_VIEW_BUTTON_BORDER_THICKNESS,
-    TAB_VIEW_ITEM_LEFT_SCROLL_BUTTON_CONTAINER_PADDING,
-    TAB_VIEW_ITEM_RIGHT_SCROLL_BUTTON_CONTAINER_PADDING, TAB_VIEW_ITEM_SCROLL_BUTON_FONT_SIZE,
-    TAB_VIEW_ITEM_SCROLL_BUTTON_HEIGHT, TAB_VIEW_ITEM_SCROLL_BUTTON_WIDTH, ThemeResources, ToolTip,
-    ToolTipService, control_text_style,
+    Brush, ColumnDefinition, CommonState, ControlBorder, ControlStates, FluentSymbol, FocusVisual,
+    FontIcon, Grid, GridCell, GridLength, RepeatButton, ScrollMetricsObserver,
+    ScrollViewportController, ThemeResources, ToolTip, ToolTipService, control_text_style,
 };
 use inset_embedder::{Color, FontWeight};
 use inset_foundation::{App, Handle, Listener, ValueKey};
@@ -62,7 +58,7 @@ impl TabScrollViewer {
 
     /// Builds the named template parts for the current scroll offset.
     fn build_template(&self, app: &mut App, context: BuildContext) -> WidgetRef {
-        let resources = ThemeResources::of(app, context).tab_view();
+        let resources = ThemeResources::of(app, context);
         let metrics = self.controller.metrics(app);
         let (decrease_enabled, increase_enabled) =
             button_states(metrics.offset, metrics.scrollable_length);
@@ -82,13 +78,13 @@ impl TabScrollViewer {
                 (
                     false,
                     decrease_enabled,
-                    TAB_VIEW_ITEM_LEFT_SCROLL_BUTTON_CONTAINER_PADDING,
+                    resources.tab_view_item_left_scroll_button_container_padding,
                     0,
                 ),
                 (
                     true,
                     increase_enabled,
-                    TAB_VIEW_ITEM_RIGHT_SCROLL_BUTTON_CONTAINER_PADDING,
+                    resources.tab_view_item_right_scroll_button_container_padding,
                     2,
                 ),
             ] {
@@ -99,7 +95,7 @@ impl TabScrollViewer {
                     } else {
                         FluentSymbol::ChevronLeft
                     })
-                    .font_size(TAB_VIEW_ITEM_SCROLL_BUTON_FONT_SIZE)
+                    .font_size(resources.tab_view_item_scroll_buton_font_size)
                     .mirrored_when_right_to_left(true),
                     Listener::new(move |app| {
                         controller.scroll_by(app, if increase { 50.0 } else { -50.0 }, false);
@@ -208,7 +204,7 @@ fn scroll_button_template(
     content: WidgetRef,
 ) -> WidgetRef {
     let theme = ThemeResources::of(app, context);
-    let r = theme.tab_view();
+    let r = &theme;
     let (background, foreground, border) = match states.common {
         CommonState::Normal => (
             r.tab_view_scroll_button_background,
@@ -232,15 +228,16 @@ fn scroll_button_template(
         ),
     };
     let presenter = SizedBox::new()
-        .width(TAB_VIEW_ITEM_SCROLL_BUTTON_WIDTH)
-        .height(TAB_VIEW_ITEM_SCROLL_BUTTON_HEIGHT)
+        .width(r.tab_view_item_scroll_button_width)
+        .height(r.tab_view_item_scroll_button_height)
         .child(
             ControlBorder::new(Brush::Solid(background), Brush::Solid(border))
-                .border_thickness_ltrb(TAB_VIEW_BUTTON_BORDER_THICKNESS)
-                .corner_radius(CONTROL_CORNER_RADIUS[0])
+                .border_thickness_ltrb(r.tab_view_button_border_thickness)
+                .corner_radius(r.control_corner_radius[0])
                 .child(Center::new().child(DefaultTextStyle::new(
                     control_text_style(
-                        TAB_VIEW_ITEM_SCROLL_BUTON_FONT_SIZE,
+                        &theme,
+                        r.tab_view_item_scroll_buton_font_size,
                         FontWeight::W400,
                         foreground,
                     ),
@@ -250,7 +247,7 @@ fn scroll_button_template(
     FocusVisual::new(presenter, theme.theme)
         .visible(states.focused)
         .margin([-3.0; 4])
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(r.control_corner_radius[0])
         .into_widget()
 }
 

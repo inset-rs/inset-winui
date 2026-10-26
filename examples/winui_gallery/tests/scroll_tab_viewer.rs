@@ -61,9 +61,8 @@ impl State for PageState {
         } else {
             Theme::Light
         };
-        let background = ThemeResources::new(theme, AccentPalette::default())
-            .common
-            .solid_background_fill_color_base;
+        let background =
+            ThemeResources::new(theme, AccentPalette::default()).solid_background_fill_color_base;
         ThemeScope::new(
             theme,
             ColoredBox::new(background).child(
@@ -126,14 +125,15 @@ fn buttons(f: &Fixture) -> Vec<(Rect, bool)> {
 
 #[test]
 fn source_scroll_buttons_repeat_and_stop_at_edges_in_both_themes() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let (mut f, p) = fixture();
     settle(&mut f);
     let controller = p.controller.get().unwrap();
     let b = buttons(&f);
     assert_eq!(b.len(), 2);
     assert!(!b[0].1 && b[1].1);
-    assert_eq!(b[1].0.width(), TAB_VIEW_ITEM_SCROLL_BUTTON_WIDTH);
-    assert_eq!(b[1].0.height(), TAB_VIEW_ITEM_SCROLL_BUTTON_HEIGHT);
+    assert_eq!(b[1].0.width(), r.tab_view_item_scroll_button_width);
+    assert_eq!(b[1].0.height(), r.tab_view_item_scroll_button_height);
     let point = b[1].0.center();
     f.send_mouse(PointerChange::Add, point, 0);
     f.send_mouse(PointerChange::Hover, point, 0);

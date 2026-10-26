@@ -5,15 +5,8 @@
 //! Behaviour is `Slider_Partial.cpp` (with `Thumb_Partial.cpp` for the thumb's drag and `RangeBase.cpp` for the range): a press on `SliderContainer` moves the thumb to the pointer (`OnPointerPressed`, `MoveThumbToPoint`) and keeps following it (`OnPointerMoved`); a press on the thumb drags it by deltas from the value it started at (`OnThumbDragStarted`, `OnThumbDragDelta`); both set `IntermediateValue`, which positions the thumb, and snap `Value` to the nearest `StepFrequency` multiple (`GetClosestStep`); the arrow keys step by `SmallChange`, Home and End go to the ends (`SliderKeyProcess.h`).
 
 use crate::{
-    Brush, CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, CONTROL_FAST_ANIMATION_DURATION,
-    CONTROL_NORMAL_ANIMATION_DURATION, ColumnDefinition, CommonState, ControlBorder, FocusVisual,
-    Grid, GridCell, GridLength, PlacementMode, RangeBase, RowDefinition,
-    SLIDER_HEADER_THEME_FONT_WEIGHT, SLIDER_HORIZONTAL_HEIGHT, SLIDER_HORIZONTAL_THUMB_HEIGHT,
-    SLIDER_HORIZONTAL_THUMB_WIDTH, SLIDER_INNER_THUMB_HEIGHT, SLIDER_INNER_THUMB_WIDTH,
-    SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT, SLIDER_POST_CONTENT_MARGIN, SLIDER_PRE_CONTENT_MARGIN,
-    SLIDER_THUMB_CORNER_RADIUS, SLIDER_TOP_HEADER_MARGIN, SLIDER_TRACK_CORNER_RADIUS,
-    SLIDER_TRACK_THEME_HEIGHT, SLIDER_VERTICAL_THUMB_HEIGHT, SLIDER_VERTICAL_THUMB_WIDTH,
-    SLIDER_VERTICAL_WIDTH, SliderResources, ThemeResources, TickBar, TickPlacement, ToolTip,
+    Brush, ColumnDefinition, CommonState, ControlBorder, FocusVisual, Grid, GridCell, GridLength,
+    PlacementMode, RangeBase, RowDefinition, ThemeResources, TickBar, TickPlacement, ToolTip,
     ToolTipService, are_close, control_text_style, fast_out_slow_in, fractional,
 };
 use inset_embedder::{Canvas, Color, Offset, PointerDeviceKind, Rect, Size};
@@ -60,12 +53,12 @@ pub const THUMB_BORDER_OVERHANG: f64 = 2.0;
 pub const TICK_BAR_MARGIN: f64 = 4.0;
 
 /// `SliderInnerThumb`'s `CompositeTransform` scale per thumb state, and the key time it reaches it with `ControlFastOutSlowInKeySpline`: 0.86 over `ControlFastAnimationDuration` (`Normal`), 1.167 over `ControlNormalAnimationDuration` (`PointerOver`), 0.71 over `ControlNormalAnimationDuration` (`Pressed`), 1.167 over `ControlFastAnimationDuration` (`Disabled`).
-pub fn inner_thumb_scale(state: CommonState) -> (f64, Duration) {
+pub fn inner_thumb_scale(r: &ThemeResources, state: CommonState) -> (f64, Duration) {
     match state {
-        CommonState::Normal => (0.86, CONTROL_FAST_ANIMATION_DURATION),
-        CommonState::PointerOver => (1.167, CONTROL_NORMAL_ANIMATION_DURATION),
-        CommonState::Pressed => (0.71, CONTROL_NORMAL_ANIMATION_DURATION),
-        CommonState::Disabled => (1.167, CONTROL_FAST_ANIMATION_DURATION),
+        CommonState::Normal => (0.86, r.control_fast_animation_duration),
+        CommonState::PointerOver => (1.167, r.control_normal_animation_duration),
+        CommonState::Pressed => (0.71, r.control_normal_animation_duration),
+        CommonState::Disabled => (1.167, r.control_fast_animation_duration),
     }
 }
 
@@ -315,10 +308,10 @@ impl Slider {
     }
 
     /// The thumb's extent along the orientation: `Slider::GetThumbLength`.
-    fn thumb_length(&self) -> f64 {
+    fn thumb_length(&self, r: &ThemeResources) -> f64 {
         match self.orientation {
-            Orientation::Horizontal => SLIDER_HORIZONTAL_THUMB_WIDTH,
-            Orientation::Vertical => SLIDER_VERTICAL_THUMB_HEIGHT,
+            Orientation::Horizontal => r.slider_horizontal_thumb_width,
+            Orientation::Vertical => r.slider_vertical_thumb_height,
         }
     }
 
@@ -471,10 +464,12 @@ impl SliderState {
 
     /// The thumb's layout slot in `SliderContainer` coordinates, for the value the thumb is at.
     fn thumb_rect(self: Handle<Self>, app: &mut App) -> Rect {
+        let r = ThemeResources::of(app, self.context(app));
         let track_size = self.track_size(app);
         let widget = self.widget(app);
         let fraction = widget.range().fraction_of(self.intermediate_value(app));
         thumb_rect(
+            &r,
             widget.orientation,
             widget.is_direction_reversed,
             track_size,
@@ -508,13 +503,14 @@ impl SliderState {
 
     /// `Slider::MoveThumbToPoint`: the share of the clickable track (the track less the thumb, whose midpoint never reaches the ends) under `point` becomes `IntermediateValue`, and `Value` snaps to it.
     fn move_thumb_to_point(self: Handle<Self>, app: &mut App, point: Offset) {
+        let r = ThemeResources::of(app, self.context(app));
         let widget = self.widget(app).clone();
         let track_size = self.track_size(app);
         let (track_length, click_delta) = match widget.orientation {
             Orientation::Horizontal => (track_size.width(), point.dx()),
             Orientation::Vertical => (track_size.height(), track_size.height() - point.dy()),
         };
-        let thumb_length = widget.thumb_length();
+        let thumb_length = widget.thumb_length(&r);
         let clickable_length = (track_length - thumb_length).max(1.0);
         let mut click_percentage = (click_delta - thumb_length / 2.0) / clickable_length;
         click_percentage = click_percentage.clamp(0.0, 1.0);
@@ -531,6 +527,7 @@ impl SliderState {
 
     /// `Slider::OnThumbDragDelta`: the pointer's movement along the track, as a share of the track less the thumb, scaled to the range and added to `m_DragValue`.
     fn thumb_drag_delta(self: Handle<Self>, app: &mut App, change: Offset) {
+        let r = ThemeResources::of(app, self.context(app));
         let widget = self.widget(app).clone();
         let track_size = self.track_size(app);
         let range = widget.range();
@@ -538,7 +535,7 @@ impl SliderState {
             Orientation::Horizontal => (change.dx(), track_size.width()),
             Orientation::Vertical => (-change.dy(), track_size.height()),
         };
-        let offset = change * range.span() / (actual_size - widget.thumb_length()).max(1.0);
+        let offset = change * range.span() / (actual_size - widget.thumb_length(&r)).max(1.0);
         if !offset.is_finite() {
             return;
         }
@@ -833,14 +830,14 @@ struct SliderBrushes {
     tick_bar: Color,
 }
 
-fn brushes(resources: &ThemeResources, r: &SliderResources, state: CommonState) -> SliderBrushes {
+fn brushes(resources: &ThemeResources, r: &ThemeResources, state: CommonState) -> SliderBrushes {
     match state {
         CommonState::Normal => SliderBrushes {
             track: r.slider_track_fill,
             decrease: r.slider_track_value_fill,
             thumb: r.slider_thumb_background,
             // `SliderContainerBackground`: `ControlFillColorTransparentBrush` in the Light dictionary; the Default dictionary omits the key.
-            container: resources.common.control_fill_color_transparent,
+            container: resources.control_fill_color_transparent,
             header: r.slider_header_foreground,
             tick_bar: r.slider_tick_bar_fill,
         },
@@ -889,35 +886,36 @@ fn decrease_length(track_length: f64, thumb_length: f64, fraction: f64) -> f64 {
 
 /// The thumb's slot in the template grid: after the decrease rect along the track (before it when reversed), centred across it in the three rows or columns.
 fn thumb_rect(
+    r: &ThemeResources,
     orientation: Orientation,
     is_direction_reversed: bool,
     track_size: Size,
     fraction: f64,
 ) -> Rect {
     let across =
-        (SLIDER_PRE_CONTENT_MARGIN + SLIDER_TRACK_THEME_HEIGHT + SLIDER_POST_CONTENT_MARGIN
-            - SLIDER_HORIZONTAL_THUMB_HEIGHT)
+        (r.slider_pre_content_margin + r.slider_track_theme_height + r.slider_post_content_margin
+            - r.slider_horizontal_thumb_height)
             / 2.0;
     match orientation {
         Orientation::Horizontal => {
-            let thumb = SLIDER_HORIZONTAL_THUMB_WIDTH;
+            let thumb = r.slider_horizontal_thumb_width;
             let decrease = decrease_length(track_size.width(), thumb, fraction);
             let left = if is_direction_reversed {
                 track_size.width() - decrease - thumb
             } else {
                 decrease
             };
-            Rect::from_ltwh(left, across, thumb, SLIDER_HORIZONTAL_THUMB_HEIGHT)
+            Rect::from_ltwh(left, across, thumb, r.slider_horizontal_thumb_height)
         }
         Orientation::Vertical => {
-            let thumb = SLIDER_VERTICAL_THUMB_HEIGHT;
+            let thumb = r.slider_vertical_thumb_height;
             let decrease = decrease_length(track_size.height(), thumb, fraction);
             let top = if is_direction_reversed {
                 decrease
             } else {
                 track_size.height() - decrease - thumb
             };
-            Rect::from_ltwh(across, top, SLIDER_VERTICAL_THUMB_WIDTH, thumb)
+            Rect::from_ltwh(across, top, r.slider_vertical_thumb_width, thumb)
         }
     }
 }
@@ -929,14 +927,15 @@ fn template(
     states: SliderTemplateStates,
     container: WidgetRef,
 ) -> WidgetRef {
-    let brushes = brushes(resources, &resources.slider(), states.slider);
+    let brushes = brushes(resources, resources, states.slider);
     let mut children = Vec::new();
     if let Some(header) = &widget.header {
         // `HeaderContentPresenter`: `SliderHeaderThemeFontWeight` is Normal; collapsed without a `Header`.
-        let [left, top, right, bottom] = SLIDER_TOP_HEADER_MARGIN;
+        let [left, top, right, bottom] = resources.slider_top_header_margin;
         let text = control_text_style(
-            CONTROL_CONTENT_FONT_SIZE,
-            SLIDER_HEADER_THEME_FONT_WEIGHT,
+            resources,
+            resources.control_content_theme_font_size,
+            resources.slider_header_theme_font_weight,
             brushes.header,
         );
         children.push(
@@ -954,7 +953,7 @@ fn template(
             FocusVisual::new(container, resources.theme)
                 .visible(states.focused)
                 .margin(SLIDER_FOCUS_VISUAL_MARGIN)
-                .corner_radius(CONTROL_CORNER_RADIUS[0]),
+                .corner_radius(resources.control_corner_radius[0]),
         )
         .row(1)
         .into_widget(),
@@ -974,7 +973,7 @@ fn slider_container(
     widget: &Slider,
     states: SliderTemplateStates,
 ) -> WidgetRef {
-    let brushes = brushes(resources, &resources.slider(), states.slider);
+    let brushes = brushes(resources, resources, states.slider);
     let template = match widget.orientation {
         Orientation::Horizontal => horizontal_template(resources, widget, states, &brushes),
         Orientation::Vertical => vertical_template(resources, widget, states, &brushes),
@@ -1014,22 +1013,27 @@ pub(crate) fn fill_bounded<K>(orientation: Orientation, child: impl IntoWidget<K
 }
 
 /// A track `Rectangle`: `RadiusX` / `RadiusY` from the control's `CornerRadius` (`SliderTrackCornerRadius`).
-fn track_rectangle(fill: Color) -> ControlBorder {
+fn track_rectangle(r: &ThemeResources, fill: Color) -> ControlBorder {
     ControlBorder::new(
         Brush::Solid(fill),
         Brush::Solid(Color::from_argb(0, 0, 0, 0)),
     )
     .border_thickness(0.0)
-    .corner_radius(SLIDER_TRACK_CORNER_RADIUS[0])
+    .corner_radius(r.slider_track_corner_radius[0])
 }
 
 /// A `TickBar` of the slider with `fill`, laid out from the slider's properties.
-fn tick_bar(widget: &Slider, states: SliderTemplateStates, fill: Color) -> TickBar {
+fn tick_bar(
+    r: &ThemeResources,
+    widget: &Slider,
+    states: SliderTemplateStates,
+    fill: Color,
+) -> TickBar {
     let range = widget.range();
     TickBar::new(fill, widget.orientation)
         .tick_frequency(widget.tick_frequency)
         .range(range.minimum, range.maximum)
-        .thumb_length(widget.thumb_length())
+        .thumb_length(widget.thumb_length(r))
         .is_direction_reversed(widget.is_direction_reversed)
         .zoom_scale(states.zoom_scale)
 }
@@ -1049,8 +1053,8 @@ fn horizontal_template(
         GridCell::new(fill_bounded(
             Orientation::Horizontal,
             SizedBox::new()
-                .height(SLIDER_TRACK_THEME_HEIGHT)
-                .child(track_rectangle(brushes.track)),
+                .height(resources.slider_track_theme_height)
+                .child(track_rectangle(resources, brushes.track)),
         ))
         .row(1)
         .column_span(3)
@@ -1058,8 +1062,8 @@ fn horizontal_template(
         // `HorizontalDecreaseRect`: `Grid.Column` 0, or the last column when reversed; its column is its width.
         GridCell::new(
             SizedBox::new()
-                .height(SLIDER_TRACK_THEME_HEIGHT)
-                .child(track_rectangle(brushes.decrease)),
+                .height(resources.slider_track_theme_height)
+                .child(track_rectangle(resources, brushes.decrease)),
         )
         .row(1)
         .column(if reversed { 2 } else { 0 })
@@ -1081,8 +1085,8 @@ fn horizontal_template(
                         .child(fill_bounded(
                             Orientation::Horizontal,
                             SizedBox::new()
-                                .height(SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT)
-                                .child(tick_bar(widget, states, brushes.tick_bar)),
+                                .height(resources.slider_outside_tick_bar_theme_height)
+                                .child(tick_bar(resources, widget, states, brushes.tick_bar)),
                         )),
                 ),
             )
@@ -1097,11 +1101,12 @@ fn horizontal_template(
             GridCell::new(fill_bounded(
                 Orientation::Horizontal,
                 SizedBox::new()
-                    .height(SLIDER_TRACK_THEME_HEIGHT)
+                    .height(resources.slider_track_theme_height)
                     .child(tick_bar(
+                        resources,
                         widget,
                         states,
-                        resources.slider().slider_inline_tick_bar_fill,
+                        resources.slider_inline_tick_bar_fill,
                     )),
             ))
             .row(1)
@@ -1125,8 +1130,8 @@ fn horizontal_template(
                         .child(fill_bounded(
                             Orientation::Horizontal,
                             SizedBox::new()
-                                .height(SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT)
-                                .child(tick_bar(widget, states, brushes.tick_bar)),
+                                .height(resources.slider_outside_tick_bar_theme_height)
+                                .child(tick_bar(resources, widget, states, brushes.tick_bar)),
                         )),
                 ),
             )
@@ -1147,8 +1152,8 @@ fn horizontal_template(
                     states,
                     brushes.thumb,
                     states.thumb,
-                    SLIDER_HORIZONTAL_THUMB_WIDTH,
-                    SLIDER_HORIZONTAL_THUMB_HEIGHT,
+                    resources.slider_horizontal_thumb_width,
+                    resources.slider_horizontal_thumb_height,
                 )),
         )
         .row(0)
@@ -1164,13 +1169,13 @@ fn horizontal_template(
             ColumnDefinition::new(last),
         ])
         .row_definitions([
-            RowDefinition::new(GridLength::pixel(SLIDER_PRE_CONTENT_MARGIN)),
+            RowDefinition::new(GridLength::pixel(resources.slider_pre_content_margin)),
             RowDefinition::new(GridLength::AUTO),
-            RowDefinition::new(GridLength::pixel(SLIDER_POST_CONTENT_MARGIN)),
+            RowDefinition::new(GridLength::pixel(resources.slider_post_content_margin)),
         ])
         .children(children);
     // `MinHeight="{ThemeResource SliderHorizontalHeight}"`.
-    ConstrainedBox::new(BoxConstraints::new().min_height(SLIDER_HORIZONTAL_HEIGHT))
+    ConstrainedBox::new(BoxConstraints::new().min_height(resources.slider_horizontal_height))
         .child(grid)
         .into_widget()
 }
@@ -1190,8 +1195,8 @@ fn vertical_template(
         GridCell::new(fill_bounded(
             Orientation::Vertical,
             SizedBox::new()
-                .width(SLIDER_TRACK_THEME_HEIGHT)
-                .child(track_rectangle(brushes.track)),
+                .width(resources.slider_track_theme_height)
+                .child(track_rectangle(resources, brushes.track)),
         ))
         .column(1)
         .row_span(3)
@@ -1199,8 +1204,8 @@ fn vertical_template(
         // `VerticalDecreaseRect`: `Grid.Row` 2, or row 0 when reversed; its row is its height.
         GridCell::new(
             SizedBox::new()
-                .width(SLIDER_TRACK_THEME_HEIGHT)
-                .child(track_rectangle(brushes.decrease)),
+                .width(resources.slider_track_theme_height)
+                .child(track_rectangle(resources, brushes.decrease)),
         )
         .column(1)
         .row(if reversed { 0 } else { 2 })
@@ -1222,8 +1227,8 @@ fn vertical_template(
                         .child(fill_bounded(
                             Orientation::Vertical,
                             SizedBox::new()
-                                .width(SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT)
-                                .child(tick_bar(widget, states, brushes.tick_bar)),
+                                .width(resources.slider_outside_tick_bar_theme_height)
+                                .child(tick_bar(resources, widget, states, brushes.tick_bar)),
                         )),
                 ),
             )
@@ -1238,11 +1243,12 @@ fn vertical_template(
             GridCell::new(fill_bounded(
                 Orientation::Vertical,
                 SizedBox::new()
-                    .width(SLIDER_TRACK_THEME_HEIGHT)
+                    .width(resources.slider_track_theme_height)
                     .child(tick_bar(
+                        resources,
                         widget,
                         states,
-                        resources.slider().slider_inline_tick_bar_fill,
+                        resources.slider_inline_tick_bar_fill,
                     )),
             ))
             .column(1)
@@ -1266,8 +1272,8 @@ fn vertical_template(
                         .child(fill_bounded(
                             Orientation::Vertical,
                             SizedBox::new()
-                                .width(SLIDER_OUTSIDE_TICK_BAR_THEME_HEIGHT)
-                                .child(tick_bar(widget, states, brushes.tick_bar)),
+                                .width(resources.slider_outside_tick_bar_theme_height)
+                                .child(tick_bar(resources, widget, states, brushes.tick_bar)),
                         )),
                 ),
             )
@@ -1288,8 +1294,8 @@ fn vertical_template(
                     states,
                     brushes.thumb,
                     states.thumb,
-                    SLIDER_VERTICAL_THUMB_WIDTH,
-                    SLIDER_VERTICAL_THUMB_HEIGHT,
+                    resources.slider_vertical_thumb_width,
+                    resources.slider_vertical_thumb_height,
                 )),
         )
         .row(1)
@@ -1306,13 +1312,13 @@ fn vertical_template(
             RowDefinition::new(last),
         ])
         .column_definitions([
-            ColumnDefinition::new(GridLength::pixel(SLIDER_PRE_CONTENT_MARGIN)),
+            ColumnDefinition::new(GridLength::pixel(resources.slider_pre_content_margin)),
             ColumnDefinition::new(GridLength::AUTO),
-            ColumnDefinition::new(GridLength::pixel(SLIDER_POST_CONTENT_MARGIN)),
+            ColumnDefinition::new(GridLength::pixel(resources.slider_post_content_margin)),
         ])
         .children(children);
     // `MinWidth="{ThemeResource SliderVerticalWidth}"`.
-    ConstrainedBox::new(BoxConstraints::new().min_width(SLIDER_VERTICAL_WIDTH))
+    ConstrainedBox::new(BoxConstraints::new().min_width(resources.slider_vertical_width))
         .child(grid)
         .into_widget()
 }
@@ -1327,20 +1333,20 @@ fn thumb(
     width: f64,
     height: f64,
 ) -> WidgetRef {
-    let r = resources.slider();
-    let (scale, duration) = inner_thumb_scale(state);
+    let r = &resources;
+    let (scale, duration) = inner_thumb_scale(resources, state);
     // `SliderInnerThumb`: `Fill="{TemplateBinding Background}"`, scaled about its centre.
     let inner = AnimatedContainer::new(duration)
-        .curve(fast_out_slow_in())
-        .width(SLIDER_INNER_THUMB_WIDTH * scale)
-        .height(SLIDER_INNER_THUMB_HEIGHT * scale)
+        .curve(fast_out_slow_in(resources))
+        .width(r.slider_inner_thumb_width * scale)
+        .height(r.slider_inner_thumb_height * scale)
         .child(CustomPaint::new().painter(EllipsePainter { fill }));
     let border = ControlBorder::new(
         Brush::Solid(r.slider_outer_thumb_background),
         Brush::ControlElevation(r.slider_thumb_border_brush),
     )
     .border_thickness(THUMB_BORDER_THICKNESS)
-    .corner_radius(SLIDER_THUMB_CORNER_RADIUS[0])
+    .corner_radius(r.slider_thumb_corner_radius[0])
     .child(Center::new().child(inner));
     let overhang = 2.0 * THUMB_BORDER_OVERHANG;
     let owner = SizedBox::new()
@@ -1362,9 +1368,10 @@ fn thumb(
         .map(|converter| converter(value))
         .unwrap_or_else(|| format_thumb_value(value, widget.step_frequency));
     let tooltip = ToolTip::new(Text::new(text).style(control_text_style(
+        resources,
         15.0,
         inset_embedder::FontWeight::W400,
-        resources.common.text_fill_color_primary,
+        resources.text_fill_color_primary,
     )))
     .padding([8.0, 3.0, 8.0, 5.0])
     .placement(if widget.orientation == Orientation::Horizontal {

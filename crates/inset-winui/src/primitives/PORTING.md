@@ -15,7 +15,7 @@ Ported against: aa3207e6
   Affect: Moving too far cancels the click, even if the pointer returns inside the button before release.
 
 - Change: `CommonStates` leaves keyboard focus on the previously focused widget when a button is clicked.
-  Reason: framework — Inset tracks keyboard-focus highlighting separately from clicks, and the kit follows Flutter buttons by leaving focus unchanged on pointer activation.
+  Reason: framework — the kit follows Flutter buttons, which leave focus unchanged on pointer activation, where WinUI's `ButtonBase` takes the focus on press.
   Affect: Tab moves focus and shows a focus ring; a mouse click does not move that ring to the clicked button.
 
 ## color_transition.rs → `BrushTransition`
@@ -110,7 +110,7 @@ Ported against: aa3207e6
   Reason: framework — a Flutter widget reports inherited changes and disposal through its lifecycle, and updating the separate overlay must wait until the current build finishes.
   Affect: Applications wrap opening widgets in FlyoutTarget; removing that widget can take another frame to close the flyout and does not dispose the retained child State.
 
-## input_device.rs → `CInputManager` last input device and `CFocusManager::CoerceFocusState`
+## input_device.rs → `CInputManager` last input device and `CFocusManager`'s focus state
 
 - Change: `FocusState::coerce_programmatic` counts every key event as hardware keyboard input and has no gamepad category.
   Reason: os — the desktop host delivers keyboard and pointer events only, while Windows also records `GamepadOrRemote` and asks `LastInputWasNonFocusNavigationKeyFromSIP` whether a key came from the touch keyboard.

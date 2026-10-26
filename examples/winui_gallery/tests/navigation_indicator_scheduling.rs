@@ -76,7 +76,6 @@ fn frame(f: &mut Fixture) {
 /// Bounds of opaque accent pixels isolate the indicator from text and neutral item fills.
 fn accent_pixels(f: &Fixture) -> Vec<(usize, usize)> {
     let color = ThemeResources::new(Theme::Light, AccentPalette::default())
-        .navigation_view()
         .navigation_view_selection_indicator_foreground
         .to_argb32();
     let rgb = [

@@ -51,17 +51,17 @@ pub struct Expander {
     /// Optional content border.
     pub border_brush: Option<Brush>,
 
-    /// Content padding in left, top, right, bottom order.
-    pub padding: [f64; 4],
+    /// Content padding in left, top, right, bottom order; the theme's `ExpanderContentPadding` when `None`.
+    pub padding: Option<[f64; 4]>,
 
-    /// Corner radius shared by the header and content.
-    pub corner_radius: f64,
+    /// Corner radius shared by the header and content; the theme's `ControlCornerRadius` when `None`.
+    pub corner_radius: Option<f64>,
 
-    /// Minimum width of the control.
-    pub min_width: f64,
+    /// Minimum width of the control; the theme's `FlyoutThemeMinWidth` when `None`.
+    pub min_width: Option<f64>,
 
-    /// Minimum height of both header and content borders.
-    pub min_height: f64,
+    /// Minimum height of both header and content borders; the theme's `ExpanderMinHeight` when `None`.
+    pub min_height: Option<f64>,
 
     /// Called when IsExpanded changes to true, before the opening animation completes.
     pub expanding: Option<Listener>,
@@ -85,10 +85,10 @@ impl Expander {
             is_enabled: true,
             background: None,
             border_brush: None,
-            padding: EXPANDER_CONTENT_PADDING,
-            corner_radius: CONTROL_CORNER_RADIUS[0],
-            min_width: FLYOUT_THEME_MIN_WIDTH,
-            min_height: EXPANDER_MIN_HEIGHT,
+            padding: None,
+            corner_radius: None,
+            min_width: None,
+            min_height: None,
             expanding: None,
             collapsed: None,
             key: None,
@@ -133,25 +133,25 @@ impl Expander {
 
     /// Sets Padding.
     pub fn padding(mut self, value: [f64; 4]) -> Self {
-        self.padding = value;
+        self.padding = Some(value);
         self
     }
 
     /// Sets CornerRadius.
     pub fn corner_radius(mut self, value: f64) -> Self {
-        self.corner_radius = value;
+        self.corner_radius = Some(value);
         self
     }
 
     /// Sets MinWidth.
     pub fn min_width(mut self, value: f64) -> Self {
-        self.min_width = value;
+        self.min_width = Some(value);
         self
     }
 
     /// Sets MinHeight.
     pub fn min_height(mut self, value: f64) -> Self {
-        self.min_height = value;
+        self.min_height = Some(value);
         self
     }
 
@@ -348,7 +348,7 @@ impl State for ExpanderState {
     /// Builds the named template parts from the current visual state.
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
-        let resources = ThemeResources::of(app, context).expander();
+        let resources = ThemeResources::of(app, context);
         let header_widget = widget.clone();
         let header_down = app.get(self).motion_direction == ExpandDirection::Down;
         let changed = widget.is_expanded_changed.clone();
@@ -383,24 +383,45 @@ impl State for ExpanderState {
                 .unwrap_or(Brush::Solid(resources.expander_content_border_brush)),
         )
         .border_thickness_ltrb(if down {
-            EXPANDER_CONTENT_DOWN_BORDER_THICKNESS
+            resources.expander_content_down_border_thickness
         } else {
-            EXPANDER_CONTENT_UP_BORDER_THICKNESS
+            resources.expander_content_up_border_thickness
         })
         .corner_radius_corners(if down {
-            [0.0, 0.0, widget.corner_radius, widget.corner_radius]
+            [
+                0.0,
+                0.0,
+                widget
+                    .corner_radius
+                    .unwrap_or(resources.control_corner_radius[0]),
+                widget
+                    .corner_radius
+                    .unwrap_or(resources.control_corner_radius[0]),
+            ]
         } else {
-            [widget.corner_radius, widget.corner_radius, 0.0, 0.0]
+            [
+                widget
+                    .corner_radius
+                    .unwrap_or(resources.control_corner_radius[0]),
+                widget
+                    .corner_radius
+                    .unwrap_or(resources.control_corner_radius[0]),
+                0.0,
+                0.0,
+            ]
         })
-        .padding(widget.padding)
+        .padding(widget.padding.unwrap_or(resources.expander_content_padding))
         .child(
             widget
                 .content
                 .clone()
                 .unwrap_or_else(|| SizedBox::shrink().into_widget()),
         );
-        let content =
-            ConstrainedBox::new(BoxConstraints::new().min_height(widget.min_height)).child(content);
+        let content = ConstrainedBox::new(
+            BoxConstraints::new()
+                .min_height(widget.min_height.unwrap_or(resources.expander_min_height)),
+        )
+        .child(content);
         let visible = app.get(self).content_visible;
 
         // ExpanderContentClip contains the translated ExpanderContent; height is reserved immediately.
@@ -433,9 +454,15 @@ impl State for ExpanderState {
                     .into_widget(),
             ]);
 
-        ExcludeFocus::new(IgnorePointer::new().ignoring(!widget.is_enabled).child(
-            ConstrainedBox::new(BoxConstraints::new().min_width(widget.min_width)).child(grid),
-        ))
+        ExcludeFocus::new(
+            IgnorePointer::new().ignoring(!widget.is_enabled).child(
+                ConstrainedBox::new(
+                    BoxConstraints::new()
+                        .min_width(widget.min_width.unwrap_or(resources.flyout_theme_min_width)),
+                )
+                .child(grid),
+            ),
+        )
         .excluding(!widget.is_enabled)
         .into_widget()
     }
@@ -451,7 +478,7 @@ fn expander_header(
     states: ControlStates,
 ) -> WidgetRef {
     let theme = ThemeResources::of(app, context);
-    let r = theme.expander();
+    let r = &theme;
     let (foreground, border, chevron_fill, chevron_border, chevron_foreground) = match states.common
     {
         CommonState::PointerOver => (
@@ -485,39 +512,49 @@ fn expander_header(
     };
     let radii = if widget.is_expanded {
         if header_down {
-            [widget.corner_radius, widget.corner_radius, 0.0, 0.0]
+            [
+                widget.corner_radius.unwrap_or(r.control_corner_radius[0]),
+                widget.corner_radius.unwrap_or(r.control_corner_radius[0]),
+                0.0,
+                0.0,
+            ]
         } else {
-            [0.0, 0.0, widget.corner_radius, widget.corner_radius]
+            [
+                0.0,
+                0.0,
+                widget.corner_radius.unwrap_or(r.control_corner_radius[0]),
+                widget.corner_radius.unwrap_or(r.control_corner_radius[0]),
+            ]
         }
     } else {
-        [widget.corner_radius; 4]
+        [widget.corner_radius.unwrap_or(r.control_corner_radius[0]); 4]
     };
     let points_up = widget.is_expanded == (widget.expand_direction == ExpandDirection::Down);
 
     // Native rotation is the established AnimatedIcon substitute used by NavigationView.
     let chevron = AnimatedRotation::new(
         if points_up { 0.5 } else { 0.0 },
-        CONTROL_NORMAL_ANIMATION_DURATION,
+        r.control_normal_animation_duration,
     )
     .child(
         FontIcon::symbol(FluentSymbol::ChevronDown)
-            .font_size(EXPANDER_CHEVRON_GLYPH_SIZE)
+            .font_size(r.expander_chevron_glyph_size)
             .foreground(chevron_foreground),
     );
     let chevron = Padding::new(EdgeInsetsGeometry::from_ltrb(
-        EXPANDER_CHEVRON_MARGIN[0],
-        EXPANDER_CHEVRON_MARGIN[1],
-        EXPANDER_CHEVRON_MARGIN[2],
-        EXPANDER_CHEVRON_MARGIN[3],
+        r.expander_chevron_margin[0],
+        r.expander_chevron_margin[1],
+        r.expander_chevron_margin[2],
+        r.expander_chevron_margin[3],
     ))
     .child(
         SizedBox::new()
-            .width(EXPANDER_CHEVRON_BUTTON_SIZE)
-            .height(EXPANDER_CHEVRON_BUTTON_SIZE)
+            .width(r.expander_chevron_button_size)
+            .height(r.expander_chevron_button_size)
             .child(
                 ControlBorder::new(Brush::Solid(chevron_fill), Brush::Solid(chevron_border))
-                    .border_thickness_ltrb(EXPANDER_CHEVRON_BORDER_THICKNESS)
-                    .corner_radius(CONTROL_CORNER_RADIUS[0])
+                    .border_thickness_ltrb(r.expander_chevron_border_thickness)
+                    .corner_radius(r.control_corner_radius[0])
                     .child(Center::new().child(chevron)),
             ),
     );
@@ -534,7 +571,8 @@ fn expander_header(
                     .height_factor(1.0)
                     .child(DefaultTextStyle::new(
                         control_text_style(
-                            CONTROL_CONTENT_FONT_SIZE,
+                            &theme,
+                            r.control_content_theme_font_size,
                             FontWeight::NORMAL,
                             foreground,
                         ),
@@ -547,14 +585,17 @@ fn expander_header(
                 .into_widget(),
         ]);
     FocusVisual::new(
-        ConstrainedBox::new(BoxConstraints::new().min_height(widget.min_height)).child(
+        ConstrainedBox::new(
+            BoxConstraints::new().min_height(widget.min_height.unwrap_or(r.expander_min_height)),
+        )
+        .child(
             ControlBorder::new(
                 Brush::Solid(r.expander_header_background),
                 Brush::Solid(border),
             )
-            .border_thickness_ltrb(EXPANDER_HEADER_BORDER_THICKNESS)
+            .border_thickness_ltrb(r.expander_header_border_thickness)
             .corner_radius_corners(radii)
-            .padding(EXPANDER_HEADER_PADDING)
+            .padding(r.expander_header_padding)
             .child(layout),
         ),
         theme.theme,

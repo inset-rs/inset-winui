@@ -1,10 +1,7 @@
 //! SplitView DisplayModeStates setters and storyboards, transcribed from
 //! controls/dev/SplitView/SplitView_themeresources.xaml.
 
-use crate::{
-    GridLength, SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION, SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION,
-    SPLIT_VIEW_PANE_ANIMATION_OPEN_PRE_DURATION,
-};
+use crate::{GridLength, ThemeResources};
 use inset_animation::{Cubic, Curve};
 use std::time::Duration;
 
@@ -137,6 +134,7 @@ pub(super) fn settled(state: DisplayModeState, open: f64, compact: f64) -> Visua
 
 /// Returns the duration of an explicitly declared transition; unlisted pairs change immediately.
 pub(super) fn transition_duration(
+    r: &ThemeResources,
     from: DisplayModeState,
     to: DisplayModeState,
 ) -> Option<Duration> {
@@ -150,14 +148,16 @@ pub(super) fn transition_duration(
         (OpenOverlayRight, Closed) => Some(Duration::from_millis(120)),
         (OpenCompactOverlayLeft, ClosedCompactLeft) => Some(Duration::from_millis(120)),
         (OpenCompactOverlayRight, ClosedCompactRight) => Some(Duration::from_millis(120)),
-        (OpenInlineLeft, Closed) => Some(SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION),
-        (Closed, OpenInlineLeft) => Some(SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION),
-        (ClosedCompactLeft, OpenInlineLeft) => Some(SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION),
-        (OpenInlineLeft, ClosedCompactLeft) => Some(SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION),
-        (Closed, OpenInlineRight) => Some(SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION),
-        (OpenInlineRight, Closed) => Some(SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION),
-        (ClosedCompactRight, OpenInlineRight) => Some(SPLIT_VIEW_PANE_ANIMATION_OPEN_PRE_DURATION),
-        (OpenInlineRight, ClosedCompactRight) => Some(SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION),
+        (OpenInlineLeft, Closed) => Some(r.split_view_pane_animation_close_duration),
+        (Closed, OpenInlineLeft) => Some(r.split_view_pane_animation_open_duration),
+        (ClosedCompactLeft, OpenInlineLeft) => Some(r.split_view_pane_animation_open_duration),
+        (OpenInlineLeft, ClosedCompactLeft) => Some(r.split_view_pane_animation_open_duration),
+        (Closed, OpenInlineRight) => Some(r.split_view_pane_animation_open_duration),
+        (OpenInlineRight, Closed) => Some(r.split_view_pane_animation_close_duration),
+        (ClosedCompactRight, OpenInlineRight) => {
+            Some(r.split_view_pane_animation_open_pre_duration)
+        }
+        (OpenInlineRight, ClosedCompactRight) => Some(r.split_view_pane_animation_close_duration),
         _ => None,
     }
 }
@@ -172,6 +172,7 @@ pub(super) fn transition(
     compact: f64,
 ) -> Visuals {
     transition_from_visuals(
+        &ThemeResources::new(crate::Theme::Light, crate::AccentPalette::default()),
         from,
         to,
         elapsed,
@@ -184,6 +185,7 @@ pub(super) fn transition(
 /// Implicit From values snapshot the live presentation when an animation is interrupted.
 /// Explicit zero-time keyframes still take the values declared by the template.
 pub(super) fn transition_from_visuals(
+    r: &ThemeResources,
     from: DisplayModeState,
     to: DisplayModeState,
     elapsed: Duration,
@@ -193,7 +195,7 @@ pub(super) fn transition_from_visuals(
 ) -> Visuals {
     use DisplayModeState::*;
     let mut v = settled(to, open, compact);
-    let Some(duration) = transition_duration(from, to) else {
+    let Some(duration) = transition_duration(r, from, to) else {
         return v;
     };
     if elapsed >= duration {
@@ -389,14 +391,14 @@ pub(super) fn transition_from_visuals(
             );
         }
         (OpenInlineLeft, Closed) => {
-            v.pane_visible = if elapsed < SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION {
+            v.pane_visible = if elapsed < r.split_view_pane_animation_close_duration {
                 previous.pane_visible
             } else {
                 false
             };
             v.content_span = 2;
             v.content_column = 0;
-            v.pane_span = if elapsed < SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION {
+            v.pane_span = if elapsed < r.split_view_pane_animation_close_duration {
                 previous.pane_span
             } else {
                 2
@@ -405,21 +407,21 @@ pub(super) fn transition_from_visuals(
                 previous.clip_translate,
                 -(open - compact),
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION,
+                r.split_view_pane_animation_close_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.pane_translate = tween(
                 previous.pane_translate,
                 -open,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION,
+                r.split_view_pane_animation_close_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.content_translate = tween(
                 open,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION,
+                r.split_view_pane_animation_close_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
         }
@@ -432,21 +434,21 @@ pub(super) fn transition_from_visuals(
                 -open,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION,
+                r.split_view_pane_animation_open_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.content_translate = tween(
                 -open,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_PRE_DURATION,
+                r.split_view_pane_animation_open_pre_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.clip_translate = tween(
                 -open,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION,
+                r.split_view_pane_animation_open_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
         }
@@ -459,14 +461,14 @@ pub(super) fn transition_from_visuals(
                 -(open - compact),
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_PRE_DURATION,
+                r.split_view_pane_animation_open_pre_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.clip_translate = tween(
                 -(open - compact),
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION,
+                r.split_view_pane_animation_open_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
         }
@@ -479,14 +481,14 @@ pub(super) fn transition_from_visuals(
                 open - compact,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_PRE_DURATION,
+                r.split_view_pane_animation_open_pre_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.clip_translate = tween(
                 0.0,
                 -(open - compact),
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION,
+                r.split_view_pane_animation_open_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
         }
@@ -501,26 +503,26 @@ pub(super) fn transition_from_visuals(
                 open,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION,
+                r.split_view_pane_animation_open_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.content_translate = tween(
                 open,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_PRE_DURATION,
+                r.split_view_pane_animation_open_pre_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.clip_translate = tween(
                 open,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_DURATION,
+                r.split_view_pane_animation_open_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
         }
         (OpenInlineRight, Closed) => {
-            v.pane_visible = if elapsed < SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION {
+            v.pane_visible = if elapsed < r.split_view_pane_animation_close_duration {
                 previous.pane_visible
             } else {
                 false
@@ -530,7 +532,7 @@ pub(super) fn transition_from_visuals(
             v.content_span = 2;
             v.content_column = 0;
             v.pane_column = 2;
-            v.pane_span = if elapsed < SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION {
+            v.pane_span = if elapsed < r.split_view_pane_animation_close_duration {
                 previous.pane_span
             } else {
                 1
@@ -539,21 +541,21 @@ pub(super) fn transition_from_visuals(
                 previous.clip_translate,
                 -open,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION,
+                r.split_view_pane_animation_close_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.pane_translate = tween(
                 previous.pane_translate,
                 open,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION,
+                r.split_view_pane_animation_close_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
             v.content_translate = tween(
                 -open,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION,
+                r.split_view_pane_animation_close_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
         }
@@ -568,7 +570,7 @@ pub(super) fn transition_from_visuals(
                 open - compact,
                 0.0,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_OPEN_PRE_DURATION,
+                r.split_view_pane_animation_open_pre_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
         }
@@ -583,7 +585,7 @@ pub(super) fn transition_from_visuals(
                 previous.clip_translate,
                 open - compact,
                 elapsed,
-                SPLIT_VIEW_PANE_ANIMATION_CLOSE_DURATION,
+                r.split_view_pane_animation_close_duration,
                 Cubic::new(0.0, 0.35, 0.15, 1.0),
             );
         }
@@ -601,6 +603,11 @@ fn tween(from: f64, to: f64, elapsed: Duration, duration: Duration, curve: Cubic
 #[cfg(test)]
 mod tests {
     use super::{DisplayModeState::*, *};
+
+    /// WinUI's own values.
+    fn winui() -> ThemeResources {
+        ThemeResources::new(crate::Theme::Light, crate::AccentPalette::default())
+    }
 
     #[test]
     fn overlay_preserves_full_content_and_compact_reserves_only_compact_length() {
@@ -682,15 +689,15 @@ mod tests {
     #[test]
     fn compact_inline_transition_asymmetry_matches_the_template() {
         assert_eq!(
-            transition_duration(OpenInlineLeft, ClosedCompactLeft),
+            transition_duration(&winui(), OpenInlineLeft, ClosedCompactLeft),
             Some(Duration::from_millis(200))
         );
         assert_eq!(
-            transition_duration(OpenInlineRight, ClosedCompactRight),
+            transition_duration(&winui(), OpenInlineRight, ClosedCompactRight),
             Some(Duration::from_millis(100))
         );
         assert_eq!(
-            transition_duration(ClosedCompactRight, OpenInlineRight),
+            transition_duration(&winui(), ClosedCompactRight, OpenInlineRight),
             Some(Duration::from_nanos(199_990_000))
         );
         let left = transition(
@@ -716,12 +723,21 @@ mod tests {
     fn interrupted_overlay_close_starts_implicit_tracks_at_the_live_position() {
         for (opened, direction) in [(OpenOverlayLeft, -1.0), (OpenOverlayRight, 1.0)] {
             let live = transition(Closed, opened, Duration::from_millis(40), 320.0, 48.0);
-            let close = transition_from_visuals(opened, Closed, Duration::ZERO, 320.0, 48.0, live);
+            let close = transition_from_visuals(
+                &winui(),
+                opened,
+                Closed,
+                Duration::ZERO,
+                320.0,
+                48.0,
+                live,
+            );
             assert_eq!(close.pane_translate, live.pane_translate);
             assert_eq!(close.clip_translate, live.clip_translate);
             // Opacity has an explicit value of one at time zero in the closing storyboard.
             assert_eq!(close.overlay_opacity, 1.0);
             let moving = transition_from_visuals(
+                &winui(),
                 opened,
                 Closed,
                 Duration::from_millis(20),
@@ -748,13 +764,16 @@ mod tests {
         ];
         for from in states {
             for to in states {
-                let duration = transition_duration(from, to).unwrap_or_default();
+                let duration = transition_duration(&winui(), from, to).unwrap_or_default();
                 assert_eq!(
                     transition(from, to, duration, 320.0, 48.0),
                     settled(to, 320.0, 48.0)
                 );
             }
         }
-        assert_eq!(transition_duration(OpenOverlayLeft, OpenOverlayRight), None);
+        assert_eq!(
+            transition_duration(&winui(), OpenOverlayLeft, OpenOverlayRight),
+            None
+        );
     }
 }

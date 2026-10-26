@@ -51,6 +51,7 @@ pub(super) struct PaneChrome {
 impl PaneChrome {
     /// Resolves the source's desktop branch without conflating Top with left Minimal mode.
     pub fn resolve(
+        r: &ThemeResources,
         widget: &NavigationView,
         mode: NavigationViewDisplayMode,
         open: bool,
@@ -76,7 +77,7 @@ impl PaneChrome {
             if !closed_compact && !widget.pane_title.is_empty() && !(overlay && !open) {
                 (widget.open_pane_length.min(width)
                     - if overlay && (show_back || show_close) {
-                        NAVIGATION_BACK_BUTTON_WIDTH
+                        r.navigation_back_button_width
                     } else {
                         0.0
                     })
@@ -85,23 +86,23 @@ impl PaneChrome {
                 widget.compact_pane_length
             };
         let toggle_left = if overlay && (show_back || show_close) {
-            NAVIGATION_BACK_BUTTON_WIDTH
+            r.navigation_back_button_width
         } else {
             0.0
         };
         // c_backButtonHeight is the source's 40px row, distinct from the 36px styled button.
         let back_row = if !overlay && show_back {
-            NAVIGATION_VIEW_PANE_HEADER_ROW_MIN_HEIGHT
+            r.navigation_view_pane_header_row_min_height
         } else {
             0.0
         };
         let header_toggle_width = if show_toggle {
-            PANE_TOGGLE_BUTTON_WIDTH
+            r.pane_toggle_button_width
         } else {
             0.0
         };
         let header_close_width = if overlay && show_close {
-            NAVIGATION_BACK_BUTTON_WIDTH
+            r.navigation_back_button_width
         } else {
             0.0
         };
@@ -121,12 +122,12 @@ impl PaneChrome {
             toggle_top: back_row,
             back_row,
             toggle_row_min_height: if show_toggle {
-                NAVIGATION_VIEW_PANE_HEADER_ROW_MIN_HEIGHT
+                r.navigation_view_pane_header_row_min_height
             } else {
                 0.0
             },
             header_row_min_height: if show_toggle || show_close {
-                PANE_TOGGLE_BUTTON_HEIGHT
+                r.pane_toggle_button_height
             } else {
                 0.0
             },
@@ -142,12 +143,12 @@ impl PaneChrome {
 }
 
 /// The source PaneTitleTextBlock's typography and non-wrapping content.
-pub(super) fn pane_title(title: String) -> WidgetRef {
+pub(super) fn pane_title(r: &ThemeResources, title: String) -> WidgetRef {
     Margin::new(
         [0.0, -2.0, 0.0, 0.0],
         Text::new(title).soft_wrap(false).max_lines(1).style(
             TextStyle::new()
-                .font_family(FONT_FAMILY)
+                .font_family(r.content_control_theme_font_family)
                 .font_size(14.0)
                 .font_weight(FontWeight::W600),
         ),
@@ -164,7 +165,7 @@ pub(super) fn pane_toggle_template(
     icon_width: f64,
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
-    let r = resources.navigation_view();
+    let r = &resources;
     let (background, foreground) = match states.common {
         CommonState::PointerOver => (
             r.navigation_view_button_background_pointer_over,
@@ -183,15 +184,15 @@ pub(super) fn pane_toggle_template(
             r.navigation_view_item_foreground,
         ),
     };
-    let margin = NAVIGATION_VIEW_ITEM_BUTTON_MARGIN;
+    let margin = r.navigation_view_item_button_margin;
     let content = Padding::new(EdgeInsetsGeometry::only(
         margin[0], margin[1], margin[2], margin[3],
     ))
     .child(
-        SizedBox::new().height(PANE_TOGGLE_BUTTON_HEIGHT).child(
+        SizedBox::new().height(r.pane_toggle_button_height).child(
             Grid::new()
                 .background(Brush::Solid(background))
-                .corner_radius(CONTROL_CORNER_RADIUS[0])
+                .corner_radius(r.control_corner_radius[0])
                 .column_definitions([
                     ColumnDefinition::new(GridLength::pixel(icon_width)),
                     ColumnDefinition::new(GridLength::STAR),
@@ -209,7 +210,12 @@ pub(super) fn pane_toggle_template(
                         Padding::new(EdgeInsetsGeometry::only(4.0, 0.0, 0.0, 0.0)).child(
                             Align::new().alignment(Alignment::CENTER_LEFT.into()).child(
                                 DefaultTextStyle::new(
-                                    control_text_style(16.0, FontWeight::NORMAL, foreground),
+                                    control_text_style(
+                                        &resources,
+                                        16.0,
+                                        FontWeight::NORMAL,
+                                        foreground,
+                                    ),
                                     content,
                                 ),
                             ),
@@ -223,7 +229,7 @@ pub(super) fn pane_toggle_template(
     .into_widget();
     FocusVisual::new(content, resources.theme)
         .visible(states.focused)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(r.control_corner_radius[0])
         .into_widget()
 }
 
@@ -237,7 +243,7 @@ pub(super) fn back_button_template(
     small: bool,
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
-    let r = resources.navigation_view();
+    let r = &resources;
     let (background, foreground) = match states.common {
         CommonState::PointerOver => (
             r.navigation_view_button_background_pointer_over,
@@ -248,15 +254,11 @@ pub(super) fn back_button_template(
             r.navigation_view_button_foreground_pressed,
         ),
         CommonState::Disabled => (
-            resources
-                .navigation_back_button()
-                .navigation_view_back_button_background,
+            resources.navigation_view_back_button_background,
             r.navigation_view_button_foreground_disabled,
         ),
         _ => (
-            resources
-                .navigation_back_button()
-                .navigation_view_back_button_background,
+            resources.navigation_view_back_button_background,
             r.navigation_view_item_foreground,
         ),
     };
@@ -269,14 +271,14 @@ pub(super) fn back_button_template(
     .child(
         SizedBox::new()
             .width(width)
-            .height(NAVIGATION_BACK_BUTTON_HEIGHT)
+            .height(r.navigation_back_button_height)
             .child(
                 Grid::new()
                     .background(Brush::Solid(background))
-                    .corner_radius(CONTROL_CORNER_RADIUS[0])
+                    .corner_radius(r.control_corner_radius[0])
                     .children([Center::new()
                         .child(DefaultTextStyle::new(
-                            control_text_style(16.0, FontWeight::NORMAL, foreground),
+                            control_text_style(&resources, 16.0, FontWeight::NORMAL, foreground),
                             content,
                         ))
                         .into_widget()]),
@@ -286,6 +288,6 @@ pub(super) fn back_button_template(
     FocusVisual::new(content, resources.theme)
         .visible(states.focused)
         .margin(BUTTON_FOCUS_VISUAL_MARGIN)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(r.control_corner_radius[0])
         .into_widget()
 }

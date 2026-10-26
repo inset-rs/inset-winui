@@ -54,7 +54,6 @@ fn fixture(theme: Theme) -> (Fixture, Probe) {
                         page.set(Some(context));
                         ColoredBox::new(
                             ThemeResources::new(theme, AccentPalette::default())
-                                .common
                                 .solid_background_fill_color_base,
                         )
                         .child(SizedBox::expand())

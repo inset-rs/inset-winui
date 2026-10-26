@@ -375,21 +375,21 @@ impl TabViewState {
             anchor: Rc::new(Cell::new(Offset::ZERO)),
         };
         let anchor = data.anchor.clone();
-        let theme = ThemeResources::of(app, self.context(app)).theme;
+        let resources = ThemeResources::of(app, self.context(app));
         let feedback_builder = widget.tab_drag_feedback_builder.clone();
-        let feedback = ThemeScope::new(
-            theme,
+        let feedback = ThemeScope::with_resources(
+            resources.clone(),
             SizedBox::new()
                 .width(width)
-                .height(TAB_VIEW_ITEM_MIN_HEIGHT)
+                .height(resources.tab_view_item_min_height)
                 .child(Builder::new(move |app, context| {
                     if let Some(builder) = &feedback_builder {
-                        let color = ThemeResources::of(app, context)
-                            .common
-                            .text_fill_color_primary;
+                        let r = ThemeResources::of(app, context);
+                        let color = r.text_fill_color_primary;
                         DefaultTextStyle::new(
                             control_text_style(
-                                TAB_VIEW_ITEM_HEADER_FONT_SIZE,
+                                &resources,
+                                r.tab_view_item_header_font_size,
                                 FontWeight::NORMAL,
                                 color,
                             ),

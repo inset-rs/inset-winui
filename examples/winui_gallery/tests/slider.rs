@@ -34,13 +34,13 @@ fn label_bounds(fixture: &Fixture, text: &str) -> Rect {
 }
 
 /// The point on the track of the horizontal slider under `header` at `fraction` of its clickable length: `MoveThumbToPoint` maps the track less the thumb, from half a thumb in, onto the range.
-fn track_point(header: Rect, fraction: f64) -> Offset {
-    let thumb = SLIDER_HORIZONTAL_THUMB_WIDTH;
+fn track_point(r: &ThemeResources, header: Rect, fraction: f64) -> Offset {
+    let thumb = r.slider_horizontal_thumb_width;
     let x = header.left + thumb / 2.0 + fraction * (header.width() - thumb);
     let y = header.bottom
-        + SLIDER_TOP_HEADER_MARGIN[3]
-        + SLIDER_PRE_CONTENT_MARGIN
-        + SLIDER_TRACK_THEME_HEIGHT / 2.0;
+        + r.slider_top_header_margin[3]
+        + r.slider_pre_content_margin
+        + r.slider_track_theme_height / 2.0;
     Offset::new(x, y)
 }
 
@@ -62,30 +62,31 @@ fn drag(fixture: &mut Fixture, from: Offset, to: Offset) {
 
 #[test]
 fn slider_presses_drags_snaps_and_switches_theme() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let mut fixture = Fixture::for_feature([900, 2600], winui_gallery::Feature::Slider);
     fixture.find("Slider: 42 · stepped 50 · vertical 30");
 
     // A press three quarters along the track: `MoveThumbToPoint` gives 0 + 0.75 × 100.
     let volume = label_bounds(&fixture, "Volume");
-    press(&mut fixture, track_point(volume, 0.75));
+    press(&mut fixture, track_point(&r, volume, 0.75));
     fixture.find("Slider: 75 · stepped 50 · vertical 30");
 
     // A drag of the thumb by a tenth of the clickable track: `OnThumbDragDelta` adds 10.
     drag(
         &mut fixture,
-        track_point(volume, 0.75),
-        track_point(volume, 0.85),
+        track_point(&r, volume, 0.75),
+        track_point(&r, volume, 0.85),
     );
     fixture.find("Slider: 85 · stepped 50 · vertical 30");
 
     // A press at 33 % of a slider with `StepFrequency` 10 snaps to 30 (`GetClosestStep`).
     let stepped = label_bounds(&fixture, "Stepped");
-    press(&mut fixture, track_point(stepped, 0.33));
+    press(&mut fixture, track_point(&r, stepped, 0.33));
     fixture.find("Slider: 85 · stepped 30 · vertical 30");
 
     // The disabled slider ignores the pointer.
     let disabled = label_bounds(&fixture, "Disabled");
-    press(&mut fixture, track_point(disabled, 0.1));
+    press(&mut fixture, track_point(&r, disabled, 0.1));
     fixture.find("Slider: 85 · stepped 30 · vertical 30");
 
     fixture.capture("slider_light");
@@ -97,11 +98,12 @@ fn slider_presses_drags_snaps_and_switches_theme() {
 /// A mouse drag updates the value and tooltip while leaving keyboard focus unchanged.
 #[test]
 fn mouse_drag_updates_the_thumb_without_acquiring_focus() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let mut fixture = Fixture::for_feature([900, 2600], winui_gallery::Feature::Slider);
     let focus = inset_widgets::primary_focus(&mut fixture.cell.borrow_mut());
     fixture.find("Slider: 42 · stepped 50 · vertical 30");
     let volume = label_bounds(&fixture, "Volume");
-    let thumb = track_point(volume, 0.42);
+    let thumb = track_point(&r, volume, 0.42);
     fixture.send_mouse(PointerChange::Add, thumb - Offset::new(40.0, 40.0), 0);
     fixture.send_mouse(PointerChange::Hover, thumb, 0);
     fixture.pump();
@@ -110,11 +112,11 @@ fn mouse_drag_updates_the_thumb_without_acquiring_focus() {
     fixture.find("42");
     let tip = label_bounds(&fixture, "42");
     assert!(
-        tip.bottom < thumb.dy() - SLIDER_HORIZONTAL_THUMB_HEIGHT / 2.0,
+        tip.bottom < thumb.dy() - r.slider_horizontal_thumb_height / 2.0,
         "tip={tip:?} thumb={thumb:?}"
     );
     // Ten moves to 20 % further along the clickable track: `OnThumbDragDelta` adds 20.
-    let end = track_point(volume, 0.62);
+    let end = track_point(&r, volume, 0.62);
     for step in 1..=10 {
         let t = step as f64 / 10.0;
         let point = Offset::new(thumb.dx() + (end.dx() - thumb.dx()) * t, thumb.dy());
@@ -136,6 +138,7 @@ fn mouse_drag_updates_the_thumb_without_acquiring_focus() {
 /// Like Flutter's `Slider`, a slider fills the width its parent bounds, with or without tick marks.
 #[test]
 fn a_slider_fills_the_width_it_is_given() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     for ticks in [
         TickPlacement::None,
         TickPlacement::Outside,
@@ -149,7 +152,7 @@ fn a_slider_fills_the_width_it_is_given() {
         });
         assert_eq!(
             size,
-            Size::new(300.0, SLIDER_HORIZONTAL_HEIGHT),
+            Size::new(300.0, r.slider_horizontal_height),
             "{ticks:?}"
         );
     }
@@ -158,6 +161,7 @@ fn a_slider_fills_the_width_it_is_given() {
 /// A vertical slider fills the height its parent bounds, with or without tick marks.
 #[test]
 fn a_vertical_slider_fills_the_height_it_is_given() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     for ticks in [
         TickPlacement::None,
         TickPlacement::Outside,
@@ -170,7 +174,7 @@ fn a_vertical_slider_fills_the_height_it_is_given() {
                 .tick_placement(ticks)
                 .into_widget()
         });
-        assert_eq!(size, Size::new(SLIDER_VERTICAL_WIDTH, 300.0), "{ticks:?}");
+        assert_eq!(size, Size::new(r.slider_vertical_width, 300.0), "{ticks:?}");
     }
 }
 
@@ -178,6 +182,7 @@ fn a_vertical_slider_fills_the_height_it_is_given() {
 /// as XAML measures it.
 #[test]
 fn a_slider_in_a_row_is_as_wide_as_its_thumb() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let size = common::size_under_center([300, 300], |_| {
         Row::new()
             .main_axis_size(MainAxisSize::Min)
@@ -187,5 +192,5 @@ fn a_slider_in_a_row_is_as_wide_as_its_thumb() {
                 .into_widget()])
             .into_widget()
     });
-    assert_eq!(size.width(), SLIDER_HORIZONTAL_THUMB_WIDTH);
+    assert_eq!(size.width(), r.slider_horizontal_thumb_width);
 }

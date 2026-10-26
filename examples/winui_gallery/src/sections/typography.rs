@@ -80,9 +80,9 @@ impl State for TypographyDemoState {
                     "Make the important things easy to read.",
                     style,
                     if secondary {
-                        r.common.text_fill_color_secondary
+                        r.text_fill_color_secondary
                     } else {
-                        r.common.text_fill_color_primary
+                        r.text_fill_color_primary
                     },
                 ),
             ],
@@ -94,11 +94,11 @@ impl State for TypographyDemoState {
                 .map(|(name, style)| {
                     column(
                         vec![
-                            label(name, style, r.common.text_fill_color_primary),
+                            label(name, style, r.text_fill_color_primary),
                             label(
-                                format!("{} px", style.font().0),
+                                format!("{} px", style.font(&r,).0),
                                 TextBlockStyle::Caption,
-                                r.common.text_fill_color_secondary,
+                                r.text_fill_color_secondary,
                             ),
                         ],
                         4.0,
@@ -112,17 +112,17 @@ impl State for TypographyDemoState {
                 label(
                     "Primary text carries the main message.",
                     TextBlockStyle::Body,
-                    r.common.text_fill_color_primary,
+                    r.text_fill_color_primary,
                 ),
                 label(
                     "Secondary text adds supporting detail.",
                     TextBlockStyle::Body,
-                    r.common.text_fill_color_secondary,
+                    r.text_fill_color_secondary,
                 ),
                 label(
                     "Disabled text describes an unavailable option.",
                     TextBlockStyle::Body,
-                    r.common.text_fill_color_disabled,
+                    r.text_fill_color_disabled,
                 ),
             ],
             12.0,

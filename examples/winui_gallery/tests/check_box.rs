@@ -115,10 +115,11 @@ fn check_box_draws_the_check_on() {
 /// room than it needs keeps its `MinWidth` and `MinHeight`.
 #[test]
 fn a_box_given_spare_room_keeps_its_own_size() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let size = common::size_under_center([300, 300], |_| {
         CheckBox::new(Some(true), |_, _| {})
             .content(Text::new("Check"))
             .into_widget()
     });
-    assert_eq!(size, Size::new(CHECK_BOX_MIN_WIDTH, CHECK_BOX_HEIGHT));
+    assert_eq!(size, Size::new(r.check_box_min_width, r.check_box_height));
 }

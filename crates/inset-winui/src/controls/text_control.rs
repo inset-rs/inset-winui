@@ -325,7 +325,8 @@ impl TextControlState {
         CommonStates::new(
             Listener::new(move |app| self.clear(app)),
             move |app, context, states| {
-                let r = ThemeResources::of(app, context).text_box();
+                let r = ThemeResources::of(app, context);
+                let corner = corner.unwrap_or(r.control_corner_radius[0]);
                 let (background, border, foreground) = match states.common {
                     CommonState::PointerOver => (
                         r.text_control_button_background_pointer_over,
@@ -346,9 +347,9 @@ impl TextControlState {
                 SizedBox::new()
                     .width(width)
                     .child(
-                        Padding::new(insets(TEXT_BOX_INNER_BUTTON_MARGIN)).child(
+                        Padding::new(insets(r.text_box_inner_button_margin)).child(
                             ControlBorder::new(Brush::Solid(background), Brush::Solid(border))
-                                .border_thickness_ltrb(TEXT_CONTROL_BORDER_THEME_THICKNESS)
+                                .border_thickness_ltrb(r.text_control_border_theme_thickness)
                                 .corner_radius(corner)
                                 .child(
                                     Center::new().width_factor(1.0).height_factor(1.0).child(
@@ -358,9 +359,9 @@ impl TextControlState {
                                             FluentSymbol::Dismiss
                                         })
                                         .font_size(if password {
-                                            PASSWORD_BOX_ICON_FONT_SIZE
+                                            r.password_box_icon_font_size
                                         } else {
-                                            TEXT_BOX_ICON_FONT_SIZE
+                                            r.text_box_icon_font_size
                                         })
                                         .foreground(foreground),
                                     ),
@@ -450,7 +451,7 @@ impl State for TextControlState {
         let widget = self.widget(app).clone();
         let config = widget.config;
         let theme = ThemeResources::of(app, context);
-        let r = theme.text_box();
+        let r = &theme;
         let focused = app.get(self).focused;
 
         let (background, border, foreground, placeholder) = if !config.is_enabled {
@@ -494,9 +495,9 @@ impl State for TextControlState {
             )
         };
         let border_thickness = if focused && config.is_enabled {
-            TEXT_CONTROL_BORDER_THEME_THICKNESS_FOCUSED
+            r.text_control_border_theme_thickness_focused
         } else {
-            TEXT_CONTROL_BORDER_THEME_THICKNESS
+            r.text_control_border_theme_thickness
         };
 
         let password = widget.password;
@@ -522,7 +523,14 @@ impl State for TextControlState {
             )));
         }
 
-        let style = control_text_style(config.font_size, FontWeight::NORMAL, foreground);
+        let style = control_text_style(
+            &theme,
+            config
+                .font_size
+                .unwrap_or(r.control_content_theme_font_size),
+            FontWeight::NORMAL,
+            foreground,
+        );
         let mut editable = EditableText::new(
             config.controller,
             app.get(self).focus.unwrap(),
@@ -597,15 +605,23 @@ impl State for TextControlState {
         };
 
         // ContentElement owns scrolling through EditableText and retains the template's base margin.
-        let mut content: WidgetRef = Padding::new(insets(config.padding))
-            .child(editable)
-            .into_widget();
+        let mut content: WidgetRef = Padding::new(insets(
+            config.padding.unwrap_or(r.text_control_theme_padding),
+        ))
+        .child(editable)
+        .into_widget();
         if config.controller.text_value(app).is_empty() && !config.placeholder_text.is_empty() {
             let placeholder = IgnorePointer::new().child(
-                Padding::new(insets(config.padding)).child(
+                Padding::new(insets(
+                    config.padding.unwrap_or(r.text_control_theme_padding),
+                ))
+                .child(
                     Text::new(config.placeholder_text.clone())
                         .style(control_text_style(
-                            config.font_size,
+                            &theme,
+                            config
+                                .font_size
+                                .unwrap_or(r.control_content_theme_font_size),
                             FontWeight::NORMAL,
                             config.placeholder_foreground.unwrap_or(placeholder),
                         ))
@@ -640,13 +656,16 @@ impl State for TextControlState {
             cells.push(
                 GridCell::new(
                     Padding::new(insets(if password.is_some() {
-                        PASSWORD_BOX_TOP_HEADER_MARGIN
+                        r.password_box_top_header_margin
                     } else {
-                        TEXT_BOX_TOP_HEADER_MARGIN
+                        r.text_box_top_header_margin
                     }))
                     .child(DefaultTextStyle::new(
                         control_text_style(
-                            config.font_size,
+                            &theme,
+                            config
+                                .font_size
+                                .unwrap_or(r.control_content_theme_font_size),
                             FontWeight::NORMAL,
                             if config.is_enabled {
                                 r.text_control_header_foreground
@@ -663,23 +682,24 @@ impl State for TextControlState {
         }
 
         // BorderElement spans the editor and helper columns; its arranged size supplies source sizing rules.
-        let font_size = config.font_size;
+        let font_size = config
+            .font_size
+            .unwrap_or(r.control_content_theme_font_size);
         let border = SizeObserver::new(
             ConstrainedBox::new(
                 BoxConstraints::new()
                     .min_width(
-                        number_box.map_or(TEXT_CONTROL_THEME_MIN_WIDTH, |style| style.min_width),
+                        number_box.map_or(r.text_control_theme_min_width, |style| style.min_width),
                     )
-                    .min_height(TEXT_CONTROL_THEME_MIN_HEIGHT),
+                    .min_height(r.text_control_theme_min_height),
             )
             .child(
                 ControlBorder::new(background, border)
                     .border_thickness_ltrb(border_thickness)
-                    .corner_radius_corners(
-                        widget
-                            .combo_box
-                            .map_or([config.corner_radius; 4], |style| style.corner_radius),
-                    ),
+                    .corner_radius_corners(widget.combo_box.map_or(
+                        [config.corner_radius.unwrap_or(r.control_corner_radius[0]); 4],
+                        |style| style.corner_radius,
+                    )),
             ),
             Rc::new(move |app, _, size| {
                 if !app.contains(self) || !self.mounted(app) {
@@ -707,9 +727,11 @@ impl State for TextControlState {
                 .into_widget(),
         );
         cells.push(
-            GridCell::new(Padding::new(insets(TEXT_CONTROL_BORDER_THEME_THICKNESS)).child(content))
-                .row(1)
-                .into_widget(),
+            GridCell::new(
+                Padding::new(insets(r.text_control_border_theme_thickness)).child(content),
+            )
+            .row(1)
+            .into_widget(),
         );
         if self.button_visible(app) {
             cells.push(
@@ -729,7 +751,10 @@ impl State for TextControlState {
             cells.push(
                 GridCell::new(DefaultTextStyle::new(
                     control_text_style(
-                        config.font_size,
+                        &theme,
+                        config
+                            .font_size
+                            .unwrap_or(r.control_content_theme_font_size),
                         FontWeight::NORMAL,
                         r.system_control_description_text_foreground_brush,
                     ),

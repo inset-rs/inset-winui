@@ -1118,6 +1118,7 @@ impl NavigationViewState {
     /// Builds one keyed eager item and its inline or attached child repeater.
     fn item_widget(
         self: Handle<Self>,
+        r: &ThemeResources,
         app: &mut App,
         item: NavigationViewItem,
         position: NavigationViewItemPosition,
@@ -1238,6 +1239,7 @@ impl NavigationViewState {
             .cloned()
             .map(|child| {
                 self.item_widget(
+                    r,
                     app,
                     child,
                     if top {
@@ -1280,7 +1282,7 @@ impl NavigationViewState {
                 } else {
                     AnchoredFlyoutPlacement::RightEdgeAlignedTop
                 })
-                .padding(NAVIGATION_VIEW_ITEM_CHILDREN_MENU_FLYOUT_PADDING)
+                .padding(r.navigation_view_item_children_menu_flyout_padding)
                 .offset(if top {
                     Offset::ZERO
                 } else {
@@ -1350,6 +1352,7 @@ impl NavigationViewState {
 
     /// Main/footer scroll allocation from UpdatePaneLayout, preserving the smaller group.
     fn pane_items(self: Handle<Self>, app: &mut App, closed_compact: bool) -> WidgetRef {
+        let r = ThemeResources::of(app, self.context(app));
         let main_items = self.widget(app).menu_items.clone();
         let footer_items = self.footer_items(app);
         let main = main_items
@@ -1357,6 +1360,7 @@ impl NavigationViewState {
             .filter(|item| item.is_visible)
             .map(|item| {
                 self.item_widget(
+                    &r,
                     app,
                     item,
                     NavigationViewItemPosition::Left,
@@ -1370,6 +1374,7 @@ impl NavigationViewState {
             .filter(|item| item.is_visible)
             .map(|item| {
                 self.item_widget(
+                    &r,
                     app,
                     item,
                     NavigationViewItemPosition::Left,
@@ -1420,15 +1425,11 @@ impl NavigationViewState {
                         .into_widget(),
                     SizedBox::new()
                         .height(line_height)
-                        .child(
-                            Align::new().alignment(Alignment::TOP_CENTER.into()).child(
-                                SizedBox::new().height(1.0).child(ColoredBox::new(
-                                    theme
-                                        .navigation_view()
-                                        .navigation_view_item_separator_foreground,
-                                )),
-                            ),
-                        )
+                        .child(Align::new().alignment(Alignment::TOP_CENTER.into()).child(
+                            SizedBox::new().height(1.0).child(ColoredBox::new(
+                                theme.navigation_view_item_separator_foreground,
+                            )),
+                        ))
                         .into_widget(),
                     ConstrainedBox::new(BoxConstraints::new().max_height(height))
                         .child(custom.clone())
@@ -1471,7 +1472,13 @@ impl NavigationViewState {
     }
 
     /// Keeps the native search editor mounted while a compact pane shows its search button.
-    fn search_presenter(self: Handle<Self>, app: &mut App, top: bool, compact: bool) -> WidgetRef {
+    fn search_presenter(
+        self: Handle<Self>,
+        r: &ThemeResources,
+        app: &mut App,
+        top: bool,
+        compact: bool,
+    ) -> WidgetRef {
         let Some(child) = self.widget(app).auto_suggest_box.clone() else {
             return SizedBox::shrink().into_widget();
         };
@@ -1480,9 +1487,9 @@ impl NavigationViewState {
             .node(scope)
             .descendants_are_focusable(!compact);
         let padding = if top {
-            TOP_NAVIGATION_VIEW_AUTO_SUGGEST_BOX_MARGIN
+            r.top_navigation_view_auto_suggest_box_margin
         } else {
-            NAVIGATION_VIEW_AUTO_SUGGEST_BOX_MARGIN
+            r.navigation_view_auto_suggest_box_margin
         };
         let editor = Padding::new(EdgeInsetsGeometry::only(
             padding[0], padding[1], padding[2], padding[3],
@@ -1490,7 +1497,7 @@ impl NavigationViewState {
         .child(
             ConstrainedBox::new(
                 BoxConstraints::new()
-                    .min_height(NAVIGATION_VIEW_AUTO_SUGGEST_AREA_HEIGHT)
+                    .min_height(r.navigation_view_auto_suggest_area_height)
                     .min_width(if top { 216.0 } else { 0.0 }),
             )
             .child(editor),
@@ -1540,25 +1547,26 @@ impl NavigationViewState {
     ) -> WidgetRef {
         let widget = self.widget(app).clone();
         let resources = ThemeResources::of(app, context);
-        let r = resources.navigation_view();
+        let r = &resources;
         let minimal = app.get(self).display_mode == NavigationViewDisplayMode::Minimal;
         let (border, corners) = if top {
             (
-                TOP_NAVIGATION_VIEW_CONTENT_GRID_BORDER_THICKNESS,
-                TOP_NAVIGATION_VIEW_CONTENT_GRID_CORNER_RADIUS,
+                r.top_navigation_view_content_grid_border_thickness,
+                r.top_navigation_view_content_grid_corner_radius,
             )
         } else if minimal {
             (
-                NAVIGATION_VIEW_MINIMAL_CONTENT_GRID_BORDER_THICKNESS,
-                NAVIGATION_VIEW_MINIMAL_CONTENT_GRID_CORNER_RADIUS,
+                r.navigation_view_minimal_content_grid_border_thickness,
+                r.navigation_view_minimal_content_grid_corner_radius,
             )
         } else {
             (
-                NAVIGATION_VIEW_CONTENT_GRID_BORDER_THICKNESS,
-                NAVIGATION_VIEW_CONTENT_GRID_CORNER_RADIUS,
+                r.navigation_view_content_grid_border_thickness,
+                r.navigation_view_content_grid_corner_radius,
             )
         };
         let chrome = PaneChrome::resolve(
+            &resources,
             &widget,
             app.get(self).display_mode,
             self.is_pane_open(app),
@@ -1575,21 +1583,22 @@ impl NavigationViewState {
             .filter(|_| widget.always_show_header || (minimal && !top))
         {
             let margin = if minimal && !top {
-                NAVIGATION_VIEW_MINIMAL_HEADER_MARGIN
+                r.navigation_view_minimal_header_margin
             } else {
-                NAVIGATION_VIEW_HEADER_MARGIN
+                r.navigation_view_header_margin
             };
             children.push(
                 GridCell::new(Margin::new(
                     margin,
                     ConstrainedBox::new(
-                        BoxConstraints::new().min_height(PANE_TOGGLE_BUTTON_HEIGHT),
+                        BoxConstraints::new().min_height(r.pane_toggle_button_height),
                     )
                     .child(DefaultTextStyle::new(
                         control_text_style(
+                            &resources,
                             28.0,
                             FontWeight::W600,
-                            resources.common.text_fill_color_primary,
+                            resources.text_fill_color_primary,
                         ),
                         self.slot(app, "header", header),
                     )),
@@ -1601,7 +1610,7 @@ impl NavigationViewState {
         }
         children.push(
             GridCell::new(Margin::new(
-                NAVIGATION_VIEW_CONTENT_PRESENTER_MARGIN,
+                r.navigation_view_content_presenter_margin,
                 self.slot(app, "content", widget.content),
             ))
             .row(2)
@@ -1628,8 +1637,10 @@ impl NavigationViewState {
 
     /// PaneContentGrid reserves the toggle row before custom content and item groups.
     fn left_pane(self: Handle<Self>, app: &mut App) -> WidgetRef {
+        let r = ThemeResources::of(app, self.context(app));
         let widget = self.widget(app).clone();
         let chrome = PaneChrome::resolve(
+            &r,
             &widget,
             app.get(self).display_mode,
             self.is_pane_open(app),
@@ -1662,7 +1673,7 @@ impl NavigationViewState {
             .pane_custom_content
             .map(|child| self.slot(app, "custom", child))
             .unwrap_or_else(|| SizedBox::shrink().into_widget());
-        let search = self.search_presenter(app, false, compact);
+        let search = self.search_presenter(&r, app, false, compact);
         let items = self.pane_items(app, compact);
         // PaneContentGrid follows the template's padding, Back, toggle, search, custom and item rows.
         let pane = Grid::new()
@@ -1697,10 +1708,10 @@ impl NavigationViewState {
     fn left_template(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let resources = ThemeResources::of(app, context);
-        let r = resources.navigation_view();
+        let r = &resources;
         let open = self.is_pane_open(app) && widget.is_pane_visible;
         let mode = app.get(self).display_mode;
-        let chrome = PaneChrome::resolve(&widget, mode, open, app.get(self).width);
+        let chrome = PaneChrome::resolve(&resources, &widget, mode, open, app.get(self).width);
         let pane = self.left_pane(app);
         let content = self.page_content(app, context, false);
         let mut split = SplitView::new(open, move |app, open| self.set_pane_open(app, open, false))
@@ -1731,9 +1742,17 @@ impl NavigationViewState {
                     r.navigation_view_item_separator_foreground
                 },
             ))
-            .border_thickness_ltrb(NAVIGATION_VIEW_BORDER_THICKNESS)
-            .corner_radius_corners([0.0, OVERLAY_CORNER_RADIUS[1], OVERLAY_CORNER_RADIUS[2], 0.0])
-            .pane(Margin::new(NAVIGATION_VIEW_PANE_CONTENT_GRID_MARGIN, pane))
+            .border_thickness_ltrb(r.navigation_view_border_thickness)
+            .corner_radius_corners([
+                0.0,
+                r.overlay_corner_radius[1],
+                r.overlay_corner_radius[2],
+                0.0,
+            ])
+            .pane(Margin::new(
+                r.navigation_view_pane_content_grid_margin,
+                pane,
+            ))
             .content(content);
         if let Some(callback) = widget.pane_opening {
             split = split.pane_opening(callback);
@@ -1765,7 +1784,7 @@ impl NavigationViewState {
                     .unwrap_or_else(|| Listener::new(|_| {}))
             };
             let back_width = if close {
-                NAVIGATION_BACK_BUTTON_WIDTH
+                r.navigation_back_button_width
             } else {
                 chrome.back_width
             };
@@ -1799,7 +1818,7 @@ impl NavigationViewState {
             let icon_width = (widget.compact_pane_length - 8.0).max(0.0);
             let title = Offstage::new()
                 .offstage(chrome.closed_compact)
-                .child(pane_title(widget.pane_title.clone()));
+                .child(pane_title(&resources, widget.pane_title.clone()));
             let button = Button::new(
                 title,
                 Listener::new(move |app| self.set_pane_open(app, !self.is_pane_open(app), true)),
@@ -1827,12 +1846,12 @@ impl NavigationViewState {
             children.push(
                 Positioned::new(
                     SizedBox::new()
-                        .height(NAVIGATION_VIEW_PANE_HEADER_ROW_MIN_HEIGHT)
+                        .height(r.navigation_view_pane_header_row_min_height)
                         .child(Margin::new(
-                            NAVIGATION_VIEW_PANE_TITLE_PRESENTER_MARGIN,
+                            r.navigation_view_pane_title_presenter_margin,
                             Offstage::new()
                                 .offstage(chrome.closed_compact)
-                                .child(pane_title(widget.pane_title.clone())),
+                                .child(pane_title(&resources, widget.pane_title.clone())),
                         )),
                 )
                 .left(chrome.toggle_left)
@@ -1847,7 +1866,13 @@ impl NavigationViewState {
     }
 
     /// Measures top chrome independently of the star column's allocated width.
-    fn top_chrome(self: Handle<Self>, child: WidgetRef, slot: usize) -> WidgetRef {
+    fn top_chrome(
+        self: Handle<Self>,
+        r: &ThemeResources,
+        child: WidgetRef,
+        slot: usize,
+    ) -> WidgetRef {
+        let custom_content_min_width = r.top_navigation_view_pane_custom_content_min_width;
         SizeObserver::new(
             child,
             Rc::new(move |app, _, size| {
@@ -1859,8 +1884,7 @@ impl NavigationViewState {
                         state.top_chrome_sizes[slot] = size.width();
                         state.top_chrome_width = state.top_chrome_sizes[0]
                             + state.top_chrome_sizes[1]
-                            + state.top_chrome_sizes[2]
-                                .max(TOP_NAVIGATION_VIEW_PANE_CUSTOM_CONTENT_MIN_WIDTH)
+                            + state.top_chrome_sizes[2].max(custom_content_min_width)
                             + 8.0;
                     });
                 }
@@ -1873,7 +1897,7 @@ impl NavigationViewState {
     fn top_template(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let resources = ThemeResources::of(app, context);
-        let r = resources.navigation_view();
+        let r = &resources;
         let selected = app
             .get(self)
             .selected
@@ -1882,7 +1906,7 @@ impl NavigationViewState {
             .filter(|path| path[0] == 0)
             .map(|path| path[1]);
         let available = (app.get(self).width - app.get(self).top_chrome_width).max(0.0);
-        app.get_mut(self).top.overflow_button_width = TOP_NAVIGATION_VIEW_OVERFLOW_BUTTON_WIDTH;
+        app.get_mut(self).top.overflow_button_width = r.top_navigation_view_overflow_button_width;
         if app.get(self).top_measure_pending {
             self.after_frame(app, move |app| {
                 let ids: Vec<_> = self
@@ -1918,6 +1942,7 @@ impl NavigationViewState {
             .filter(|index| widget.menu_items[*index].is_visible)
             .map(|index| {
                 self.item_widget(
+                    &resources,
                     app,
                     widget.menu_items[index].clone(),
                     NavigationViewItemPosition::TopPrimary,
@@ -1931,6 +1956,7 @@ impl NavigationViewState {
             .filter(|index| widget.menu_items[**index].is_visible)
             .map(|index| {
                 self.item_widget(
+                    &resources,
                     app,
                     widget.menu_items[*index].clone(),
                     if overflow_open {
@@ -1974,9 +2000,10 @@ impl NavigationViewState {
             popup,
             Listener::new(move |app| self.set_state(app, |state| state.overflow_open = false)),
         )
-        .padding(TOP_NAVIGATION_VIEW_OVERFLOW_MENU_PADDING)
-        .max_width(FLYOUT_THEME_MAX_WIDTH);
+        .padding(r.top_navigation_view_overflow_menu_padding)
+        .max_width(r.flyout_theme_max_width);
         let chrome = PaneChrome::resolve(
+            &resources,
             &widget,
             app.get(self).display_mode,
             self.is_pane_open(app),
@@ -1991,8 +2018,8 @@ impl NavigationViewState {
                 .unwrap_or_else(|| SizedBox::shrink().into_widget()),
             if chrome.show_top_title {
                 Margin::new(
-                    NAVIGATION_VIEW_ITEM_INNER_HEADER_MARGIN,
-                    pane_title(widget.pane_title.clone()),
+                    r.navigation_view_item_inner_header_margin,
+                    pane_title(&resources, widget.pane_title.clone()),
                 )
                 .into_widget()
             } else {
@@ -2004,7 +2031,7 @@ impl NavigationViewState {
             .children([
                 SizedBox::new()
                     .width(if chrome.show_back {
-                        NAVIGATION_BACK_BUTTON_WIDTH
+                        r.navigation_back_button_width
                     } else {
                         0.0
                     })
@@ -2017,10 +2044,17 @@ impl NavigationViewState {
             .into_iter()
             .filter(|item| item.is_visible)
             .map(|item| {
-                self.item_widget(app, item, NavigationViewItemPosition::TopFooter, 0, false)
+                self.item_widget(
+                    &resources,
+                    app,
+                    item,
+                    NavigationViewItemPosition::TopFooter,
+                    0,
+                    false,
+                )
             })
             .collect::<Vec<_>>();
-        let search = self.search_presenter(app, true, false);
+        let search = self.search_presenter(&resources, app, true, false);
         let trailing = Row::new()
             .main_axis_size(MainAxisSize::Min)
             .children([
@@ -2036,8 +2070,8 @@ impl NavigationViewState {
                     .into_widget(),
             ])
             .into_widget();
-        let leading = self.top_chrome(leading, 0);
-        let trailing = self.top_chrome(trailing, 1);
+        let leading = self.top_chrome(&resources, leading, 0);
+        let trailing = self.top_chrome(&resources, trailing, 1);
         let custom = widget
             .pane_custom_content
             .clone()
@@ -2045,7 +2079,7 @@ impl NavigationViewState {
             .unwrap_or_else(|| SizedBox::shrink().into_widget());
         let custom = Align::new()
             .alignment(Alignment::CENTER_LEFT.into())
-            .child(self.top_chrome(custom, 2));
+            .child(self.top_chrome(&resources, custom, 2));
         let top_row = Grid::new()
             .column_definitions([
                 ColumnDefinition::new(GridLength::AUTO),
@@ -2059,7 +2093,7 @@ impl NavigationViewState {
                 })
                 .min_width(
                     app.get(self).top_chrome_sizes[2]
-                        .max(TOP_NAVIGATION_VIEW_PANE_CUSTOM_CONTENT_MIN_WIDTH),
+                        .max(r.top_navigation_view_pane_custom_content_min_width),
                 ),
                 ColumnDefinition::new(GridLength::AUTO),
             ])
@@ -2070,7 +2104,7 @@ impl NavigationViewState {
                         BoxConstraints::new().max_width(
                             (available
                                 - if has_overflow {
-                                    TOP_NAVIGATION_VIEW_OVERFLOW_BUTTON_WIDTH
+                                    r.top_navigation_view_overflow_button_width
                                 } else {
                                     0.0
                                 })
@@ -2093,7 +2127,7 @@ impl NavigationViewState {
             ]);
         let top_row = Offstage::new().offstage(!widget.is_pane_visible).child(
             SizedBox::new()
-                .height(NAVIGATION_VIEW_TOP_PANE_HEIGHT)
+                .height(r.navigation_view_top_pane_height)
                 .child(Padding::new(EdgeInsetsGeometry::only(4.0, 0.0, 4.0, 0.0)).child(top_row)),
         );
         let content = self.page_content(app, context, true);
@@ -2316,9 +2350,10 @@ impl State for NavigationViewState {
             };
             DefaultTextStyle::new(
                 control_text_style(
+                    &resources,
                     14.0,
                     FontWeight::NORMAL,
-                    resources.common.text_fill_color_primary,
+                    resources.text_fill_color_primary,
                 ),
                 child,
             )
@@ -2360,7 +2395,7 @@ fn navigation_button_template(
     focus_margin: [f64; 4],
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
-    let r = resources.navigation_view();
+    let r = &resources;
     let (background, foreground) = match states.common {
         CommonState::PointerOver => (
             r.navigation_view_button_background_pointer_over,
@@ -2376,13 +2411,13 @@ fn navigation_button_template(
     let content = Padding::new(EdgeInsetsGeometry::only(4.0, 2.0, 4.0, 2.0))
         .child(
             SizedBox::new()
-                .width(PANE_TOGGLE_BUTTON_WIDTH)
-                .height(PANE_TOGGLE_BUTTON_HEIGHT)
+                .width(r.pane_toggle_button_width)
+                .height(r.pane_toggle_button_height)
                 .child(
                     ControlBorder::new(Brush::Solid(background), Brush::Solid(Color::new(0)))
-                        .corner_radius(CONTROL_CORNER_RADIUS[0])
+                        .corner_radius(r.control_corner_radius[0])
                         .child(Center::new().child(DefaultTextStyle::new(
-                            control_text_style(16.0, FontWeight::NORMAL, foreground),
+                            control_text_style(&resources, 16.0, FontWeight::NORMAL, foreground),
                             content,
                         ))),
                 ),
@@ -2391,7 +2426,7 @@ fn navigation_button_template(
     FocusVisual::new(content, resources.theme)
         .visible(states.focused)
         .margin(focus_margin)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(r.control_corner_radius[0])
         .into_widget()
 }
 

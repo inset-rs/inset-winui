@@ -265,9 +265,9 @@ impl State for BreadcrumbBarState {
         let flyout = Flyout::new(app, SizedBox::new());
         app.get_mut(self).flyout = Some(flyout);
         app.get_mut(flyout).placement = FlyoutPlacementMode::Bottom;
-        app.get_mut(flyout).minimum_size = Size::new(0.0, 40.0);
+        app.get_mut(flyout).minimum_size = Some(Size::new(0.0, 40.0));
         app.get_mut(flyout).flyout_presenter_style = Some(Rc::new(move |app, context, content| {
-            let r = ThemeResources::of(app, context).breadcrumb_bar();
+            let r = ThemeResources::of(app, context);
             IntrinsicWidth::new()
                 .child(
                     ControlBorder::new(
@@ -275,9 +275,9 @@ impl State for BreadcrumbBarState {
                         Brush::Solid(r.breadcrumb_bar_ellipsis_flyout_presenter_border_brush),
                     )
                     .border_thickness_ltrb(
-                        BREADCRUMB_BAR_ELLIPSIS_FLYOUT_PRESENTER_BORDER_THEME_THICKNESS,
+                        r.breadcrumb_bar_ellipsis_flyout_presenter_border_theme_thickness,
                     )
-                    .corner_radius_corners(OVERLAY_CORNER_RADIUS)
+                    .corner_radius_corners(r.overlay_corner_radius)
                     .child(
                         Padding::new(EdgeInsetsGeometry::from_ltrb(0.0, 2.0, 0.0, 2.0))
                             .child(ScrollBarViewport::new(scroll, content)),
@@ -457,7 +457,7 @@ impl BreadcrumbItemState {
     fn content(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let theme = ThemeResources::of(app, context);
-        let r = theme.breadcrumb_bar();
+        let r = theme.clone();
         let focused = app.get(self).highlight && app.get(self).focus_state.shows_focus_visual();
         let body = widget
             .item
@@ -466,7 +466,8 @@ impl BreadcrumbItemState {
             .unwrap_or_else(|| {
                 Padding::new(EdgeInsetsGeometry::all(3.0))
                     .child(
-                        FontIcon::symbol(FluentSymbol::More).font_size(CONTROL_CONTENT_FONT_SIZE),
+                        FontIcon::symbol(FluentSymbol::More)
+                            .font_size(r.control_content_theme_font_size),
                     )
                     .into_widget()
             });
@@ -475,11 +476,12 @@ impl BreadcrumbItemState {
                 Padding::new(EdgeInsetsGeometry::from_ltrb(1.0, 3.0, 1.0, 3.0)).child(
                     DefaultTextStyle::new(
                         control_text_style(
-                            CONTROL_CONTENT_FONT_SIZE,
+                            &theme,
+                            r.control_content_theme_font_size,
                             FontWeight::NORMAL,
                             r.breadcrumb_bar_current_normal_foreground_brush,
                         )
-                        .height(20.0 / CONTROL_CONTENT_FONT_SIZE),
+                        .height(20.0 / r.control_content_theme_font_size),
                         body,
                     ),
                 ),
@@ -487,13 +489,15 @@ impl BreadcrumbItemState {
             )
             .visible(focused)
             .margin([-3.0; 4])
-            .corner_radius(CONTROL_CORNER_RADIUS[0])
+            .corner_radius(r.control_corner_radius[0])
             .into_widget();
         }
         let dropdown = widget.dropdown;
+        let states_r = r.clone();
         let control = CommonStates::new(
             Listener::new(move |app| self.activate(app)),
             move |_, _, state| {
+                let r = &states_r;
                 let (foreground, background) = if dropdown {
                     match state.common {
                         CommonState::Disabled => (
@@ -528,7 +532,7 @@ impl BreadcrumbItemState {
                         Brush::Solid(r.breadcrumb_bar_border_brush),
                     )
                     .border_thickness(0.0)
-                    .corner_radius_corners(CONTROL_CORNER_RADIUS)
+                    .corner_radius_corners(r.control_corner_radius)
                     .padding(if dropdown {
                         [11.0, 7.0, 11.0, 9.0]
                     } else {
@@ -537,17 +541,19 @@ impl BreadcrumbItemState {
                     .child(DefaultTextStyle::new(
                         if dropdown {
                             control_text_style(
-                                CONTROL_CONTENT_FONT_SIZE,
+                                &theme,
+                                r.control_content_theme_font_size,
                                 FontWeight::NORMAL,
                                 foreground,
                             )
                         } else {
                             control_text_style(
-                                CONTROL_CONTENT_FONT_SIZE,
+                                &theme,
+                                r.control_content_theme_font_size,
                                 FontWeight::NORMAL,
                                 foreground,
                             )
-                            .height(20.0 / CONTROL_CONTENT_FONT_SIZE)
+                            .height(20.0 / r.control_content_theme_font_size)
                         },
                         body.clone(),
                     )),
@@ -555,7 +561,7 @@ impl BreadcrumbItemState {
                 )
                 .visible(focused)
                 .margin([-3.0; 4])
-                .corner_radius(CONTROL_CORNER_RADIUS[0])
+                .corner_radius(r.control_corner_radius[0])
                 .into_widget()
             },
         )
@@ -576,7 +582,7 @@ impl BreadcrumbItemState {
                         } else {
                             FluentSymbol::ChevronRight
                         })
-                        .font_size(BREADCRUMB_BAR_CHEVRON_FONT_SIZE)
+                        .font_size(r.breadcrumb_bar_chevron_font_size)
                         .foreground(r.breadcrumb_bar_normal_foreground_brush),
                     )
                     .into_widget(),

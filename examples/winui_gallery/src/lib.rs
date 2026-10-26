@@ -115,9 +115,17 @@ impl StatefulWidget for Gallery {
     }
 }
 
-/// Builds text using the kit's typography and resolved theme color.
+/// Builds text using the kit's typography, read from the resources where it is built, and
+/// resolved theme color.
 pub(crate) fn label(text: impl Into<String>, style: TextBlockStyle, color: Color) -> WidgetRef {
-    Text::new(text).style(style.text_style(color)).into_widget()
+    let text = text.into();
+    Builder::new(move |app, context| {
+        let resources = ThemeResources::of(app, context);
+        Text::new(text.clone())
+            .style(style.text_style(&resources, color))
+            .into_widget()
+    })
+    .into_widget()
 }
 
 /// Stacks example content with consistent spacing.
@@ -149,13 +157,13 @@ pub(crate) fn example(
     let mut children = vec![label(
         title,
         TextBlockStyle::Subtitle,
-        resources.common.text_fill_color_primary,
+        resources.text_fill_color_primary,
     )];
     if !description.is_empty() {
         children.push(label(
             description,
             TextBlockStyle::Body,
-            resources.common.text_fill_color_secondary,
+            resources.text_fill_color_secondary,
         ));
     }
     children.push(SizedBox::new().height(4.0).into_widget());
@@ -164,8 +172,8 @@ pub(crate) fn example(
         .width(f64::INFINITY)
         .child(
             ControlBorder::new(
-                Brush::Solid(resources.common.card_background_fill_color_default),
-                Brush::Solid(resources.common.card_stroke_color_default),
+                Brush::Solid(resources.card_background_fill_color_default),
+                Brush::Solid(resources.card_stroke_color_default),
             )
             .border_thickness(1.0)
             .corner_radius(8.0)
@@ -204,7 +212,7 @@ pub(crate) fn section(
     resources: &ThemeResources,
     content: WidgetRef,
 ) -> Vec<WidgetRef> {
-    let text = resources.common.text_fill_color_primary;
+    let text = resources.text_fill_color_primary;
     vec![label(title, TextBlockStyle::Subtitle, text), content]
 }
 
@@ -251,13 +259,14 @@ impl GalleryState {
             Feature::TabView => sections::tab_view::build(resources),
             Feature::NavigationView => sections::navigation_view::build(resources),
             Feature::TreeView => sections::tree_view::build(resources),
+            Feature::SelectorBar => sections::selector_bar::page(resources),
             Feature::Typography => sections::typography::build(resources),
             Feature::Icons => sections::icons::build(resources),
         };
         let mut children = vec![label(
             feature.description(),
             TextBlockStyle::Body,
-            resources.common.text_fill_color_secondary,
+            resources.text_fill_color_secondary,
         )];
         if matches!(feature, Feature::Button | Feature::ToggleSwitch) {
             let state = app.get(self);
@@ -267,7 +276,7 @@ impl GalleryState {
                     state.clicks, state.wifi, state.airplane
                 ),
                 TextBlockStyle::Body,
-                resources.common.text_fill_color_secondary,
+                resources.text_fill_color_secondary,
             ));
         }
         // The shell supplies the page heading; each section's first widget is that same title.
@@ -291,12 +300,13 @@ impl State for GalleryState {
     inset_widgets::state_accessors!();
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
+        let r = ThemeResources::of(app, context);
         // Minimal HeaderContent follows the visible toggle column and its negative margin.
         let horizontal_inset =
             if MediaQuery::size_of(app, context).width() < GALLERY_NAVIGATION_BREAKPOINT {
-                PANE_TOGGLE_BUTTON_WIDTH + NAVIGATION_VIEW_MINIMAL_HEADER_MARGIN[0]
+                r.pane_toggle_button_width + r.navigation_view_minimal_header_margin[0]
             } else {
-                NAVIGATION_VIEW_HEADER_MARGIN[0]
+                r.navigation_view_header_margin[0]
             };
         let state = app.get(self);
         let (dark, selected, visited) = (state.dark, state.selected, state.visited.clone());
@@ -353,7 +363,7 @@ impl State for GalleryState {
         navigation.header = Some(label(
             selected.title(),
             TextBlockStyle::Title,
-            resources.common.text_fill_color_primary,
+            resources.text_fill_color_primary,
         ));
         navigation = navigation
             .footer_menu_items(vec![
@@ -375,7 +385,7 @@ impl State for GalleryState {
             });
         ThemeScope::new(
             theme,
-            ColoredBox::new(resources.common.solid_background_fill_color_base).child(navigation),
+            ColoredBox::new(resources.solid_background_fill_color_base).child(navigation),
         )
         .into_widget()
     }

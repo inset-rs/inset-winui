@@ -2,12 +2,7 @@
 //! `InfoBadge.cpp`): a small status badge showing a number, an icon, or a bare dot, filled with
 //! its severity colour and rounded to a stadium by half its own height.
 
-use crate::{
-    Brush, FontIcon, ICON_INFO_BADGE_FONT_ICON_MARGIN, ICON_INFO_BADGE_ICON_MARGIN,
-    INFO_BADGE_MAX_HEIGHT, INFO_BADGE_MIN_HEIGHT, INFO_BADGE_MIN_WIDTH, INFO_BADGE_PADDING,
-    INFO_BADGE_VALUE_FONT_SIZE, Margin, ThemeResources, VALUE_INFO_BADGE_TEXT_MARGIN,
-    control_text_style,
-};
+use crate::{Brush, FontIcon, Margin, ThemeResources, control_text_style};
 use inset_embedder::{Canvas, Color, FontWeight, Matrix4, Offset, RRect, Radius, Size};
 use inset_foundation::App;
 use inset_painting::EdgeInsets;
@@ -36,9 +31,9 @@ pub enum InfoBadgeStyle {
 impl InfoBadgeStyle {
     /// The `Background` setter of the style, resolved in this theme.
     pub fn background(self, resources: &ThemeResources) -> Color {
-        let common = &resources.common;
+        let common = &resources;
         match self {
-            Self::Default => resources.info_badge().info_badge_background,
+            Self::Default => resources.info_badge_background,
             Self::Attention => common.system_fill_color_attention_brush,
             Self::Informational => common.system_fill_color_solid_neutral_brush,
             Self::Success => common.system_fill_color_success_brush,
@@ -63,12 +58,12 @@ pub enum InfoBadgeDisplayKind {
 
 impl InfoBadgeDisplayKind {
     /// The margin the state's setter gives the visible element.
-    fn margin(self) -> [f64; 4] {
+    fn margin(self, r: &ThemeResources) -> [f64; 4] {
         match self {
             Self::Dot => [0.0; 4],
-            Self::Value => VALUE_INFO_BADGE_TEXT_MARGIN,
-            Self::Icon => ICON_INFO_BADGE_ICON_MARGIN,
-            Self::FontIcon => ICON_INFO_BADGE_FONT_ICON_MARGIN,
+            Self::Value => r.value_info_badge_text_margin,
+            Self::Icon => r.icon_info_badge_icon_margin,
+            Self::FontIcon => r.icon_info_badge_font_icon_margin,
         }
     }
 }
@@ -95,8 +90,8 @@ pub struct InfoBadge {
     /// `OnSizeChanged` computes it.
     pub corner_radius: Option<[f64; 4]>,
 
-    /// `Padding` inside the filled shape.
-    pub padding: [f64; 4],
+    /// `Padding` inside the filled shape; the theme's `InfoBadgePadding` when `None`.
+    pub padding: Option<[f64; 4]>,
 
     /// Identity retained across parent rebuilds.
     pub key: Option<KeyRef>,
@@ -112,7 +107,7 @@ impl Default for InfoBadge {
             background: None,
             foreground: None,
             corner_radius: None,
-            padding: INFO_BADGE_PADDING,
+            padding: None,
             key: None,
         }
     }
@@ -163,7 +158,7 @@ impl InfoBadge {
 
     /// Sets the XAML `Padding`.
     pub fn padding(mut self, padding: [f64; 4]) -> Self {
-        self.padding = padding;
+        self.padding = Some(padding);
         self
     }
 
@@ -199,18 +194,19 @@ impl StatelessWidget for InfoBadge {
         let resources = ThemeResources::of(app, context);
         let foreground = self
             .foreground
-            .unwrap_or_else(|| resources.info_badge().info_badge_foreground);
+            .unwrap_or_else(|| resources.info_badge_foreground);
         let kind = self.display_kind();
         // ValueTextBlock and IconPresenter, of which one state at a time is visible.
         let content = match kind {
             InfoBadgeDisplayKind::Dot => SizedBox::new().into_widget(),
             InfoBadgeDisplayKind::Value => Margin::new(
-                kind.margin(),
+                kind.margin(&resources),
                 // HorizontalAlignment and VerticalAlignment are Center, so the text keeps its
                 // own size until the badge is squared up around it.
                 Center::new().width_factor(1.0).height_factor(1.0).child(
                     Text::new(self.value.to_string()).style(control_text_style(
-                        INFO_BADGE_VALUE_FONT_SIZE,
+                        &resources,
+                        resources.info_badge_value_font_size,
                         FontWeight::NORMAL,
                         foreground,
                     )),
@@ -218,7 +214,7 @@ impl StatelessWidget for InfoBadge {
             )
             .into_widget(),
             InfoBadgeDisplayKind::Icon | InfoBadgeDisplayKind::FontIcon => Margin::new(
-                kind.margin(),
+                kind.margin(&resources),
                 // IconPresenter is a Viewbox: it keeps the icon's own size where there is room
                 // and scales it down to whatever height the badge is left with.
                 Center::new()
@@ -237,7 +233,7 @@ impl StatelessWidget for InfoBadge {
         );
 
         // RootGrid: the filled, rounded background around the padded content.
-        let [left, top, right, bottom] = self.padding;
+        let [left, top, right, bottom] = self.padding.unwrap_or(resources.info_badge_padding);
         let root = CustomPaint::new()
             .painter(BadgeFill {
                 background: self
@@ -249,10 +245,10 @@ impl StatelessWidget for InfoBadge {
                 Padding::new(EdgeInsets::from_ltrb(left, top, right, bottom).into()).child(content),
             );
         ConstrainedBox::new(BoxConstraints {
-            min_width: INFO_BADGE_MIN_WIDTH,
+            min_width: resources.info_badge_min_width,
             max_width: f64::INFINITY,
-            min_height: INFO_BADGE_MIN_HEIGHT,
-            max_height: INFO_BADGE_MAX_HEIGHT,
+            min_height: resources.info_badge_min_height,
+            max_height: resources.info_badge_max_height,
         })
         .child(SquareWhenTallerThanWide::new(root))
         .into_widget()

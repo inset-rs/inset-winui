@@ -30,7 +30,7 @@ fn navigation_and_split_options_reach_the_control_properties() {
     let configured = fixture.elements().into_iter().any(|element| {
         let app = fixture.cell.borrow();
         downcast_widget::<SplitView>(element.widget(&app).as_ref())
-            .is_some_and(|split| split.open_pane_length == 240.0)
+            .is_some_and(|split| split.open_pane_length == Some(240.0))
     });
     assert!(configured);
     fixture.capture("gallery_split_configured");

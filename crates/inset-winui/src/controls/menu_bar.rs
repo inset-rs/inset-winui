@@ -215,13 +215,13 @@ impl State for MenuBarState {
                 .into_widget()
             })
             .collect::<Vec<_>>();
-        ConstrainedBox::new(BoxConstraints::new().min_height(MENU_BAR_HEIGHT))
+        ConstrainedBox::new(BoxConstraints::new().min_height(resources.menu_bar_height))
             .child(
                 ControlBorder::new_optional(
                     Some(
                         widget
                             .background
-                            .unwrap_or(Brush::Solid(resources.menu_bar().menu_bar_background)),
+                            .unwrap_or(Brush::Solid(resources.menu_bar_background)),
                     ),
                     None,
                 )
@@ -408,7 +408,7 @@ impl MenuHeaderState {
     fn content(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let theme = ThemeResources::of(app, context);
-        let resources = theme.menu_bar();
+        let resources = theme.clone();
         let menu = self.menu(app);
         let title = widget.item.title.clone();
         let content = CommonStates::new(Listener::new(|_| {}), move |app, _, states| {
@@ -432,26 +432,27 @@ impl MenuHeaderState {
                 ),
             };
             let foreground = if states.common == CommonState::Disabled {
-                theme.button().button_foreground_disabled
+                theme.button_foreground_disabled
             } else if states.common == CommonState::Pressed {
-                theme.button().button_foreground_pressed
+                theme.button_foreground_pressed
             } else {
                 resources.menu_bar_item_foreground
             };
             ControlBorder::new(Brush::Solid(background), Brush::Solid(border))
-                .border_thickness_ltrb(MENU_BAR_ITEM_BORDER_THICKNESS)
-                .corner_radius_corners(CONTROL_CORNER_RADIUS)
+                .border_thickness_ltrb(resources.menu_bar_item_border_thickness)
+                .corner_radius_corners(resources.control_corner_radius)
                 .child(
                     Padding::new(EdgeInsetsGeometry::from_ltrb(
-                        MENU_BAR_ITEM_BUTTON_PADDING[0],
-                        MENU_BAR_ITEM_BUTTON_PADDING[1],
-                        MENU_BAR_ITEM_BUTTON_PADDING[2],
-                        MENU_BAR_ITEM_BUTTON_PADDING[3],
+                        resources.menu_bar_item_button_padding[0],
+                        resources.menu_bar_item_button_padding[1],
+                        resources.menu_bar_item_button_padding[2],
+                        resources.menu_bar_item_button_padding[3],
                     ))
                     .child(
                         Center::new().width_factor(1.0).height_factor(1.0).child(
                             Text::new(title.clone()).style(control_text_style(
-                                CONTROL_CONTENT_FONT_SIZE,
+                                &theme,
+                                theme.control_content_theme_font_size,
                                 FontWeight::NORMAL,
                                 foreground,
                             )),
@@ -515,6 +516,7 @@ impl State for MenuHeaderState {
     }
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
+        let r = ThemeResources::of(app, context);
         let widget = self.widget(app).clone();
         let flyout = self.menu(app).as_flyout(app);
         let content = ListenableBuilder::new(Rc::new(flyout), move |app, context, _| {
@@ -554,14 +556,14 @@ impl State for MenuHeaderState {
                 self.set_state(app, |state| state.focused = focused)
             });
         Margin::new(
-            MENU_BAR_ITEM_MARGIN,
+            r.menu_bar_item_margin,
             TapRegion::new(
                 FocusVisual::new(content, ThemeResources::of(app, context).theme)
                     .visible(
                         app.get(self).focused && app.get(self).focus_state.shows_focus_visual(),
                     )
                     .margin([-3.0; 4])
-                    .corner_radius(CONTROL_CORNER_RADIUS[0]),
+                    .corner_radius(r.control_corner_radius[0]),
             )
             .group_id(widget.owner.id())
             .enabled(widget.enabled),

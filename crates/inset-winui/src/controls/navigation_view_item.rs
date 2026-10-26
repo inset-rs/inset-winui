@@ -237,18 +237,15 @@ impl StatelessWidget for NavigationViewItemPresenter {
             return SizedBox::shrink().into_widget();
         }
         if self.item.kind != NavigationViewItemKind::Item {
-            return self.section_template(&ThemeResources::of(app, context).navigation_view());
+            return self.section_template(&ThemeResources::of(app, context));
         }
         let w = self.clone();
         let content = CommonStates::new(self.on_invoked.clone(), move |app, context, states| {
             let resources = ThemeResources::of(app, context);
-            FocusVisual::new(
-                w.template(&resources.navigation_view(), states.common),
-                resources.theme,
-            )
-            .visible(states.focused || w.is_keyboard_focused)
-            .corner_radius(CONTROL_CORNER_RADIUS[0])
-            .into_widget()
+            FocusVisual::new(w.template(&resources, states.common), resources.theme)
+                .visible(states.focused || w.is_keyboard_focused)
+                .corner_radius(resources.control_corner_radius[0])
+                .into_widget()
         })
         .is_enabled(self.item.is_enabled)
         .focus_node(self.focus_node)
@@ -269,7 +266,7 @@ impl StatelessWidget for NavigationViewItemPresenter {
 
 impl NavigationViewItemPresenter {
     /// Header and separator templates have no input or focus handlers.
-    fn section_template(&self, r: &NavigationViewResources) -> WidgetRef {
+    fn section_template(&self, r: &ThemeResources) -> WidgetRef {
         let top = matches!(
             self.position,
             NavigationViewItemPosition::TopPrimary | NavigationViewItemPosition::TopFooter
@@ -277,9 +274,9 @@ impl NavigationViewItemPresenter {
         if self.item.kind == NavigationViewItemKind::Header {
             let collapsed = self.is_closed_compact && self.is_top_level_item;
             let mut margin = if self.position != NavigationViewItemPosition::Left {
-                TOP_NAVIGATION_VIEW_ITEM_INNER_HEADER_MARGIN
+                r.top_navigation_view_item_inner_header_margin
             } else {
-                NAVIGATION_VIEW_ITEM_INNER_HEADER_MARGIN
+                r.navigation_view_item_inner_header_margin
             };
             margin[0] += self.depth as f64 * 31.0;
             // InnerHeaderGrid changes height immediately; HeaderText has the source's two-phase fade.
@@ -296,6 +293,7 @@ impl NavigationViewItemPresenter {
                 [0.0, -1.0, 0.0, -1.0],
                 DefaultTextStyle::new(
                     control_text_style(
+                        r,
                         14.0,
                         FontWeight::W600,
                         r.navigation_view_item_header_foreground,
@@ -320,25 +318,25 @@ impl NavigationViewItemPresenter {
             r.navigation_view_item_separator_foreground
         }));
         if top {
-            line.width(TOP_NAVIGATION_VIEW_ITEM_SEPARATOR_WIDTH)
+            line.width(r.top_navigation_view_item_separator_width)
                 .height(24.0)
-                .margin(TOP_NAVIGATION_VIEW_ITEM_SEPARATOR_MARGIN)
+                .margin(r.top_navigation_view_item_separator_margin)
                 .into_widget()
         } else {
             let mut margin = if self.is_closed_compact {
-                NAVIGATION_VIEW_COMPACT_ITEM_SEPARATOR_MARGIN
+                r.navigation_view_compact_item_separator_margin
             } else {
-                NAVIGATION_VIEW_ITEM_SEPARATOR_MARGIN
+                r.navigation_view_item_separator_margin
             };
             margin[0] += self.depth as f64 * 31.0;
-            line.height(NAVIGATION_VIEW_ITEM_SEPARATOR_HEIGHT)
+            line.height(r.navigation_view_item_separator_height)
                 .margin(margin)
                 .into_widget()
         }
     }
 
     /// Transcribes LayoutRoot, ContentGrid and the separate selection-indicator layer.
-    fn template(&self, r: &NavigationViewResources, state: CommonState) -> WidgetRef {
+    fn template(&self, r: &ThemeResources, state: CommonState) -> WidgetRef {
         let top = matches!(
             self.position,
             NavigationViewItemPosition::TopPrimary | NavigationViewItemPosition::TopFooter
@@ -391,21 +389,21 @@ impl NavigationViewItemPresenter {
                 .child(icon_box.child(FittedBox::new().child(icon))),
         );
         let margin = if compact {
-            NAVIGATION_VIEW_COMPACT_ITEM_CONTENT_PRESENTER_MARGIN
+            r.navigation_view_compact_item_content_presenter_margin
         } else if top {
             if self.item.icon.is_some() {
-                TOP_NAVIGATION_VIEW_ITEM_CONTENT_PRESENTER_MARGIN
+                r.top_navigation_view_item_content_presenter_margin
             } else {
-                TOP_NAVIGATION_VIEW_ITEM_CONTENT_ONLY_CONTENT_PRESENTER_MARGIN
+                r.top_navigation_view_item_content_only_content_presenter_margin
             }
         } else if overflow {
             if self.item.icon.is_some() {
-                TOP_NAVIGATION_VIEW_ITEM_ON_OVERFLOW_CONTENT_PRESENTER_MARGIN
+                r.top_navigation_view_item_on_overflow_content_presenter_margin
             } else {
-                TOP_NAVIGATION_VIEW_ITEM_ON_OVERFLOW_NO_ICON_CONTENT_PRESENTER_MARGIN
+                r.top_navigation_view_item_on_overflow_no_icon_content_presenter_margin
             }
         } else {
-            NAVIGATION_VIEW_ITEM_CONTENT_PRESENTER_MARGIN
+            r.navigation_view_item_content_presenter_margin
         };
         let mut cells = vec![];
         if self.item.icon.is_some() || (!top && !overflow) {
@@ -456,10 +454,10 @@ impl NavigationViewItemPresenter {
             let callback = self.on_expansion_toggled.clone();
             let enabled = self.item.is_enabled;
             let glyph = FontIcon::symbol(FluentSymbol::ChevronDown)
-                .font_size(NAVIGATION_VIEW_ITEM_EXPANDED_GLYPH_FONT_SIZE);
+                .font_size(r.navigation_view_item_expanded_glyph_font_size);
             let glyph = AnimatedRotation::new(
                 if self.is_expanded { 0.5 } else { 0.0 },
-                CONTROL_NORMAL_ANIMATION_DURATION,
+                r.control_normal_animation_duration,
             )
             .child(glyph);
             let chevron = GestureDetector::new()
@@ -479,16 +477,16 @@ impl NavigationViewItemPresenter {
                     PresenterGrid::new()
                         .margin(if top {
                             if !self.item.has_content {
-                                TOP_NAVIGATION_VIEW_ITEM_ICON_ONLY_EXPAND_CHEVRON_MARGIN
+                                r.top_navigation_view_item_icon_only_expand_chevron_margin
                             } else if self.item.icon.is_some() {
-                                TOP_NAVIGATION_VIEW_ITEM_EXPAND_CHEVRON_MARGIN
+                                r.top_navigation_view_item_expand_chevron_margin
                             } else {
-                                TOP_NAVIGATION_VIEW_ITEM_CONTENT_ONLY_EXPAND_CHEVRON_MARGIN
+                                r.top_navigation_view_item_content_only_expand_chevron_margin
                             }
                         } else if overflow {
-                            TOP_NAVIGATION_VIEW_ITEM_ON_OVERFLOW_EXPAND_CHEVRON_MARGIN
+                            r.top_navigation_view_item_on_overflow_expand_chevron_margin
                         } else {
-                            NAVIGATION_VIEW_ITEM_EXPAND_CHEVRON_MARGIN
+                            r.navigation_view_item_expand_chevron_margin
                         })
                         .child(chevron),
                 )
@@ -520,20 +518,20 @@ impl NavigationViewItemPresenter {
                 .background(Brush::Solid(
                     r.navigation_view_selection_indicator_foreground,
                 ))
-                .corner_radius(NAVIGATION_VIEW_SELECTION_INDICATOR_RADIUS)
+                .corner_radius(r.navigation_view_selection_indicator_radius)
                 .width(if top {
                     16.0
                 } else if overflow {
                     2.0
                 } else {
-                    NAVIGATION_VIEW_SELECTION_INDICATOR_WIDTH
+                    r.navigation_view_selection_indicator_width
                 })
                 .height(if top {
                     3.0
                 } else if overflow {
                     24.0
                 } else {
-                    NAVIGATION_VIEW_SELECTION_INDICATOR_HEIGHT
+                    r.navigation_view_selection_indicator_height
                 });
             let visible = self.is_selected || (self.is_child_selected && !self.is_expanded);
             let indicator = NavigationIndicatorTransition::build(
@@ -577,19 +575,24 @@ impl NavigationViewItemPresenter {
         }
         let root = PresenterGrid::new()
             .background(Brush::Solid(background))
-            .corner_radius(CONTROL_CORNER_RADIUS[0])
+            .corner_radius(r.control_corner_radius[0])
             .margin(if overflow {
                 [0.0; 4]
             } else if top && !self.item.has_content {
                 [2.0; 4]
             } else {
-                NAVIGATION_VIEW_ITEM_BUTTON_MARGIN
+                r.navigation_view_item_button_margin
             })
             .child(Stack::new().children(layers));
         DefaultTextStyle::new(
-            control_text_style(CONTROL_CONTENT_FONT_SIZE, FontWeight::W400, foreground),
+            control_text_style(
+                r,
+                r.control_content_theme_font_size,
+                FontWeight::W400,
+                foreground,
+            ),
             Opacity::new(if !top && !overflow && state == CommonState::Disabled {
-                LIST_VIEW_ITEM_DISABLED_THEME_OPACITY
+                r.list_view_item_disabled_theme_opacity
             } else {
                 1.0
             })
@@ -602,7 +605,7 @@ impl NavigationViewItemPresenter {
 
 /// CommonStates colors from the left and top-primary presenter visual states.
 fn item_colors(
-    r: &NavigationViewResources,
+    r: &ThemeResources,
     top: bool,
     selected: bool,
     state: CommonState,

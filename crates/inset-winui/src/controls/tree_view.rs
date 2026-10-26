@@ -408,6 +408,7 @@ impl StatefulWidget for TreeView {
             rows,
             requested_expansion: HashMap::new(),
             requested_selection: None,
+            row_estimate: 0.0,
             item_focus: HashMap::new(),
             row_keys: HashMap::new(),
             viewport_key: GlobalKey::new(),
@@ -431,6 +432,9 @@ impl StatefulWidget for TreeView {
 /// what the tree asked of the application since it last built the tree.
 pub struct TreeViewState {
     state: StateData<TreeView>,
+
+    /// The height of a row of one line of text, as the last build resolved it from the theme.
+    row_estimate: f64,
 
     /// TickerMode subscription.
     single_ticker_provider: SingleTickerProviderStateMixinData,
@@ -1340,7 +1344,7 @@ impl TreeViewState {
             .heights
             .get(id)
             .copied()
-            .unwrap_or_else(estimated_row_height)
+            .unwrap_or(app.get(self).row_estimate)
     }
 
     /// Each row's top relative to the top of the viewport: the built rows where they are laid
@@ -1612,7 +1616,9 @@ impl State for TreeViewState {
         app.destroy(scroll);
     }
 
-    fn build(self: Handle<Self>, app: &mut App, _context: BuildContext) -> WidgetRef {
+    fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
+        let estimate = estimated_row_height(&ThemeResources::of(app, context));
+        app.get_mut(self).row_estimate = estimate;
         let list = LayoutBuilder::new(move |app, _, constraints| {
             self.list(app, constraints.max_height.is_infinite())
         });

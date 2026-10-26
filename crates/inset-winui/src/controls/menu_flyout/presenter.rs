@@ -170,7 +170,7 @@ fn template_settings(
         settings.has_accelerators |= !text.is_empty();
         let mut painter = TextPainter::new();
         painter.set_text(Some(Rc::new(TextSpan::new().text(text.clone()).style(
-            TextBlockStyle::Caption.text_style(theme.common.text_fill_color_secondary),
+            TextBlockStyle::Caption.text_style(&theme, theme.text_fill_color_secondary),
         ))));
         painter.set_text_direction(Some(Directionality::of(app, context)));
         painter.set_text_scaler(MediaQuery::text_scaler_of(app, context));
@@ -203,12 +203,12 @@ impl State for MenuFlyoutPresenterState {
         let items = data.items.clone();
         let input = data.input;
         let theme = ThemeResources::of(app, context);
-        let resources = theme.menu_flyout();
+        let resources = &theme;
         let settings = template_settings(app, context, &items, input.is_narrow());
         let min_width = if input == crate::InputDevice::Touch {
-            FLYOUT_THEME_TOUCH_MIN_WIDTH
+            resources.flyout_theme_touch_min_width
         } else {
-            FLYOUT_THEME_MIN_WIDTH
+            resources.flyout_theme_min_width
         }
         .min(MediaQuery::size_of(app, context).width());
         let contents = Column::new()
@@ -225,16 +225,13 @@ impl State for MenuFlyoutPresenterState {
                 .into_widget()
             }));
         let container = ControlBorder::new(
-            Brush::Acrylic(
-                AcrylicThemeResources::for_theme(theme.theme, &theme.accent)
-                    .acrylic_in_app_fill_color_default_brush,
-            ),
+            Brush::Acrylic(theme.acrylic_in_app_fill_color_default_brush),
             Brush::Solid(resources.menu_flyout_presenter_border_brush),
         )
-        .border_thickness_ltrb(MENU_FLYOUT_PRESENTER_BORDER_THEME_THICKNESS)
-        .corner_radius_corners(OVERLAY_CORNER_RADIUS)
+        .border_thickness_ltrb(resources.menu_flyout_presenter_border_theme_thickness)
+        .corner_radius_corners(resources.overlay_corner_radius)
         .child(Margin::new(
-            MENU_FLYOUT_PRESENTER_THEME_PADDING,
+            resources.menu_flyout_presenter_theme_padding,
             ConstrainedBox::new(BoxConstraints::new().min_width(min_width)).child(
                 ScrollBarViewport::new(app.get(self).scroll.unwrap(), contents),
             ),

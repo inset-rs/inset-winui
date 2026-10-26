@@ -250,7 +250,7 @@ struct Showing {
 
     /// The theme and direction of the context that showed the dialog, which its route, in the
     /// root overlay, does not inherit.
-    resources: ThemeResources,
+    resources: Rc<ThemeResources>,
     direction: TextDirection,
 }
 
@@ -505,7 +505,7 @@ impl ContentDialog {
         app: &mut App,
         resources: &ThemeResources,
     ) -> Handle<ContentDialogRoute> {
-        let smoke = resources.content_dialog().content_dialog_smoke_fill;
+        let smoke = resources.content_dialog_smoke_fill;
         ContentDialogRoute::new(app, self, smoke)
     }
 
@@ -784,9 +784,9 @@ impl ButtonsVisibilityState {
     /// The command space's columns and the column of each visible button: the template's,
     /// with this state's setters applied. `None` for `NoneVisible`, which collapses the command
     /// space.
-    fn layout(self) -> Option<CommandLayout> {
+    fn layout(self, r: &ThemeResources) -> Option<CommandLayout> {
         use ButtonsVisibilityState::*;
-        let spacing = GridLength::pixel(CONTENT_DIALOG_BUTTON_SPACING);
+        let spacing = GridLength::pixel(r.content_dialog_button_spacing);
         // `PrimaryColumn`, `FirstSpacer`, `SecondaryColumn`, `SecondSpacer`, `CloseColumn`.
         let mut columns = [
             GridLength::STAR,
@@ -1117,12 +1117,8 @@ impl State for ContentDialogPresenterState {
                     dialog.execute_close_action(app);
                 }
             }));
-        let mut themed = ThemeScope::new(
-            resources.theme,
-            Directionality::new(direction, back_request),
-        );
-        themed.resources = resources;
-        themed.into_widget()
+        ThemeScope::with_resources(resources, Directionality::new(direction, back_request))
+            .into_widget()
     }
 }
 
@@ -1159,23 +1155,23 @@ impl ContentDialogPresenterState {
     ) -> WidgetRef {
         let dialog = app.get(self.widget(app).dialog);
         let full_size = dialog.full_size_desired;
-        let r = resources.content_dialog();
+        let r = &resources;
         let dialog_space = self.dialog_space(app, resources);
         let border = ControlBorder::new(
             Brush::Solid(r.content_dialog_background),
             Brush::Solid(r.content_dialog_border_brush),
         )
-        .border_thickness_ltrb(CONTENT_DIALOG_BORDER_WIDTH)
-        .corner_radius(OVERLAY_CORNER_RADIUS[0])
+        .border_thickness_ltrb(r.content_dialog_border_width)
+        .corner_radius(r.overlay_corner_radius[0])
         .background_sizing(BackgroundSizing::InnerBorderEdge)
         .child(
             // `DialogSpace` rounds its own corners with `OverlayCornerRadius`.
             ClipRRect::new()
-                .border_radius(BorderRadius::circular(OVERLAY_CORNER_RADIUS[0]).into())
+                .border_radius(BorderRadius::circular(r.overlay_corner_radius[0]).into())
                 .child(dialog_space),
         );
         let shadowed = CustomPaint::new()
-            .painter(PopupShadow::for_dialog(resources.theme))
+            .painter(PopupShadow::for_dialog(resources, resources.theme))
             .child(border);
         let sized = IntrinsicWidth::new().child(shadowed);
         // FullDialogSizing stretches the dialog to the window's height, up to its maximum.
@@ -1189,10 +1185,10 @@ impl ContentDialogPresenterState {
         };
         ConstrainedBox::new(
             BoxConstraints::new()
-                .min_width(CONTENT_DIALOG_MIN_WIDTH)
-                .max_width(CONTENT_DIALOG_MAX_WIDTH)
-                .min_height(CONTENT_DIALOG_MIN_HEIGHT)
-                .max_height(CONTENT_DIALOG_MAX_HEIGHT),
+                .min_width(r.content_dialog_min_width)
+                .max_width(r.content_dialog_max_width)
+                .min_height(r.content_dialog_min_height)
+                .max_height(r.content_dialog_max_height),
         )
         .child(sized)
         .into_widget()
@@ -1224,7 +1220,7 @@ impl ContentDialogPresenterState {
     /// the separator.
     fn content_area(self: Handle<Self>, app: &mut App, resources: &ThemeResources) -> WidgetRef {
         let dialog = app.get(self.widget(app).dialog);
-        let r = resources.content_dialog();
+        let r = &resources;
         let foreground = r.content_dialog_foreground;
         let mut children = Vec::new();
         if let Some(title) = dialog.title.clone() {
@@ -1233,9 +1229,9 @@ impl ContentDialogPresenterState {
                 Align::new()
                     .alignment(AlignmentDirectional::TOP_START.into())
                     .child(Margin::new(
-                        CONTENT_DIALOG_TITLE_MARGIN,
+                        r.content_dialog_title_margin,
                         DefaultTextStyle::new(
-                            control_text_style(20.0, FontWeight::W600, foreground),
+                            control_text_style(resources, 20.0, FontWeight::W600, foreground),
                             title,
                         )
                         .max_lines(2)
@@ -1251,7 +1247,12 @@ impl ContentDialogPresenterState {
                 .expect("an initialized presenter");
             children.push(
                 Focus::new(DefaultTextStyle::new(
-                    control_text_style(CONTROL_CONTENT_FONT_SIZE, FontWeight::NORMAL, foreground),
+                    control_text_style(
+                        resources,
+                        r.control_content_theme_font_size,
+                        FontWeight::NORMAL,
+                        foreground,
+                    ),
                     content,
                 ))
                 .focus_node(focus.as_node())
@@ -1264,8 +1265,8 @@ impl ContentDialogPresenterState {
             Brush::Solid(r.content_dialog_top_overlay),
             Brush::Solid(r.content_dialog_separator_border_brush),
         )
-        .border_thickness_ltrb(CONTENT_DIALOG_SEPARATOR_THICKNESS)
-        .padding(CONTENT_DIALOG_PADDING)
+        .border_thickness_ltrb(r.content_dialog_separator_thickness)
+        .padding(r.content_dialog_padding)
         .child(
             Column::new()
                 .main_axis_size(MainAxisSize::Min)
@@ -1289,7 +1290,7 @@ impl ContentDialogPresenterState {
             !dialog.secondary_button_text.is_empty(),
             !dialog.close_button_text.is_empty(),
         )
-        .layout()?;
+        .layout(resources)?;
         let accented = accented_button(dialog.default_button, self.focused_button(app));
         let dialog = app.get(dialog_handle);
         // `PrimaryButton`, `SecondaryButton` and `CloseButton`.
@@ -1332,11 +1333,11 @@ impl ContentDialogPresenterState {
                 Some(GridCell::new(button).column(column).into_widget())
             })
             .collect();
-        let background = resources.content_dialog().content_dialog_background;
+        let background = resources.content_dialog_background;
         Some(
             Grid::new()
                 .column_definitions(layout.columns.map(ColumnDefinition::new))
-                .padding(CONTENT_DIALOG_PADDING)
+                .padding(resources.content_dialog_padding)
                 .background(Brush::Solid(background))
                 .children(cells)
                 .into_widget(),
@@ -1422,8 +1423,9 @@ mod tests {
 
     #[test]
     fn each_set_of_button_texts_picks_its_columns() {
+        let r = ThemeResources::new(Theme::Light, AccentPalette::default());
         let layout = |primary, secondary, close| {
-            ButtonsVisibilityState::of(primary, secondary, close).layout()
+            ButtonsVisibilityState::of(primary, secondary, close).layout(&r)
         };
         let all = layout(true, true, true).unwrap();
         assert_eq!(
@@ -1432,7 +1434,7 @@ mod tests {
         );
         assert_eq!(
             all.columns[1],
-            GridLength::pixel(CONTENT_DIALOG_BUTTON_SPACING)
+            GridLength::pixel(r.content_dialog_button_spacing)
         );
         let secondary_and_close = layout(false, true, true).unwrap();
         assert_eq!(

@@ -9,7 +9,23 @@ from pathlib import Path
 
 import xml.etree.ElementTree as ET
 
-from gen_resources import DEFAULT_SOURCE, DEFAULT_OUTPUT, control_source, emit_struct, inherited_setters, plain_value, read_dictionaries, resolve
+from gen_resources import DEFAULT_SOURCE, DEFAULT_OUTPUT, ThemeResources, control_source, gather, inherited_setters, plain_value, read_dictionaries, resolve
+
+
+def quietly(gathering):
+    """`gathering`'s result, with the generator's warnings kept off the test output."""
+    with contextlib.redirect_stderr(io.StringIO()):
+        return gathering()
+
+
+def section(resources, source):
+    """The fields `source` added to `resources`, in order."""
+    return next(fields for name, fields in resources.sections if name == source)
+
+
+def value(resources, field):
+    """The Rust type and the light and dark literals `resources` holds for `field`."""
+    return resources.fields[field][1:4]
 
 
 class ResourceGenerationTests(unittest.TestCase):
@@ -26,25 +42,21 @@ class ResourceGenerationTests(unittest.TestCase):
             self.assertEqual(output.read_bytes(), DEFAULT_OUTPUT.read_bytes())
 
     def test_password_box_uses_sibling_fluent_text_box_brushes(self):
-        source = DEFAULT_SOURCE
-        if not source.exists():
+        if not DEFAULT_SOURCE.exists():
             self.skipTest('local WinUI source checkout unavailable')
-        generator = Path(__file__).with_name('gen_resources.py')
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / 'resources.rs'
-            subprocess.run(
-                [sys.executable, str(generator), str(source), str(output), 'TextBox', 'PasswordBox'],
-                check=True, capture_output=True, text=True,
-            )
-            generated = output.read_text()
-        password = generated.split('pub struct PasswordBoxResources {', 1)[1]
-        self.assertIn('TEXT_CONTROL_BORDER_THEME_THICKNESS: [f64; 4] = [1.0, 1.0, 1.0, 1.0]', generated)
-        self.assertIn('TEXT_CONTROL_BORDER_THEME_THICKNESS_FOCUSED: [f64; 4] = [1.0, 1.0, 1.0, 2.0]', generated)
-        self.assertIn('TEXT_CONTROL_THEME_PADDING: [f64; 4] = [10.0, 5.0, 6.0, 6.0]', generated)
-        self.assertIn('pub text_control_border_brush: [(f64, Color); 2]', password)
-        self.assertIn('pub text_control_border_brush_focused: [(f64, Color); 2]', password)
-        self.assertIn('text_control_background: Color::from_argb(179, 255, 255, 255)', password)
-        self.assertIn('text_control_background: Color::from_argb(15, 255, 255, 255)', password)
+        # PasswordBox first, so the brushes it resolves through TextBox's dictionary are its own.
+        resources = quietly(lambda: gather(DEFAULT_SOURCE, ['PasswordBox', 'TextBox']))
+        password = section(resources, 'PasswordBox_themeresources.xaml')
+        thickness = lambda literal: ('[f64; 4]', literal, literal)
+        self.assertEqual(value(resources, 'text_control_border_theme_thickness'), thickness('[1.0, 1.0, 1.0, 1.0]'))
+        self.assertEqual(value(resources, 'text_control_border_theme_thickness_focused'), thickness('[1.0, 1.0, 1.0, 2.0]'))
+        self.assertEqual(value(resources, 'text_control_theme_padding'), thickness('[10.0, 5.0, 6.0, 6.0]'))
+        self.assertIn('text_control_border_brush', password)
+        self.assertIn('text_control_border_brush_focused', password)
+        self.assertEqual(value(resources, 'text_control_border_brush')[0], '[(f64, Color); 2]')
+        self.assertEqual(value(resources, 'text_control_background'),
+                         ('Color', 'Color::from_argb(179, 255, 255, 255)', 'Color::from_argb(15, 255, 255, 255)'))
+        self.assertIn('text_control_background', password)
 
     def test_control_source_prefers_common_styles_then_control_directory(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -118,18 +130,11 @@ class ResourceGenerationTests(unittest.TestCase):
         source = DEFAULT_SOURCE
         if not source.exists():
             self.skipTest('local WinUI source checkout unavailable')
-        generator = Path(__file__).with_name('gen_resources.py')
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / 'resources.rs'
-            subprocess.run(
-                [sys.executable, str(generator), str(source), str(output), 'ColorPicker'],
-                check=True, capture_output=True, text=True,
-            )
-            generated = output.read_text()
-        picker = generated.split('pub struct ColorPickerResources {', 1)[1]
+        resources = quietly(lambda: gather(source, ['ColorPicker']))
+        picker = section(resources, 'ColorPicker_themeresources.xaml')
         # `ColorSpectrum.xaml` strokes the selection ellipse with these.
-        self.assertIn('pub system_control_background_chrome_white_brush: Color', picker)
-        self.assertIn('pub system_control_background_chrome_black_high_brush: Color', picker)
+        self.assertIn('system_control_background_chrome_white_brush', picker)
+        self.assertIn('system_control_background_chrome_black_high_brush', picker)
 
     def test_a_derived_style_inherits_only_the_setters_it_does_not_set(self):
         namespaces = 'xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"'
@@ -152,24 +157,17 @@ class ResourceGenerationTests(unittest.TestCase):
         source = DEFAULT_SOURCE
         if not source.exists():
             self.skipTest('local WinUI source checkout unavailable')
-        generator = Path(__file__).with_name('gen_resources.py')
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / 'resources.rs'
-            subprocess.run(
-                [sys.executable, str(generator), str(source), str(output), 'TreeView'],
-                check=True, capture_output=True, text=True,
-            )
-            generated = output.read_text()
-        tree = generated.split('pub struct TreeViewResources {', 1)[1]
+        resources = quietly(lambda: gather(source, ['TreeView']))
+        tree = section(resources, 'TreeView_themeresources.xaml')
         # `DefaultListViewItemStyle`'s `Foreground`, `MinWidth` and focus visual brushes reach
         # `TreeViewItem`; its `Background` and `MinHeight` the item style sets itself.
-        self.assertIn('pub list_view_item_foreground: Color', tree)
-        self.assertIn('pub list_view_item_focus_visual_primary_brush: Color', tree)
-        self.assertIn('pub const LIST_VIEW_ITEM_MIN_WIDTH: f64 = 88.0;', generated)
+        self.assertIn('list_view_item_foreground', tree)
+        self.assertIn('list_view_item_focus_visual_primary_brush', tree)
+        self.assertEqual(value(resources, 'list_view_item_min_width'), ('f64', '88.0', '88.0'))
         self.assertNotIn('list_view_item_background', tree)
-        self.assertNotIn('LIST_VIEW_ITEM_MIN_HEIGHT', generated)
+        self.assertNotIn('list_view_item_min_height', resources.fields)
         # `TreeViewItem.xaml`, beside the dictionary, draws the drag count on these.
-        self.assertIn('pub system_control_background_accent_brush: Color', tree)
+        self.assertIn('system_control_background_accent_brush', tree)
 
     def test_control_source_finds_companion_control_in_parent_directory(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -205,26 +203,18 @@ class ResourceGenerationTests(unittest.TestCase):
             'Default': {'IconHeight': ('f64', 8.0)},
         }
         with contextlib.redirect_stderr(errors):
-            emit_struct([], 'TestResources', ['IconHeight'], themes, {}, {}, 'Test.xaml')
+            ThemeResources().add_dictionary('Test.xaml', ['IconHeight'], themes, {}, {})
         self.assertIn('Test.xaml: IconHeight differs by theme (9.0 light, 8.0 dark)', errors.getvalue())
 
-    def test_brush_aliases_of_the_common_dictionary_reach_the_shared_struct(self):
+    def test_brush_aliases_of_the_common_dictionary_reach_the_resources(self):
         source = DEFAULT_SOURCE
         if not source.exists():
             self.skipTest('local WinUI source checkout unavailable')
-        generator = Path(__file__).with_name('gen_resources.py')
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / 'resources.rs'
-            subprocess.run(
-                [sys.executable, str(generator), str(source), str(output), 'Button'],
-                check=True, capture_output=True, text=True,
-            )
-            generated = output.read_text()
-        common = generated.split('pub struct CommonResources {', 1)[1].split('}', 1)[0]
+        resources = quietly(lambda: gather(source, ['Button']))
+        common = section(resources, 'Common_themeresources_any.xaml')
         # SystemFillColorAttentionBrush states its colour through a ThemeResource reference.
-        self.assertIn('pub system_fill_color_attention_brush: Color', common)
-        self.assertIn('system_fill_color_attention_brush: accent.base', generated)
-        self.assertIn('system_fill_color_attention_brush: accent.light2', generated)
+        self.assertIn('system_fill_color_attention_brush', common)
+        self.assertEqual(value(resources, 'system_fill_color_attention_brush'), ('Color', 'accent.base', 'accent.light2'))
 
     def test_brush_opacity_survives_aliases_and_multiplies_existing_alpha(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -244,9 +234,10 @@ class ResourceGenerationTests(unittest.TestCase):
         self.assertEqual(hover, ('opacity', (('accent', 'SystemAccentColorDark1'), 0.9)))
         alpha = resolve(entries, {}, 'Translucent')
         self.assertEqual(alpha, ('opacity', (('color', (128, 1, 2, 3)), 0.5)))
+        resources = ThemeResources()
+        resources.add_dictionary('opacity.xaml', ['ControlHover', 'Translucent'], {'Light': entries, 'Default': entries}, {}, {})
         out = []
-        emit_struct(out, 'TestResources', ['ControlHover', 'Translucent'],
-                    {'Light': entries, 'Default': entries}, {}, {}, 'opacity.xaml')
+        resources.emit(out)
         generated = '\n'.join(out)
         self.assertIn('pub control_hover: Color', generated)
         self.assertIn('color = accent.dark1;', generated)
@@ -257,7 +248,7 @@ class ResourceGenerationTests(unittest.TestCase):
     def test_unresolved_resource_names_are_reported(self):
         errors = io.StringIO()
         with contextlib.redirect_stderr(errors):
-            emit_struct([], 'TestResources', ['MissingBrush'], {}, {}, {}, 'Test.xaml')
+            ThemeResources().add_dictionary('Test.xaml', ['MissingBrush'], {}, {}, {})
         self.assertIn('Test.xaml: unresolved resource MissingBrush (Light, Default)', errors.getvalue())
 
 

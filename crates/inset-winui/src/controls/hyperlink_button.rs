@@ -3,10 +3,8 @@
 //! The template is one `ContentPresenter` (`x:Name="ContentPresenter"`) with `BackgroundSizing="OuterBorderEdge"`, `ButtonPadding`, `HyperlinkButtonBorderThemeThickness` and a `BrushTransition` of 83 ms on `Background`; the `CommonStates` storyboards swap `Foreground`, `Background` and `BorderBrush` per state. The text carries no underline: `Hyperlink_themeresources.xaml` sets `HyperlinkUnderlineVisible` to `False`, which `HyperlinkButton::UpdateContentPresenterTextUnderline` reads (the underline returns only in high contrast). `HyperlinkButton::Initialize` sets the hand cursor.
 
 use crate::{
-    BUTTON_PADDING, BackgroundSizing, Brush, CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS,
-    CONTROL_FASTER_ANIMATION_DURATION, ColorTransition, CommonState, CommonStates, ControlBorder,
-    ControlStates, FocusVisual, HYPERLINK_BUTTON_BORDER_THEME_THICKNESS, HyperlinkButtonResources,
-    ThemeResources, control_text_style,
+    BackgroundSizing, Brush, ColorTransition, CommonState, CommonStates, ControlBorder,
+    ControlStates, FocusVisual, ThemeResources, control_text_style,
 };
 use inset_embedder::{Color, FontWeight};
 use inset_foundation::{App, Listener};
@@ -14,8 +12,6 @@ use inset_services::SystemMouseCursors;
 use inset_widgets::*;
 use std::{fmt, rc::Rc};
 
-/// XAML `HyperlinkButtonBorderThemeThickness`.
-pub const HYPERLINK_BUTTON_BORDER_THICKNESS: f64 = HYPERLINK_BUTTON_BORDER_THEME_THICKNESS[0];
 /// The `FocusVisualMargin` the style sets.
 pub const HYPERLINK_BUTTON_FOCUS_VISUAL_MARGIN: [f64; 4] = [-3.0; 4];
 
@@ -29,7 +25,7 @@ pub struct HyperlinkButtonBrushes {
 
 /// The `{ThemeResource …}` values the `CommonStates` storyboards name for `state`.
 pub fn hyperlink_button_brushes(
-    resources: &HyperlinkButtonResources,
+    resources: &ThemeResources,
     state: CommonState,
 ) -> HyperlinkButtonBrushes {
     let r = resources;
@@ -128,9 +124,10 @@ fn template(
     states: ControlStates,
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
-    let brushes = hyperlink_button_brushes(&resources.hyperlink_button(), states.common);
+    let brushes = hyperlink_button_brushes(&resources, states.common);
     let text = control_text_style(
-        CONTROL_CONTENT_FONT_SIZE,
+        &resources,
+        resources.control_content_theme_font_size,
         FontWeight::W400,
         brushes.foreground,
     );
@@ -140,15 +137,17 @@ fn template(
         .height_factor(1.0)
         .child(DefaultTextStyle::new(text, content))
         .into_widget();
+    let border_thickness = resources.hyperlink_button_border_theme_thickness[0];
+    let (corner_radius, padding) = (resources.control_corner_radius[0], resources.button_padding);
     let presenter = ColorTransition::new(
         brushes.background,
-        CONTROL_FASTER_ANIMATION_DURATION,
+        resources.control_faster_animation_duration,
         move |_app, background| {
             ControlBorder::new(Brush::Solid(background), brushes.border)
-                .border_thickness(HYPERLINK_BUTTON_BORDER_THICKNESS)
-                .corner_radius(CONTROL_CORNER_RADIUS[0])
+                .border_thickness(border_thickness)
+                .corner_radius(corner_radius)
                 .background_sizing(BackgroundSizing::OuterBorderEdge)
-                .padding(BUTTON_PADDING)
+                .padding(padding)
                 .child(label.clone())
                 .into_widget()
         },
@@ -156,6 +155,6 @@ fn template(
     FocusVisual::new(presenter, resources.theme)
         .visible(states.focused)
         .margin(HYPERLINK_BUTTON_FOCUS_VISUAL_MARGIN)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(resources.control_corner_radius[0])
         .into_widget()
 }

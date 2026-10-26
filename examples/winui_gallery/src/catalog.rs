@@ -74,11 +74,13 @@ pub enum Feature {
     NavigationView,
     /// Nested nodes to expand, select and reorder.
     TreeView,
+    /// A few views of one page, one at a time.
+    SelectorBar,
 }
 
 impl Feature {
     /// Display order in the navigation pane.
-    pub const ALL: [Self; 35] = [
+    pub const ALL: [Self; 36] = [
         Self::Button,
         Self::DropDownButton,
         Self::SplitButton,
@@ -112,6 +114,7 @@ impl Feature {
         Self::TabView,
         Self::NavigationView,
         Self::TreeView,
+        Self::SelectorBar,
         Self::Typography,
         Self::Icons,
     ];
@@ -152,6 +155,7 @@ impl Feature {
             Self::TabView => "TabView",
             Self::NavigationView => "NavigationView",
             Self::TreeView => "TreeView",
+            Self::SelectorBar => "SelectorBar",
             Self::Typography => "Typography",
             Self::Icons => "Icons",
         }
@@ -193,6 +197,7 @@ impl Feature {
             Self::TabView => FluentSymbol::Tab,
             Self::NavigationView => FluentSymbol::Navigation,
             Self::TreeView => FluentSymbol::TextBulletListTree,
+            Self::SelectorBar => FluentSymbol::Tabs,
             Self::Typography => FluentSymbol::TextFont,
             Self::Icons => FluentSymbol::Apps,
         }
@@ -252,6 +257,7 @@ impl Feature {
             Self::TreeView => {
                 "Expand, select and reorder nested items, one at a time or with check boxes."
             }
+            Self::SelectorBar => "Switch between a few views of the same page.",
             Self::Typography => "Choose text styles and build a clear hierarchy.",
             Self::Icons => "Use Fluent symbols in navigation, actions and status indicators.",
         }

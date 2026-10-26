@@ -114,8 +114,8 @@ Ported against: aa3207e6
   Reason: framework — the fill’s widget description is built before layout knows its width, so a proportional grid track expresses the size without waiting for another build.
   Affect: `Slider`’s fill can end on a fractional pixel where Windows rounds it.
 
-- Change: `Slider` shows its value label using the kit’s tooltip and Flutter focus handling.
-  Reason: framework — WinUI records whether mouse, keyboard or application code caused each focus change, while Inset uses Flutter’s separate focus and focus-highlight handling.
+- Change: `Slider` shows its value label using the kit’s tooltip.
+  Reason: framework — Inset shows popups in an `Overlay`, where WinUI's ToolTip opens a popup of its own.
   Affect: The slider needs an Overlay ancestor for its value label, whose placement and fade follow the tooltip behavior documented below.
 
 - Change: `Slider` accepts a function returning text to format its value label.
@@ -143,10 +143,6 @@ Ported against: aa3207e6
 - Change: `SplitView` reports opening and closing requested by application code after the new layout is ready.
   Reason: framework — Inset forbids updating ancestors or showing overlays during child build.
   Affect: `SplitView` opening and explicit closing notifications arrive after layout, while tapping outside the pane still raises a cancelable event before closing.
-
-- Change: `SplitView` moves focus into its pane’s FocusScope when opening and can restore the previous FocusNode when closing.
-  Reason: framework — WinUI associates an input cause with each focus change, while Inset uses Flutter’s focus nodes and separate focus-highlight handling.
-  Affect: The focus ring follows Flutter’s highlight handling when focus enters or returns from the pane, rather than the cause attached to a WinUI focus event.
 
 ## tool_tip/mod.rs → `ToolTip` and `ToolTipService`
 
@@ -604,6 +600,16 @@ Ported against: aa3207e6
   Reason: framework — without `DragItemsStarting` TreeViewList knows no dragged node, and WinUI's ListView then reorders the flattened rows of its view model, which in Inset is no collection a list owns.
   Affect: The rows open a gap while dragged and the drop leaves the tree as it was, where WinUI moves a row without changing the tree.
 
+## selector_bar.rs → `SelectorBar` and `SelectorBarItem`
+
+- Change: `SelectorBar` lays its items out in a row inside the kit's scroll viewport, and does itself what the template's `ItemsView` does for it: single selection on a click (Control with a click deselects the selected item), Left, Right, Home and End moving the focus with selection following it, and one Tab stop at the selected item.
+  Reason: framework — WinUI's `ItemsView` makes item containers from a collection through `ItemsRepeater`, while Inset builds the items as widgets from the application's list, as the kit's `TabView` and `TreeView` do with their lists.
+  Affect: `ItemsView` is not a kit control; only the parts `SelectorBar`'s spec relies on are reproduced.
+
+- Change: `SelectorBar` receives its selection from the application as an index, and `selection_changed` asks the application to change it.
+  Reason: framework — Inset rebuilds a control's description from its owner's state instead of the control holding a `SelectedItem` property of its own.
+  Affect: Callers set `selected` from `selection_changed`, and selecting an item from code raises no event, where setting WinUI's `SelectedItem` raises `SelectionChanged`.
+
 ## Deferred
 
 - `MenuBar` activation by pressing Alt followed by a letter, and the temporary labels showing those letters, remain deferred. Trigger: The kit provides shared access-key mode and label display.
@@ -650,3 +656,5 @@ Ported against: aa3207e6
 - `TreeView`'s gamepad input, Gamepad A cycling a node of Multiple mode between expanding and selecting, and directional focus movement, remains deferred. Trigger: A host supplies gamepad or remote-control input.
 - `TreeView`'s accessibility, its automation peers, the automation events of expanding, collapsing, selection and drops, and the drop-effect descriptions TreeViewList builds, remains deferred. Trigger: The kit gains accessibility support.
 - Cancelling a `TreeView` drag with Escape remains deferred. Trigger: Inset's drag and drop can be cancelled by a key.
+- `SelectorBar`'s accessibility, its automation peers and their selection pattern, remains deferred. Trigger: The kit gains accessibility support.
+- `SelectorBarItem`'s tooltip for a truncated text, which the spec leaves open, remains deferred. Trigger: WinUI's control shows one.

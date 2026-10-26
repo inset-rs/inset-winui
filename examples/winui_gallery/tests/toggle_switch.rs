@@ -7,8 +7,8 @@ use inset_embedder::{Offset, PointerChange, PointerData, PointerDataPacket, Poin
 use inset_gestures::GestureBinding;
 use inset_rendering::RenderParagraph;
 use inset_winui::{
-    CONTENT_GAP, KNOB_AREA, KNOB_TRANSLATION_RANGE, TOGGLE_SWITCH_PRE_CONTENT_MARGIN,
-    TOGGLE_SWITCH_TOP_HEADER_MARGIN, TRACK_HEIGHT, TRACK_WIDTH,
+    AccentPalette, CONTENT_GAP, KNOB_AREA, KNOB_TRANSLATION_RANGE, TRACK_HEIGHT, TRACK_WIDTH,
+    Theme, ThemeResources,
 };
 use std::time::Duration;
 
@@ -43,12 +43,12 @@ fn knob_center(fixture: &Fixture, content: &str, is_on: bool) -> Offset {
 }
 
 /// The knob of the switch whose header is `header`: the track starts under the header's left edge, `ToggleSwitchTopHeaderMargin` and `ToggleSwitchPreContentMargin` below it.
-fn knob_under_header(fixture: &Fixture, header: &str, is_on: bool) -> Offset {
+fn knob_under_header(r: &ThemeResources, fixture: &Fixture, header: &str, is_on: bool) -> Offset {
     let (label, height) = label_bounds(fixture, header);
     let y = label.dy()
         + height / 2.0
-        + TOGGLE_SWITCH_TOP_HEADER_MARGIN[3]
-        + TOGGLE_SWITCH_PRE_CONTENT_MARGIN
+        + r.toggle_switch_top_header_margin[3]
+        + r.toggle_switch_pre_content_margin
         + TRACK_HEIGHT / 2.0;
     knob_at(label.dx(), y, is_on)
 }
@@ -90,6 +90,7 @@ fn drag(fixture: &mut Fixture, from: Offset, steps: &[f64]) {
 
 #[test]
 fn toggle_switch_drags_toggle_past_half_the_track() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let mut fixture = Fixture::for_feature([900, 2000], winui_gallery::Feature::ToggleSwitch);
     fixture.ensure_visible("Airplane mode off");
     fixture.find("Clicked 0 times · wifi true · airplane false");
@@ -114,7 +115,7 @@ fn toggle_switch_drags_toggle_past_half_the_track() {
 
     // Wi-Fi is on; the knob dragged 30 pt left, held mid-drag for a frame, then released
     // below half: it toggles off.
-    let knob = knob_under_header(&fixture, "Wi-Fi", true);
+    let knob = knob_under_header(&r, &fixture, "Wi-Fi", true);
     fixture.send(PointerChange::Down, knob);
     let mut at = knob;
     for step in [-8.0, -8.0, -8.0] {

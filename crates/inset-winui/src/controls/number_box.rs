@@ -123,11 +123,12 @@ pub struct NumberBox {
     /// `IsEnabled`.
     pub is_enabled: bool,
 
-    /// `FontSize`: of the text, the header and the inline spin buttons' glyphs.
-    pub font_size: f64,
+    /// `FontSize`: of the text, the header and the inline spin buttons' glyphs; the theme's `ControlContentThemeFontSize` when `None`.
+    pub font_size: Option<f64>,
 
-    /// `CornerRadius`: of the box and its inline spin buttons.
-    pub corner_radius: f64,
+    /// `CornerRadius`: of the box and its inline spin buttons; the theme's `ControlCornerRadius`
+    /// when `None`.
+    pub corner_radius: Option<f64>,
 
     /// `SelectionHighlightColor`: overrides the selection fill.
     pub selection_highlight_color: Option<Color>,
@@ -162,8 +163,8 @@ impl NumberBox {
             accepts_expression: false,
             number_formatter: None,
             is_enabled: true,
-            font_size: CONTROL_CONTENT_FONT_SIZE,
-            corner_radius: CONTROL_CORNER_RADIUS[0],
+            font_size: None,
+            corner_radius: None,
             selection_highlight_color: None,
             text_alignment: TextAlign::Start,
             key: None,
@@ -264,13 +265,13 @@ impl NumberBox {
 
     /// Sets FontSize.
     pub fn font_size(mut self, value: f64) -> Self {
-        self.font_size = value;
+        self.font_size = Some(value);
         self
     }
 
     /// Sets CornerRadius.
     pub fn corner_radius(mut self, value: f64) -> Self {
-        self.corner_radius = value;
+        self.corner_radius = Some(value);
         self
     }
 
@@ -395,10 +396,10 @@ impl NumberBoxTextBoxStyle {
         if self.spin_buttons != SpinButtonsState::SpinButtonsPopup {
             return None;
         }
-        let foreground = resources.number_box().number_box_popup_indicator_foreground;
+        let foreground = resources.number_box_popup_indicator_foreground;
         Some(
             Margin::new(
-                NUMBER_BOX_POPUP_INDICATOR_MARGIN,
+                resources.number_box_popup_indicator_margin,
                 Center::new().width_factor(1.0).height_factor(1.0).child(
                     FontIcon::symbol(FluentSymbol::ChevronUpDown)
                         .font_size(POPUP_INDICATOR_FONT_SIZE)
@@ -947,7 +948,7 @@ impl State for NumberBoxState {
         self.settle_request(app);
         let widget = self.widget(app).clone();
         let resources = ThemeResources::of(app, context);
-        let r = resources.number_box();
+        let r = &resources;
         let common = if widget.is_enabled {
             NumberBoxCommonState::Normal
         } else {
@@ -963,9 +964,16 @@ impl State for NumberBoxState {
             };
             cells.push(
                 GridCell::new(Margin::new(
-                    TEXT_BOX_TOP_HEADER_MARGIN,
+                    r.text_box_top_header_margin,
                     DefaultTextStyle::new(
-                        control_text_style(widget.font_size, FontWeight::NORMAL, foreground),
+                        control_text_style(
+                            &resources,
+                            widget
+                                .font_size
+                                .unwrap_or(r.control_content_theme_font_size),
+                            FontWeight::NORMAL,
+                            foreground,
+                        ),
                         header,
                     ),
                 ))
@@ -975,7 +983,7 @@ impl State for NumberBoxState {
         }
         // `InputBox`.
         cells.push(
-            GridCell::new(self.input_box(app, spin_buttons))
+            GridCell::new(self.input_box(&resources, app, spin_buttons))
                 .row(1)
                 .column_span(3)
                 .into_widget(),
@@ -1008,7 +1016,7 @@ impl State for NumberBoxState {
             cells.push(
                 GridCell::new(Margin::new(
                     [4.0; 4],
-                    self.inline_spin_button(app, FluentSymbol::ChevronUp, 1.0, up),
+                    self.inline_spin_button(&resources, app, FluentSymbol::ChevronUp, 1.0, up),
                 ))
                 .row(1)
                 .column(1)
@@ -1017,7 +1025,7 @@ impl State for NumberBoxState {
             cells.push(
                 GridCell::new(Margin::new(
                     [0.0, 4.0, 4.0, 4.0],
-                    self.inline_spin_button(app, FluentSymbol::ChevronDown, -1.0, down),
+                    self.inline_spin_button(&resources, app, FluentSymbol::ChevronDown, -1.0, down),
                 ))
                 .row(1)
                 .column(2)
@@ -1029,7 +1037,10 @@ impl State for NumberBoxState {
             cells.push(
                 GridCell::new(DefaultTextStyle::new(
                     control_text_style(
-                        widget.font_size,
+                        &resources,
+                        widget
+                            .font_size
+                            .unwrap_or(r.control_content_theme_font_size),
                         FontWeight::NORMAL,
                         r.system_control_description_text_foreground_brush,
                     ),
@@ -1065,22 +1076,31 @@ impl State for NumberBoxState {
 
 impl NumberBoxState {
     /// `InputBox`: a TextBox in `NumberBoxTextBoxStyle`, with the box's text properties.
-    fn input_box(self: Handle<Self>, app: &App, spin_buttons: SpinButtonsState) -> WidgetRef {
+    fn input_box(
+        self: Handle<Self>,
+        r: &ThemeResources,
+        app: &App,
+        spin_buttons: SpinButtonsState,
+    ) -> WidgetRef {
         let widget = self.widget(app);
         let mut config = TextBox::new(self.controller(app))
             .focus_node(self.focus(app))
             .placeholder_text(widget.placeholder_text.clone())
             .is_enabled(widget.is_enabled)
-            .font_size(widget.font_size)
-            .corner_radius(widget.corner_radius)
+            .font_size(
+                widget
+                    .font_size
+                    .unwrap_or(r.control_content_theme_font_size),
+            )
+            .corner_radius(widget.corner_radius.unwrap_or(r.control_corner_radius[0]))
             .text_alignment(widget.text_alignment);
         if let Some(color) = widget.selection_highlight_color {
             config = config.selection_highlight_color(color);
         }
         let min_width = if spin_buttons == SpinButtonsState::SpinButtonsVisible {
-            NUMBER_BOX_MIN_WIDTH
+            r.number_box_min_width
         } else {
-            TEXT_CONTROL_THEME_MIN_WIDTH
+            r.text_control_theme_min_width
         };
         TextControl::new(config, None)
             .number_box_style(NumberBoxTextBoxStyle {
@@ -1125,6 +1145,7 @@ impl NumberBoxState {
             .template(move |app, context, states, content| {
                 let resources = ThemeResources::of(app, context);
                 repeat_button_presenter(
+                    &resources,
                     spin_button_brushes(&resources, states.common),
                     setters,
                     content,
@@ -1136,6 +1157,7 @@ impl NumberBoxState {
     /// tall as the box less their margins, with the box's font size and corner radius.
     fn inline_spin_button(
         self: Handle<Self>,
+        r: &ThemeResources,
         app: &App,
         glyph: FluentSymbol,
         direction: f64,
@@ -1143,10 +1165,12 @@ impl NumberBoxState {
     ) -> WidgetRef {
         let widget = self.widget(app);
         let setters = RepeatButtonSetters {
-            border_thickness: NUMBER_BOX_SPIN_BUTTON_BORDER_THICKNESS,
-            corner_radius: widget.corner_radius,
+            border_thickness: r.number_box_spin_button_border_thickness,
+            corner_radius: widget.corner_radius.unwrap_or(r.control_corner_radius[0]),
             padding: [0.0; 4],
-            font_size: widget.font_size,
+            font_size: widget
+                .font_size
+                .unwrap_or(r.control_content_theme_font_size),
         };
         ConstrainedBox::new(BoxConstraints::new().min_width(SPIN_BUTTON_MIN_WIDTH))
             .child(self.spin_button(app, glyph, direction, state, setters))
@@ -1158,14 +1182,15 @@ impl NumberBoxState {
     /// as XAML arranges an element of fixed size.
     fn popup_spin_button(
         self: Handle<Self>,
+        r: &ThemeResources,
         app: &App,
         glyph: FluentSymbol,
         direction: f64,
         state: SpinButtonEnabledState,
     ) -> WidgetRef {
         let setters = RepeatButtonSetters {
-            border_thickness: NUMBER_BOX_POPUP_SPIN_BUTTON_BORDER_THICKNESS,
-            corner_radius: CONTROL_CORNER_RADIUS[0],
+            border_thickness: r.number_box_popup_spin_button_border_thickness,
+            corner_radius: r.control_corner_radius[0],
             padding: [0.0; 4],
             font_size: POPUP_SPIN_BUTTON_FONT_SIZE,
         };
@@ -1188,13 +1213,20 @@ impl NumberBoxState {
     /// from where the popup is in the template.
     fn up_down_popup(self: Handle<Self>, app: &App) -> WidgetRef {
         OverlayPortal::overlay_child_layout_builder(self.popup(app), move |app, context, info| {
+            let r = ThemeResources::of(app, context);
             let slot = transform_rect(
                 &info.child_paint_transform(),
                 Offset::ZERO & info.child_size(),
             );
-            CustomSingleChildLayout::new(Rc::new(PopupLayout { slot }))
-                .child(self.popup_content_root(app, context))
-                .into_widget()
+            CustomSingleChildLayout::new(Rc::new(PopupLayout {
+                slot,
+                offset: Offset::new(
+                    r.number_box_popup_horizonal_offset,
+                    r.number_box_popup_vertical_offset,
+                ),
+            }))
+            .child(self.popup_content_root(app, context))
+            .into_widget()
         })
         .overlay_location(OverlayChildLocation::RootOverlay)
         .child(SizedBox::shrink())
@@ -1205,7 +1237,7 @@ impl NumberBoxState {
     /// `NumberBoxPopupShadowDepth`.
     fn popup_content_root(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);
-        let r = resources.number_box();
+        let r = &resources;
         let (up, down) = self.spin_button_enabled_states(app);
         let root = Grid::new()
             .row_definitions([
@@ -1215,21 +1247,30 @@ impl NumberBoxState {
             .padding([POPUP_CONTENT_PADDING; 4])
             .background(Brush::Acrylic(r.number_box_popup_background))
             .border_brush(Brush::Solid(r.number_box_popup_border_brush))
-            .border_thickness_ltrb(NUMBER_BOX_POPUP_BORDER_THICKNESS)
-            .corner_radius_corners(OVERLAY_CORNER_RADIUS)
+            .border_thickness_ltrb(r.number_box_popup_border_thickness)
+            .corner_radius_corners(r.overlay_corner_radius)
             .children([
                 GridCell::new(Margin::new(
                     [0.0, 0.0, 0.0, 4.0],
-                    self.popup_spin_button(app, FluentSymbol::ChevronUp, 1.0, up),
+                    self.popup_spin_button(&resources, app, FluentSymbol::ChevronUp, 1.0, up),
                 ))
                 .into_widget(),
-                GridCell::new(self.popup_spin_button(app, FluentSymbol::ChevronDown, -1.0, down))
-                    .row(1)
-                    .into_widget(),
+                GridCell::new(self.popup_spin_button(
+                    &resources,
+                    app,
+                    FluentSymbol::ChevronDown,
+                    -1.0,
+                    down,
+                ))
+                .row(1)
+                .into_widget(),
             ]);
         TextFieldTapRegion::new(
             CustomPaint::new()
-                .painter(PopupShadow::for_number_box_popup(resources.theme))
+                .painter(PopupShadow::for_number_box_popup(
+                    &resources,
+                    resources.theme,
+                ))
                 .child(root),
         )
         .into_widget()
@@ -1240,7 +1281,7 @@ impl NumberBoxState {
 /// template's `Grid.Resources` set the `RepeatButton` brushes of the normal, pointer-over and
 /// pressed states, and the disabled border, to their `TextControlButton` counterparts.
 fn spin_button_brushes(resources: &ThemeResources, state: CommonState) -> RepeatButtonBrushes {
-    let r = resources.number_box();
+    let r = &resources;
     let (background, border, foreground) = match state {
         CommonState::Normal => (
             r.text_control_button_background,
@@ -1258,7 +1299,7 @@ fn spin_button_brushes(resources: &ThemeResources, state: CommonState) -> Repeat
             r.text_control_button_foreground_pressed,
         ),
         CommonState::Disabled => {
-            let repeat_button = resources.repeat_button();
+            let repeat_button = &resources;
             (
                 repeat_button.repeat_button_background_disabled,
                 r.text_control_button_border_brush,
@@ -1280,6 +1321,8 @@ fn spin_button_brushes(resources: &ThemeResources, state: CommonState) -> Repeat
 struct PopupLayout {
     /// The popup's slot in the overlay.
     slot: Rect,
+    /// `NumberBoxPopupHorizonalOffset` and `NumberBoxPopupVerticalOffset`.
+    offset: Offset,
 }
 
 impl SingleChildLayoutDelegate for PopupLayout {
@@ -1290,8 +1333,8 @@ impl SingleChildLayoutDelegate for PopupLayout {
 
     fn get_position_for_child(&self, _size: Size, _child_size: Size) -> Offset {
         Offset::new(
-            self.slot.left + NUMBER_BOX_POPUP_HORIZONAL_OFFSET,
-            self.slot.top + NUMBER_BOX_POPUP_VERTICAL_OFFSET,
+            self.slot.left + self.offset.dx(),
+            self.slot.top + self.offset.dy(),
         )
     }
 

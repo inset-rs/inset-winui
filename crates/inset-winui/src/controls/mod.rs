@@ -118,3 +118,6 @@ pub use breadcrumb_bar::*;
 
 mod tree_view;
 pub use tree_view::*;
+
+mod selector_bar;
+pub use selector_bar::*;

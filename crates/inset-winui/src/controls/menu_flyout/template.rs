@@ -58,7 +58,7 @@ struct MenuBrushes {
 }
 
 /// Resolves the named setters in the three source item templates.
-fn brushes(r: &MenuFlyoutResources, item: &MenuFlyoutItem, state: MenuVisualState) -> MenuBrushes {
+fn brushes(r: &ThemeResources, item: &MenuFlyoutItem, state: MenuVisualState) -> MenuBrushes {
     let index = match state.common {
         CommonState::Normal => 0,
         CommonState::PointerOver => 1,
@@ -154,11 +154,11 @@ fn brushes(r: &MenuFlyoutResources, item: &MenuFlyoutItem, state: MenuVisualStat
 
 /// Builds the separator rectangle with the source signed margins.
 pub(super) fn separator(app: &mut App, context: BuildContext) -> WidgetRef {
-    let resources = ThemeResources::of(app, context).menu_flyout();
+    let resources = ThemeResources::of(app, context);
     Margin::new(
-        MENU_FLYOUT_SEPARATOR_THEME_PADDING,
+        resources.menu_flyout_separator_theme_padding,
         SizedBox::new()
-            .height(MENU_FLYOUT_SEPARATOR_HEIGHT)
+            .height(resources.menu_flyout_separator_height)
             .child(ColoredBox::new(resources.menu_flyout_separator_background)),
     )
     .into_widget()
@@ -173,7 +173,7 @@ pub(super) fn item_template(
     state: MenuVisualState,
 ) -> WidgetRef {
     let theme = ThemeResources::of(app, context);
-    let colors = brushes(&theme.menu_flyout(), item, state);
+    let colors = brushes(&theme, item, state);
     let checked = match item.kind {
         MenuFlyoutItemKind::Toggle { is_checked, .. }
         | MenuFlyoutItemKind::Radio { is_checked, .. } => Some(is_checked),
@@ -191,14 +191,14 @@ pub(super) fn item_template(
     ]);
     let text_margin = if checked.is_some() {
         if settings.has_icons {
-            MENU_FLYOUT_ITEM_PLACEHOLDER_THEME_THICKNESS
+            theme.menu_flyout_item_placeholder_theme_thickness
         } else {
             [0.0; 4]
         }
     } else if settings.has_checks && settings.has_icons {
-        MENU_FLYOUT_ITEM_DOUBLE_PLACEHOLDER_THEME_THICKNESS
+        theme.menu_flyout_item_double_placeholder_theme_thickness
     } else if settings.has_checks || settings.has_icons {
-        MENU_FLYOUT_ITEM_PLACEHOLDER_THEME_THICKNESS
+        theme.menu_flyout_item_placeholder_theme_thickness
     } else {
         [0.0; 4]
     };
@@ -222,7 +222,7 @@ pub(super) fn item_template(
     }
     if settings.has_icons {
         let icon_margin = if checked.is_none() && settings.has_checks {
-            MENU_FLYOUT_ITEM_PLACEHOLDER_THEME_THICKNESS
+            theme.menu_flyout_item_placeholder_theme_thickness
         } else {
             [0.0; 4]
         };
@@ -266,7 +266,7 @@ pub(super) fn item_template(
     if submenu {
         children.push(
             GridCell::new(Margin::new(
-                MENU_FLYOUT_ITEM_CHEVRON_MARGIN,
+                theme.menu_flyout_item_chevron_margin,
                 FontIcon::symbol(FluentSymbol::ChevronRight)
                     .font_size(12.0)
                     .foreground(colors.chevron)
@@ -289,7 +289,9 @@ pub(super) fn item_template(
                         .height_factor(1.0)
                         .child(
                             Text::new(item.keyboard_accelerator_text_override.clone())
-                                .style(TextBlockStyle::Caption.text_style(colors.accelerator))
+                                .style(
+                                    TextBlockStyle::Caption.text_style(&theme, colors.accelerator),
+                                )
                                 .soft_wrap(false),
                         ),
                 ),
@@ -300,28 +302,29 @@ pub(super) fn item_template(
     }
     let layout = DefaultTextStyle::new(
         control_text_style(
-            CONTROL_CONTENT_FONT_SIZE,
+            &theme,
+            theme.control_content_theme_font_size,
             FontWeight::NORMAL,
             colors.foreground,
         ),
         Grid::new().column_definitions(columns).children(children),
     );
     Margin::new(
-        MENU_FLYOUT_ITEM_MARGIN,
+        theme.menu_flyout_item_margin,
         FocusVisual::new(
             ControlBorder::new(Brush::Solid(colors.background), Brush::Solid(Color::new(0)))
-                .border_thickness_ltrb(MENU_FLYOUT_ITEM_BORDER_THICKNESS)
-                .corner_radius_corners(CONTROL_CORNER_RADIUS)
+                .border_thickness_ltrb(theme.menu_flyout_item_border_thickness)
+                .corner_radius_corners(theme.control_corner_radius)
                 .padding(if settings.narrow {
-                    MENU_FLYOUT_ITEM_THEME_PADDING_NARROW
+                    theme.menu_flyout_item_theme_padding_narrow
                 } else {
-                    MENU_FLYOUT_ITEM_THEME_PADDING
+                    theme.menu_flyout_item_theme_padding
                 })
                 .child(layout),
             theme.theme,
         )
         .visible(state.focused)
-        .corner_radius(CONTROL_CORNER_RADIUS[0]),
+        .corner_radius(theme.control_corner_radius[0]),
     )
     .into_widget()
 }

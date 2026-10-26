@@ -78,7 +78,7 @@ impl State for SliderDemoState {
     /// Builds the examples from their current property choices.
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);
-        let text = resources.common.text_fill_color_primary;
+        let text = resources.text_fill_color_primary;
         let (volume, stepped, vertical) = {
             let state = app.get(self);
             (state.volume, state.stepped, state.vertical)
@@ -175,7 +175,7 @@ impl State for SliderDemoState {
                 label(
                     format!("Slider: {volume:.0} · stepped {stepped:.0} · vertical {vertical:.0}"),
                     TextBlockStyle::Body,
-                    resources.common.text_fill_color_secondary,
+                    resources.text_fill_color_secondary,
                 ),
                 example(
                     "Range, snapping and tooltips",
@@ -271,7 +271,7 @@ impl State for SliderDemoState {
                             label(
                                 format!("Gain: {sample:+.0} dB"),
                                 TextBlockStyle::Body,
-                                resources.common.text_fill_color_secondary,
+                                resources.text_fill_color_secondary,
                             ),
                         ],
                         12.0,

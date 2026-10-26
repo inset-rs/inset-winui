@@ -5,9 +5,14 @@ mod typography;
 pub use generated::*;
 pub use typography::*;
 
+use std::fmt;
+use std::rc::Rc;
+
 use inset_embedder::Color;
 use inset_foundation::App;
-use inset_widgets::{BuildContext, InheritedWidget, IntoWidget, MediaQuery, WidgetRef};
+use inset_widgets::{
+    BuildContext, InheritedWidget, IntoWidget, MediaQuery, StatelessWidget, WidgetRef,
+};
 
 /// The source AcrylicBrush tint, luminosity, and fallback recipe.
 /// `Brush::Acrylic` paints the in-window material using these values.
@@ -62,220 +67,172 @@ impl Default for AccentPalette {
     }
 }
 
-/// The resolved theme a subtree renders with: the theme, the accent palette, and the shared Fluent tokens for that theme. Controls fetch their own `<Control>Resources` from it.
-#[derive(Clone, Debug, PartialEq)]
-pub struct ThemeResources {
-    pub theme: Theme,
-    pub accent: AccentPalette,
-    pub common: CommonResources,
-}
-
 impl ThemeResources {
-    pub fn new(theme: Theme, accent: AccentPalette) -> ThemeResources {
-        ThemeResources {
-            theme,
-            accent,
-            common: CommonResources::for_theme(theme, &accent),
-        }
-    }
-
-    /// The nearest [`ThemeScope`]'s resources, or the platform's (light or dark from the media query, the default accent) when none encloses `context`.
-    pub fn of(app: &mut App, context: BuildContext) -> ThemeResources {
-        if let Some(scope) = context.depend_on_inherited_widget_of_exact_type::<ThemeScope>(app) {
+    /// The nearest [`ThemeScope`]'s resources, or WinUI's (light or dark from the media query, the default accent) when none encloses `context`.
+    pub fn of(app: &mut App, context: BuildContext) -> Rc<ThemeResources> {
+        if let Some(scope) =
+            context.depend_on_inherited_widget_of_exact_type::<InheritedResources>(app)
+        {
             return scope.resources.clone();
         }
         let theme = match MediaQuery::maybe_platform_brightness_of(app, context) {
             Some(inset_embedder::Brightness::Dark) => Theme::Dark,
             _ => Theme::Light,
         };
-        ThemeResources::new(theme, AccentPalette::default())
+        ThemeResources::default_for(theme)
     }
 
-    /// A control's own resources, as `{ThemeResource ButtonBackground}` resolves in this theme.
-    pub fn button(&self) -> ButtonResources {
-        ButtonResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The text editor's brushes, including its focused elevation border.
-    pub fn text_box(&self) -> TextBoxResources {
-        TextBoxResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The password editor's shared text-control and reveal-button brushes.
-    pub fn password_box(&self) -> PasswordBoxResources {
-        PasswordBoxResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// ProgressBar's track and status colors.
-    pub fn progress_bar(&self) -> ProgressBarResources {
-        ProgressBarResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// ProgressRing's arc and track colors.
-    pub fn progress_ring(&self) -> ProgressRingResources {
-        ProgressRingResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// Expander's header, chevron and content colors.
-    pub fn expander(&self) -> ExpanderResources {
-        ExpanderResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// InfoBadge's accent fill and the foreground on it.
-    pub fn info_badge(&self) -> InfoBadgeResources {
-        InfoBadgeResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// InfoBar's severity and content colors.
-    pub fn info_bar(&self) -> InfoBarResources {
-        InfoBarResources::for_theme(self.theme, &self.accent)
-    }
-
-    pub fn toggle_switch(&self) -> ToggleSwitchResources {
-        ToggleSwitchResources::for_theme(self.theme, &self.accent)
-    }
-
-    pub fn check_box(&self) -> CheckBoxResources {
-        CheckBoxResources::for_theme(self.theme, &self.accent)
-    }
-
-    pub fn radio_button(&self) -> RadioButtonResources {
-        RadioButtonResources::for_theme(self.theme, &self.accent)
-    }
-
-    pub fn toggle_button(&self) -> ToggleButtonResources {
-        ToggleButtonResources::for_theme(self.theme, &self.accent)
-    }
-
-    pub fn hyperlink_button(&self) -> HyperlinkButtonResources {
-        HyperlinkButtonResources::for_theme(self.theme, &self.accent)
-    }
-
-    pub fn repeat_button(&self) -> RepeatButtonResources {
-        RepeatButtonResources::for_theme(self.theme, &self.accent)
-    }
-
-    pub fn slider(&self) -> SliderResources {
-        SliderResources::for_theme(self.theme, &self.accent)
-    }
-
-    pub fn split_view(&self) -> SplitViewResources {
-        SplitViewResources::for_theme(self.theme, &self.accent)
-    }
-
-    pub fn tool_tip(&self) -> ToolTipResources {
-        ToolTipResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The tab strip and tab item resources for this theme.
-    pub fn tab_view(&self) -> TabViewResources {
-        TabViewResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The desktop scroll indicator resources for this theme.
-    pub fn scroll_bar(&self) -> ScrollBarResources {
-        ScrollBarResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The interactive popup presenter resources for this theme.
-    pub fn flyout_presenter(&self) -> FlyoutPresenterResources {
-        FlyoutPresenterResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The menu presenter and menu item resources for this theme.
-    pub fn menu_flyout(&self) -> MenuFlyoutResources {
-        MenuFlyoutResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The dropdown chevron resources for this theme.
-    pub fn drop_down_button(&self) -> DropDownButtonResources {
-        DropDownButtonResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// Resolves BreadcrumbBar and BreadcrumbBarItem template resources.
-    pub fn breadcrumb_bar(&self) -> BreadcrumbBarResources {
-        BreadcrumbBarResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// Resolves MenuBar and MenuBarItem template resources.
-    pub fn menu_bar(&self) -> MenuBarResources {
-        MenuBarResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The split button resources for this theme.
-    pub fn split_button(&self) -> SplitButtonResources {
-        SplitButtonResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The radio menu item resources for this theme.
-    pub fn radio_menu_flyout_item(&self) -> RadioMenuFlyoutItemResources {
-        RadioMenuFlyoutItemResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The navigation back and close button resources for this theme.
-    pub fn navigation_back_button(&self) -> NavigationBackButtonResources {
-        NavigationBackButtonResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The navigation pane and top navigation resources for this theme.
-    pub fn navigation_view(&self) -> NavigationViewResources {
-        NavigationViewResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The dialog's brushes, including its smoke layer.
-    pub fn content_dialog(&self) -> ContentDialogResources {
-        ContentDialogResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The number box's popup, its spin buttons and its text box brushes.
-    pub fn number_box(&self) -> NumberBoxResources {
-        NumberBoxResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The combo box's box, drop-down, items and editable text box brushes.
-    pub fn combo_box(&self) -> ComboBoxResources {
-        ComboBoxResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The color picker's slider thumbs, borders and checkered backgrounds, and its spectrum's
-    /// selection ellipse.
-    pub fn color_picker(&self) -> ColorPickerResources {
-        ColorPickerResources::for_theme(self.theme, &self.accent)
-    }
-
-    /// The tree view items' backgrounds, foregrounds and selection indicator, the drag count
-    /// badge, and what the items inherit from `DefaultListViewItemStyle`.
-    pub fn tree_view(&self) -> TreeViewResources {
-        TreeViewResources::for_theme(self.theme, &self.accent)
+    /// WinUI's resources for `theme` in the default accent, made once per thread.
+    fn default_for(theme: Theme) -> Rc<ThemeResources> {
+        thread_local! {
+            static LIGHT: Rc<ThemeResources> = Rc::new(ThemeResources::new(Theme::Light, AccentPalette::default()));
+            static DARK: Rc<ThemeResources> = Rc::new(ThemeResources::new(Theme::Dark, AccentPalette::default()));
+        }
+        match theme {
+            Theme::Light => LIGHT.with(Rc::clone),
+            Theme::Dark => DARK.with(Rc::clone),
+        }
     }
 }
 
-/// Sets the theme and accent for a subtree; XAML `FrameworkElement.RequestedTheme` plus the accent the OS would supply.
-#[derive(Debug)]
+/// Gives a subtree its theme resources, as XAML's `RequestedTheme` and resource dictionaries do: [`ThemeScope::new`] a theme and accent with WinUI's values, [`ThemeScope::overriding`] the enclosing scope's, and [`ThemeScope::with_resources`] resolved ones. Its `any`, `light` and `dark` then change them, as a dictionary's entries and its `ThemeDictionaries` do: `any` in both themes, then the one for the theme shown.
 pub struct ThemeScope {
-    pub resources: ThemeResources,
-    pub child: WidgetRef,
+    base: Base,
+    any: Option<Override>,
+    light: Option<Override>,
+    dark: Option<Override>,
+    child: WidgetRef,
 }
+
+/// What a [`ThemeScope`] starts from, before its own values.
+#[allow(clippy::large_enum_variant, reason = "a scope is made once per build")]
+enum Base {
+    /// WinUI's values for the theme in the palette; XAML `RequestedTheme`, with the accent the OS would supply.
+    Theme(Theme, AccentPalette),
+    /// The enclosing scope's resources; XAML `<Control.Resources>`.
+    Enclosing,
+    /// Resources resolved elsewhere, such as a popup's target's.
+    Resources(Rc<ThemeResources>),
+}
+
+/// A change to some of a scope's resources.
+type Override = Rc<dyn Fn(&mut ThemeResources)>;
 
 impl ThemeScope {
+    /// `new` shows `child` in `theme`, with WinUI's values in the default accent. It does not keep an enclosing scope's values: XAML's `RequestedTheme` would.
     pub fn new<K>(theme: Theme, child: impl IntoWidget<K>) -> ThemeScope {
+        ThemeScope::from_base(Base::Theme(theme, AccentPalette::default()), child)
+    }
+
+    /// `overriding` shows `child` with the enclosing scope's resources, changed by its own.
+    pub fn overriding<K>(child: impl IntoWidget<K>) -> ThemeScope {
+        ThemeScope::from_base(Base::Enclosing, child)
+    }
+
+    /// `with_resources` shows `child` with `resources`. A popup's content takes its target's this way, since the overlay it shows in is outside the target's scope.
+    pub fn with_resources<K>(
+        resources: Rc<ThemeResources>,
+        child: impl IntoWidget<K>,
+    ) -> ThemeScope {
+        ThemeScope::from_base(Base::Resources(resources), child)
+    }
+
+    fn from_base<K>(base: Base, child: impl IntoWidget<K>) -> ThemeScope {
         ThemeScope {
-            resources: ThemeResources::new(theme, AccentPalette::default()),
+            base,
+            any: None,
+            light: None,
+            dark: None,
             child: child.into_widget(),
         }
     }
 
+    /// `accent` sets the palette of a scope made with [`ThemeScope::new`]; the others take theirs from their base. Panics otherwise.
     pub fn accent(mut self, accent: AccentPalette) -> ThemeScope {
-        self.resources = ThemeResources::new(self.resources.theme, accent);
+        match &mut self.base {
+            Base::Theme(_, palette) => *palette = accent,
+            _ => panic!("`accent` sets the palette of a scope made with `ThemeScope::new`"),
+        }
         self
+    }
+
+    /// `any` changes the resources in both themes.
+    pub fn any(mut self, change: impl Fn(&mut ThemeResources) + 'static) -> ThemeScope {
+        self.any = Some(Rc::new(change));
+        self
+    }
+
+    /// `light` changes the resources in the light theme, after `any`.
+    pub fn light(mut self, change: impl Fn(&mut ThemeResources) + 'static) -> ThemeScope {
+        self.light = Some(Rc::new(change));
+        self
+    }
+
+    /// `dark` changes the resources in the dark theme, after `any`.
+    pub fn dark(mut self, change: impl Fn(&mut ThemeResources) + 'static) -> ThemeScope {
+        self.dark = Some(Rc::new(change));
+        self
+    }
+
+    /// `base` is the resources the scope starts from.
+    fn base(&self, app: &mut App, context: BuildContext) -> Rc<ThemeResources> {
+        match &self.base {
+            Base::Theme(theme, accent) if *accent == AccentPalette::default() => {
+                ThemeResources::default_for(*theme)
+            }
+            Base::Theme(theme, accent) => Rc::new(ThemeResources::new(*theme, *accent)),
+            Base::Enclosing => ThemeResources::of(app, context),
+            Base::Resources(resources) => resources.clone(),
+        }
+    }
+
+    /// `changed` is `resources` with the scope's own values: `any`, then the one for their theme.
+    fn changed(&self, resources: Rc<ThemeResources>) -> Rc<ThemeResources> {
+        let for_theme = match resources.theme {
+            Theme::Light => &self.light,
+            Theme::Dark => &self.dark,
+        };
+        let changes: Vec<&Override> = self.any.iter().chain(for_theme).collect();
+        if changes.is_empty() {
+            return resources;
+        }
+        let mut resources = Rc::unwrap_or_clone(resources);
+        for change in changes {
+            change(&mut resources);
+        }
+        Rc::new(resources)
     }
 }
 
-impl InheritedWidget for ThemeScope {
+impl fmt::Debug for ThemeScope {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ThemeScope").finish_non_exhaustive()
+    }
+}
+
+impl StatelessWidget for ThemeScope {
+    fn build(&self, app: &mut App, context: BuildContext) -> WidgetRef {
+        let resources = self.changed(self.base(app, context));
+        InheritedResources {
+            resources,
+            child: self.child.clone(),
+        }
+        .into_widget()
+    }
+}
+
+/// The resources a [`ThemeScope`] resolved, for [`ThemeResources::of`] below it.
+#[derive(Debug)]
+struct InheritedResources {
+    resources: Rc<ThemeResources>,
+    child: WidgetRef,
+}
+
+impl InheritedWidget for InheritedResources {
     fn child(&self) -> &WidgetRef {
         &self.child
     }
     fn update_should_notify(&self, old: &Self) -> bool {
-        self.resources != old.resources
+        !Rc::ptr_eq(&self.resources, &old.resources) && self.resources != old.resources
     }
 }

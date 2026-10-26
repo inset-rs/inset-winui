@@ -2,9 +2,7 @@
 #![feature(arbitrary_self_types)]
 #[path = "../../../crates/inset-winui/src/primitives/anchored_flyout.rs"]
 mod attachment;
-mod theme {
-    pub use inset_winui::*;
-}
+mod theme {}
 use attachment::{AnchoredFlyout, AnchoredFlyoutPlacement};
 use inset_embedder::{Offset, PointerChange, TextDirection};
 use inset_foundation::{App, Handle, Listener};
@@ -145,7 +143,6 @@ impl State for PageState {
                     },
                     AccentPalette::default(),
                 )
-                .common
                 .solid_background_fill_color_base,
             )
             .child(Stack::new().children(vec![

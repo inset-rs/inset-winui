@@ -138,8 +138,8 @@ fn template(
     content: WidgetRef,
 ) -> WidgetRef {
     let theme = ThemeResources::of(app, context);
-    let resources = theme.drop_down_button();
-    let brushes = ButtonStyle::Default.brushes(&theme.button(), states.common);
+    let resources = &theme;
+    let brushes = ButtonStyle::Default.brushes(&theme, states.common);
     let chevron = match states.common {
         CommonState::Normal => resources.drop_down_button_foreground_secondary,
         CommonState::PointerOver => resources.drop_down_button_foreground_secondary_pointer_over,
@@ -155,7 +155,8 @@ fn template(
             GridCell::new(Center::new().width_factor(1.0).height_factor(1.0).child(
                 DefaultTextStyle::new(
                     control_text_style(
-                        CONTROL_CONTENT_FONT_SIZE,
+                        &theme,
+                        theme.control_content_theme_font_size,
                         FontWeight::NORMAL,
                         brushes.foreground,
                     ),
@@ -178,14 +179,15 @@ fn template(
             .into_widget(),
         ])
         .into_widget();
+    let (corner_radius, padding) = (theme.control_corner_radius, theme.button_padding);
     let root = ColorTransition::new(
         brushes.background,
-        CONTROL_FASTER_ANIMATION_DURATION,
+        theme.control_faster_animation_duration,
         move |_, background| {
             ControlBorder::new(Brush::Solid(background), brushes.border)
                 .border_thickness(BUTTON_BORDER_THICKNESS)
-                .corner_radius_corners(CONTROL_CORNER_RADIUS)
-                .padding(BUTTON_PADDING)
+                .corner_radius_corners(corner_radius)
+                .padding(padding)
                 .child(content.clone())
                 .into_widget()
         },
@@ -193,6 +195,6 @@ fn template(
     FocusVisual::new(root, theme.theme)
         .visible(states.focused)
         .margin(BUTTON_FOCUS_VISUAL_MARGIN)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(corner_radius[0])
         .into_widget()
 }

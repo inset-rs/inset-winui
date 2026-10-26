@@ -112,7 +112,7 @@ impl State for NumberBoxDemoState {
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let r = ThemeResources::of(app, context);
-        let secondary = r.common.text_fill_color_secondary;
+        let secondary = r.text_fill_color_secondary;
         let s = app.get(self);
         let (expression, spin, placement, wrap) = (s.expression, s.spin, s.placement, s.wrap);
         let (percentage, overwrite, amount) = (s.percentage, s.overwrite, s.amount);

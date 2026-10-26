@@ -64,7 +64,7 @@ fn captioned(badge: WidgetRef, name: &str, resources: &ThemeResources) -> Widget
             label(
                 name,
                 TextBlockStyle::Caption,
-                resources.common.text_fill_color_secondary,
+                resources.text_fill_color_secondary,
             ),
         ])
         .into_widget()

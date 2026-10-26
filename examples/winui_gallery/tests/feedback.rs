@@ -410,6 +410,10 @@ fn info_bar_status_glyphs_keep_their_natural_line_height() {
 /// needs keeps its own: a narrow header leaves it at the style's `MinWidth`.
 #[test]
 fn an_expander_given_spare_width_keeps_its_own() {
+    let r = inset_winui::ThemeResources::new(
+        inset_winui::Theme::Light,
+        inset_winui::AccentPalette::default(),
+    );
     let size = common::size_under_center([300, 300], |_| {
         Expander::new(false, |_, _| {})
             .header(SizedBox::new().width(10.0).height(10.0))
@@ -417,10 +421,7 @@ fn an_expander_given_spare_width_keeps_its_own() {
     });
     assert_eq!(
         size,
-        inset_embedder::Size::new(
-            inset_winui::FLYOUT_THEME_MIN_WIDTH,
-            inset_winui::EXPANDER_MIN_HEIGHT
-        )
+        inset_embedder::Size::new(r.flyout_theme_min_width, r.expander_min_height)
     );
 }
 

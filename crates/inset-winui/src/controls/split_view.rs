@@ -2,9 +2,7 @@
 
 use super::split_view_visuals::{self, DisplayModeState};
 use crate::{
-    Brush, ColorTransition, ColumnDefinition, Grid, GridCell, GridLength,
-    SPLIT_VIEW_COMPACT_PANE_THEME_LENGTH, SPLIT_VIEW_LEFT_BORDER_THEME_THICKNESS,
-    SPLIT_VIEW_OPEN_PANE_THEME_LENGTH, SPLIT_VIEW_PANE_ROOT_CORNER_RADIUS, SizeObserver,
+    Brush, ColorTransition, ColumnDefinition, Grid, GridCell, GridLength, SizeObserver,
     ThemeResources, after_next_frame,
 };
 use inset_embedder::{Color, Offset, Path, PathBuilder, Rect, Size};
@@ -144,10 +142,12 @@ pub struct SplitView {
     pub display_mode: SplitViewDisplayMode,
     /// The side containing the pane; defaults to Left.
     pub pane_placement: SplitViewPanePlacement,
-    /// The open pane width, defaulting to 320; `f64::NAN` sizes to the pane content.
-    pub open_pane_length: f64,
-    /// The width reserved by a closed compact pane; defaults to 48.
-    pub compact_pane_length: f64,
+    /// The open pane width; `f64::NAN` sizes to the pane content, and `None` is the theme's
+    /// `SplitViewOpenPaneThemeLength`.
+    pub open_pane_length: Option<f64>,
+    /// The width reserved by a closed compact pane; the theme's `SplitViewCompactPaneThemeLength`
+    /// when `None`.
+    pub compact_pane_length: Option<f64>,
     /// Whether the dismiss layer dims the content; defaults to desktop Auto (transparent).
     pub light_dismiss_overlay_mode: LightDismissOverlayMode,
     /// The pane fill; `None` resolves the default brush from the current theme.
@@ -156,10 +156,12 @@ pub struct SplitView {
     pub background: Option<Brush>,
     /// The pane border brush; the default theme brush is transparent.
     pub border_brush: Option<Brush>,
-    /// Pane border widths in left, top, right, bottom order; defaults to `[0, 0, 1, 0]`.
-    pub border_thickness: [f64; 4],
-    /// Pane radii in top-left, top-right, bottom-right, bottom-left order; defaults to zero.
-    pub corner_radius: [f64; 4],
+    /// Pane border widths in left, top, right, bottom order; the theme's
+    /// `SplitViewLeftBorderThemeThickness` when `None`.
+    pub border_thickness: Option<[f64; 4]>,
+    /// Pane radii in top-left, top-right, bottom-right, bottom-left order; the theme's
+    /// `SplitViewPaneRootCornerRadius` when `None`.
+    pub corner_radius: Option<[f64; 4]>,
     /// Called after the first layout of an opening transition, before focus moves into the pane.
     pub pane_opening: Option<PaneEvent>,
     /// Called when the current opening transition completes.
@@ -181,14 +183,14 @@ impl SplitView {
             content: None,
             display_mode: SplitViewDisplayMode::Overlay,
             pane_placement: SplitViewPanePlacement::Left,
-            open_pane_length: SPLIT_VIEW_OPEN_PANE_THEME_LENGTH,
-            compact_pane_length: SPLIT_VIEW_COMPACT_PANE_THEME_LENGTH,
+            open_pane_length: None,
+            compact_pane_length: None,
             light_dismiss_overlay_mode: LightDismissOverlayMode::Auto,
             pane_background: None,
             background: None,
             border_brush: None,
-            border_thickness: SPLIT_VIEW_LEFT_BORDER_THEME_THICKNESS,
-            corner_radius: SPLIT_VIEW_PANE_ROOT_CORNER_RADIUS,
+            border_thickness: None,
+            corner_radius: None,
             pane_opening: None,
             pane_opened: None,
             pane_closing: None,
@@ -231,7 +233,7 @@ impl SplitView {
     /// Panics for negative lengths or infinity.
     pub fn open_pane_length(mut self, length: f64) -> Self {
         assert!(length.is_nan() || (length.is_finite() && length >= 0.0));
-        self.open_pane_length = length;
+        self.open_pane_length = Some(length);
         self
     }
 
@@ -240,7 +242,7 @@ impl SplitView {
     /// Panics if the length is negative or non-finite.
     pub fn compact_pane_length(mut self, length: f64) -> Self {
         assert!(length.is_finite() && length >= 0.0);
-        self.compact_pane_length = length;
+        self.compact_pane_length = Some(length);
         self
     }
 
@@ -258,7 +260,7 @@ impl SplitView {
 
     /// Sets pane radii in top-left, top-right, bottom-right, bottom-left order.
     pub fn corner_radius_corners(mut self, radius: [f64; 4]) -> Self {
-        self.corner_radius = radius;
+        self.corner_radius = Some(radius);
         self
     }
 
@@ -276,19 +278,19 @@ impl SplitView {
 
     /// Sets the same pane border width on all four sides.
     pub fn border_thickness(mut self, thickness: f64) -> Self {
-        self.border_thickness = [thickness; 4];
+        self.border_thickness = Some([thickness; 4]);
         self
     }
 
     /// Sets pane border widths in left, top, right, bottom order.
     pub fn border_thickness_ltrb(mut self, thickness: [f64; 4]) -> Self {
-        self.border_thickness = thickness;
+        self.border_thickness = Some(thickness);
         self
     }
 
     /// Sets the same radius on all four pane corners.
     pub fn corner_radius(mut self, radius: f64) -> Self {
-        self.corner_radius = [radius; 4];
+        self.corner_radius = Some([radius; 4]);
         self
     }
 
@@ -371,8 +373,11 @@ pub struct SplitViewState {
     closing_by_dismiss: bool,
     /// Latest measured pane width, retained even in explicit-width mode for a later Auto update.
     measured_pane_length: f64,
-    /// Live values captured at interruption for tracks without an explicit starting keyframe.
-    initial_visuals: split_view_visuals::Visuals,
+    /// Live values captured at interruption for tracks without an explicit starting keyframe; set
+    /// when a transition starts.
+    initial_visuals: Option<split_view_visuals::Visuals>,
+    /// The pane's lengths as the last build resolved them.
+    lengths: (f64, f64),
     /// Previous window metrics used to detect changes that should light-dismiss the pane.
     root_metrics: Option<(Size, f64, EdgeInsets, EdgeInsets)>,
 }
@@ -401,15 +406,8 @@ impl StatefulWidget for SplitView {
             closing_by_dismiss: false,
             measured_pane_length: 0.0,
             root_metrics: None,
-            initial_visuals: split_view_visuals::settled(
-                self.visual_state(),
-                if self.open_pane_length.is_nan() {
-                    0.0
-                } else {
-                    self.open_pane_length
-                },
-                self.compact_pane_length,
-            ),
+            initial_visuals: None,
+            lengths: (0.0, 0.0),
         }
     }
 }
@@ -435,13 +433,13 @@ impl SplitViewState {
     ///
     /// For Auto pane width, these values reflect the latest completed layout.
     pub fn template_settings(self: Handle<Self>, app: &App) -> SplitViewTemplateSettings {
-        let w = self.widget(app);
-        let open = if w.open_pane_length.is_nan() {
+        let (open, compact) = app.get(self).lengths;
+        let open = if open.is_nan() {
             app.get(self).measured_pane_length
         } else {
-            w.open_pane_length
+            open
         };
-        SplitViewTemplateSettings::new(open, w.compact_pane_length)
+        SplitViewTemplateSettings::new(open, compact)
     }
 
     /// Whether an open overlay pane can start another light-dismiss request.
@@ -584,6 +582,40 @@ impl SplitViewState {
     }
 }
 
+/// `PaneLayout` is the pane's lengths, border and corners: the widget's own, else the theme's.
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct PaneLayout {
+    /// The open pane width; `f64::NAN` sizes to the pane content.
+    open: f64,
+    /// The width reserved by a closed compact pane.
+    compact: f64,
+    /// Pane border widths in left, top, right, bottom order.
+    border_thickness: [f64; 4],
+    /// Pane radii in top-left, top-right, bottom-right, bottom-left order.
+    corner_radius: [f64; 4],
+}
+
+impl SplitView {
+    /// `pane_layout` is the pane's lengths, border and corners, the theme's where the widget sets
+    /// none, as the style's setters do.
+    fn pane_layout(&self, r: &ThemeResources) -> PaneLayout {
+        PaneLayout {
+            open: self
+                .open_pane_length
+                .unwrap_or(r.split_view_open_pane_theme_length),
+            compact: self
+                .compact_pane_length
+                .unwrap_or(r.split_view_compact_pane_theme_length),
+            border_thickness: self
+                .border_thickness
+                .unwrap_or(r.split_view_left_border_theme_thickness),
+            corner_radius: self
+                .corner_radius
+                .unwrap_or(r.split_view_pane_root_corner_radius),
+        }
+    }
+}
+
 impl State for SplitViewState {
     type Widget = SplitView;
     inset_widgets::state_accessors!();
@@ -623,28 +655,33 @@ impl State for SplitViewState {
             self.restore_focus(app);
         }
         self.update_portal(app);
-        let lengths_changed = !(old.open_pane_length == widget.open_pane_length
-            || (old.open_pane_length.is_nan() && widget.open_pane_length.is_nan()))
-            || old.compact_pane_length != widget.compact_pane_length;
+        let r = ThemeResources::of(app, self.context(app));
+        let (old_pane, pane) = (old.pane_layout(&r), widget.pane_layout(&r));
+        let lengths_changed = !(old_pane.open == pane.open
+            || (old_pane.open.is_nan() && pane.open.is_nan()))
+            || old_pane.compact != pane.compact;
         if from == to && !lengths_changed {
             return;
         }
         let previous = app.get(self);
-        let old_open = if old.open_pane_length.is_nan() {
+        let old_open = if old_pane.open.is_nan() {
             previous.measured_pane_length
         } else {
-            old.open_pane_length
+            old_pane.open
         };
         let initial = if previous.duration.is_zero() {
-            split_view_visuals::settled(from, old_open, old.compact_pane_length)
+            split_view_visuals::settled(from, old_open, old_pane.compact)
         } else {
             split_view_visuals::transition_from_visuals(
+                &r,
                 previous.from,
                 from,
                 previous.elapsed,
                 old_open,
-                old.compact_pane_length,
-                previous.initial_visuals,
+                old_pane.compact,
+                previous
+                    .initial_visuals
+                    .expect("set when a transition starts"),
             )
         };
         let ticker = app.get(self).ticker.unwrap();
@@ -652,10 +689,10 @@ impl State for SplitViewState {
         let duration = if lengths_changed {
             Duration::ZERO
         } else {
-            split_view_visuals::transition_duration(from, to).unwrap_or_default()
+            split_view_visuals::transition_duration(&r, from, to).unwrap_or_default()
         };
         let s = app.get_mut(self);
-        s.initial_visuals = initial;
+        s.initial_visuals = Some(initial);
         s.from = from;
         s.duration = duration;
         s.elapsed = Duration::ZERO;
@@ -750,7 +787,7 @@ impl State for SplitViewState {
                 TraversalEdgeBehavior::ParentScope
             },
         );
-        let resources = ThemeResources::of(app, context).split_view();
+        let resources = ThemeResources::of(app, context);
         let body = LayoutBuilder::new(move |app, _, constraints| {
             self.build_template(app, constraints, resources.clone())
         });
@@ -820,25 +857,28 @@ impl SplitViewState {
         self: Handle<Self>,
         app: &mut App,
         constraints: BoxConstraints,
-        resources: crate::SplitViewResources,
+        resources: Rc<ThemeResources>,
     ) -> WidgetRef {
         let widget = self.widget(app).clone();
-        let open = if widget.open_pane_length.is_nan() {
+        let pane = widget.pane_layout(&resources);
+        app.get_mut(self).lengths = (pane.open, pane.compact);
+        let open = if pane.open.is_nan() {
             app.get(self).measured_pane_length
         } else {
-            widget.open_pane_length
+            pane.open
         };
         let state = app.get(self);
         let v = if state.duration.is_zero() {
-            split_view_visuals::settled(widget.visual_state(), open, widget.compact_pane_length)
+            split_view_visuals::settled(widget.visual_state(), open, pane.compact)
         } else {
             split_view_visuals::transition_from_visuals(
+                &resources,
                 state.from,
                 widget.visual_state(),
                 state.elapsed,
                 open,
-                widget.compact_pane_length,
-                state.initial_visuals,
+                pane.compact,
+                state.initial_visuals.expect("set when a transition starts"),
             )
         };
         let pane_focus = state.pane_focus.unwrap();
@@ -851,7 +891,7 @@ impl SplitViewState {
             pane_child,
             Rc::new(move |app, _, new| {
                 if app.get(self).measured_pane_length != new.width() {
-                    if self.widget(app).open_pane_length.is_nan() {
+                    if app.get(self).lengths.0.is_nan() {
                         self.set_state(app, |s| s.measured_pane_length = new.width());
                     } else {
                         app.get_mut(self).measured_pane_length = new.width();
@@ -859,18 +899,18 @@ impl SplitViewState {
                 }
             }),
         );
-        let auto = widget.open_pane_length.is_nan();
+        let auto = pane.open.is_nan();
         let pane_child = OverflowBox::new()
             .alignment(Alignment::TOP_LEFT.into())
             .min_width(if auto {
                 0.0
             } else {
-                (open - widget.border_thickness[0] - widget.border_thickness[2]).max(0.0)
+                (open - pane.border_thickness[0] - pane.border_thickness[2]).max(0.0)
             })
             .max_width(if auto {
                 constraints.max_width
             } else {
-                (open - widget.border_thickness[0] - widget.border_thickness[2]).max(0.0)
+                (open - pane.border_thickness[0] - pane.border_thickness[2]).max(0.0)
             })
             .child(
                 Align::new()
@@ -885,6 +925,9 @@ impl SplitViewState {
         let background = widget.pane_background.unwrap_or(Brush::Solid(
             resources.system_control_page_background_chrome_low_brush,
         ));
+        let border_brush = widget.border_brush.unwrap_or(Brush::Solid(
+            resources.system_control_foreground_transparent_brush,
+        ));
         // PaneRoot: Grid chrome and its default BrushTransition (150 ms in SimplePropertiesMetadata.g.h).
         let pane_root = ColorTransition::new(
             background.representative_color(),
@@ -896,11 +939,9 @@ impl SplitViewState {
                     } else {
                         background
                     })
-                    .border_brush(widget.border_brush.unwrap_or(Brush::Solid(
-                        resources.system_control_foreground_transparent_brush,
-                    )))
-                    .border_thickness_ltrb(widget.border_thickness)
-                    .corner_radius_corners(widget.corner_radius)
+                    .border_brush(border_brush)
+                    .border_thickness_ltrb(pane.border_thickness)
+                    .corner_radius_corners(pane.corner_radius)
                     .children([pane_child.clone()])
                     .into_widget()
             },

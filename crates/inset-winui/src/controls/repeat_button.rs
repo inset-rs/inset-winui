@@ -5,10 +5,8 @@
 //! Behaviour follows `RepeatButton_Partial.cpp` and `ButtonBaseKeyProcess.h`: pointer and Space presses click immediately and start the repeat timer; Enter clicks once. The control owns its pressed state and focus node so activation keys reach its Press-mode handler before application shortcuts.
 
 use crate::{
-    BUTTON_BORDER_THEME_THICKNESS, BUTTON_PADDING, BackgroundSizing, Brush, ButtonTemplate,
-    CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, CONTROL_FASTER_ANIMATION_DURATION,
-    ColorTransition, CommonState, ControlBorder, ControlStates, FocusVisual, RepeatButtonResources,
-    ThemeResources, control_text_style,
+    BackgroundSizing, Brush, ButtonTemplate, ColorTransition, CommonState, ControlBorder,
+    ControlStates, FocusVisual, ThemeResources, control_text_style,
 };
 use inset_embedder::{Color, FontWeight, Offset, PointerDeviceKind};
 use inset_foundation::{App, Handle, Listener, Timer};
@@ -23,8 +21,6 @@ use std::{fmt, rc::Rc, time::Duration};
 pub const REPEAT_BUTTON_DELAY: Duration = Duration::from_millis(500);
 /// The default `Interval`, 33 ms: `RepeatButton_Interval` in `DependencyProperty.cpp`.
 pub const REPEAT_BUTTON_INTERVAL: Duration = Duration::from_millis(33);
-/// The style's `BorderThickness` is `ButtonBorderThemeThickness`.
-pub const REPEAT_BUTTON_BORDER_THICKNESS: f64 = BUTTON_BORDER_THEME_THICKNESS[0];
 /// The `FocusVisualMargin` the style sets.
 pub const REPEAT_BUTTON_FOCUS_VISUAL_MARGIN: [f64; 4] = [-3.0; 4];
 
@@ -38,7 +34,7 @@ pub struct RepeatButtonBrushes {
 
 /// The `{ThemeResource …}` values the `CommonStates` storyboards name for `state`.
 pub fn repeat_button_brushes(
-    resources: &RepeatButtonResources,
+    resources: &ThemeResources,
     state: CommonState,
 ) -> RepeatButtonBrushes {
     let r = resources;
@@ -489,12 +485,17 @@ fn template(
     states: ControlStates,
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
-    let brushes = repeat_button_brushes(&resources.repeat_button(), states.common);
-    let presenter = repeat_button_presenter(brushes, RepeatButtonSetters::DEFAULT, content);
+    let brushes = repeat_button_brushes(&resources, states.common);
+    let presenter = repeat_button_presenter(
+        &resources,
+        brushes,
+        RepeatButtonSetters::default_style(&resources),
+        content,
+    );
     FocusVisual::new(presenter, resources.theme)
         .visible(states.focused)
         .margin(REPEAT_BUTTON_FOCUS_VISUAL_MARGIN)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(resources.control_corner_radius[0])
         .into_widget()
 }
 
@@ -513,24 +514,27 @@ pub(crate) struct RepeatButtonSetters {
 }
 
 impl RepeatButtonSetters {
-    /// `DefaultRepeatButtonStyle`'s own.
-    pub(crate) const DEFAULT: RepeatButtonSetters = RepeatButtonSetters {
-        border_thickness: [REPEAT_BUTTON_BORDER_THICKNESS; 4],
-        corner_radius: CONTROL_CORNER_RADIUS[0],
-        padding: BUTTON_PADDING,
-        font_size: CONTROL_CONTENT_FONT_SIZE,
-    };
+    /// `DefaultRepeatButtonStyle`'s own, with the theme's values.
+    pub(crate) fn default_style(r: &ThemeResources) -> RepeatButtonSetters {
+        RepeatButtonSetters {
+            border_thickness: [r.button_border_theme_thickness[0]; 4],
+            corner_radius: r.control_corner_radius[0],
+            padding: r.button_padding,
+            font_size: r.control_content_theme_font_size,
+        }
+    }
 }
 
 /// `ContentPresenter`, the template of `DefaultRepeatButtonStyle`: `content` centered in a
 /// border drawn with `brushes` and `setters`, its background fading between states over 83 ms
 /// (`BrushTransition`).
 pub(crate) fn repeat_button_presenter(
+    r: &ThemeResources,
     brushes: RepeatButtonBrushes,
     setters: RepeatButtonSetters,
     content: WidgetRef,
 ) -> WidgetRef {
-    let text = control_text_style(setters.font_size, FontWeight::W400, brushes.foreground);
+    let text = control_text_style(r, setters.font_size, FontWeight::W400, brushes.foreground);
     // `ContentPresenter`: `HorizontalContentAlignment` and `VerticalContentAlignment` are Center.
     let label = Center::new()
         .width_factor(1.0)
@@ -539,7 +543,7 @@ pub(crate) fn repeat_button_presenter(
         .into_widget();
     ColorTransition::new(
         brushes.background,
-        CONTROL_FASTER_ANIMATION_DURATION,
+        r.control_faster_animation_duration,
         move |_app, background| {
             ControlBorder::new(Brush::Solid(background), brushes.border)
                 .border_thickness_ltrb(setters.border_thickness)

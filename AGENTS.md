@@ -21,7 +21,7 @@ git clone https://github.com/microsoft/microsoft-ui-xaml.git .reference/microsof
 
 ## How the code is shaped
 
-- `theme/generated.rs` holds every colour, brush, size, duration and spline of the XAML theme dictionaries, produced by `tools/gen_resources.py`; `{ThemeResource X}` in a template is the field `x`. It is generated rather than typed so a value cannot be mistyped or invented; a control whose resources are missing is added to `DEFAULT_CONTROLS` in the generator.
+- `theme/generated.rs` holds every colour, brush, size, duration and spline of the XAML theme dictionaries in one struct, `ThemeResources`, produced by `tools/gen_resources.py`; `{ThemeResource X}` or `{StaticResource X}` in a template is its field `x`, read from `ThemeResources::of(app, context)`. It is generated rather than typed so a value cannot be mistyped or invented; a control whose resources are missing is added to `DEFAULT_CONTROLS` in the generator.
 - A control file is a transcription of its `ControlTemplate`: the elements in order with their `x:Name`s in comments, each visual state group as an enum, the storyboards as the animations they declare. Its behaviour follows the C++ as closely as Inset allows.
 - What the repository leaves to Windows (accent shades, system colours, theme-animation timings, Segoe UI) has a substitute and a `PORTING.md` entry saying so. Text is Selawik, Microsoft's metric-compatible open substitute for Segoe UI, bundled with the gallery.
 - Widget construction follows `docs/widget-syntax.md`.

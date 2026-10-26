@@ -550,10 +550,11 @@ fn an_equal_formatter_built_again_leaves_typed_text_alone() {
 /// buttons given more height than it needs keeps the height it needs.
 #[test]
 fn a_compact_box_given_spare_height_keeps_its_own() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let size = common::size_under_center([300, 300], |_| {
         NumberBox::new(1.0, |_, _| {})
             .spin_button_placement_mode(NumberBoxSpinButtonPlacementMode::Compact)
             .into_widget()
     });
-    assert_eq!(size.height(), TEXT_CONTROL_THEME_MIN_HEIGHT);
+    assert_eq!(size.height(), r.text_control_theme_min_height);
 }

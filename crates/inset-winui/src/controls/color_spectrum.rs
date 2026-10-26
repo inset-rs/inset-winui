@@ -1197,7 +1197,7 @@ impl State for ColorSpectrumState {
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
-        let r = ThemeResources::of(app, context).color_picker();
+        let r = ThemeResources::of(app, context);
         let shape = app
             .get(self)
             .creation

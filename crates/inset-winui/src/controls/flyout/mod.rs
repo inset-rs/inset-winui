@@ -120,6 +120,15 @@ impl InheritedWidget for FlyoutScope {
     }
 }
 
+/// FlyoutPresenter's style: `MinWidth`, `MinHeight`, `MaxWidth` and `MaxHeight` from the theme's
+/// `FlyoutThemeMinWidth`, `FlyoutThemeMinHeight`, `FlyoutThemeMaxWidth` and `FlyoutThemeMaxHeight`.
+pub fn flyout_presenter_sizes(r: &ThemeResources) -> (Size, Size) {
+    (
+        Size::new(r.flyout_theme_min_width, r.flyout_theme_min_height),
+        Size::new(r.flyout_theme_max_width, r.flyout_theme_max_height),
+    )
+}
+
 /// A persistent flyout object whose child State survives closing and changing opening targets.
 ///
 /// Create it once with the App, use contexts beneath FlyoutTarget for ShowAt,
@@ -134,12 +143,17 @@ pub struct Flyout {
     /// Focus and outside-input policy used by ShowAt.
     pub show_mode: FlyoutShowMode,
 
-    /// Default presenter's content padding in left, top, right, bottom order.
-    pub padding: [f64; 4],
+    /// Default presenter's content padding in left, top, right, bottom order; the theme's
+    /// `FlyoutContentPadding` when `None`.
+    pub padding: Option<[f64; 4]>,
 
-    /// Minimum and maximum presenter sizes.
-    pub minimum_size: Size,
-    pub maximum_size: Size,
+    /// Minimum and maximum presenter sizes, overriding the presenter style's.
+    pub minimum_size: Option<Size>,
+    pub maximum_size: Option<Size>,
+
+    /// The presenter style's `MinWidth`, `MinHeight`, `MaxWidth` and `MaxHeight`, from the
+    /// theme: FlyoutPresenter's unless a derived flyout's presenter has its own.
+    pub presenter_sizes: fn(&ThemeResources) -> (Size, Size),
 
     /// Optional replacement presenter; receives the persistent content widget.
     pub flyout_presenter_style: Option<FlyoutPresenterBuilder>,
@@ -237,9 +251,10 @@ impl Flyout {
             content: content.into_widget(),
             placement: FlyoutPlacementMode::Top,
             show_mode: FlyoutShowMode::Standard,
-            padding: FLYOUT_CONTENT_PADDING,
-            minimum_size: Size::new(FLYOUT_THEME_MIN_WIDTH, FLYOUT_THEME_MIN_HEIGHT),
-            maximum_size: Size::new(FLYOUT_THEME_MAX_WIDTH, FLYOUT_THEME_MAX_HEIGHT),
+            padding: None,
+            minimum_size: None,
+            maximum_size: None,
+            presenter_sizes: flyout_presenter_sizes,
             flyout_presenter_style: None,
             opening: None,
             on_opening: None,
@@ -674,20 +689,22 @@ impl Flyout {
                 if let Some(bounds) = host.target_bounds(app) {
                     app.get_mut(self).last_target_bounds = bounds;
                 }
+                let r = ThemeResources::of(app, context);
                 let flyout = app.get(self);
+                let (style_minimum, style_maximum) = (flyout.presenter_sizes)(&r);
                 let target = flyout.last_target_bounds;
                 let submenu = flyout.is_sub_menu;
                 let point_kind = flyout.point_kind;
                 let position = flyout.position;
                 let exclusion = flyout.exclusion;
                 let placement = flyout.placement_override.unwrap_or(flyout.placement);
-                let minimum = flyout.minimum_size;
-                let maximum = flyout.maximum_size;
+                let minimum = flyout.minimum_size.unwrap_or(style_minimum);
+                let maximum = flyout.maximum_size.unwrap_or(style_maximum);
                 let content = flyout.content.clone();
                 let style = flyout.flyout_presenter_style.clone();
                 let key: KeyRef = Rc::new(flyout.presenter_key.clone());
                 let open = self.is_open(app);
-                let padding = flyout.padding;
+                let padding = flyout.padding.unwrap_or(r.flyout_content_padding);
                 let root = self.root(app);
                 let group = app.get(root).tap_region_group;
                 let grouped = group.is_some();
@@ -709,15 +726,19 @@ impl Flyout {
                 }
                 let presenter = CustomPaint::new()
                     .painter(shadow::PopupShadow::for_flyout(
+                        &r,
                         ThemeResources::of(app, context).theme,
                         depth,
                     ))
                     .child(presenter);
-                let foreground = ThemeResources::of(app, context)
-                    .common
-                    .text_fill_color_primary;
+                let foreground = ThemeResources::of(app, context).text_fill_color_primary;
                 let presenter = DefaultTextStyle::new(
-                    control_text_style(CONTROL_CONTENT_FONT_SIZE, FontWeight::NORMAL, foreground),
+                    control_text_style(
+                        &r,
+                        r.control_content_theme_font_size,
+                        FontWeight::NORMAL,
+                        foreground,
+                    ),
                     presenter,
                 );
                 let presenter = KeyedSubtree::new(presenter).key(key);
@@ -846,7 +867,7 @@ impl State for FlyoutPresenterState {
     }
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
-        let resources = ThemeResources::of(app, context).flyout_presenter();
+        let resources = ThemeResources::of(app, context);
         let horizontal = app.get(self).horizontal.unwrap();
         let vertical = app.get(self).vertical.unwrap();
         let widget = self.widget(app).clone();
@@ -854,8 +875,8 @@ impl State for FlyoutPresenterState {
             Brush::Acrylic(resources.flyout_presenter_background),
             Brush::Solid(resources.flyout_border_theme_brush),
         )
-        .border_thickness_ltrb(FLYOUT_BORDER_THEME_THICKNESS)
-        .corner_radius_corners(OVERLAY_CORNER_RADIUS)
+        .border_thickness_ltrb(resources.flyout_border_theme_thickness)
+        .corner_radius_corners(resources.overlay_corner_radius)
         .child(
             LayoutBuilder::new(move |_, _, constraints| {
                 ScrollBarViewport::new(

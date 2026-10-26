@@ -105,7 +105,7 @@ impl State for CheckBoxDemoState {
                 label(
                     status,
                     TextBlockStyle::Body,
-                    resources.common.text_fill_color_secondary,
+                    resources.text_fill_color_secondary,
                 ),
             ],
             8.0,
@@ -154,7 +154,7 @@ impl State for CheckBoxDemoState {
                                     label(
                                         "Content can contain more than a single line of text.",
                                         TextBlockStyle::Caption,
-                                        resources.common.text_fill_color_secondary,
+                                        resources.text_fill_color_secondary,
                                     ),
                                 ],
                                 2.0,
@@ -163,7 +163,7 @@ impl State for CheckBoxDemoState {
                             label(
                                 format!("Configurable value: {}", describe(sample)),
                                 TextBlockStyle::Body,
-                                resources.common.text_fill_color_secondary,
+                                resources.text_fill_color_secondary,
                             ),
                         ],
                         12.0,

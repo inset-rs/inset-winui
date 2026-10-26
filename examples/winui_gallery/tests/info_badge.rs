@@ -125,7 +125,7 @@ fn each_named_style_fills_with_its_own_severity_colour() {
     .map(|style| style.background(&resources))
     .collect();
     assert_eq!(
-        colours[3], resources.common.system_fill_color_success_brush,
+        colours[3], resources.system_fill_color_success_brush,
         "Success uses SystemFillColorSuccessBrush"
     );
     for (index, colour) in colours.iter().enumerate() {

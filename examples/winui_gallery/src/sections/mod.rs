@@ -43,4 +43,5 @@ pub mod menu_bar;
 
 pub mod breadcrumb_bar;
 
+pub mod selector_bar;
 pub mod tree_view;

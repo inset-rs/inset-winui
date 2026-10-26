@@ -47,9 +47,8 @@ fn fixture(theme: Theme, acrylic: bool) -> Fixture {
 
 fn fixture_with_fallback_alpha(theme: Theme, acrylic: bool, transparent_fallback: bool) -> Fixture {
     Fixture::with_root([384, 256], move |app| {
-        let mut recipe = ThemeResources::new(theme, AccentPalette::default())
-            .flyout_presenter()
-            .flyout_presenter_background;
+        let mut recipe =
+            ThemeResources::new(theme, AccentPalette::default()).flyout_presenter_background;
         if transparent_fallback {
             recipe.fallback_color = recipe.fallback_color.with_alpha(0);
         }

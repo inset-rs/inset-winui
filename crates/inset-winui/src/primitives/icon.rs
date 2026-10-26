@@ -74,6 +74,8 @@ pub enum FluentSymbol {
     PanelLeft,
     /// Switch between tabbed pages.
     Tab,
+    /// Switch between a few views.
+    Tabs,
     /// Contextual help.
     TooltipQuote,
     /// Layered surfaces and materials.
@@ -152,6 +154,7 @@ impl FluentSymbol {
             Self::Options => 62855,
             Self::PanelLeft => 59568,
             Self::Tab => 63300,
+            Self::Tabs => 60527,
             Self::TooltipQuote => 63419,
             Self::Layer => 62667,
             Self::Link => 62692,

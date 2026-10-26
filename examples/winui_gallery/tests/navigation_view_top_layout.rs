@@ -153,10 +153,11 @@ fn recovery_width(f: &mut Fixture, state: Handle<PageState>) -> f64 {
 }
 #[test]
 fn custom_slot_minimum_is_counted_once_and_wider_content_forces_overflow() {
+    let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let (mut f, state) = fixture();
     let empty = recovery_width(&mut f, state);
     update(&mut f, state, |s| {
-        s.custom_width = TOP_NAVIGATION_VIEW_PANE_CUSTOM_CONTENT_MIN_WIDTH
+        s.custom_width = r.top_navigation_view_pane_custom_content_min_width
     });
     let minimum = recovery_width(&mut f, state);
     assert!(
@@ -165,7 +166,7 @@ fn custom_slot_minimum_is_counted_once_and_wider_content_forces_overflow() {
     );
     update(&mut f, state, |s| {
         s.width = minimum + 10.0;
-        s.custom_width = TOP_NAVIGATION_VIEW_PANE_CUSTOM_CONTENT_MIN_WIDTH;
+        s.custom_width = r.top_navigation_view_pane_custom_content_min_width;
     });
     assert!(!overflow(&f));
     update(&mut f, state, |s| s.custom_width = 220.0);

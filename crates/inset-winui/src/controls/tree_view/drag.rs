@@ -274,11 +274,10 @@ impl TreeViewState {
         let preview = id.to_owned();
         // The preview is a widget of its own, in the overlay, where the tree's theme does not
         // reach.
-        let feedback = ThemeScope::new(
-            resources.theme,
+        let feedback = ThemeScope::with_resources(
+            resources,
             Builder::new(move |app, _| self.drag_preview(app, &preview)),
-        )
-        .accent(resources.accent);
+        );
         let draggable = Draggable::new(displaced, feedback)
             .data(data)
             .max_simultaneous_drags(1)

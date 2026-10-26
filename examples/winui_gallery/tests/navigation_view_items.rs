@@ -88,9 +88,8 @@ impl State for PageState {
                 .push(format!("collapsed:{}", args.item.id))
         }));
         let theme = app.get(self).theme;
-        let background = ThemeResources::new(theme, AccentPalette::default())
-            .common
-            .solid_background_fill_color_base;
+        let background =
+            ThemeResources::new(theme, AccentPalette::default()).solid_background_fill_color_base;
         ThemeScope::new(theme, ColoredBox::new(background).child(nav)).into_widget()
     }
 }

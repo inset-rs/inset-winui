@@ -93,7 +93,7 @@ impl State for ColorPickerDemoState {
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let r = ThemeResources::of(app, context);
-        let secondary = r.common.text_fill_color_secondary;
+        let secondary = r.text_fill_color_secondary;
         let s = app.get(self);
         let (color, previous, event) = (s.color, s.previous, s.event.clone());
         let (ring, alpha, more_button, horizontal) = (s.ring, s.alpha, s.more_button, s.horizontal);

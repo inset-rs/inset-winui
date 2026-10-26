@@ -82,7 +82,7 @@ impl State for TabViewDemoState {
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let resources = ThemeResources::of(app, context);
-        let text = resources.common.text_fill_color_primary;
+        let text = resources.text_fill_color_primary;
         let state = app.get(self);
         let (items, selected, mode, drag, reorder, event) = (
             state.items.clone(),

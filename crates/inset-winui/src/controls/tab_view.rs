@@ -298,8 +298,9 @@ pub struct TabViewState {
     /// Keeps neighboring close buttons stationary until the pointer leaves.
     deferred_width_update: bool,
 
-    /// Most recently allocated common header width.
-    equal_width: f64,
+    /// Most recently allocated common header width; the theme's `TabViewItemMaxWidth` before
+    /// the first layout.
+    equal_width: Option<f64>,
 
     /// Measured width reserved before the first tab.
     header_width: f64,
@@ -344,7 +345,7 @@ impl StatefulWidget for TabView {
             hovered: None,
             pointer_in_strip: false,
             deferred_width_update: false,
-            equal_width: TAB_VIEW_ITEM_MAX_WIDTH,
+            equal_width: None,
             header_width: 2.0,
             footer_width: 0.0,
             tab_widths: HashMap::new(),
@@ -668,6 +669,7 @@ impl TabViewState {
         epoch: u64,
         attempt: usize,
     ) {
+        let r = ThemeResources::of(app, self.context(app));
         after_next_frame(
             app,
             View::maybe_id_of(app, self.context(app)),
@@ -703,9 +705,11 @@ impl TabViewState {
                 }
                 let widths = &app.get(self).tab_widths;
                 let estimate = if widget.tab_width_mode == TabViewWidthMode::Equal {
-                    app.get(self).equal_width
+                    app.get(self)
+                        .equal_width
+                        .unwrap_or(r.tab_view_item_max_width)
                 } else if widths.is_empty() {
-                    TAB_VIEW_ITEM_MIN_WIDTH
+                    r.tab_view_item_min_width
                 } else {
                     widths.values().sum::<f64>() / widths.len() as f64
                 };
@@ -908,7 +912,7 @@ impl TabViewState {
     ) -> WidgetRef {
         let widget = self.effective_widget(app);
         let theme = ThemeResources::of(app, context);
-        let r = theme.tab_view();
+        let r = theme.clone();
         let visible: Vec<_> = widget
             .tab_items
             .iter()
@@ -919,20 +923,23 @@ impl TabViewState {
         let taken = app.get(self).header_width
             + app.get(self).footer_width
             + if widget.is_add_tab_button_visible {
-                TAB_VIEW_ITEM_ADD_BUTTON_WIDTH + TAB_VIEW_ITEM_ADD_BUTTON_CONTAINER_PADDING[0]
+                r.tab_view_item_add_button_width + r.tab_view_item_add_button_container_padding[0]
             } else {
                 0.0
             };
         let available = (constraints.max_width - taken).max(0.0);
         if !app.get(self).deferred_width_update {
-            app.get_mut(self).equal_width = if visible.is_empty() {
-                TAB_VIEW_ITEM_MAX_WIDTH
+            app.get_mut(self).equal_width = Some(if visible.is_empty() {
+                r.tab_view_item_max_width
             } else {
                 ((available - 8.0) / visible.len() as f64)
-                    .clamp(TAB_VIEW_ITEM_MIN_WIDTH, TAB_VIEW_ITEM_MAX_WIDTH)
-            };
+                    .clamp(r.tab_view_item_min_width, r.tab_view_item_max_width)
+            });
         }
-        let width = app.get(self).equal_width;
+        let width = app
+            .get(self)
+            .equal_width
+            .unwrap_or(r.tab_view_item_max_width);
         let equal = widget.tab_width_mode == TabViewWidthMode::Equal;
         let required = if equal {
             width * visible.len() as f64 + 8.0
@@ -944,7 +951,7 @@ impl TabViewState {
                         .tab_widths
                         .get(&widget.tab_items[*index].id)
                         .copied()
-                        .unwrap_or(TAB_VIEW_ITEM_MIN_WIDTH)
+                        .unwrap_or(r.tab_view_item_min_width)
                 })
                 .sum::<f64>()
                 + 8.0
@@ -1021,7 +1028,7 @@ impl TabViewState {
                         .tab_widths
                         .get(&id)
                         .copied()
-                        .unwrap_or(TAB_VIEW_ITEM_MIN_WIDTH)
+                        .unwrap_or(r.tab_view_item_min_width)
                 },
             );
             let measured_id = id.clone();
@@ -1063,7 +1070,7 @@ impl TabViewState {
         let list = if equal { list.item_extent(width) } else { list };
         let strip = SizedBox::new()
             .width(strip_width)
-            .height(TAB_VIEW_ITEM_MIN_HEIGHT)
+            .height(theme.tab_view_item_min_height)
             .child(
                 TabScrollViewer::new(scroll, list)
                     .scroll_buttons_visible(show_scroll)
@@ -1071,7 +1078,7 @@ impl TabViewState {
             );
         let strip = Padding::new(EdgeInsetsGeometry::only(
             0.0,
-            TAB_VIEW_HEADER_PADDING[1],
+            theme.tab_view_header_padding[1],
             0.0,
             0.0,
         ))
@@ -1134,7 +1141,8 @@ impl TabViewState {
                 .add_tab_button_click
                 .unwrap_or_else(|| Listener::new(|_| {}));
             let button = Button::new(
-                FontIcon::symbol(FluentSymbol::Add).font_size(TAB_VIEW_ITEM_ADD_BUTTON_FONT_SIZE),
+                FontIcon::symbol(FluentSymbol::Add)
+                    .font_size(theme.tab_view_item_add_button_font_size),
                 click,
             )
             .focus_node(app.get(self).add_focus.unwrap())
@@ -1145,10 +1153,10 @@ impl TabViewState {
                         .alignment(Alignment::BOTTOM_CENTER.into())
                         .child(
                             Padding::new(EdgeInsetsGeometry::only(
-                                TAB_VIEW_ITEM_ADD_BUTTON_CONTAINER_PADDING[0],
+                                theme.tab_view_item_add_button_container_padding[0],
                                 0.0,
                                 0.0,
-                                TAB_VIEW_ITEM_ADD_BUTTON_CONTAINER_PADDING[3],
+                                theme.tab_view_item_add_button_container_padding[3],
                             ))
                             .child(ToolTipService::new(button, ToolTip::text("Add new tab"))),
                         ),
@@ -1171,14 +1179,14 @@ impl TabViewState {
         for &(name, column, span) in lines {
             strip_children.insert(
                 0,
-                bottom_border_line(name, r.tab_view_border_brush)
+                bottom_border_line(name, theme.tab_view_border_brush)
                     .column(column)
                     .column_span(span)
                     .into_widget(),
             );
         }
         let strip = Grid::new()
-            .background(Brush::Solid(r.tab_view_background))
+            .background(Brush::Solid(theme.tab_view_background))
             .column_definitions([
                 ColumnDefinition::new(GridLength::AUTO),
                 ColumnDefinition::new(GridLength::AUTO),
@@ -1236,7 +1244,7 @@ fn add_button_template(
     content: WidgetRef,
 ) -> WidgetRef {
     let theme = ThemeResources::of(app, context);
-    let r = theme.tab_view();
+    let r = &theme;
     let (background, foreground, border) = match states.common {
         CommonState::Normal => (
             r.tab_view_button_background,
@@ -1261,15 +1269,16 @@ fn add_button_template(
     };
     FocusVisual::new(
         SizedBox::new()
-            .width(TAB_VIEW_ITEM_ADD_BUTTON_WIDTH)
-            .height(TAB_VIEW_ITEM_ADD_BUTTON_HEIGHT)
+            .width(r.tab_view_item_add_button_width)
+            .height(r.tab_view_item_add_button_height)
             .child(
                 ControlBorder::new(Brush::Solid(background), Brush::Solid(border))
-                    .border_thickness_ltrb(TAB_VIEW_BUTTON_BORDER_THICKNESS)
-                    .corner_radius(CONTROL_CORNER_RADIUS[0])
+                    .border_thickness_ltrb(r.tab_view_button_border_thickness)
+                    .corner_radius(r.control_corner_radius[0])
                     .child(Center::new().child(DefaultTextStyle::new(
                         control_text_style(
-                            TAB_VIEW_ITEM_ADD_BUTTON_FONT_SIZE,
+                            &theme,
+                            r.tab_view_item_add_button_font_size,
                             FontWeight::NORMAL,
                             foreground,
                         ),
@@ -1280,6 +1289,6 @@ fn add_button_template(
     )
     .visible(states.focused)
     .margin([-3.0; 4])
-    .corner_radius(CONTROL_CORNER_RADIUS[0])
+    .corner_radius(r.control_corner_radius[0])
     .into_widget()
 }

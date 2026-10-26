@@ -19,10 +19,20 @@ Run the gallery from this repository. Dependencies come from crates.io.
 
 ```toml
 [dependencies]
-inset-winui = "0.4.2"
+inset-winui = "0.5.0"
 ```
 
 Use controls inside an Inset `WidgetsApp`, with `ThemeScope` selecting the light or dark theme. Call `install_icon_font` once during application setup. Controls that show popups need an `Overlay` ancestor.
+
+A `ThemeScope` can also change WinUI's theme resources for its subtree, as XAML's resource dictionaries do: `any` in both themes, then `light` or `dark`. Each resource is a field named after its XAML key.
+
+```rust
+ThemeScope::new(Theme::Light, app)
+    .any(|r| r.control_corner_radius = [6.0; 4])
+    .dark(|r| r.text_fill_color_primary = Color::from_argb(255, 240, 240, 240))
+```
+
+`ThemeScope::overriding(child)` changes the enclosing scope's resources for one control, as `<Control.Resources>` does.
 
 The [gallery](https://github.com/inset-rs/inset-winui/tree/main/examples/winui_gallery) demonstrates application setup, font registration and control state.
 

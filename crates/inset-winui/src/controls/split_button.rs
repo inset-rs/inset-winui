@@ -311,6 +311,7 @@ impl SplitButtonState {
     /// Builds one internal Button with the source template's unstyled content presenter.
     fn button(
         self: Handle<Self>,
+        r: &ThemeResources,
         app: &mut App,
         primary: bool,
         foreground: Color,
@@ -332,6 +333,13 @@ impl SplitButtonState {
                 )
                 .into_widget()
         };
+        let padding = r.split_button_padding;
+        let text_style = control_text_style(
+            r,
+            r.control_content_theme_font_size,
+            FontWeight::NORMAL,
+            foreground,
+        );
         let button = CommonStates::new(
             Listener::new(move |app| {
                 if primary {
@@ -341,16 +349,10 @@ impl SplitButtonState {
                 }
             }),
             move |_, _, states| {
-                let content = DefaultTextStyle::new(
-                    control_text_style(CONTROL_CONTENT_FONT_SIZE, FontWeight::NORMAL, foreground),
-                    content.clone(),
-                );
+                let content = DefaultTextStyle::new(text_style.clone(), content.clone());
                 let presenter = if primary {
                     Padding::new(EdgeInsetsGeometry::from_ltrb(
-                        SPLIT_BUTTON_PADDING[0],
-                        SPLIT_BUTTON_PADDING[1],
-                        SPLIT_BUTTON_PADDING[2],
-                        SPLIT_BUTTON_PADDING[3],
+                        padding[0], padding[1], padding[2], padding[3],
                     ))
                     .child(
                         Center::new()
@@ -422,7 +424,7 @@ impl SplitButtonState {
     /// RootGrid layers appear in the same order as SplitButton.xaml.
     fn template(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let theme = ThemeResources::of(app, context);
-        let r = theme.split_button();
+        let r = &theme;
         let state = self.visual_state(app);
         let mut primary_fill = r.split_button_background;
         let mut secondary_fill = r.split_button_background;
@@ -507,12 +509,14 @@ impl SplitButtonState {
             }
         }
         let primary = self.button(
+            &theme,
             app,
             true,
             primary_foreground,
             r.split_button_background_disabled,
         );
         let secondary = self.button(
+            &theme,
             app,
             false,
             secondary_foreground,
@@ -521,11 +525,12 @@ impl SplitButtonState {
         let key_down = app.get(self).key_down;
         let root = Grid::new()
             .background(Brush::Solid(Color::new(0)))
-            .corner_radius_corners(CONTROL_CORNER_RADIUS)
+            .corner_radius_corners(r.control_corner_radius)
             .column_definitions([
-                ColumnDefinition::new(GridLength::STAR).min_width(SPLIT_BUTTON_PRIMARY_BUTTON_SIZE),
+                ColumnDefinition::new(GridLength::STAR)
+                    .min_width(r.split_button_primary_button_size),
                 ColumnDefinition::new(GridLength::pixel(1.0)),
-                ColumnDefinition::new(GridLength::pixel(SPLIT_BUTTON_SECONDARY_BUTTON_SIZE)),
+                ColumnDefinition::new(GridLength::pixel(r.split_button_secondary_button_size)),
             ])
             .children([
                 GridCell::new(Grid::new().background(Brush::Solid(primary_fill)))
@@ -561,7 +566,7 @@ impl SplitButtonState {
         FocusVisual::new(root, theme.theme)
             .visible(app.get(self).focused)
             .margin([-1.0; 4])
-            .corner_radius(CONTROL_CORNER_RADIUS[0])
+            .corner_radius(r.control_corner_radius[0])
             .into_widget()
     }
 }

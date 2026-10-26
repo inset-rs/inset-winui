@@ -83,12 +83,12 @@ impl State for RadioButtonSectionState {
         children.push(label(
             format!("RadioButton: {}", OPTIONS[selected]),
             TextBlockStyle::Body,
-            resources.common.text_fill_color_secondary,
+            resources.text_fill_color_secondary,
         ));
         children.push(label(
             format!("Checked {checked_count} times"),
             TextBlockStyle::Caption,
-            resources.common.text_fill_color_secondary,
+            resources.text_fill_color_secondary,
         ));
         let (delivery, express_enabled) = {
             let state = app.get(self);
@@ -131,7 +131,7 @@ impl State for RadioButtonSectionState {
                                             label(
                                                 detail,
                                                 TextBlockStyle::Caption,
-                                                resources.common.text_fill_color_secondary,
+                                                resources.text_fill_color_secondary,
                                             ),
                                         ],
                                         2.0,
@@ -147,7 +147,7 @@ impl State for RadioButtonSectionState {
                                     if delivery == 0 { "Standard" } else { "Express" }
                                 ),
                                 TextBlockStyle::Body,
-                                resources.common.text_fill_color_secondary,
+                                resources.text_fill_color_secondary,
                             ),
                         ],
                         12.0,

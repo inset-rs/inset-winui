@@ -35,7 +35,6 @@ fn fixture(theme: Theme) -> (Fixture, Handle<ScrollViewportController>) {
                         theme,
                         ColoredBox::new(
                             ThemeResources::new(theme, AccentPalette::default())
-                                .common
                                 .solid_background_fill_color_base,
                         )
                         .child(ScrollBarViewport::new(

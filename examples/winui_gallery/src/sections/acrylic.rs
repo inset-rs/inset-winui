@@ -10,7 +10,7 @@ use inset_winui::*;
 
 /// Builds two surfaces using the source flyout material recipe.
 pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
-    let recipe = resources.flyout_presenter().flyout_presenter_background;
+    let recipe = resources.flyout_presenter_background;
     let panels = [
         ("Acrylic", Brush::Acrylic(recipe)),
         ("Opaque fallback", Brush::Solid(recipe.fallback_color)),
@@ -41,12 +41,12 @@ pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
                                         label(
                                             title,
                                             TextBlockStyle::Subtitle,
-                                            resources.common.text_fill_color_primary,
+                                            resources.text_fill_color_primary,
                                         ),
                                         label(
                                             "Text and controls stay sharp.",
                                             TextBlockStyle::Body,
-                                            resources.common.text_fill_color_primary,
+                                            resources.text_fill_color_primary,
                                         ),
                                     ],
                                     12.0,

@@ -120,7 +120,7 @@ impl State for ContentDialogDemoState {
                 state.event.clone(),
             )
         };
-        let text = resources.common.text_fill_color_secondary;
+        let text = resources.text_fill_color_secondary;
         column(
             vec![
                 example(

@@ -54,7 +54,7 @@ fn status(app: &mut App, context: BuildContext, text: String) -> WidgetRef {
     label(
         text,
         TextBlockStyle::Body,
-        resources.common.text_fill_color_secondary,
+        resources.text_fill_color_secondary,
     )
 }
 

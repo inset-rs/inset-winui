@@ -8,18 +8,15 @@ use inset_winui::*;
 
 /// Builds the grid sizing, spanning and alignment example.
 pub fn build(resources: &ThemeResources) -> Vec<WidgetRef> {
-    let text = resources.common.text_fill_color_primary;
+    let text = resources.text_fill_color_primary;
     let cell = |name: &str, brush: Brush| {
-        ControlBorder::new(
-            brush,
-            Brush::Solid(resources.common.control_stroke_color_default),
-        )
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
-        .padding([8.0, 4.0, 8.0, 4.0])
-        .child(label(name, TextBlockStyle::Caption, text))
+        ControlBorder::new(brush, Brush::Solid(resources.control_stroke_color_default))
+            .corner_radius(resources.control_corner_radius[0])
+            .padding([8.0, 4.0, 8.0, 4.0])
+            .child(label(name, TextBlockStyle::Caption, text))
     };
     let accent = Brush::Solid(resources.accent.light3);
-    let fill = Brush::Solid(resources.common.control_fill_color_default);
+    let fill = Brush::Solid(resources.control_fill_color_default);
     let grid = Grid::new()
         .column_definitions([
             ColumnDefinition::new(GridLength::AUTO),

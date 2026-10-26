@@ -1,6 +1,6 @@
 //! ElevationHelper.cpp and DropShadowRecipe.h, using Inset's native shadow blur.
 
-use crate::{NUMBER_BOX_POPUP_SHADOW_DEPTH, OVERLAY_CORNER_RADIUS, Theme};
+use crate::{Theme, ThemeResources};
 use inset_embedder::{BlurStyle, Canvas, ClipOp, Color, Offset, RRect, Radius, Size};
 use inset_foundation::App;
 use inset_painting::{BoxShadow, draw_rrect};
@@ -21,30 +21,30 @@ pub(crate) struct PopupShadow {
 
 impl PopupShadow {
     /// A flyout's, `depth` submenus deep: ElevationHelper's base Z of 32 and 8 more per level.
-    pub(crate) fn for_flyout(theme: Theme, depth: usize) -> PopupShadow {
+    pub(crate) fn for_flyout(r: &ThemeResources, theme: Theme, depth: usize) -> PopupShadow {
         PopupShadow {
             theme,
             translation_z: 32.0 + depth as f64 * 8.0,
-            corner_radius: OVERLAY_CORNER_RADIUS,
+            corner_radius: r.overlay_corner_radius,
         }
     }
 
     /// A dialog's: ContentDialog raises its background element to a Z of 128.
-    pub(crate) fn for_dialog(theme: Theme) -> PopupShadow {
+    pub(crate) fn for_dialog(r: &ThemeResources, theme: Theme) -> PopupShadow {
         PopupShadow {
             theme,
             translation_z: 128.0,
-            corner_radius: OVERLAY_CORNER_RADIUS,
+            corner_radius: r.overlay_corner_radius,
         }
     }
 
     /// NumberBox's popup: `OnApplyTemplate` raises `PopupContentRoot` to a Z of
     /// `NumberBoxPopupShadowDepth`.
-    pub(crate) fn for_number_box_popup(theme: Theme) -> PopupShadow {
+    pub(crate) fn for_number_box_popup(r: &ThemeResources, theme: Theme) -> PopupShadow {
         PopupShadow {
             theme,
-            translation_z: NUMBER_BOX_POPUP_SHADOW_DEPTH,
-            corner_radius: OVERLAY_CORNER_RADIUS,
+            translation_z: r.number_box_popup_shadow_depth,
+            corner_radius: r.overlay_corner_radius,
         }
     }
 

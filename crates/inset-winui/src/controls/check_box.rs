@@ -5,11 +5,8 @@
 //! The glyph is not a font glyph on a Windows 11 host: `AnimatedIcon` renders the composition program in `controls/dev/AnimatedIcon/AnimatedVisuals/AnimatedAcceptVisualSource.cpp` (LottieGen output), which this file transcribes: a 48 × 48 canvas, the check as a polyline stroked 4 wide with round caps and joins under the layer transforms, drawn on by `TrimEnd` and erased by `TrimStart`, and the indeterminate bar as a line. `AnimatedIcon::ArrangeOverride` scales the canvas uniformly into the icon's bounds and centres it.
 
 use crate::{
-    BackgroundSizing, Brush, CHECK_BOX_BORDER_THICKNESS, CHECK_BOX_FOCUS_VISUAL_MARGIN,
-    CHECK_BOX_HEIGHT, CHECK_BOX_MIN_WIDTH, CHECK_BOX_PADDING, CHECK_BOX_SIZE,
-    CONTROL_CONTENT_FONT_SIZE, CONTROL_CORNER_RADIUS, CheckBoxResources, ColumnDefinition,
-    CommonState, CommonStates, ControlBorder, ControlStates, FocusVisual, Grid, GridCell,
-    GridLength, ThemeResources, control_text_style,
+    BackgroundSizing, Brush, ColumnDefinition, CommonState, CommonStates, ControlBorder,
+    ControlStates, FocusVisual, Grid, GridCell, GridLength, ThemeResources, control_text_style,
 };
 use inset_animation::{
     Animation, AnimationBehavior, AnimationController, AnimationStatusListener, Cubic, Curve,
@@ -109,7 +106,7 @@ pub struct CheckBoxBrushes {
 
 /// The `{ThemeResource …}` values the `CombinedStates` storyboard for (`check`, `common`) names.
 pub fn check_box_brushes(
-    r: &CheckBoxResources,
+    r: &ThemeResources,
     check: CheckState,
     common: CommonState,
 ) -> CheckBoxBrushes {
@@ -318,7 +315,7 @@ fn template(
 ) -> WidgetRef {
     let resources = ThemeResources::of(app, context);
     let check = CheckState::from_is_checked(widget.is_checked);
-    let brushes = check_box_brushes(&resources.check_box(), check, states.common);
+    let brushes = check_box_brushes(&resources, check, states.common);
     // `RootGrid`.
     let root = Grid::new()
         .column_definitions([
@@ -328,36 +325,36 @@ fn template(
         .background(Brush::Solid(brushes.background))
         .border_brush(Brush::Solid(brushes.border))
         .border_thickness(CHECK_BOX_ROOT_BORDER_THICKNESS)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .corner_radius(resources.control_corner_radius[0])
         .children([
-            GridCell::new(check_area(&brushes, check)).into_widget(),
-            GridCell::new(content_presenter(widget, &brushes))
+            GridCell::new(check_area(&resources, &brushes, check)).into_widget(),
+            GridCell::new(content_presenter(&resources, widget, &brushes))
                 .column(1)
                 .into_widget(),
         ]);
     // The style's `MinWidth` and `MinHeight`.
     let body = ConstrainedBox::new(
         BoxConstraints::new()
-            .min_width(CHECK_BOX_MIN_WIDTH)
-            .min_height(CHECK_BOX_HEIGHT),
+            .min_width(resources.check_box_min_width)
+            .min_height(resources.check_box_height),
     )
     .child(root);
     FocusVisual::new(body, resources.theme)
         .visible(states.focused)
-        .margin(CHECK_BOX_FOCUS_VISUAL_MARGIN)
-        .corner_radius(CONTROL_CORNER_RADIUS[0])
+        .margin(resources.check_box_focus_visual_margin)
+        .corner_radius(resources.control_corner_radius[0])
         .into_widget()
 }
 
 /// The 20 × 20 grid in column 0 (`VerticalAlignment="Center"`) with `NormalRectangle` and `CheckGlyph` in its one cell.
-fn check_area(brushes: &CheckBoxBrushes, check: CheckState) -> WidgetRef {
+fn check_area(r: &ThemeResources, brushes: &CheckBoxBrushes, check: CheckState) -> WidgetRef {
     // `NormalRectangle`: a `Rectangle` fills under its stroke.
     let rectangle = ControlBorder::new(
         Brush::Solid(brushes.box_fill),
         Brush::Solid(brushes.box_stroke),
     )
-    .border_thickness(CHECK_BOX_BORDER_THICKNESS)
-    .corner_radius(CONTROL_CORNER_RADIUS[0])
+    .border_thickness(r.check_box_border_thickness)
+    .corner_radius(r.control_corner_radius[0])
     .background_sizing(BackgroundSizing::OuterBorderEdge);
     let glyph = CheckGlyph {
         check,
@@ -379,18 +376,23 @@ fn check_area(brushes: &CheckBoxBrushes, check: CheckState) -> WidgetRef {
         .height_factor(1.0)
         .child(
             SizedBox::new()
-                .width(CHECK_BOX_SIZE)
-                .height(CHECK_BOX_SIZE)
+                .width(r.check_box_size)
+                .height(r.check_box_size)
                 .child(grid),
         )
         .into_widget()
 }
 
 /// `ContentPresenter` in column 1: `Margin` is the style's `Padding`, aligned left and top.
-fn content_presenter(widget: &CheckBox, brushes: &CheckBoxBrushes) -> WidgetRef {
-    let [left, top, right, bottom] = CHECK_BOX_PADDING;
+fn content_presenter(
+    r: &ThemeResources,
+    widget: &CheckBox,
+    brushes: &CheckBoxBrushes,
+) -> WidgetRef {
+    let [left, top, right, bottom] = r.check_box_padding;
     let text = control_text_style(
-        CONTROL_CONTENT_FONT_SIZE,
+        r,
+        r.control_content_theme_font_size,
         FontWeight::W400,
         brushes.foreground,
     );

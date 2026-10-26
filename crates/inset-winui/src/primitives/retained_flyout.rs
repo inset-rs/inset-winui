@@ -30,7 +30,7 @@ pub struct RetainedFlyoutHost {
     target: Option<Handle<FlyoutTargetState>>,
 
     /// Theme last supplied by the current target.
-    resources: Option<ThemeResources>,
+    resources: Option<Rc<ThemeResources>>,
 
     /// Text direction last supplied by the current target.
     direction: TextDirection,
@@ -319,7 +319,7 @@ pub struct FlyoutTargetState {
     hosts: Vec<Handle<RetainedFlyoutHost>>,
 
     /// Theme obtained through this target's inherited dependencies.
-    resources: Option<ThemeResources>,
+    resources: Option<Rc<ThemeResources>>,
 
     /// Current inherited text direction.
     direction: TextDirection,
@@ -516,14 +516,13 @@ impl State for RetainedFlyoutState {
         let direction = data.direction;
         let builder = data.builder.clone();
         let on_key_event = data.on_key_event.clone();
-        let mut themed_content = ThemeScope::new(
-            resources.theme,
+        let themed_content = ThemeScope::with_resources(
+            resources,
             Directionality::new(
                 direction,
                 Builder::new(move |app, context| builder(app, context)),
             ),
         );
-        themed_content.resources = resources;
         let mut scope = FocusScope::new(themed_content).node(app.get(self).focus.unwrap());
         if let Some(handler) = on_key_event {
             scope = scope.on_key_event(handler);

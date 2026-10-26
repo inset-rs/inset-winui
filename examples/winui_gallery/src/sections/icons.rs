@@ -99,7 +99,7 @@ impl State for IconDemoState {
         let foreground = if accent {
             r.accent.base
         } else {
-            r.common.text_fill_color_primary
+            r.text_fill_color_primary
         };
         let options = example_row(
             vec![

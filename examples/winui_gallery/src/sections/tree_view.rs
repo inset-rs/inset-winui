@@ -269,7 +269,7 @@ impl State for TreeViewDemoState {
 
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let r = ThemeResources::of(app, context);
-        let secondary = r.common.text_fill_color_secondary;
+        let secondary = r.text_fill_color_secondary;
         let panel = |tree: TreeView| {
             SizedBox::new()
                 .width(360.0)

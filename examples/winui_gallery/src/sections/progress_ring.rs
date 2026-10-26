@@ -48,7 +48,7 @@ fn captioned(ring: WidgetRef, name: &str, resources: &ThemeResources) -> WidgetR
             label(
                 name,
                 TextBlockStyle::Caption,
-                resources.common.text_fill_color_secondary,
+                resources.text_fill_color_secondary,
             ),
         ])
         .into_widget()
@@ -119,13 +119,13 @@ impl State for RingDemoState {
                             ProgressRing::new()
                                 .is_indeterminate(false)
                                 .value(75.0)
-                                .background(r.common.control_strong_fill_color_default)
+                                .background(r.control_strong_fill_color_default)
                                 .into_widget(),
                             ProgressRing::new()
                                 .is_indeterminate(false)
                                 .value(75.0)
-                                .foreground(r.common.system_fill_color_success_brush)
-                                .background(r.common.control_strong_fill_color_default)
+                                .foreground(r.system_fill_color_success_brush)
+                                .background(r.control_strong_fill_color_default)
                                 .into_widget(),
                         ],
                         24.0,

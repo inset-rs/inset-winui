@@ -34,17 +34,17 @@ pub struct ProgressBar {
     /// Whether the control is visible and its indeterminate animation runs.
     pub is_visible: bool,
 
-    /// Height of the indicator grid, as bound by the source template.
-    pub min_height: f64,
+    /// Height of the indicator grid, as bound by the source template; the theme's `ProgressBarMinHeight` when `None`.
+    pub min_height: Option<f64>,
 
     /// Padding in left, top, right, bottom order.
     pub padding: [f64; 4],
 
-    /// Border widths in left, top, right, bottom order.
-    pub border_thickness: [f64; 4],
+    /// Border widths in left, top, right, bottom order; the theme's `ProgressBarBorderThemeThickness` when `None`.
+    pub border_thickness: Option<[f64; 4]>,
 
-    /// Radius of the indicator rectangles.
-    pub corner_radius: f64,
+    /// Radius of the indicator rectangles; the theme's `ProgressBarCornerRadius` when `None`.
+    pub corner_radius: Option<f64>,
 
     /// Optional normal indicator color.
     pub foreground: Option<Color>,
@@ -70,10 +70,10 @@ impl ProgressBar {
             show_paused: false,
             show_error: false,
             is_visible: true,
-            min_height: PROGRESS_BAR_MIN_HEIGHT,
+            min_height: None,
             padding: [0.0; 4],
-            border_thickness: PROGRESS_BAR_BORDER_THEME_THICKNESS,
-            corner_radius: PROGRESS_BAR_CORNER_RADIUS[0],
+            border_thickness: None,
+            corner_radius: None,
             foreground: None,
             background: None,
             border_brush: None,
@@ -125,7 +125,7 @@ impl ProgressBar {
 
     /// Sets MinHeight.
     pub fn min_height(mut self, value: f64) -> Self {
-        self.min_height = value;
+        self.min_height = Some(value);
         self
     }
 
@@ -137,13 +137,13 @@ impl ProgressBar {
 
     /// Sets BorderThickness.
     pub fn border_thickness(mut self, value: [f64; 4]) -> Self {
-        self.border_thickness = value;
+        self.border_thickness = Some(value);
         self
     }
 
     /// Sets CornerRadius.
     pub fn corner_radius(mut self, value: f64) -> Self {
-        self.corner_radius = value;
+        self.corner_radius = Some(value);
         self
     }
 
@@ -188,7 +188,7 @@ impl ProgressBar {
     }
 
     /// Resolves the target fill of the active state.
-    fn indicator_color(&self, resources: &ProgressBarResources) -> Color {
+    fn indicator_color(&self, resources: &ThemeResources) -> Color {
         if self.show_error {
             resources.progress_bar_error_foreground_color
         } else if self.show_paused {
@@ -360,7 +360,7 @@ impl SingleTickerProviderStateMixin for ProgressBarState {
 impl ProgressBarState {
     /// SetProgressBarIndicatorWidth visits Updating before returning to the target state.
     fn update_indicator_width(self: Handle<Self>, app: &mut App) {
-        let resources = ThemeResources::of(app, self.context(app)).progress_bar();
+        let resources = ThemeResources::of(app, self.context(app));
         let widget = self.widget(app);
         let from = if widget.show_error {
             ProgressState::UpdatingError
@@ -412,7 +412,7 @@ impl ProgressBarState {
         self: Handle<Self>,
         app: &App,
         widget: &ProgressBar,
-        resources: &ProgressBarResources,
+        resources: &ThemeResources,
     ) -> Color {
         let target = widget.indicator_color(resources);
         let state = app.get(self);
@@ -455,7 +455,7 @@ impl State for ProgressBarState {
         if width_component_changed {
             self.update_indicator_width(app);
         } else if old.visual_state() != widget.visual_state() {
-            let resources = ThemeResources::of(app, self.context(app)).progress_bar();
+            let resources = ThemeResources::of(app, self.context(app));
             let color = self.color(app, old, &resources);
             let previous = progress_visuals(
                 old.visual_state(),
@@ -485,11 +485,12 @@ impl State for ProgressBarState {
     /// Builds the named template parts from the current visual state.
     fn build(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
-        let resources = ThemeResources::of(app, context).progress_bar();
+        let resources = ThemeResources::of(app, context);
         let state = widget.visual_state();
         let scale = MediaQuery::device_pixel_ratio_of(app, context);
         let border = widget
             .border_thickness
+            .unwrap_or(resources.progress_bar_border_theme_thickness)
             .map(|side| (side * scale).round() / scale);
         let range = RangeBase::new(widget.minimum, widget.maximum, widget.value).coerced();
 
@@ -501,7 +502,9 @@ impl State for ProgressBarState {
             };
             let inset = widget.padding[0] + widget.padding[2] + border[0] + border[2];
             let available = (width - inset).max(0.0);
-            let height = widget.min_height;
+            let height = widget
+                .min_height
+                .unwrap_or(resources.progress_bar_min_height);
             let root_size = constraints.constrain(Size::new(
                 width,
                 height + widget.padding[1] + widget.padding[3] + border[1] + border[3],
@@ -525,14 +528,14 @@ impl State for ProgressBarState {
                 parts.push(
                     Positioned::new(progress_rectangle(
                         available,
-                        PROGRESS_BAR_TRACK_HEIGHT,
-                        PROGRESS_BAR_TRACK_CORNER_RADIUS[0],
+                        resources.progress_bar_track_height,
+                        resources.progress_bar_track_corner_radius[0],
                         widget
                             .background
                             .unwrap_or(resources.progress_bar_background),
                     ))
                     .left(visuals.track_translation * width)
-                    .top((height - PROGRESS_BAR_TRACK_HEIGHT) / 2.0)
+                    .top((height - resources.progress_bar_track_height) / 2.0)
                     .into_widget(),
                 );
             }
@@ -547,7 +550,9 @@ impl State for ProgressBarState {
                             0.0
                         },
                         height,
-                        widget.corner_radius,
+                        widget
+                            .corner_radius
+                            .unwrap_or(resources.progress_bar_corner_radius[0]),
                         foreground,
                     ))
                     .left(0.0)
@@ -562,7 +567,9 @@ impl State for ProgressBarState {
                     Positioned::new(progress_rectangle(
                         available * 0.4,
                         height,
-                        widget.corner_radius,
+                        widget
+                            .corner_radius
+                            .unwrap_or(resources.progress_bar_corner_radius[0]),
                         foreground,
                     ))
                     .left(position * width)
@@ -575,7 +582,9 @@ impl State for ProgressBarState {
                     Positioned::new(progress_rectangle(
                         available * if state.suspended() { 1.0 } else { 0.6 },
                         height,
-                        widget.corner_radius,
+                        widget
+                            .corner_radius
+                            .unwrap_or(resources.progress_bar_corner_radius[0]),
                         foreground,
                     ))
                     .left(position * width)
@@ -596,7 +605,11 @@ impl State for ProgressBarState {
                         ),
                     )
                     .border_thickness_ltrb(border)
-                    .corner_radius(widget.corner_radius)
+                    .corner_radius(
+                        widget
+                            .corner_radius
+                            .unwrap_or(resources.progress_bar_corner_radius[0]),
+                    )
                     .child(
                         Padding::new(EdgeInsetsGeometry::from_ltrb(
                             widget.padding[0],

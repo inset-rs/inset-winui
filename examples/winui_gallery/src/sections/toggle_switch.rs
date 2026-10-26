@@ -131,7 +131,7 @@ impl State for TogglePropertiesState {
                     label(
                         format!("Notification preference: {}", if on { "On" } else { "Off" }),
                         TextBlockStyle::Body,
-                        resources.common.text_fill_color_secondary,
+                        resources.text_fill_color_secondary,
                     ),
                 ],
                 12.0,
