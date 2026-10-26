@@ -1003,9 +1003,9 @@ dependencies = [
 
 [[package]]
 name = "inset"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e33115478d1c643a5250cae6e36d4e756e9d61d716e00300f37f67ac200e29cb"
+checksum = "78bbbb35e57de0239b55e82d84426a13ab2172c6d37e247d65b069a3cf48a288"
 dependencies = [
  "inset-embedder",
  "inset-embedder-default",
@@ -1019,9 +1019,9 @@ dependencies = [
 
 [[package]]
 name = "inset-animation"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "722c2116a1a7988aa92b893cd7d17260c461f93da9f2778eb89775a0fddc9343"
+checksum = "c21ee7dac8abfe29f74546550082fe0d53cdb7a5c79bfb5addef66cd2a2dea7c"
 dependencies = [
  "inset-embedder",
  "inset-foundation",
@@ -1031,9 +1031,9 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0bde1d3eeec05314df86eb42d74f68b954e7f8f9062452efadfb8be93d26ccdc"
+checksum = "ce2332709259b2c4f5b388a42c215240e71919775de736202dd18d0cbf00b56b"
 dependencies = [
  "indexmap",
  "objc2-core-foundation",
@@ -1047,9 +1047,9 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder-android"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f04f2a3f735bacc4962388cd1c834f8904c825a85c280c0b784e4f80964787f"
+checksum = "3af48ee96bae45b2b32f7f869aa07958cc15693752ce9ff7d68ef8bb09e5fa69"
 dependencies = [
  "android-activity",
  "inset-embedder",
@@ -1066,9 +1066,9 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder-default"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d94ce8ad9951efa06e6dadc95cafcf434c498441ae3f51255f36020be260652"
+checksum = "81bdab13a620f30cac22e95bcc9e98f3450263e161aebd5e58bc147f364ab92e"
 dependencies = [
  "inset-embedder",
  "inset-embedder-android",
@@ -1078,9 +1078,9 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder-web"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08f05778e5782a91900cd15f64510d5f9be1687b113d32dc6b56f94d2f69d469"
+checksum = "d40d37de745889acbcf99b52f76e52ffea11929e5de251041432ff8b433ff3f2"
 dependencies = [
  "console_error_panic_hook",
  "getrandom 0.3.4",
@@ -1096,9 +1096,9 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder-winit"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1081e296c31bc8a66f2bdeefaf66cc2f90c126f135205529fa7f66b8f4db6f1d"
+checksum = "999dc7c75b4943949d8165e65ce8f670011afae3daf32b78da4650a356fe7b5f"
 dependencies = [
  "arboard",
  "dispatch2",
@@ -1120,9 +1120,9 @@ dependencies = [
 
 [[package]]
 name = "inset-foundation"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1769e42344faac010b83ad2d8a801bc000fe38547df40594ba07f0ef49cdd954"
+checksum = "8d351763afb9b0f3b12f6115218a1261a5f886d29de14b6e06cf42c7b67f583a"
 dependencies = [
  "async-task",
  "indexmap",
@@ -1132,9 +1132,9 @@ dependencies = [
 
 [[package]]
 name = "inset-gestures"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2492e017f928f177a78588b97a0f60afa0096416b2886e0385370bb6b3831632"
+checksum = "96132d1e2603a4ff2e2f8361abe11f79222b8ef595c98fa63ee5c35c4ff14096"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -1145,9 +1145,9 @@ dependencies = [
 
 [[package]]
 name = "inset-macros"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39cae00ff3778608a044a69665d75d2acec63bdac998fe36f0b2dc517f435f95"
+checksum = "5380de5181707d7ab4003040b82e09d02db828c785adeb7cc062db1badb57f09"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1156,9 +1156,9 @@ dependencies = [
 
 [[package]]
 name = "inset-painting"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "000256a0d943e157a8671d5cfce4e056aace7e517478c032e3f0f64dc036061a"
+checksum = "e3ce27de98c1fc691553d8342b6357c9a4ac844aa1e1bcafc6ef6fa191441d3c"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -1168,18 +1168,18 @@ dependencies = [
 
 [[package]]
 name = "inset-physics"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "388d41a7cb908461a8afc1b9895db5856052a486cc58039cf5bff03feecec9ab"
+checksum = "da49ecb9ed21c0a011e3f24c63a8672374507cd7dc7006da4e19ef026e76dfa8"
 dependencies = [
  "inset-embedder",
 ]
 
 [[package]]
 name = "inset-rendering"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30bd93375dc5123dc2f3b5da49639e3e3e8ce32493ccf4ca293fd224453860dc"
+checksum = "0da26daa4edda89fff567d843f6918f4472ac4c209340ad1c52162e57b94289e"
 dependencies = [
  "indexmap",
  "inset-animation",
@@ -1194,9 +1194,9 @@ dependencies = [
 
 [[package]]
 name = "inset-scheduler"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8391eb51fe73c6e1447479132aca6d7db4d2c0957639f6f32a46c48c44452fd5"
+checksum = "f533eefd199a7d627d2f4cbd65c216c7e2c7d62ec9b088c521ad8ec8b80034f1"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -1205,9 +1205,9 @@ dependencies = [
 
 [[package]]
 name = "inset-services"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfb84c8e1eee406e0477a602b18ee6e4786f3f5a7575d5a6d1d40a3d7d158310"
+checksum = "cfcd807115b745663a57d61a2e360888c690c8583e49c91b2931013cc46e6bc7"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -1219,9 +1219,9 @@ dependencies = [
 
 [[package]]
 name = "inset-shell"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bac384815b91ce6ba2fc0dff0a5e03cc3884953536f46ea3271fa9f3a6b2d72d"
+checksum = "dfb0120d900410c282625885f49709dc2c9e42962d5eff670f436e39e804b2a9"
 dependencies = [
  "inset-embedder",
  "inset-foundation",
@@ -1234,18 +1234,18 @@ dependencies = [
 
 [[package]]
 name = "inset-test"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "705eaa6552bc79f6c28714a9fc381f05f3c64ae577f5bb8363da3d16cd7de36c"
+checksum = "8a08cce9e5aabbdb2525d670a09e5a336e4b884a58895c06ec763b050c5067ef"
 dependencies = [
  "inset-embedder",
 ]
 
 [[package]]
 name = "inset-widgets"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1802b476632fdd7ff4b6af84b7ff76edffa74fbc476df8b1fbf5b6a30130f766"
+checksum = "4128261ff14c1b09c7ef23abe09a2eea1d7624651a12eea4a7eb0a77ec3bd53e"
 dependencies = [
  "indexmap",
  "inset-animation",
@@ -2904,9 +2904,9 @@ checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
 
 [[package]]
 name = "valo"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c4721a4dea5e6fedf01d868e978895c617db2a0db649a8585e0ec71aef0eae2"
+checksum = "0b65a3e30d4a3902d253f7fccbe17b467dbd6b35bbe9331aa7c2edb4805b4d8f"
 dependencies = [
  "objc2 0.6.4",
  "objc2-metal 0.3.2",
@@ -2920,9 +2920,9 @@ dependencies = [
 
 [[package]]
 name = "valo-codec"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac0506dc2b1073e1c50661fb7d3aa057f00f5199ba3c834659d3eada365e6c5b"
+checksum = "ee1b5b5c4dd2df6a0277abac2e595650a0ce8f791c111965bc9a37a75433e6d3"
 dependencies = [
  "valo",
  "wgpu",
@@ -2930,9 +2930,9 @@ dependencies = [
 
 [[package]]
 name = "valo-codec-apple"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f45c99883f5ba33003fee0ede28420787e4832fe7f1c79e773afd98d96126e3a"
+checksum = "b913386360dd61dbf55b5fe34a063d3539107d8e4b32fc4f54a923a9d5a1f173"
 dependencies = [
  "core-foundation 0.10.1",
  "core-foundation-sys",
@@ -2949,9 +2949,9 @@ dependencies = [
 
 [[package]]
 name = "valo-codec-software"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94f0cbd2a81588732c8582c9119bbb11ab2054ebcd3a7ff591bed045c355abcd"
+checksum = "d470cf70330af5a002520211fcd153f929a307ac9913d0ce769a31f9259dceb5"
 dependencies = [
  "gif",
  "image",
@@ -2964,9 +2964,9 @@ dependencies = [
 
 [[package]]
 name = "valo-dl"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0eea1105efca64ac0c56581c8188f0ab26525e92ffcc780437c3c12b29068dab"
+checksum = "e0969f6e41bbef48cb7a2d65ac9c875b516c4eb2ca761b10d63bafb2421169c0"
 dependencies = [
  "valo-geometry",
  "valo-text",
@@ -2975,9 +2975,9 @@ dependencies = [
 
 [[package]]
 name = "valo-fontmgr"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0c97303f125d97dc6afb51e55e55e526439638bf0659f2e001eade403de43de"
+checksum = "e000b436234309204f32889c045de15af32b516cb965e1ece5cbf6c1589acb2b"
 dependencies = [
  "core-foundation 0.10.1",
  "core-foundation-sys",
@@ -2989,18 +2989,18 @@ dependencies = [
 
 [[package]]
 name = "valo-geometry"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d305e269d55eef9ad1e01e5f811c3833cde6f6c36edcc3296fbc9bbbb77a3010"
+checksum = "7bccf52afbb9a251ceaa9bac9293e1228df84ae9fe1c19f9cb3b3ba993d8702b"
 dependencies = [
  "glam",
 ]
 
 [[package]]
 name = "valo-renderer"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "459d8ee17e45fb66adfec9eed4d787f903f15bb0961686c680d76a3964559129"
+checksum = "21f142175908745790a2f217390318e684fd3969ebc1dd507293132a15464bef"
 dependencies = [
  "bytemuck",
  "etagere",
@@ -3016,9 +3016,9 @@ dependencies = [
 
 [[package]]
 name = "valo-system-fonts"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e98ba264f4b9fc6bd6517f6c840dbeacaff0d5473e5dd77dc1b53e5bb5332484"
+checksum = "10689075e777f6e0be1dc86ce81df2d082bb0a382d9ff9e4c24e3ff88d66d43a"
 dependencies = [
  "valo-fontmgr",
  "valo-text",
@@ -3026,9 +3026,9 @@ dependencies = [
 
 [[package]]
 name = "valo-text"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "216ed0e8603fbe2c85af132ed22ae9765b1a3d654e6a24000005cd40f0272ca7"
+checksum = "8c3f2d8817f901a38912442b9146c42301ab899f024f2a685b4eb57cf537f290"
 dependencies = [
  "allsorts",
  "harfrust",

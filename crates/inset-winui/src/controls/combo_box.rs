@@ -2806,7 +2806,7 @@ impl ComboBoxState {
     fn editable_text(self: Handle<Self>, app: &mut App, context: BuildContext) -> WidgetRef {
         let widget = self.widget(app).clone();
         let r = ThemeResources::of(app, context);
-        let mut config = TextBox::new(self.text(app))
+        let mut config = TextBox::new(self.text(app).as_controller())
             .focus_node(self.text_focus(app))
             .placeholder_text(widget.placeholder_text.clone())
             .is_enabled(widget.is_enabled)

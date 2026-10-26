@@ -103,7 +103,7 @@ fn label_center(f: &Fixture, text: &str) -> Option<Offset> {
 
 /// The editable box's text box: its text, its focus and a point inside it.
 struct EditableText {
-    controller: Handle<TextEditingController>,
+    controller: AnyTextEditingController,
     focus: Handle<FocusNode>,
 }
 

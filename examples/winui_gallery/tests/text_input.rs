@@ -14,7 +14,7 @@ use inset_widgets::*;
 use inset_winui::*;
 
 /// Finds a public control's native controller by its placeholder.
-fn controller(f: &Fixture, placeholder: &str) -> Handle<TextEditingController> {
+fn controller(f: &Fixture, placeholder: &str) -> AnyTextEditingController {
     let elements = f.elements();
     let app = f.cell.borrow();
     for element in elements {
@@ -35,10 +35,7 @@ fn controller(f: &Fixture, placeholder: &str) -> Handle<TextEditingController> {
 }
 
 /// Finds the mounted editor and a point inside its native render object.
-fn editor(
-    f: &Fixture,
-    controller: Handle<TextEditingController>,
-) -> (Handle<FocusNode>, Offset, bool) {
+fn editor(f: &Fixture, controller: AnyTextEditingController) -> (Handle<FocusNode>, Offset, bool) {
     let elements = f.elements();
     let app = f.cell.borrow();
     for element in elements {
@@ -346,7 +343,9 @@ fn a_box_showing_its_delete_button_given_spare_height_keeps_its_own() {
     let r = ThemeResources::new(Theme::Light, AccentPalette::default());
     let size = common::size_under_center([300, 300], |app| {
         let controller = TextEditingController::new(app).text(app, "Text");
-        TextBox::new(controller).autofocus(true).into_widget()
+        TextBox::new(controller.as_controller())
+            .autofocus(true)
+            .into_widget()
     });
     assert_eq!(size.height(), r.text_control_theme_min_height);
 }

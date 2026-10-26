@@ -73,7 +73,7 @@ pub(super) struct TextControlState {
     focus: Option<Handle<FocusNode>>,
 
     /// Controller whose listener is currently attached.
-    controller: Option<Handle<TextEditingController>>,
+    controller: Option<AnyTextEditingController>,
 
     /// Native editing history retained across theme and template changes.
     undo: Option<Handle<UndoHistoryController>>,

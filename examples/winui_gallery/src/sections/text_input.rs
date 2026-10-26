@@ -135,7 +135,7 @@ impl State for TextExamplesState {
                                     vec![enable.into_widget(), change_mode.into_widget()],
                                     16.0,
                                 ),
-                                PasswordBox::new(controllers[0])
+                                PasswordBox::new(controllers[0].as_controller())
                                     .header(Text::new("Password"))
                                     .placeholder_text("Enter a password")
                                     .description(Text::new(
@@ -160,11 +160,11 @@ impl State for TextExamplesState {
                         &r,
                         column(
                             vec![
-                                PasswordBox::new(controllers[1])
+                                PasswordBox::new(controllers[1].as_controller())
                                     .header(Text::new("Stored password"))
                                     .is_enabled(false)
                                     .into_widget(),
-                                PasswordBox::new(controllers[2])
+                                PasswordBox::new(controllers[2].as_controller())
                                     .header(Text::new("Limited password"))
                                     .placeholder_text("Up to 12 characters")
                                     .max_length(12)
@@ -213,7 +213,7 @@ impl State for TextExamplesState {
                                     ],
                                     16.0,
                                 ),
-                                TextBox::new(controller)
+                                TextBox::new(controller.as_controller())
                                     .header(Text::new("Name"))
                                     .placeholder_text("Enter your name")
                                     .description(Text::new(
@@ -228,7 +228,7 @@ impl State for TextExamplesState {
                                     TextBlockStyle::Caption,
                                     r.text_fill_color_secondary,
                                 ),
-                                TextBox::new(controllers[1])
+                                TextBox::new(controllers[1].as_controller())
                                     .header(Text::new("Read-only sample"))
                                     .is_read_only(true)
                                     .into_widget(),
@@ -240,7 +240,7 @@ impl State for TextExamplesState {
                         "Multiline text",
                         "Enter line breaks; long lines wrap and the editor scrolls after four visible lines.",
                         &r,
-                        TextBox::new(controllers[2])
+                        TextBox::new(controllers[2].as_controller())
                             .header(Text::new("Notes"))
                             .placeholder_text("Write a few lines…")
                             .accepts_return(true)

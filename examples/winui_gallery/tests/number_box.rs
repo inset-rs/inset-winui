@@ -26,7 +26,7 @@ const PAGE: [u32; 2] = [1080, 1700];
 
 /// The text box of the NumberBox with `placeholder`: its text, its focus and a point inside it.
 struct InputBox {
-    controller: Handle<TextEditingController>,
+    controller: AnyTextEditingController,
     focus: Handle<FocusNode>,
     point: Offset,
 }

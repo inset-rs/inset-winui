@@ -26,7 +26,7 @@ pub enum PasswordRevealMode {
 #[derive(Clone)]
 pub struct PasswordBox {
     /// Owns the text, selection and composing range; the caller retains and disposes it.
-    pub controller: Handle<TextEditingController>,
+    pub controller: AnyTextEditingController,
 
     /// An optional caller-owned focus node; otherwise the control creates one.
     pub focus_node: Option<Handle<FocusNode>>,
@@ -91,7 +91,7 @@ pub struct PasswordBox {
 
 impl PasswordBox {
     /// Creates an editor using a caller-owned native editing controller.
-    pub fn new(controller: Handle<TextEditingController>) -> Self {
+    pub fn new(controller: AnyTextEditingController) -> Self {
         Self {
             controller,
             focus_node: None,

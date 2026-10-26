@@ -1742,7 +1742,7 @@ impl ColorPickerState {
         max_length: i32,
     ) -> TextBox {
         let part = self.part(app, text_box);
-        TextBox::new(part.controller)
+        TextBox::new(part.controller.as_controller())
             .focus_node(part.focus)
             .max_length(max_length)
             .is_enabled(self.widget(app).is_enabled)

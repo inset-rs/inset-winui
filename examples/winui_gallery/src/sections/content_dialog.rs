@@ -66,7 +66,7 @@ impl State for ContentDialogDemoState {
             .title(app, Text::new("New collection"))
             .content(
                 app,
-                TextBox::new(name)
+                TextBox::new(name.as_controller())
                     .header(Text::new("Name"))
                     .placeholder_text("Photos"),
             )

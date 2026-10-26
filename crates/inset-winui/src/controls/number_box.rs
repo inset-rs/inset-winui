@@ -1083,7 +1083,7 @@ impl NumberBoxState {
         spin_buttons: SpinButtonsState,
     ) -> WidgetRef {
         let widget = self.widget(app);
-        let mut config = TextBox::new(self.controller(app))
+        let mut config = TextBox::new(self.controller(app).as_controller())
             .focus_node(self.focus(app))
             .placeholder_text(widget.placeholder_text.clone())
             .is_enabled(widget.is_enabled)
