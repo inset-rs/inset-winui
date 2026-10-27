@@ -1003,9 +1003,9 @@ dependencies = [
 
 [[package]]
 name = "inset"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78bbbb35e57de0239b55e82d84426a13ab2172c6d37e247d65b069a3cf48a288"
+checksum = "f60101ae5aa427db47d076d51496b068a147d30ed9bc378ab342a82a3e879db2"
 dependencies = [
  "inset-embedder",
  "inset-embedder-default",
@@ -1019,9 +1019,9 @@ dependencies = [
 
 [[package]]
 name = "inset-animation"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c21ee7dac8abfe29f74546550082fe0d53cdb7a5c79bfb5addef66cd2a2dea7c"
+checksum = "ff61c36ad95c403bc12703318047538158f4e3b218055ed743e8cf5e10e8494b"
 dependencies = [
  "inset-embedder",
  "inset-foundation",
@@ -1031,9 +1031,9 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce2332709259b2c4f5b388a42c215240e71919775de736202dd18d0cbf00b56b"
+checksum = "dc5298c99b959d8f557cd0fd7b6413878c106fa56f07e244606e478b3c3ba9f5"
 dependencies = [
  "indexmap",
  "objc2-core-foundation",
@@ -1047,9 +1047,9 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder-android"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3af48ee96bae45b2b32f7f869aa07958cc15693752ce9ff7d68ef8bb09e5fa69"
+checksum = "0c4fcf3385c6a22bd561428679caa6a5834eb13d043cc4cb91494d22a37fded6"
 dependencies = [
  "android-activity",
  "inset-embedder",
@@ -1066,9 +1066,9 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder-default"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81bdab13a620f30cac22e95bcc9e98f3450263e161aebd5e58bc147f364ab92e"
+checksum = "8cffd37adf7f7bfa208be03fc63ff8fb5d2eaf574c84a1fbb4fedf3c1a33b801"
 dependencies = [
  "inset-embedder",
  "inset-embedder-android",
@@ -1078,9 +1078,9 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder-web"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d40d37de745889acbcf99b52f76e52ffea11929e5de251041432ff8b433ff3f2"
+checksum = "f87a68e36b7219bdb7fc80cf4c617ae8155e0fda22e3a574dda577fb57d2c1fa"
 dependencies = [
  "console_error_panic_hook",
  "getrandom 0.3.4",
@@ -1096,11 +1096,12 @@ dependencies = [
 
 [[package]]
 name = "inset-embedder-winit"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "999dc7c75b4943949d8165e65ce8f670011afae3daf32b78da4650a356fe7b5f"
+checksum = "47c13d0d7ca71fdf49fbaeb4a5e284e7213f5d6e146414ef669135af3d666d6e"
 dependencies = [
  "arboard",
+ "block2 0.6.2",
  "dispatch2",
  "inset-embedder",
  "objc2 0.6.4",
@@ -1108,6 +1109,8 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "objc2-io-surface",
  "objc2-quartz-core 0.3.2",
+ "objc2-ui-kit 0.3.2",
+ "objc2-uniform-type-identifiers 0.3.2",
  "pollster",
  "sys-locale",
  "valo",
@@ -1115,14 +1118,15 @@ dependencies = [
  "valo-codec-apple",
  "valo-codec-software",
  "wgpu",
+ "windows-sys 0.60.2",
  "winit",
 ]
 
 [[package]]
 name = "inset-foundation"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d351763afb9b0f3b12f6115218a1261a5f886d29de14b6e06cf42c7b67f583a"
+checksum = "9b6dcd50bab5ee0f9089ff75d188b75a1f3f8f0701e2deac0f13a7a3e3652a4b"
 dependencies = [
  "async-task",
  "indexmap",
@@ -1132,9 +1136,9 @@ dependencies = [
 
 [[package]]
 name = "inset-gestures"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96132d1e2603a4ff2e2f8361abe11f79222b8ef595c98fa63ee5c35c4ff14096"
+checksum = "332614ca4e4c69db7230695b1b1ee1217971eb7a74c2beafd2a1f58ca1ae6d9c"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -1145,9 +1149,9 @@ dependencies = [
 
 [[package]]
 name = "inset-macros"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5380de5181707d7ab4003040b82e09d02db828c785adeb7cc062db1badb57f09"
+checksum = "de1b6429e6f29c53c4517b3201b0b261ed41ba8609df657f898e614b3d10c4b3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1156,9 +1160,9 @@ dependencies = [
 
 [[package]]
 name = "inset-painting"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3ce27de98c1fc691553d8342b6357c9a4ac844aa1e1bcafc6ef6fa191441d3c"
+checksum = "eecc665befde96eef728e1dca80911477b5e371c2021bac25d6544ba2d737bf9"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -1168,18 +1172,18 @@ dependencies = [
 
 [[package]]
 name = "inset-physics"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da49ecb9ed21c0a011e3f24c63a8672374507cd7dc7006da4e19ef026e76dfa8"
+checksum = "dd0b8afd63305afe077a950387a216b3be175b16fbbce3ec18dbda3110470a26"
 dependencies = [
  "inset-embedder",
 ]
 
 [[package]]
 name = "inset-rendering"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0da26daa4edda89fff567d843f6918f4472ac4c209340ad1c52162e57b94289e"
+checksum = "d96ac7c0cd4a014a78293016c36c6abf5ba24e2cfe5335802e760fa3fe7051c0"
 dependencies = [
  "indexmap",
  "inset-animation",
@@ -1194,9 +1198,9 @@ dependencies = [
 
 [[package]]
 name = "inset-scheduler"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f533eefd199a7d627d2f4cbd65c216c7e2c7d62ec9b088c521ad8ec8b80034f1"
+checksum = "76c4839b0b6d2a5c3a8c7254fbece271a2caa5adf2629b316d659f5531e38874"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -1205,9 +1209,9 @@ dependencies = [
 
 [[package]]
 name = "inset-services"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfcd807115b745663a57d61a2e360888c690c8583e49c91b2931013cc46e6bc7"
+checksum = "f7579422a61750742f2d6261ee0b22734ba4e094fcf6f64d571a34662e695d83"
 dependencies = [
  "indexmap",
  "inset-embedder",
@@ -1219,9 +1223,9 @@ dependencies = [
 
 [[package]]
 name = "inset-shell"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfb0120d900410c282625885f49709dc2c9e42962d5eff670f436e39e804b2a9"
+checksum = "4425911003a534772ef6eb107ce49dc598ceb7881b84f1a9ed856b0a4e6ab7a2"
 dependencies = [
  "inset-embedder",
  "inset-foundation",
@@ -1234,18 +1238,18 @@ dependencies = [
 
 [[package]]
 name = "inset-test"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a08cce9e5aabbdb2525d670a09e5a336e4b884a58895c06ec763b050c5067ef"
+checksum = "8b0bd4430d35fffeca725e77200f62d2a2c8988748370aa883e8fbf62ed51a12"
 dependencies = [
  "inset-embedder",
 ]
 
 [[package]]
 name = "inset-widgets"
-version = "0.10.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4128261ff14c1b09c7ef23abe09a2eea1d7624651a12eea4a7eb0a77ec3bd53e"
+checksum = "b6b4eff2c4f23d29954247e95725cd5030e2ef5a1c8132b46b428c28e86138b5"
 dependencies = [
  "indexmap",
  "inset-animation",
@@ -1991,8 +1995,19 @@ dependencies = [
  "objc2-link-presentation",
  "objc2-quartz-core 0.2.2",
  "objc2-symbols",
- "objc2-uniform-type-identifiers",
+ "objc2-uniform-type-identifiers 0.2.2",
  "objc2-user-notifications",
+]
+
+[[package]]
+name = "objc2-ui-kit"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d87d638e33c06f577498cbcc50491496a3ed4246998a7fbba7ccb98b1e7eab22"
+dependencies = [
+ "bitflags 2.13.2",
+ "objc2 0.6.4",
+ "objc2-foundation 0.3.2",
 ]
 
 [[package]]
@@ -2004,6 +2019,17 @@ dependencies = [
  "block2 0.5.1",
  "objc2 0.5.2",
  "objc2-foundation 0.2.2",
+]
+
+[[package]]
+name = "objc2-uniform-type-identifiers"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7902ac02859fc1f7045f8b598c63f1ae0cc7efeaa06a9bc9f3d9a3c955974fa4"
+dependencies = [
+ "block2 0.6.2",
+ "objc2 0.6.4",
+ "objc2-foundation 0.3.2",
 ]
 
 [[package]]
@@ -3739,7 +3765,7 @@ dependencies = [
  "objc2 0.5.2",
  "objc2-app-kit 0.2.2",
  "objc2-foundation 0.2.2",
- "objc2-ui-kit",
+ "objc2-ui-kit 0.2.2",
  "orbclient",
  "percent-encoding",
  "pin-project",

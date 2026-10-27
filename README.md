@@ -1,5 +1,7 @@
 # Inset WinUI
 
+> **This repository is deprecated.** `inset-winui` now lives in the Inset main repository at [`crates/inset-winui`](https://github.com/inset-rs/inset/tree/main/crates/inset-winui).
+
 WinUI controls and Fluent styling for [Inset](https://github.com/inset-rs/inset).
 
 The library ports control templates, theme resources and behavior from [Microsoft’s WinUI](https://github.com/microsoft/microsoft-ui-xaml). Inset handles rendering, layout and input.
